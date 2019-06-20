@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -6,10 +6,12 @@
 
   <ItemGroup>
     <None Remove="Resources\Sql\20190607142110-initial-tables.sql" />
+    <None Remove="Resources\Sql\20190620143210-change-date-sproc.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\Sql\20190607142110-initial-tables.sql" />
+    <EmbeddedResource Include="Resources\Sql\20190620143210-change-date-sproc.sql" />
   </ItemGroup>
 
   <ItemGroup>
