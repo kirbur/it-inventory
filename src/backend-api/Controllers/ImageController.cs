@@ -19,16 +19,25 @@ namespace backend_api.Controllers
         private string[] models = new string[] { "employee", "department", "program", "server", "computer", "server", "monitor", "peripheral" };
 
         /*  ValidModel ensures the model requested is an actual model
-         *  Returns true if the routeModel is an actual model,
+         *  Return: true if the routeModel is an actual model,
          *      false otherwise.
          */
-        public bool ValidModel(string routeModel)
+        private bool ValidModel(string routeModel)
         {
             if (models.Contains(routeModel.ToLower()))
             {
                 return true;
             }
             return false;
+        }
+
+        /* Change the front end to match the back end verbatim. 
+         * Return: "computer" if "laptop" is matched.
+         * Else: return the same string.
+         */
+        private string VerbatimMatch(string routeModel)
+        {
+            return routeModel.ToLower() == "laptop" ? "computer" : routeModel;
         }
 
         /* GET: api/image/{model}/{id}
@@ -39,10 +48,14 @@ namespace backend_api.Controllers
         [Route("{model}/{id}")]
         public IActionResult GetPicture([FromRoute] string model, int id)
         {
+            model = VerbatimMatch(model);
             // TODO: Replace C:\\ with the root path.
             string path = Path.Combine($"C:\\", $"images\\{model}\\{id}");
+
+            // Check that the model name is valid.
             if (ValidModel(model))
             {
+                // Check that the file exists.
                 if (System.IO.File.Exists(path))
                 {
                     return new PhysicalFileResult(path, "image/jpeg");
@@ -65,11 +78,13 @@ namespace backend_api.Controllers
         public async Task<IActionResult> Upload([FromForm] PicturePayload payload, [FromRoute] string model, int id)
         {
             var file = payload.File;
+            model = VerbatimMatch(model);
+
+            // Check that the model is valid and there is content in the file.
             if (ValidModel(model) && file.Length > 0)
             {
-                // Path to where the file is saved locally.
+                // Path to where the file is saved locally. Folder needs to exist before picture can be saved.
                 // TODO: Create an environment variable that is the root of the image path. Replace C:\\
-                // Note: The folder needs to exist before images can be added.
                 string path = Path.Combine("C:\\", $"images\\{model}\\{id}");
 
                 // Create a fileStream used to store.
