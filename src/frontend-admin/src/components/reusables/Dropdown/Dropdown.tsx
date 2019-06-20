@@ -19,7 +19,7 @@ interface IDropdownProps {
 export const Dropdown: React.FC<IDropdownProps> = props => {
     const {content, titleClassName} = props
     const [selected, setSelected] = useState(content[0])
-    if (content[0].name === undefined) {
+    if (content[0] === undefined) {
         content.push({
             id: -1,
             name: '',

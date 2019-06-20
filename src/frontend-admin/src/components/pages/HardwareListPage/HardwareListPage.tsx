@@ -7,6 +7,8 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
+import {Table} from '../../reusables/Table/Table'
+import icon from '../../../content/Images/CQL-favicon.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -19,6 +21,12 @@ import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 interface IHardwareListPageProps {
     history: any
     match: any
+}
+interface IHW {
+    peripherals: any[]
+    servers: any[]
+    monitors: any[]
+    laptops: any[]
 }
 
 interface ITableDatum {
@@ -37,6 +45,7 @@ interface ITableDatum {
     resolution?: number
     inputs?: string
     purchase_Date?: string
+    icon?: string
 }
 
 interface IServerDatum {
@@ -83,13 +92,14 @@ const initColumns: string[] = []
 const initOptions: {value: string; label: string}[] = []
 let initDropdownContent: {
     name: string
-    selectedList: ITableDatum[] | IServerDatum[] | IMonitorDatum[] | ILaptopDatum[] | IPeripheralDatum[]
+    selectedList: ITableDatum[]
 }[] = [
     {
         name: 'Select',
         selectedList: initListData,
     },
 ]
+const initConcats: any[] = []
 
 // Primary Component
 export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
@@ -233,6 +243,80 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     const handleRowClick = (id: number) => {
         history.push(`${match.url}/${id}`)
     }
+    const concatenatedName = (data: any) => {
+        return (
+            <td className={styles.hardware}>
+                <img className={styles.icon} src={icon} />
+                <text className={styles.name}>{data.name}</text>
+            </td>
+        )
+    }
+    const concatenatedFQDN = (data: any) => {
+        return <td>{data.FQDN}</td>
+    }
+    const concatenatedNumber_Of_Cores = (data: any) => {
+        return <td>{data.number_Of_Cores} cores</td>
+    }
+    const concatenatedRAM = (data: any) => {
+        return <td>{data.RAM} GB</td>
+    }
+    const concatenatedRenewal_Date = (data: any) => {
+        return <td>{data.renewal_Date}</td>
+    }
+    const concatenatedMFG_Tag = (data: any) => {
+        return <td>{data.MFG_Tag}</td>
+    }
+    const concatenatedCPU = (data: any) => {
+        return <td>{data.CPU}</td>
+    }
+    const concatenatedSSD = (data: any) => {
+        return <td>{data.SSD} GB</td>
+    }
+    const concatenatedAssigned = (data: any) => {
+        return <td>{data.assigned}</td>
+    }
+    const concatenatedMake = (data: any) => {
+        return <td>{data.make}</td>
+    }
+    const concatenatedScreen_Size = (data: any) => {
+        return <td>{data.screen_Size} in</td>
+    }
+    const concatenatedResolution = (data: any) => {
+        return <td>{data.resolution}</td>
+    }
+    const concatenatedInputs = (data: any) => {
+        return <td>{data.inputs}</td>
+    }
+    const concatenatedPurchase_Date = (data: any) => {
+        return <td>{data.purchase_date}</td>
+    }
+
+    const [concats, setConcats] = useState(initConcats)
+    const concatFunctions: any = {
+        peripherals: [concatenatedName, concatenatedPurchase_Date, concatenatedAssigned],
+        servers: [
+            concatenatedFQDN,
+            concatenatedNumber_Of_Cores,
+            concatenatedRAM,
+            concatenatedRenewal_Date,
+            concatenatedMFG_Tag,
+        ],
+        monitors: [
+            concatenatedMake,
+            concatenatedScreen_Size,
+            concatenatedResolution,
+            concatenatedInputs,
+            concatenatedAssigned,
+        ],
+        laptops: [concatenatedCPU, concatenatedRAM, concatenatedSSD, concatenatedAssigned, concatenatedMFG_Tag],
+    }
+
+    const headers: any = {
+        peripherals: ['Name', 'Purchase Date', 'Assigned To'],
+        servers: ['FQDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag'],
+        monitors: ['Make', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To'],
+        laptops: ['CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag'],
+    }
 
     return (
         <div className={styles.hardwareListMain}>
@@ -272,6 +356,7 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                                         onClick={() => {
                                             setSelectedHW(i)
                                             setListData(i.selectedList)
+                                            setConcats(concatFunctions[selectedHW.name])
                                         }}
                                     >
                                         <button className={dropdownStyles.dropdownListItemButton}>
@@ -285,13 +370,17 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                     <div />
                 </div>
             </div>
-            {/*<List />*/}
 
-            {
-                <div className={styles.list}>
-                    list of {selectedHW.name} searched using {selected.label}
-                </div>
-            }
+            {selectedHW.selectedList[1] !== undefined && (
+                <Table
+                    headers={headers[selectedHW.name]}
+                    propData={selectedHW.selectedList}
+                    dataKeys={columns}
+                    concatonations={concats}
+                />
+            )}
+            {console.log(selectedHW.selectedList)}
+            {console.log(columns)}
         </div>
     )
 }
