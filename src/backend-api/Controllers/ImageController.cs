@@ -28,7 +28,10 @@ namespace backend_api.Controllers
             {
                 return true;
             }
-            return false;
+            else
+            {
+                return false;
+            }
         }
 
         /* Change the front end to match the back end verbatim. 
@@ -60,9 +63,15 @@ namespace backend_api.Controllers
                 {
                     return new PhysicalFileResult(path, "image/jpeg");
                 }
-                return NoContent();
+                else
+                {
+                    return NoContent();
+                }
             }
-            return BadRequest("Invalid Model");
+            else
+            {
+                return BadRequest("Invalid Model");
+            }
         }
 
         /* PUT: api/image/{model}/{id}
@@ -95,7 +104,10 @@ namespace backend_api.Controllers
                 }
                 return Ok();
             }
-            return BadRequest();
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }
