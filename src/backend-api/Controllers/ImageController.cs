@@ -16,6 +16,21 @@ namespace backend_api.Controllers
     [ApiController]
     public class UploadController : ControllerBase
     {
+        private string[] models = new string[] { "employee", "department", "program", "server", "computer", "server", "monitor", "peripheral" };
+
+        /*  ValidModel ensures the model requested is an actual model
+         *  Returns true if the routeModel is an actual model,
+         *      false otherwise.
+         */
+        public bool ValidModel(string routeModel)
+        {
+            if (models.Contains(routeModel.ToLower()))
+            {
+                return true;
+            }
+            return false;
+        }
+
         /* GET: api/image/{model}/{id}
          *      Return: The requested image of the model with the ID
          *      Will return null if the image does not exist.
@@ -24,17 +39,17 @@ namespace backend_api.Controllers
         [Route("{model}/{id}")]
         public IActionResult GetPicture([FromRoute] string model, int id)
         {
-            PhysicalFileResult image = null;
-            try
+            // TODO: Replace C:\\ with the root path.
+            string path = Path.Combine($"C:\\", $"images\\{model}\\{id}");
+            if (ValidModel(model))
             {
-                // TODO: Replace C:\\ with the root path.
-                image = new PhysicalFileResult($"C:\\images\\{model}\\{id}", "image/jpeg");
+                if (System.IO.File.Exists(path))
+                {
+                    return new PhysicalFileResult(path, "image/jpeg");
+                }
+                return NoContent();
             }
-            catch
-            {
-
-            }
-            return image;
+            return BadRequest("Invalid Model");
         }
 
         /* PUT: api/image/{model}/{id}
@@ -50,14 +65,11 @@ namespace backend_api.Controllers
         public async Task<IActionResult> Upload([FromForm] PicturePayload payload, [FromRoute] string model, int id)
         {
             var file = payload.File;
-            if (file.Length > 0)
+            if (ValidModel(model) && file.Length > 0)
             {
                 // Path to where the file is saved locally.
                 // TODO: Create an environment variable that is the root of the image path. Replace C:\\
-                //string path = Path.Combine(env.WebRootPath, "uploadFiles");
-
-                // TODO: MAKE SURE MODEL IS ONE OF THE SPECIFIED
-                // Note: the folder needs to be created before images can be added.
+                // Note: The folder needs to exist before images can be added.
                 string path = Path.Combine("C:\\", $"images\\{model}\\{id}");
 
                 // Create a fileStream used to store.
