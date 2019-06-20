@@ -4,6 +4,7 @@ import {Route, NavLink, BrowserRouter as Router, Switch, Redirect} from 'react-r
 // Components
 import {DashboardPage} from '../pages/DashboardPage/DashboardPage'
 import {DepartmentsListPage} from '../pages/DepartmentsListPage/DepartmentsListPage'
+import {DepartmentDetailPage} from '../pages/DepartmentDetailPage/DepartmentDetailPage'
 import {EmployeesListPage} from '../pages/EmployeesListPage/EmployeesListPage'
 import {HardwareListPage} from '../pages/HardwareListPage/HardwareListPage'
 import {ProgramsListPage} from '../pages/ProgramsListPage/ProgramsListPage'
@@ -112,7 +113,10 @@ export const App: React.FC = () => {
                         <Route exact path='/programs' component={ProgramsListPage} />
                         <Route exact path='/hardware' component={HardwareListPage} />
                         <Route exact path='/departments' component={DepartmentsListPage} />
-                        <Route path='/login' component={Login} />
+                        <Route exact path='/login' component={Login} />
+                        <Route exact path='/' component={Login} />
+
+                        <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
                     </Switch>
                 </Router>
 
