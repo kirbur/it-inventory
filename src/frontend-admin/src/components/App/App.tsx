@@ -6,6 +6,7 @@ import {DashboardPage} from '../pages/DashboardPage/DashboardPage'
 import {DepartmentsListPage} from '../pages/DepartmentsListPage/DepartmentsListPage'
 import {EmployeesListPage} from '../pages/EmployeesListPage/EmployeesListPage'
 import {HardwareListPage} from '../pages/HardwareListPage/HardwareListPage'
+import {HardwareDetailPage} from '../pages/HardwareDetailPage/HardwareDetailPage'
 import {ProgramsListPage} from '../pages/ProgramsListPage/ProgramsListPage'
 import {Login} from '../reusables/Login/Login'
 import {HelloUser} from '../HelloUser/HelloUser'
@@ -112,6 +113,8 @@ export const App: React.FC = () => {
                         <Route exact path='/hardware' component={HardwareListPage} />
                         <Route exact path='/departments' component={DepartmentsListPage} />
                         <Route path='/login' component={Login} />
+
+                        <Route path={'/hardware/:id'} render={props => <HardwareDetailPage {...props} />} />
                     </Switch>
                 </Router>
 

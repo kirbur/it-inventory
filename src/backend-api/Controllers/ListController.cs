@@ -260,7 +260,7 @@ namespace backend_api.Controllers
                 }
                 string icon = "";
                 // Create a server object to be returned.
-                var Server = new { sv.ServerId, sv.Fqdn, sv.NumberOfCores, sv.Ram, sv.Mfg, employeeFirstName, employeeLastName, icon };
+                var Server = new { sv.ServerId, sv.Fqdn, sv.NumberOfCores, sv.Ram, sv.RenewalDate, sv.Mfg, employeeFirstName, employeeLastName, icon };
                 listOfservers.Add(Server);
             }
             return Ok(listOfservers);
