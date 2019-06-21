@@ -10,6 +10,9 @@ import {Group} from '../../reusables/Group/Group'
 // Context
 import {LoginContext} from '../../App/App'
 
+import {Table} from '../../reusables/Table/Table'
+import icon from '../../../content/Images/CQL-favicon.png'
+
 // Styles
 import styles from './DepartmentsListPage.module.css'
 
@@ -96,7 +99,23 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const handleRowClick = (id: number) => {
         history.push(`${match.url}/${id}`)
     }
+    const {} = props
+    function concatenateName(data: any) {
+        return (
+            <td className={styles.departments}>
+                <img className={styles.icon} src={icon} />
+                <text className={styles.name}>{data.name}</text>
+            </td>
+        )
+    }
 
+    const concatenateTotalEmployees = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>{data.totalEmployees} employees</td>
+    }
+
+    const concatenatedCost = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>${data.cost}</td>
+    }
     return (
         <div className={styles.departmentsListMain}>
             <Group direction='row' justify='between'>
@@ -111,6 +130,19 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                 />
             </Group>
             {/*<List />*/}
+
+            <Table
+                headers={['Departments', 'Total Employees', 'Cost']}
+                propData={[
+                    {name: 'Developers', totalEmployees: 0, cost: 350},
+                    {name: 'Designers', totalEmployees: 1, cost: 200},
+                    {name: 'Project Managers', totalEmployees: 154, cost: 575},
+                    {name: 'Sales', role: 'PM', totalEmployees: 16, cost: 154},
+                    {name: 'Information Technology', totalEmployees: 15, cost: 764},
+                ]}
+                dataKeys={['name', 'totalEmployees', 'cost']}
+                concatonations={[concatenateName, concatenateTotalEmployees, concatenatedCost]}
+            />
         </div>
     )
 }

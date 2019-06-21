@@ -11,6 +11,8 @@ import {ProgramsListPage} from '../pages/ProgramsListPage/ProgramsListPage'
 import {Login} from '../reusables/Login/Login'
 import {HelloUser} from '../HelloUser/HelloUser'
 
+import {EmployeeDetailPage} from '../pages/EmployeeDetailPage/EmployeeDetailPage'
+
 // Styles
 import styles from './App.module.css'
 
@@ -44,13 +46,18 @@ export const App: React.FC = () => {
     useEffect(() => {
         document.title = 'CQL'
     })
-    const [loginContextVariables, setLoginContextVariables] = useState({
-        refreshToken: '',
-        accessToken: '',
-        validTo: '',
-        givenName: '',
-        isAdmin: false,
-    })
+    const user = localStorage.getItem('user')
+    const [loginContextVariables, setLoginContextVariables] = useState(
+        user
+            ? JSON.parse(user)
+            : {
+                  refreshToken: '',
+                  accessToken: '',
+                  validTo: '',
+                  givenName: '',
+                  isAdmin: false,
+              }
+    )
 
     var contextValue = {
         loginContextVariables: loginContextVariables,
@@ -116,6 +123,9 @@ export const App: React.FC = () => {
                         <Route exact path='/' component={Login} />
 
                         <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
+                        <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
+                        {/* <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
+                        <Route path={'/hardware/:id'} render={props => <HardwareDetailPage {...props} />} /> */}
                     </Switch>
                 </Router>
 
