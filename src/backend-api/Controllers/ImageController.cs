@@ -94,15 +94,21 @@ namespace backend_api.Controllers
             {
                 // Path to where the file is saved locally. Folder needs to exist before picture can be saved.
                 // TODO: Create an environment variable that is the root of the image path. Replace C:\\
-                string path = Path.Combine("C:\\", $"images\\{model}\\{id}");
-
-                // Create a fileStream used to store.
-                using (var fs = new FileStream(path, FileMode.Create))
+                string folderPath = Path.Combine("C:\\", $"images\\{model}");
+                if (Directory.Exists(folderPath))
                 {
-                    // Copy the file to the local hard drive.
-                    await file.CopyToAsync(fs);
+                    // Create a fileStream used to store.
+                    using (var fs = new FileStream(folderPath + $"\\{id}", FileMode.Create))
+                    {
+                        // Copy the file to the local hard drive.
+                        await file.CopyToAsync(fs);
+                    }
+                    return Ok();
                 }
-                return Ok();
+                else
+                {
+                    return BadRequest("Model folder not found.");
+                }
             }
             else
             {
