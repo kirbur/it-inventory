@@ -16,7 +16,7 @@ namespace Cql.InventoryManagement.DbMigrations.Migrations._2019._06
 
             public override void Up()
             {
-            Execute.EmbeddedScript("Cql.InventoryManagement.DbMigrations.Resources.Sql.Stored-procedure.sql");
+            Execute.EmbeddedScript("Cql.InventoryManagement.DbMigrations.Resources.Sql.20190620143210-change-date-sproc.sql");
         }
         }
     
