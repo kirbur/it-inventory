@@ -34,8 +34,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'name', value: 'name'})
 
-    const columns = ['name', 'role', 'dateHired', 'daysEmployed', 'hardwareCost', 'programsCost']
-    const options = columns.map(c => ({label: c, value: c}))
+    const columns = ['name', 'role', 'dateHired', 'daysEmployed', 'cost']
+    const headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost']
+    const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
     useEffect(() => {
         axios
@@ -46,10 +47,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                     employees.push({
                         name: i.employeeName,
                         role: i.role,
-                        dateHired: i.hireDate,
-                        daysEmployed: 0, //TODO: calculate days employed
-                        hardwareCost: i.hardwareCostForEmp,
-                        programsCost: i.programCostForEmp,
+                        dateHired: formatDate(i.hireDate),
+                        daysEmployed: calculateDaysEmployed(i.hireDate),
+                        cost: formatCost(i.hardwareCostForEmp, i.programCostForEmp),
                     })
                 )
                 setListData(employees)
@@ -70,6 +70,37 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         })
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])
+
+    const formatDate = (hireDate: string) => {
+        const hired = new Date(hireDate)
+        const date = hired.getFullYear() + '/' + hired.getMonth() + '/' + hired.getDate()
+        return date
+    }
+
+    //does not account for leap years or variable # of days in a month
+    const calculateDaysEmployed = (hireDate: string) => {
+        var oneDay = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
+        const today = new Date()
+        const hired = new Date(hireDate)
+        const dif = Math.round(Math.abs(today.getTime() - hired.getTime()))
+
+        var days = Math.floor(dif / oneDay)
+        var months = Math.floor(days / 31)
+        var years = Math.floor(months / 12)
+
+        months = Math.floor(months % 12)
+        days = Math.floor(days % 31)
+
+        var ret: string = ''
+        ret += years !== 0 ? (years === 1 ? years + ' year, ' : years + ' years, ') : ''
+        ret += months !== 0 ? (months === 1 ? months + ' month, ' : months + ' months, ') : ''
+        ret += days === 1 ? days + ' day' : days + ' days'
+        return ret
+    }
+
+    const formatCost = (hwCpost: number, progCost: number) => {
+        return 'HW:$' + hwCpost + '|SW:$' + progCost //TODO: SW or PROG? or something else??
+    }
 
     const handleClick = () => {
         history.push(`${match.url}/new`)
@@ -127,7 +158,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             </Group>
 
             <Table
-                headers={['Employees', 'Date Hired', 'Days Employed', 'Hardware Cost', 'Programs Cost']}
+                headers={headers}
                 propData={rows}
                 dataKeys={columns}
                 concatonations={[
