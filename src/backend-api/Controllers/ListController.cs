@@ -434,6 +434,9 @@ namespace backend_api.Controllers
             //loop through all the distinct programs 
             foreach (var prog in DistinctUsefulPrograms)
             {
+                // calculate the count of programs under this specific distinct program name that are in use
+                var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId!= null).Count();
+
                 // calculate the count of programs under this specific distinct program name
                 var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName).Count();
 
@@ -447,7 +450,7 @@ namespace backend_api.Controllers
                 string icon = $"/image/program/{prog.ProgramId}";
 
                 //create our object of returnables
-                ListOfPrograms.Add(new { prog.ProgramName, prog.RenewalDate, CountProgOverall, ProgCostPerYear, ProgCostPerUse, prog.IsCostPerYear, icon });
+                ListOfPrograms.Add(new { prog.ProgramName, prog.RenewalDate, CountProgOverall, ProgCostPerYear, CountProgInUse, ProgCostPerUse, prog.IsCostPerYear, icon });
             }
             return Ok(ListOfPrograms);
         }
