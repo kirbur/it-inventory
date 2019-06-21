@@ -52,20 +52,29 @@ namespace backend_api.Controllers
         public IActionResult GetPicture([FromRoute] string model, int id)
         {
             model = VerbatimMatch(model);
-            // TODO: Replace C:\\ with the root path.
-            string path = Path.Combine($"C:\\", $"images\\{model}\\{id}");
+            // TODO: Replace Environment.CurrentDirectory?
+            string folderPath = Path.Combine(Environment.CurrentDirectory, $"..\\images\\{model}");
+            string imagePath = Path.Combine(folderPath, $"{id}");
 
             // Check that the model name is valid.
             if (ValidModel(model))
             {
                 // Check that the file exists.
-                if (System.IO.File.Exists(path))
+                if (System.IO.File.Exists(imagePath))
                 {
-                    return new PhysicalFileResult(path, "image/jpeg");
+                    return new PhysicalFileResult(imagePath, "image/jpeg");
                 }
                 else
                 {
-                    return NoContent();
+                    // Return a placeholder image if file does not exist.
+                    if (System.IO.File.Exists(folderPath + "\\placeholder"))
+                    {
+                        return new PhysicalFileResult(folderPath + "\\placeholder", "image/jpeg");
+                    }
+                    else
+                    {
+                        return NoContent();
+                    }
                 }
             }
             else
@@ -93,8 +102,8 @@ namespace backend_api.Controllers
             if (ValidModel(model) && file.Length > 0)
             {
                 // Path to where the file is saved locally. Folder needs to exist before picture can be saved.
-                // TODO: Create an environment variable that is the root of the image path. Replace C:\\
-                string folderPath = Path.Combine("C:\\", $"images\\{model}");
+                // TODO: Create an environment variable for the image path?
+                string folderPath = Path.Combine(Environment.CurrentDirectory, $"..\\images\\{model}");
                 if (Directory.Exists(folderPath))
                 {
                     // Create a fileStream used to store.
