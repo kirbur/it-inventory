@@ -18,88 +18,11 @@ import styles from './HardwareListPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Types
+
 interface IHardwareListPageProps {
     history: any
     match: any
 }
-interface IHW {
-    peripherals: any[]
-    servers: any[]
-    monitors: any[]
-    laptops: any[]
-}
-
-interface ITableDatum {
-    id?: number
-    name?: string
-    FQDN?: string
-    number_Of_Cores?: number
-    RAM?: number
-    renewal_Date?: string
-    MFG_Tag?: string
-    CPU?: string
-    SSD?: string
-    assigned?: string
-    make?: string
-    screen_Size?: string
-    resolution?: number
-    inputs?: string
-    purchase_Date?: string
-    icon?: string
-}
-
-interface IServerDatum {
-    id: number
-    FQDN: string
-    number_Of_Cores: number
-    RAM: number
-    renewal_Date: string
-    MFG_Tag: string
-}
-
-interface ILaptopDatum {
-    id: number
-    CPU: string
-    RAM: number
-    SSD: string
-    assigned: string
-    MFG_Tag: string
-}
-
-interface IMonitorDatum {
-    id: number
-    make: string
-    screen_Size: string
-    resolution: number
-    inputs: string
-    assigned: string
-}
-
-interface IPeripheralDatum {
-    id: number
-    name: string
-    purchase_Date: string
-    assigned: string
-}
-
-//TODO: replace any w/ real type
-const initListData: ITableDatum[] = [{name: '', id: 0}]
-const initServerList: IServerDatum[] = []
-const initLaptopList: ILaptopDatum[] = []
-const initMonitorList: IMonitorDatum[] = []
-const initPeripheralList: IPeripheralDatum[] = []
-const initColumns: string[] = []
-const initOptions: {value: string; label: string}[] = []
-let initDropdownContent: {
-    name: string
-    selectedList: ITableDatum[]
-}[] = [
-    {
-        name: 'Select',
-        selectedList: initListData,
-    },
-]
-const initConcats: any[] = []
 
 // Primary Component
 export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
@@ -110,131 +33,175 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     const axios = new AxiosService(accessToken, refreshToken)
 
     // state
-    const [serverList, setServerList] = useState(initServerList)
-    const [laptopList, setLaptopList] = useState(initLaptopList)
-    const [monitorList, setMonitorList] = useState(initMonitorList)
-    const [peripheralList, setPeripherlList] = useState(initPeripheralList)
-    const [listData, setListData] = useState(initListData)
-    const [columns, setColumns] = useState(initColumns)
-    const [options, setOptions] = useState(initOptions)
-    const [filtered, setFiltered] = useState(listData) //this is what is used in the list
+    const [serverList, setServerList] = useState<any[]>([])
+    const [laptopList, setLaptopList] = useState<any[]>([])
+    const [monitorList, setMonitorList] = useState<any[]>([])
+    const [peripheralList, setPeripherlList] = useState<any[]>([])
+    const [listData, setListData] = useState<any[]>([])
+    const [filteredData, setFilteredData] = useState<any[]>([])
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'name', value: 'name'})
-    const [selectedHW, setSelectedHW] = useState(initDropdownContent[0])
-    const [dropdownContent, setDropdownContent] = useState(initDropdownContent)
+    const [selectedHW, setSelectedHW] = useState<{id: number; name: string}>({id: 0, name: 'servers'})
+
+    const dropdownContent = [
+        {id: 0, name: 'servers'},
+        {id: 1, name: 'laptops'},
+        {id: 2, name: 'monitors'},
+        {id: 3, name: 'peripherals'},
+    ]
+    const allColumns: any = {
+        peripherals: ['name', 'purchaseDate', 'assigned'],
+        servers: ['FQDN', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag'],
+        monitors: ['make', 'screenSize', 'Resolution', 'inputs', 'assigned'],
+        laptops: ['CPU', 'RAM', 'SSD', 'assigned', 'MFGTag'],
+    }
+    const allHeaders: any = {
+        peripherals: ['Name', 'Purchase Date', 'Assigned To'],
+        servers: ['FQDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag'],
+        monitors: ['Make', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To'],
+        laptops: ['CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag'],
+    }
+    var allOptions: any = {
+        peripherals: [],
+        servers: [],
+        monitors: [],
+        laptops: [],
+    }
+    allOptions.peripherals = allColumns.peripherals.map((c: any, i: any) => ({
+        label: allHeaders.peripherals[i],
+        value: c,
+    }))
+    allOptions.servers = allColumns.servers.map((c: any, i: any) => ({label: allHeaders.servers[i], value: c}))
+    allOptions.monitors = allColumns.monitors.map((c: any, i: any) => ({label: allHeaders.monitors[i], value: c}))
+    allOptions.laptops = allColumns.laptops.map((c: any, i: any) => ({label: allHeaders.laptops[i], value: c}))
+
+    // default / current list info
+    const [columns, setColumns] = useState(['FQDN', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag'])
+    const [headers, setHeaders] = useState(['FQDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag'])
+    const [options, setOptions] = useState(columns.map((c, i) => ({label: headers[i], value: c})))
 
     //fetch data
     useEffect(() => {
-        initServerList.length = 0
         axios
             .get('/list/servers')
-            .then((data: any) =>
+            .then((data: any) => {
+                var servers: any[] = []
                 data.map((i: any) =>
-                    initServerList.push({
+                    servers.push({
                         id: i.serverId,
                         FQDN: i.fqdn,
-                        number_Of_Cores: i.numberOfCores,
+                        numberOfCores: i.numberOfCores,
                         RAM: i.ram,
-                        renewal_Date: i.renewalDate,
-                        MFG_Tag: i.mfg,
+                        renewalDate: i.renewalDate,
+                        MFGTag: i.mfg,
                     })
                 )
-            )
-            .catch((err: any) => console.log(err))
-        setServerList(initServerList)
+                setServerList(servers)
+                setListData(servers)
+            })
+            .catch((err: any) => console.error(err))
 
-        initLaptopList.length = 0
         axios
             .get('/list/laptops')
-            .then((data: any) =>
+            .then((data: any) => {
+                var laptops: any[] = []
                 data.map((i: any) =>
-                    initLaptopList.push({
+                    laptops.push({
                         id: i.computerId,
                         CPU: i.cpu,
                         RAM: i.ramgb,
                         SSD: i.ssdgb,
                         assigned: i.isAssigned ? i.employeeFirstName + i.employeeLastName : '',
-                        MFG_Tag: i.mfg,
+                        MFGTag: i.mfg,
                     })
                 )
-            )
-            .catch((err: any) => console.log(err))
-        setLaptopList(initLaptopList)
+                setLaptopList(laptops)
+            })
+            .catch((err: any) => console.error(err))
 
-        initMonitorList.length = 0
         axios
             .get('/list/monitors')
-            .then((data: any) =>
+            .then((data: any) => {
+                var monitors: any[] = []
                 data.map((i: any) =>
-                    initMonitorList.push({
+                    monitors.push({
                         id: i.monitorId,
                         make: i.make,
-                        screen_Size: i.screenSize,
+                        screenSize: i.screenSize,
                         resolution: i.resolution,
                         inputs: i.inputs,
                         assigned: i.isAssigned ? i.employeeFirstName + i.employeeLastName : '',
                     })
                 )
-            )
-            .catch((err: any) => console.log(err))
-        setMonitorList(initMonitorList)
+                setMonitorList(monitors)
+            })
+            .catch((err: any) => console.error(err))
 
-        initPeripheralList.length = 0
         axios
             .get('/list/peripherals')
-            .then((data: any) =>
+            .then((data: any) => {
+                var peripherals: any[] = []
                 data.map((i: any) =>
-                    initPeripheralList.push({
+                    peripherals.push({
                         id: i.peripheralId,
                         name: i.peripheralName,
-                        purchase_Date: i.purchaseDate,
+                        purchaseDate: i.purchaseDate,
                         assigned: i.isAssigned ? i.employeeFirstName + i.employeeLastName : '',
                     })
                 )
-            )
-            .catch((err: any) => console.log(err))
-        setPeripherlList(initPeripheralList)
+                setPeripherlList(peripherals)
+            })
+            .catch((err: any) => console.error(err))
     }, [setServerList, setLaptopList, setMonitorList, setPeripherlList])
 
-    //filter the list based on search
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        let filteredTableInput
-        listData[0].id !== undefined
-            ? (filteredTableInput = listData.filter((row: any) => {
-                  return row[selected.value] !== undefined
-                      ? row[selected.value]
-                            .toString()
-                            .toLowerCase()
-                            .search(search.toLowerCase()) !== -1
-                      : false
-              }))
-            : (filteredTableInput = listData)
-        setFiltered(filteredTableInput)
-        selectedHW.selectedList[0] && setColumns(Object.keys(selectedHW.selectedList[0]))
-    }, [search, selected, listData, selectedHW])
-
-    // format columns for search filter
-    useEffect(() => {
-        initOptions.length = 0
-        columns.map(i => {
-            initOptions.push({
-                value: i,
-                label: i.replace(/_/g, ' '),
-            })
+        let filteredTableInput = listData.filter((row: any) => {
+            return row[selected.value]
+                ? row[selected.value]
+                      .toString()
+                      .toLowerCase()
+                      .search(search.toLowerCase()) !== -1
+                : false
         })
-        setOptions(initOptions)
-    }, [columns])
+        setFilteredData(filteredTableInput)
+    }, [search, selected, listData])
 
-    //update dropdown content
+    //update current list info when a new hardwar elist is selected
     useEffect(() => {
-        initDropdownContent.length = 0
-        initDropdownContent.push({name: 'servers', selectedList: serverList})
-        initDropdownContent.push({name: 'laptops', selectedList: laptopList})
-        initDropdownContent.push({name: 'monitors', selectedList: monitorList})
-        initDropdownContent.push({name: 'peripherals', selectedList: peripheralList})
-    }, [serverList, laptopList, monitorList, peripheralList])
+        switch (selectedHW.name) {
+            case 'servers':
+                setListData(serverList)
+                setColumns(allColumns.servers)
+                setHeaders(allHeaders.servers)
+                setOptions(allOptions.servers)
+                setSelected({label: 'FQDN', value: 'FQDN'})
+                break
+            case 'laptops':
+                setListData(laptopList)
+                setColumns(allColumns.laptops)
+                setHeaders(allHeaders.laptops)
+                setOptions(allOptions.laptops)
+                setSelected({label: 'CPU', value: 'CPU'})
+                break
+
+            case 'monitors':
+                setListData(monitorList)
+                setColumns(allColumns.monitors)
+                setHeaders(allHeaders.monitors)
+                setOptions(allOptions.monitors)
+                setSelected({label: 'make', value: 'make'})
+                break
+            case 'peripherals':
+                setListData(peripheralList)
+                setColumns(allColumns.peripherals)
+                setHeaders(allHeaders.peripherals)
+                setOptions(allOptions.peripherals)
+                setSelected({label: 'name', value: 'name'})
+                break
+        }
+    }, [selectedHW])
 
     const handleClick = () => {
         history.push(`${match.url}/new`)
@@ -246,7 +213,7 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     const concatenatedName = (data: any) => {
         return (
             <td className={styles.hardware}>
-                <img className={styles.icon} src={icon} />
+                <img className={styles.icon} src={icon} alt='' />
                 <text className={styles.name}>{data.name}</text>
             </td>
         )
@@ -291,7 +258,6 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
         return <td>{data.purchase_date}</td>
     }
 
-    const [concats, setConcats] = useState(initConcats)
     const concatFunctions: any = {
         peripherals: [concatenatedName, concatenatedPurchase_Date, concatenatedAssigned],
         servers: [
@@ -311,12 +277,36 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
         laptops: [concatenatedCPU, concatenatedRAM, concatenatedSSD, concatenatedAssigned, concatenatedMFG_Tag],
     }
 
-    const headers: any = {
-        peripherals: ['Name', 'Purchase Date', 'Assigned To'],
-        servers: ['FQDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag'],
-        monitors: ['Make', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To'],
-        laptops: ['CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag'],
+    const {} = props
+    function concatenateName(data: any) {
+        return (
+            <td className={styles.hardware}>
+                <img className={styles.icon} src={icon} />
+                <div className={styles.alignLeft}>
+                    <text className={styles.name}>{data.name}</text> <br />
+                    <text className={styles.role}>{data.role}</text>
+                </div>
+            </td>
+        )
     }
+
+    const concatenateDateHired = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>{data.dateHired}</td>
+    }
+
+    const concatenateDaysEmployed = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>{data.daysEmployed} days</td>
+    }
+
+    const concatenatedCost = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>${data.cost}</td>
+    }
+
+    console.log(filteredData)
+    const rows: any[] = []
+    filteredData.forEach(rowObj => {
+        rows.push(Object.values(rowObj).map((val: any) => <td>{val}</td>))
+    })
 
     return (
         <div className={styles.hardwareListMain}>
@@ -355,8 +345,6 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                                         key={i.name}
                                         onClick={() => {
                                             setSelectedHW(i)
-                                            setListData(i.selectedList)
-                                            setConcats(concatFunctions[selectedHW.name])
                                         }}
                                     >
                                         <button className={dropdownStyles.dropdownListItemButton}>
@@ -371,16 +359,13 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                 </div>
             </div>
 
-            {selectedHW.selectedList[1] !== undefined && (
-                <Table
-                    headers={headers[selectedHW.name]}
-                    propData={selectedHW.selectedList}
-                    dataKeys={columns}
-                    concatonations={concats}
-                />
-            )}
-            {console.log(selectedHW.selectedList)}
-            {console.log(columns)}
+            <Table
+                headers={headers}
+                propData={rows}
+                dataKeys={columns}
+                concatonations={concatFunctions}
+                onRowClick={handleRowClick}
+            />
         </div>
     )
 }

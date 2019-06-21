@@ -1,130 +1,137 @@
-import React, { useState, useEffect } from "react";
-import { Route, Switch } from "react-router-dom";
+import React, {useState, useEffect, useContext} from 'react'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
-import { FilteredSearch } from "../../reusables/FilteredSearch/FilteredSearch";
-import { Button } from "../../reusables/Button/Button";
-import { Group } from "../../reusables/Group/Group";
-import { Table } from "../../reusables/Table/Table";
-import icon from "../../../content/Images/CQL-favicon.png";
+import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
+import {Button} from '../../reusables/Button/Button'
+import {Group} from '../../reusables/Group/Group'
+//import {Table, ITableDatum} from '../../reusables/Table/Table'
+
+// Context
+import {LoginContext} from '../../App/App'
+
+import {Table} from '../../reusables/Table/Table'
+import icon from '../../../content/Images/CQL-favicon.png'
 
 // Styles
-import styles from "./DepartmentsListPage.module.css";
+import styles from './DepartmentsListPage.module.css'
+import {MdFormatColorReset} from 'react-icons/md'
 
 // Types
 interface IDepartmentsListPageProps {
-  history: any;
+    history: any
+    match: any
 }
 
-//TODO: replace any w/ real type
-const initListData: any[] = [];
-
 // Primary Component
-export const DepartmentsListPage: React.SFC<
-  IDepartmentsListPageProps
-> = props => {
-  const { history } = props;
-  const [listData, setListData] = useState(initListData);
-  const [filtered, setFiltered] = useState(listData); //this is what is used in the list
-  const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState({ label: "name", value: "name" });
+export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props => {
+    const {history, match} = props
+    const {
+        loginContextVariables: {accessToken, refreshToken},
+    } = useContext(LoginContext)
+    const axios = new AxiosService(accessToken, refreshToken)
 
-  useEffect(() => {
-    //TODO: replace w/ real type
-    let data: any[] = [];
-    //TODO: fetch data
-    setListData(data);
-  }, [setListData]);
+    // state
+    const [listData, setListData] = useState<any[]>([])
+    const [filteredData, setFilteredData] = useState<any[]>([])
+    const [search, setSearch] = useState('')
+    const [selected, setSelected] = useState({label: 'name', value: 'name'})
 
-  useEffect(() => {
-    // Search through listData based on current value
-    // of search bar and save results in filtered
-    let filteredTableInput = listData;
-    filteredTableInput = listData.filter((row: any) => {
-      return (
-        row[selected.value]
-          .toString()
-          .toLowerCase()
-          .search(search.toLowerCase()) !== -1
-      );
-    });
-    setFiltered(filteredTableInput);
-  }, [search, selected, listData]);
+    const columns = ['name', 'totalEmployees', 'cost']
+    const headers = ['Departments', 'Total Employees', 'Programs Cost']
+    const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
-  const handleClick = () => {
-    history.push("/departments/new");
-  };
+    useEffect(() => {
+        axios
+            .get('/list/departments')
+            .then((data: any) => {
+                var depts: any[] = []
 
-  const handleRowClick = (name: string) => {
-    history.push(`/departments/${name}`);
-  };
-  const {} = props;
-  function concatenateName(data: any) {
+                console.log(data)
+                data.map((i: any) =>
+                    depts.push({
+                        id: i.departmentId,
+                        name: i.departmentName,
+                        totalEmployees: i.numOfEmp === 1 ? i.numOfEmp + ' employee' : i.numOfEmp + ' employees',
+                        //TODO: verify that this recieves a cost per year
+                        cost: formatCost(i.costOfPrograms),
+                    })
+                )
+                setListData(depts)
+            })
+            .catch((err: any) => console.error(err))
+    }, [setListData])
+
+    const formatCost = (cost: number) => {
+        return '$' + Math.round((cost / 12) * 100) / 100 + '/mo|$' + cost + '/yr'
+    }
+
+    useEffect(() => {
+        // Search through listData based on current value
+        // of search bar and save results in filtered
+        let filteredTableInput = listData.filter((row: any) => {
+            return row[selected.value]
+                ? row[selected.value]
+                      .toString()
+                      .toLowerCase()
+                      .search(search.toLowerCase()) !== -1
+                : false
+        })
+        setFilteredData(filteredTableInput)
+    }, [search, selected, listData])
+
+    const handleClick = () => {
+        history.push(`${match.url}/new`)
+    }
+
+    //TODO: verify that table will pass back the id
+    const handleRowClick = (id: number) => {
+        history.push(`${match.url}/${id}`)
+    }
+    const {} = props
+    function concatenateName(data: any) {
+        return (
+            <td className={styles.departments}>
+                <img className={styles.icon} src={icon} />
+                <text className={styles.name}>{data.name}</text>
+            </td>
+        )
+    }
+
+    const concatenateTotalEmployees = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>{data.totalEmployees} employees</td>
+    }
+
+    const concatenatedCost = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>${data.cost}</td>
+    }
+
+    console.log(filteredData)
+    const rows: any[] = []
+    filteredData.forEach(rowObj => {
+        rows.push(Object.values(rowObj).map((val: any) => <td>{val}</td>))
+    })
     return (
-      <td className={styles.departments}>
-        <img className={styles.icon} src={icon} />
-        <text className={styles.name}>{data.name}</text>
-      </td>
-    );
-  }
+        <div className={styles.departmentsListMain}>
+            <Group direction='row' justify='between'>
+                <Button text='Add' icon='add' onClick={handleClick} />
 
-  const concatenateTotalEmployees = (data: any) => {
-    return (
-      <td className={styles.alignLeftAndPadding}>
-        {data.totalEmployees} employees
-      </td>
-    );
-  };
+                <FilteredSearch
+                    search={search}
+                    setSearch={setSearch}
+                    options={options}
+                    selected={selected}
+                    setSelected={setSelected}
+                />
+            </Group>
 
-  const concatenatedCost = (data: any) => {
-    return <td className={styles.alignLeftAndPadding}>${data.cost}</td>;
-  };
-
-  return (
-    <div className={styles.deptsListMain}>
-      <Switch>
-        {/*TODO: replace divs w/ detail page */}
-        <Route
-          path="/departments/new"
-          render={props => <div>New Department Detail Page</div>}
-        />
-        <Route
-          path="/departments/:name"
-          render={props => <div>{props.match.params.name} Detail Page</div>}
-        />
-      </Switch>
-      <Group direction="row" justify="between">
-        <Button text="Add" icon="add" onClick={handleClick} />
-
-        <FilteredSearch
-          search={search}
-          setSearch={setSearch}
-          options={[
-            //TODO: replace w/ real options
-            { label: "name", value: "name" },
-            { label: "cost", value: "cost" }
-          ]}
-          selected={selected}
-          setSelected={setSelected}
-        />
-      </Group>
-
-      <Table
-        headers={["Departments", "Total Employees", "Cost"]}
-        propData={[
-          { name: "Developers", totalEmployees: 0, cost: 350 },
-          { name: "Designers", totalEmployees: 1, cost: 200 },
-          { name: "Project Managers", totalEmployees: 154, cost: 575 },
-          { name: "Sales", role: "PM", totalEmployees: 16, cost: 154 },
-          { name: "Information Technology", totalEmployees: 15, cost: 764 }
-        ]}
-        dataKeys={["name", "totalEmployees", "cost"]}
-        concatonations={[
-          concatenateName,
-          concatenateTotalEmployees,
-          concatenatedCost
-        ]}
-      />
-    </div>
-  );
-};
+            <Table
+                headers={headers}
+                propData={rows}
+                dataKeys={columns}
+                concatonations={[concatenateName, concatenateTotalEmployees, concatenatedCost]}
+                onRowClick={handleRowClick}
+            />
+        </div>
+    )
+}

@@ -1,164 +1,174 @@
-import React, { useState, useEffect } from "react";
-import { Route, Switch } from "react-router-dom";
+import React, {useState, useEffect, useContext} from 'react'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
-import { FilteredSearch } from "../../reusables/FilteredSearch/FilteredSearch";
-import { Button } from "../../reusables/Button/Button";
-import { Group } from "../../reusables/Group/Group";
-import { Table } from "../../reusables/Table/Table";
-import icon from "../../../content/Images/CQL-favicon.png";
+import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
+import {Button} from '../../reusables/Button/Button'
+import {Group} from '../../reusables/Group/Group'
+import {Table} from '../../reusables/Table/Table'
+import icon from '../../../content/Images/CQL-favicon.png'
+
+// Context
+import {LoginContext} from '../../App/App'
 
 // Styles
-import styles from "./EmployeesListPage.module.css";
+import styles from './EmployeesListPage.module.css'
 
 // Types
 interface IEmployeesListPageProps {
-  history: any;
+    history: any
+    match: any
 }
-
-//TODO: replace any w/ real type
-const initListData: any[] = [];
 
 // Primary Component
 export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
-  const { history } = props;
-  const [listData, setListData] = useState(initListData);
-  const [filtered, setFiltered] = useState(listData); //this is what is used in the list
-  const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState({ label: "name", value: "name" });
+    const {history, match} = props
+    const {
+        loginContextVariables: {accessToken, refreshToken},
+    } = useContext(LoginContext)
+    const axios = new AxiosService(accessToken, refreshToken)
 
-  useEffect(() => {
-    //TODO: replace w/ real type
-    let data: any[] = [];
-    //TODO: fetch data
-    setListData(data);
-  }, [setListData]);
+    // state
+    const [listData, setListData] = useState<any[]>([])
+    const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
+    const [search, setSearch] = useState('')
+    const [selected, setSelected] = useState({label: 'name', value: 'name'})
 
-  useEffect(() => {
-    // Search through listData based on current value
-    // of search bar and save results in filtered
-    let filteredTableInput = listData;
-    filteredTableInput = listData.filter((row: any) => {
-      return (
-        row[selected.value]
-          .toString()
-          .toLowerCase()
-          .search(search.toLowerCase()) !== -1
-      );
-    });
-    setFiltered(filteredTableInput);
-  }, [search, selected, listData]);
+    const columns = ['name', 'role', 'dateHired', 'daysEmployed', 'cost']
+    const headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost']
+    const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
-  const handleClick = () => {
-    history.push("/employees/new");
-  };
+    useEffect(() => {
+        axios
+            .get('/list/employees')
+            .then((data: any) => {
+                const employees: any[] = []
+                data.map((i: any) =>
+                    employees.push({
+                        name: i.employeeName,
+                        role: i.role,
+                        dateHired: formatDate(i.hireDate),
+                        daysEmployed: calculateDaysEmployed(i.hireDate),
+                        cost: formatCost(i.hardwareCostForEmp, i.programCostForEmp),
+                    })
+                )
+                setListData(employees)
+            })
+            .catch((err: any) => console.error(err))
+    }, [])
 
-  const handleRowClick = (name: string) => {
-    history.push(`/employees/${name}`);
-  };
+    useEffect(() => {
+        // Search through listData based on current value
+        // of search bar and save results in filtered
+        var filteredTableInput = listData.filter((row: any) => {
+            return (
+                row[selected.value]
+                    .toString()
+                    .toLowerCase()
+                    .search(search.toLowerCase()) !== -1
+            )
+        })
+        setFilteredData(filteredTableInput)
+    }, [search, selected, listData])
 
-  function concatenateName(data: any) {
+    const formatDate = (hireDate: string) => {
+        const hired = new Date(hireDate)
+        const date = hired.getFullYear() + '/' + hired.getMonth() + '/' + hired.getDate()
+        return date
+    }
+
+    //does not account for leap years or variable # of days in a month
+    const calculateDaysEmployed = (hireDate: string) => {
+        var oneDay = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
+        const today = new Date()
+        const hired = new Date(hireDate)
+        const dif = Math.round(Math.abs(today.getTime() - hired.getTime()))
+
+        var days = Math.floor(dif / oneDay)
+        var months = Math.floor(days / 31)
+        var years = Math.floor(months / 12)
+
+        months = Math.floor(months % 12)
+        days = Math.floor(days % 31)
+
+        var ret: string = ''
+        ret += years !== 0 ? (years === 1 ? years + ' year, ' : years + ' years, ') : ''
+        ret += months !== 0 ? (months === 1 ? months + ' month, ' : months + ' months, ') : ''
+        ret += days === 1 ? days + ' day' : days + ' days'
+        return ret
+    }
+
+    const formatCost = (hwCpost: number, progCost: number) => {
+        return 'HW:$' + hwCpost + '|SW:$' + progCost //TODO: SW or PROG? or something else??
+    }
+
+    const handleClick = () => {
+        history.push(`${match.url}/new`)
+    }
+
+    const handleRowClick = (id: number) => {
+        history.push(`${match.url}/${id}`)
+    }
+
+    function concatenateName(data: any) {
+        return (
+            <td className={styles.employees}>
+                <img className={styles.icon} src={icon} />
+                <div className={styles.alignLeft}>
+                    <text className={styles.employeeName}>{data.name}</text> <br />
+                    <text className={styles.role}>{data.role}</text>
+                </div>
+            </td>
+        )
+    }
+
+    const concatenateDateHired = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>{data.dateHired}</td>
+    }
+
+    const concatenateDaysEmployed = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>{data.daysEmployed} days</td>
+    }
+
+    const concatenatedHWCost = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>${data.hardwareCost}</td>
+    }
+    const concatenatedProgCost = (data: any) => {
+        return <td className={styles.alignLeftAndPadding}>${data.programsCost}</td>
+    }
+
+    console.log(filteredData)
+    const rows: any[] = []
+    filteredData.forEach(rowObj => {
+        rows.push(Object.values(rowObj).map((val: any) => <td>{val}</td>))
+    })
+
     return (
-      <td className={styles.employees}>
-        <img className={styles.icon} src={icon} />
-        <div className={styles.alignLeft}>
-          <text className={styles.employeeName}>{data.name}</text> <br />
-          <text className={styles.role}>{data.role}</text>
+        <div className={styles.employeesListMain}>
+            <Group direction='row' justify='between'>
+                <Button text='Add' icon='add' onClick={handleClick} />
+
+                <FilteredSearch
+                    search={search}
+                    setSearch={setSearch}
+                    options={options}
+                    selected={selected}
+                    setSelected={setSelected}
+                />
+            </Group>
+
+            <Table
+                headers={headers}
+                propData={rows}
+                dataKeys={columns}
+                concatonations={[
+                    concatenateName,
+                    concatenateDateHired,
+                    concatenateDaysEmployed,
+                    concatenatedHWCost,
+                    concatenatedProgCost,
+                ]}
+            />
         </div>
-      </td>
-    );
-  }
-
-  const concatenateDateHired = (data: any) => {
-    return <td className={styles.alignLeftAndPadding}>{data.dateHired}</td>;
-  };
-
-  const concatenateDaysEmployed = (data: any) => {
-    return (
-      <td className={styles.alignLeftAndPadding}>{data.daysEmployed} days</td>
-    );
-  };
-
-  const concatenatedCost = (data: any) => {
-    return <td className={styles.alignLeftAndPadding}>${data.cost}</td>;
-  };
-
-  return (
-    <div className={styles.employeesListMain}>
-      <Switch>
-        {/*TODO: replace divs w/ detail page */}
-        <Route
-          path="/employees/new"
-          render={props => <div>New Employee Detail Page</div>}
-        />
-        <Route
-          path="/employees/:name"
-          render={props => <div>{props.match.params.name} Detail Page</div>}
-        />
-      </Switch>
-      <Group direction="row" justify="between">
-        <Button text="Add" icon="add" onClick={handleClick} />
-
-        <FilteredSearch
-          search={search}
-          setSearch={setSearch}
-          options={[
-            //TODO: replace w/ real options
-            { label: "name", value: "name" },
-            { label: "cost", value: "cost" }
-          ]}
-          selected={selected}
-          setSelected={setSelected}
-        />
-      </Group>
-
-      <Table
-        headers={["Employees", "Date Hired", "Days Employed", "Cost"]}
-        propData={[
-          {
-            name: "Bill Belichik",
-            role: "Sales",
-            dateHired: "2012/09/12",
-            daysEmployed: 0,
-            cost: 350
-          },
-          {
-            name: "Joe Montana",
-            role: "Sales",
-            dateHired: "2012/09/11",
-            daysEmployed: 1,
-            cost: 200
-          },
-          {
-            name: "Bob the Builder",
-            role: "Developer",
-            dateHired: "2012/09/13",
-            daysEmployed: 154,
-            cost: 575
-          },
-          {
-            name: "Anne Manion",
-            role: "PM",
-            dateHired: "2010/09/12",
-            daysEmployed: 16,
-            cost: 154
-          },
-          {
-            name: "Sue Z",
-            role: "Designer",
-            dateHired: "2014/09/12",
-            daysEmployed: 15,
-            cost: 764
-          }
-        ]}
-        dataKeys={["name", "dateHired", "daysEmployed", "cost"]}
-        concatonations={[
-          concatenateName,
-          concatenateDateHired,
-          concatenateDaysEmployed,
-          concatenatedCost
-        ]}
-      />
-    </div>
-  );
-};
+    )
+}
