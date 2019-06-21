@@ -44,7 +44,6 @@ namespace backend_api.Controllers
 
         public ActionResult<object> GetListOfEmployees()
         {
-            string photo = "";
             // List that will be returned containing the list of employees
             var ListOfEmployees = new List<object>();
 
@@ -128,6 +127,8 @@ namespace backend_api.Controllers
                     // lambda to select the department of this employee which is not deleted
                     var EmpDep = _context.Department.Where(x => x.DepartmentId == emp.DepartmentId && x.IsDeleted == false).Select(x => x.DepartmentName).FirstOrDefault().ToString();
 
+                    // photo path.
+                    string photo = $"/image/employee/{emp.EmployeeId}";
 
                     // building returnable object that contains all the required fields
                     var Employee = new { emp.EmployeeId, EmployeeName, EmpDep, emp.Role, emp.HireDate, HardwareCostForEmp, ProgramCostForEmp, HardwareList, ProgForEmp, photo };
@@ -208,8 +209,7 @@ namespace backend_api.Controllers
 
 
                     }
-                    // TODO: Add the icon string once we figure out how to store it on the db.
-                    string icon = "";
+                    string icon = $"/image/department/{dep.DepartmentId}";
                     //creating list of returnables
                     var Department = new { dep.DepartmentId, dep.DepartmentName, numOfEmp, CostOfPrograms, icon };
                     ListOfDepartments.Add(Department);
@@ -258,7 +258,7 @@ namespace backend_api.Controllers
                     employeeFirstName = ownerEmployee.Select(emp => emp.FirstName).FirstOrDefault().ToString();
                     employeeLastName = ownerEmployee.Select(emp => emp.LastName).FirstOrDefault().ToString();
                 }
-                string icon = "";
+                string icon = $"/image/server/{sv.ServerId}";
                 // Create a server object to be returned.
                 var Server = new { sv.ServerId, sv.Fqdn, sv.NumberOfCores, sv.Ram, sv.RenewalDate, sv.Mfg, employeeFirstName, employeeLastName, icon };
                 listOfservers.Add(Server);
@@ -305,7 +305,8 @@ namespace backend_api.Controllers
                     employeeFirstName = ownerEmployee.Select(emp => emp.FirstName).FirstOrDefault().ToString();
                     employeeLastName = ownerEmployee.Select(emp => emp.LastName).FirstOrDefault().ToString();
                 }
-                string icon = "";
+                // NOTE: Laptop is used here for consistency with the front end.
+                string icon = $"/image/laptop/{cp.ComputerId}";
                 // Create a Computer object to be returned.
                 var Computer = new { cp.ComputerId, cp.Cpu, cp.Ramgb, cp.Ssdgb, cp.IsAssigned, cp.Mfg, employeeFirstName, employeeLastName, icon };
                 listOfComputers.Add(Computer);
@@ -349,9 +350,8 @@ namespace backend_api.Controllers
                     employeeFirstName = ownerEmployee.Select(emp => emp.FirstName).FirstOrDefault().ToString();
                     employeeLastName = ownerEmployee.Select(emp => emp.LastName).FirstOrDefault().ToString();
                 }
-
+                string icon = $"/image/monitor/{mn.MonitorId}";
                 // Create a Monitor object to be returned.
-                string icon = "";
                 var Monitor = new { mn.MonitorId, mn.Make, mn.ScreenSize, mn.Resolution, mn.Inputs, employeeFirstName, employeeLastName, icon };
                 listOfMonitors.Add(Monitor);
             }
@@ -369,8 +369,6 @@ namespace backend_api.Controllers
          *             employeeLastName: string,
          *             icon: string,
          *          } ,.. ] for every peripheral at CQL.
-         * 
-         * 
          */
         [Route("Peripherals")]
         [HttpGet]
@@ -396,9 +394,8 @@ namespace backend_api.Controllers
                     employeeFirstName = ownerEmployee.Select(emp => emp.FirstName).FirstOrDefault().ToString();
                     employeeLastName = ownerEmployee.Select(emp => emp.LastName).FirstOrDefault().ToString();
                 }
-
+                string icon = $"/image/peripheral/{pr.PeripheralId}";
                 // Create a Peripheral object to be returned.
-                string icon = "";
                 var Peripheral = new { pr.PeripheralId, pr.PeripheralName, pr.PeripheralType, pr.PurchaseDate, pr.IsAssigned, employeeFirstName, employeeLastName, icon };
                 listOfPeripherals.Add(Peripheral);
             }
@@ -425,7 +422,6 @@ namespace backend_api.Controllers
 
         public ActionResult<object> GetListOfPrograms()
         {
-            string Icon = "";
             // List that will be returned containing the list of programs
             var ListOfPrograms = new List<object>();
 
@@ -447,8 +443,11 @@ namespace backend_api.Controllers
                 // calculate the cost of each distinct program if it is charged as a flat rate 
                 var ProgCostPerUse = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramFlatCost != null && x.IsDeleted != true).Sum(x => x.ProgramFlatCost);
 
+                // icon path.
+                string icon = $"/image/program/{prog.ProgramId}";
+
                 //create our object of returnables
-                ListOfPrograms.Add(new { prog.ProgramName, prog.RenewalDate, CountProgOverall, ProgCostPerYear, ProgCostPerUse, prog.IsCostPerYear, Icon });
+                ListOfPrograms.Add(new { prog.ProgramName, prog.RenewalDate, CountProgOverall, ProgCostPerYear, ProgCostPerUse, prog.IsCostPerYear, icon });
             }
             return Ok(ListOfPrograms);
         }
