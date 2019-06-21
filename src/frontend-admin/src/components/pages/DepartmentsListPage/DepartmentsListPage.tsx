@@ -15,6 +15,7 @@ import icon from '../../../content/Images/CQL-favicon.png'
 
 // Styles
 import styles from './DepartmentsListPage.module.css'
+import {MdFormatColorReset} from 'react-icons/md'
 
 // Types
 interface IDepartmentsListPageProps {
@@ -29,11 +30,6 @@ interface ITableDatum {
     programCost: number
 }
 
-//TODO: replace any w/ real type
-const initListData: ITableDatum[] = [{departments: '', totalEmployees: 0, programCost: 0}]
-const initColumns: string[] = []
-const initOptions: {value: string; label: string}[] = []
-
 // Primary Component
 export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props => {
     const {history, match} = props
@@ -43,35 +39,44 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const axios = new AxiosService(accessToken, refreshToken)
 
     // state
-    const [listData, setListData] = useState(initListData)
-    const [columns, setColumns] = useState(initColumns)
-    const [options, setOptions] = useState(initOptions)
-    const [filtered, setFiltered] = useState(listData) //this is what is used in the list
+    const [listData, setListData] = useState<any[]>([])
+    const [filteredData, setFilteredData] = useState<any[]>([])
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'name', value: 'name'})
 
+    const columns = ['name', 'totalEmployees', 'cost']
+    const headers = ['Departments', 'Total Employees', 'Programs Cost']
+    const options = columns.map((c, i) => ({label: headers[i], value: c}))
+
     useEffect(() => {
-        let list: ITableDatum[] = []
         axios
             .get('/list/departments')
-            .then((data: any) =>
+            .then((data: any) => {
+                var depts: any[] = []
+
+                console.log(data)
                 data.map((i: any) =>
-                    list.push({
-                        departments: i.departmentName,
-                        totalEmployees: i.numberOfEmp,
-                        programCost: i.costOfPrograms,
+                    depts.push({
+                        id: i.departmentId,
+                        name: i.departmentName,
+                        totalEmployees: i.numOfEmp === 1 ? i.numOfEmp + ' employee' : i.numOfEmp + ' employees',
+                        //TODO: verify that this recieves a cost per year
+                        cost: formatCost(i.costOfPrograms),
                     })
                 )
-            )
-            .catch((err: any) => console.log(err))
-        setListData(list)
+                setListData(depts)
+            })
+            .catch((err: any) => console.error(err))
     }, [setListData])
+
+    const formatCost = (cost: number) => {
+        return '$' + Math.round((cost / 12) * 100) / 100 + '/mo|$' + cost + '/yr'
+    }
 
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        let filteredTableInput = listData
-        filteredTableInput = listData.filter((row: any) => {
+        let filteredTableInput = listData.filter((row: any) => {
             return row[selected.value]
                 ? row[selected.value]
                       .toString()
@@ -79,23 +84,14 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                       .search(search.toLowerCase()) !== -1
                 : false
         })
-        setFiltered(filteredTableInput)
-        listData[0] && setColumns(Object.keys(listData[0]))
+        setFilteredData(filteredTableInput)
     }, [search, selected, listData])
-
-    useEffect(() => {
-        initOptions.length = 0
-        columns.map(i => {
-            initOptions.push({value: i, label: i.replace(/([a-zA-Z])(?=[A-Z])/g, '$1 ').toLowerCase()})
-        })
-        setOptions(initOptions)
-        console.log(columns)
-    }, [columns])
 
     const handleClick = () => {
         history.push(`${match.url}/new`)
     }
 
+    //TODO: verify that table will pass back the id
     const handleRowClick = (id: number) => {
         history.push(`${match.url}/${id}`)
     }
@@ -116,6 +112,12 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const concatenatedCost = (data: any) => {
         return <td className={styles.alignLeftAndPadding}>${data.cost}</td>
     }
+
+    console.log(filteredData)
+    const rows: any[] = []
+    filteredData.forEach(rowObj => {
+        rows.push(Object.values(rowObj).map((val: any) => <td>{val}</td>))
+    })
     return (
         <div className={styles.departmentsListMain}>
             <Group direction='row' justify='between'>
@@ -129,19 +131,13 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                     setSelected={setSelected}
                 />
             </Group>
-            {/*<List />*/}
 
             <Table
-                headers={['Departments', 'Total Employees', 'Cost']}
-                propData={[
-                    {name: 'Developers', totalEmployees: 0, cost: 350},
-                    {name: 'Designers', totalEmployees: 1, cost: 200},
-                    {name: 'Project Managers', totalEmployees: 154, cost: 575},
-                    {name: 'Sales', role: 'PM', totalEmployees: 16, cost: 154},
-                    {name: 'Information Technology', totalEmployees: 15, cost: 764},
-                ]}
-                dataKeys={['name', 'totalEmployees', 'cost']}
+                headers={headers}
+                propData={rows}
+                dataKeys={columns}
                 concatonations={[concatenateName, concatenateTotalEmployees, concatenatedCost]}
+                onRowClick={handleRowClick}
             />
         </div>
     )
