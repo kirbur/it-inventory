@@ -1,3 +1,4 @@
 # Ignore all images that are not the placeholder images.
 
+images/*
 !*/placeholder
