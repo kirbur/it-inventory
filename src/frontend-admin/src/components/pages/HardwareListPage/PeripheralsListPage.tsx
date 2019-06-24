@@ -75,7 +75,10 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         ['Office 365', '2020/08/23', 'Zelda'],
     ])
 
+    //this is the only thing to change
     const headerList = ['Peripherals', 'Purchase Date', 'Assigned to']
+
+    //-------------- this will all be the same -------------
     const headerStates = []
     const headerStateCounts = []
 
@@ -154,9 +157,10 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             </td>
         )
     }
-
+    // ------------------------------------------------------------
     var renderedRows: any[] = []
 
+    //this is where the individual rows are rendered
     rows.forEach(row => {
         const transformedRow: any[] = []
         for (let i = 0; i < row.length; i++) {
