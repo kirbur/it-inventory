@@ -66,7 +66,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         ['Minecraft', '2020/08/24', 154, 575],
         ['WoW', '2020/08/24', 16, 154],
         ['League', '2020/08/24', 15, 764],
-        ['Office 365', '2020/08/24', 0, 350],
+        ['Office 365', '2020/08/23', 0, 350],
         ['Jira', '2020/08/24', 0, 350],
         ['Atlassian', '2020/08/24', 1, 200],
         ['Minecraft', '2020/08/24', 154, 575],
@@ -169,9 +169,9 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                 case 1:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[2]} employees</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]} employees</td>
                 case 3:
-                    transformedRow[2] = <td className={styles.alignLeft}>${row[3]}</td>
+                    transformedRow[3] = <td className={styles.alignLeft}>${row[3]}</td>
             }
         }
 
