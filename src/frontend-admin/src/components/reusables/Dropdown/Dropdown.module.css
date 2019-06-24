@@ -8,6 +8,7 @@
     display: inline-block;
     position: relative;
     align-self: flex-start;
+    z-index: 99;
 }
 
 .dropdownButton {

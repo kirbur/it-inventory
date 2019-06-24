@@ -45,7 +45,6 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             .get('/list/employees')
             .then((data: any) => {
                 const employees: any[] = []
-                console.log(data)
                 data.map((i: any) => {
                     employees.push({
                         name: i.employeeName,
@@ -119,8 +118,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         history.push(`${match.url}/new`)
     }
 
-    const handleRowClick = (id: number) => {
-        history.push(`${match.url}/${id}`)
+    const handleRowClick = (row: any) => {
+        // console.log(row[0].props.children[1].props.children[0].props.children)
+        history.push(`${match.url}/${row[0].props.children[1].props.children[0].props.children}`)
     }
 
     //console.log(filteredData)
@@ -290,7 +290,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                 />
             </Group>
 
-            <Table headers={renderHeaders()} rows={renderedRows} />
+            <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
         </div>
     )
 }

@@ -1,5 +1,8 @@
 .hardwareListMain {
-    margin: 50px 85px;
+    margin: 20px 85px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .listMain {
@@ -9,9 +12,17 @@
     align-items: flex-start;
 }
 
-.dropdown {
-    padding-top: 10px;
+.group {
+    padding-bottom: 80px;
 }
+
+.dropdown {
+    padding: 20px 0;
+}
+
+/* .dropdownTitle {
+    font-size: 36px;
+} */
 
 .hardware {
     display: flex;
@@ -40,4 +51,44 @@
     text-align: left;
     padding-left: 34px;
     color: #979797;
+}
+
+.header {
+    text-align: left;
+    color: #a5a5a5;
+    font-size: 24px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+    display: flex;
+    cursor: pointer;
+}
+
+/* sorting states */
+.notSorted {
+    border-left: 8px solid #636363;
+    border-right: 8px solid #636363;
+    border-top: 2px solid #636363;
+    border-bottom: none;
+    height: 2px;
+    position: relative;
+    top: 15px;
+    left: 5px;
+}
+.ascending {
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid #636363;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: relative;
+    bottom: 10px;
+    left: 5px;
+}
+.descending {
+    border-top: 8px solid #636363;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: relative;
+    top: 15px;
+    left: 5px;
 }
