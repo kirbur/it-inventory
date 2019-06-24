@@ -2,6 +2,9 @@ import React, {useState, useEffect, useContext} from 'react'
 import {Switch, Route} from 'react-router-dom'
 import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
+import {sortTable} from '../../../utilities/quicksort'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
+
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
@@ -9,6 +12,10 @@ import {Group} from '../../reusables/Group/Group'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import {Table} from '../../reusables/Table/Table'
 import icon from '../../../content/Images/CQL-favicon.png'
+import {LaptopsListPage} from './LaptopsListPage'
+import {ServersListPage} from './ServersListPage'
+import {MonitorsListPage} from './MonitorsListPage'
+import {PeripheralListPage} from './PeripheralsListPage'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -41,13 +48,17 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     const [filteredData, setFilteredData] = useState<any[]>([])
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'name', value: 'name'})
-    const [selectedHW, setSelectedHW] = useState<{id: number; name: string}>({id: 0, name: 'servers'})
+    const [selectedHW, setSelectedHW] = useState<{id: number; name: string; onClick: any}>({
+        id: 0,
+        name: 'servers',
+        onClick: () => history.push('/hardware/servers'),
+    })
 
     const dropdownContent = [
-        {id: 0, name: 'servers'},
-        {id: 1, name: 'laptops'},
-        {id: 2, name: 'monitors'},
-        {id: 3, name: 'peripherals'},
+        {id: 0, name: 'servers', onClick: () => history.push('/hardware/servers')},
+        {id: 1, name: 'laptops', onClick: () => history.push('/hardware/laptops')},
+        {id: 2, name: 'monitors', onClick: () => history.push('/hardware/monitors')},
+        {id: 3, name: 'peripherals', onClick: () => history.push('/hardware/peripherals')},
     ]
     const allColumns: any = {
         peripherals: ['name', 'purchaseDate', 'assigned'],
@@ -210,74 +221,7 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     const handleRowClick = (id: number) => {
         history.push(`${match.url}/${id}`)
     }
-    const concatenatedName = (data: any) => {
-        return (
-            <td className={styles.hardware}>
-                <img className={styles.icon} src={icon} alt='' />
-                <text className={styles.name}>{data.name}</text>
-            </td>
-        )
-    }
-    const concatenatedFQDN = (data: any) => {
-        return <td>{data.FQDN}</td>
-    }
-    const concatenatedNumber_Of_Cores = (data: any) => {
-        return <td>{data.number_Of_Cores} cores</td>
-    }
-    const concatenatedRAM = (data: any) => {
-        return <td>{data.RAM} GB</td>
-    }
-    const concatenatedRenewal_Date = (data: any) => {
-        return <td>{data.renewal_Date}</td>
-    }
-    const concatenatedMFG_Tag = (data: any) => {
-        return <td>{data.MFG_Tag}</td>
-    }
-    const concatenatedCPU = (data: any) => {
-        return <td>{data.CPU}</td>
-    }
-    const concatenatedSSD = (data: any) => {
-        return <td>{data.SSD} GB</td>
-    }
-    const concatenatedAssigned = (data: any) => {
-        return <td>{data.assigned}</td>
-    }
-    const concatenatedMake = (data: any) => {
-        return <td>{data.make}</td>
-    }
-    const concatenatedScreen_Size = (data: any) => {
-        return <td>{data.screen_Size} in</td>
-    }
-    const concatenatedResolution = (data: any) => {
-        return <td>{data.resolution}</td>
-    }
-    const concatenatedInputs = (data: any) => {
-        return <td>{data.inputs}</td>
-    }
-    const concatenatedPurchase_Date = (data: any) => {
-        return <td>{data.purchase_date}</td>
-    }
 
-    const concatFunctions: any = {
-        peripherals: [concatenatedName, concatenatedPurchase_Date, concatenatedAssigned],
-        servers: [
-            concatenatedFQDN,
-            concatenatedNumber_Of_Cores,
-            concatenatedRAM,
-            concatenatedRenewal_Date,
-            concatenatedMFG_Tag,
-        ],
-        monitors: [
-            concatenatedMake,
-            concatenatedScreen_Size,
-            concatenatedResolution,
-            concatenatedInputs,
-            concatenatedAssigned,
-        ],
-        laptops: [concatenatedCPU, concatenatedRAM, concatenatedSSD, concatenatedAssigned, concatenatedMFG_Tag],
-    }
-
-    const {} = props
     function concatenateName(data: any) {
         return (
             <td className={styles.hardware}>
@@ -302,20 +246,173 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
         return <td className={styles.alignLeftAndPadding}>${data.cost}</td>
     }
 
-    console.log(filteredData)
-    const rows: any[] = []
+    //console.log(filteredData)
+    var filteredRows: any[] = []
     filteredData.forEach(rowObj => {
-        rows.push(Object.values(rowObj).map((val: any) => <td>{val}</td>))
+        filteredRows.push(Object.values(rowObj))
     })
 
+    const [rows, setRows] = useState(filteredRows)
+    useEffect(() => {
+        setRows(filteredRows)
+    }, [filteredData])
+
+    //if it is 0 --> descending
+    //if it is 1 --> ascending
+    const [sortedState, setSortedState] = useState({
+        nameSortDir: styles.notSorted,
+        name: 0,
+        dateHiredSortDir: styles.notSorted,
+        dateHired: 0,
+        daysEmployedSortDir: styles.notSorted,
+        daysEmployed: 0,
+        costSortDir: styles.notSorted,
+        cost: 0,
+    })
+    const initSortedState = {
+        nameSortDir: styles.notSorted,
+        name: 0,
+        dateHiredSortDir: styles.notSorted,
+        dateHired: 0,
+        daysEmployedSortDir: styles.notSorted,
+        daysEmployed: 0,
+        costSortDir: styles.notSorted,
+        cost: 0,
+    }
+    function sortByName() {
+        if (sortedState.name == 0) {
+            setSortedState({...initSortedState, nameSortDir: styles.descending, name: 1})
+        } else if (sortedState.name == 1) {
+            setSortedState({...initSortedState, nameSortDir: styles.ascending, name: 0})
+        }
+    }
+
+    function sortByDateHired() {
+        if (sortedState.dateHired == 0) {
+            setSortedState({...initSortedState, dateHiredSortDir: styles.descending, dateHired: 1})
+        } else if (sortedState.dateHired == 1) {
+            setSortedState({...initSortedState, dateHiredSortDir: styles.ascending, dateHired: 0})
+        }
+    }
+    function sortByDaysEmployed() {
+        if (sortedState.daysEmployed == 0) {
+            setSortedState({...initSortedState, daysEmployedSortDir: styles.descending, daysEmployed: 1})
+        } else if (sortedState.daysEmployed == 1) {
+            setSortedState({...initSortedState, daysEmployedSortDir: styles.ascending, daysEmployed: 0})
+        }
+    }
+
+    function sortByCost() {
+        if (sortedState.cost == 0) {
+            setSortedState({...initSortedState, costSortDir: styles.descending, cost: 1})
+        } else if (sortedState.cost == 1) {
+            setSortedState({...initSortedState, costSortDir: styles.ascending, cost: 0})
+        }
+    }
+    const renderHeaders = () => {
+        var nameHeader = (
+            <td
+                onClick={e => {
+                    setRows(sortTable(rows, 0, sortedState.name))
+                    sortByName()
+                }}
+            >
+                <div className={s(styles.header, styles.nameHeader)}>
+                    Employee
+                    <div className={sortedState.nameSortDir} />
+                </div>
+            </td>
+        )
+        var dateHiredHeader = (
+            <td
+                onClick={e => {
+                    setRows(sortTable(rows, 2, sortedState.dateHired))
+                    sortByDateHired()
+                }}
+            >
+                <div className={styles.header}>
+                    Date Hired
+                    <div className={sortedState.dateHiredSortDir} />
+                </div>
+            </td>
+        )
+        var daysEmployedHeader = (
+            <td
+                onClick={e => {
+                    setRows(sortTable(rows, 5, sortedState.daysEmployed))
+                    sortByDaysEmployed()
+                }}
+            >
+                <div className={styles.header}>
+                    Days Employed
+                    <div className={sortedState.daysEmployedSortDir} />
+                </div>
+            </td>
+        )
+        var costHeader = (
+            <td
+                onClick={e => {
+                    setRows(sortTable(rows, 6, sortedState.cost))
+                    sortByCost()
+                }}
+            >
+                <div className={styles.header}>
+                    Cost
+                    <div className={sortedState.costSortDir} />
+                </div>
+            </td>
+        )
+        return [nameHeader, dateHiredHeader, daysEmployedHeader, costHeader]
+    }
+
+    function concatenatedName(row: any[]) {
+        return (
+            <td className={styles.employees}>
+                <img className={styles.icon} src={icon} />
+                <div className={styles.alignLeft}>
+                    <text className={styles.employeeName}>{row[0]}</text> <br />
+                    <text className={styles.role}>{row[1]}</text>
+                </div>
+            </td>
+        )
+    }
+    var renderedRows: any[] = []
+    rows.forEach(row => {
+        const transformedRow: any[] = []
+        for (let i = 0; i < row.length; i++) {
+            switch (i) {
+                case 0:
+                    transformedRow[0] = concatenatedName(row)
+                case 1:
+                    break
+                case 2:
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[2]}</td>
+                case 3:
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]}</td>
+                case 4:
+                    transformedRow[3] = <td className={styles.alignLeft}>${row[4]}</td>
+            }
+        }
+
+        renderedRows.push(transformedRow)
+    })
+
+    const displayList = () => {
+        switch (selectedHW.name) {
+            case 'servers':
+                return <ServersListPage history={history} />
+            case 'laptops':
+                return <LaptopsListPage history={history} />
+
+            case 'monitors':
+                return <MonitorsListPage history={history} />
+            case 'peripherals':
+                return <PeripheralListPage history={history} />
+        }
+    }
     return (
         <div className={styles.hardwareListMain}>
-            <Switch>
-                {/*TODO: replace divs w/ detail page */}
-                <Route path='/hardware/new' render={props => <div>New Employee Detail Page</div>} />
-                <Route path='/hardware/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
-            </Switch>
-            <Group direction='row' justify='between'>
+            {/* <Group direction='row' justify='between'>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
@@ -325,7 +422,7 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                     selected={selected}
                     setSelected={setSelected}
                 />
-            </Group>
+            </Group> */}
             <div className={styles.dropdown}>
                 <div className={dropdownStyles.dropdownContainer}>
                     <DropdownList
@@ -345,6 +442,7 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                                         key={i.name}
                                         onClick={() => {
                                             setSelectedHW(i)
+                                            //i.onClick()
                                         }}
                                     >
                                         <button className={dropdownStyles.dropdownListItemButton}>
@@ -357,15 +455,10 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                     />
                     <div />
                 </div>
+                {/* {selected ? selected.onClick && selected.onClick(selected.id) : null} */}
             </div>
-
-            <Table
-                headers={headers}
-                propData={rows}
-                dataKeys={columns}
-                concatonations={concatFunctions}
-                onRowClick={handleRowClick}
-            />
+            {displayList()}
+            {/* <Table headers={renderHeaders()} rows={renderedRows} /> */}
         </div>
     )
 }

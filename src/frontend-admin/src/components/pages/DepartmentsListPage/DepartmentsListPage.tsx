@@ -125,13 +125,13 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                 />
             </Group>
 
-            <Table
+            {/* <Table
                 headers={headers}
                 propData={rows}
                 dataKeys={columns}
                 concatonations={[concatenateName, concatenateTotalEmployees, concatenatedCost]}
                 onRowClick={handleRowClick}
-            />
+            /> */}
         </div>
     )
 }

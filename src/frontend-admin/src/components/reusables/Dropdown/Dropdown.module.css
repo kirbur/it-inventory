@@ -21,6 +21,7 @@
     text-align: left;
     position: relative;
     align-self: left;
+    padding-left: 0;
 }
 
 .dropdownTitle {

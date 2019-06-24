@@ -121,13 +121,13 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                 />
             </Group>
 
-            <Table
+            {/* <Table
                 headers={headers}
                 propData={filteredData}
                 dataKeys={columns}
                 concatonations={[concatenateName, concatenateRenewalDate, concatenateTotalUsers, concatenatedCost]}
                 onRowClick={handleRowClick}
-            />
+            /> */}
         </div>
     )
 }
