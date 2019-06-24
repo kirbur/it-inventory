@@ -56,7 +56,8 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const handleRowClick = (name: string) => {
         history.push(`/programs/${name}`)
     }
-    function concatenateName(data: any) {
+
+    const concatenateName = (data: any) => {
         return (
             <td className={styles.programs}>
                 <img className={styles.icon} src={icon} />
@@ -64,15 +65,12 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             </td>
         )
     }
-
     const concatenateRenewalDate = (data: any) => {
         return <td className={styles.alignLeftAndPadding}>{data.renewalDate}</td>
     }
-
     const concatenateTotalUsers = (data: any) => {
         return <td className={styles.alignLeftAndPadding}>{data.totalUsers} users</td>
     }
-
     const concatenatedCost = (data: any) => {
         return <td className={styles.alignLeftAndPadding}>${data.cost}</td>
     }
@@ -80,8 +78,6 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     return (
         <div className={styles.programsListMain}>
             <Switch>
-                {/*TODO: replace divs w/ detail page */}
-                <Route path='/programs/new' render={props => <div>New Employee Detail Page</div>} />
                 <Route path='/programs/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
             </Switch>
             <Group direction='row' justify='between'>
