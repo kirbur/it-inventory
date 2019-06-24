@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from 'react'
 import {Switch, Route} from 'react-router-dom'
 import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
-import {sortTable} from '../../../utilities/quicksort'
+import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Components
@@ -48,11 +48,16 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     const [filteredData, setFilteredData] = useState<any[]>([])
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'name', value: 'name'})
-    const [selectedHW, setSelectedHW] = useState<{id: number; name: string; onClick: any}>({
-        id: 0,
-        name: 'servers',
-        onClick: () => history.push('/hardware/servers'),
-    })
+    const currentList = localStorage.getItem('selectedHW')
+    const [selectedHW, setSelectedHW] = useState<{id: number; name: string; onClick: any}>(
+        currentList
+            ? JSON.parse(currentList)
+            : {
+                  id: 0,
+                  name: 'servers',
+                  onClick: () => history.push('/hardware/servers'),
+              }
+    )
 
     const dropdownContent = [
         {id: 0, name: 'servers', onClick: () => history.push('/hardware/servers')},
@@ -442,7 +447,7 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                                         key={i.name}
                                         onClick={() => {
                                             setSelectedHW(i)
-                                            //i.onClick()
+                                            localStorage.setItem('selectedHW', JSON.stringify(i))
                                         }}
                                     >
                                         <button className={dropdownStyles.dropdownListItemButton}>

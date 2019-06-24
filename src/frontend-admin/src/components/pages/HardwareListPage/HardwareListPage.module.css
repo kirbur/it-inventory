@@ -24,17 +24,10 @@
     font-size: 36px;
 } */
 
-.hardware {
+.page {
+    text-align: center;
     display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.name {
-    color: #009eff;
-}
-.role {
-    color: #979797;
+    justify-content: center;
 }
 
 .icon {
@@ -45,12 +38,20 @@
 
 .alignLeft {
     text-align: left;
-    padding: 5px;
 }
 .alignLeftAndPadding {
     text-align: left;
     padding-left: 34px;
     color: #979797;
+}
+
+.hardware {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.hardwareName {
+    color: #009eff;
 }
 
 .header {
@@ -61,6 +62,9 @@
     padding-top: 16px;
     display: flex;
     cursor: pointer;
+}
+.nameHeader {
+    padding-left: 24px;
 }
 
 /* sorting states */

@@ -1,5 +1,7 @@
-.employeesListMain {
-    margin: 50px 85px;
+.page {
+    text-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 .group {
@@ -14,7 +16,6 @@
 
 .alignLeft {
     text-align: left;
-    padding: 5px;
 }
 .alignLeftAndPadding {
     text-align: left;

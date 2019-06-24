@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService} from '../../../services/AxiosService/AxiosService'
-import {sortTable} from '../../../utilities/quicksort'
+import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Components
@@ -218,7 +218,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         var daysEmployedHeader = (
             <td
                 onClick={e => {
-                    setRows(sortTable(rows, 5, sortedState.daysEmployed))
+                    setRows(sortTable(rows, 3, sortedState.daysEmployed))
                     sortByDaysEmployed()
                 }}
             >
@@ -231,7 +231,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         var costHeader = (
             <td
                 onClick={e => {
-                    setRows(sortTable(rows, 6, sortedState.cost))
+                    setRows(sortTable(rows, 4, sortedState.cost))
                     sortByCost()
                 }}
             >
