@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {cloneDeep} from 'lodash'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -74,116 +75,76 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         ['Office 365', '2020/08/24', 0, 350],
     ])
 
-    //if it is 0 --> descending
-    //if it is 1 --> ascending
-    const [sortedState, setSortedState] = useState({
-        nameSortDir: styles.notSorted,
-        name: 0,
-        renewalDateSortDir: styles.notSorted,
-        renewalDate: 0,
-        totalUsersSortDir: styles.notSorted,
-        totalUsers: 0,
-        costSortDir: styles.notSorted,
-        cost: 0,
-    })
+    //this is the only thing to change
+    const headerList = ['Programs', 'Renewal Date', 'Total Users', 'Cost']
 
-    const initSortedState = {
-        nameSortDir: styles.notSorted,
-        name: 0,
-        renewalDateSortDir: styles.notSorted,
-        renewalDate: 0,
-        totalUsersSortDir: styles.notSorted,
-        totalUsers: 0,
-        costSortDir: styles.notSorted,
-        cost: 0,
+    //-------------- this will all be the same -------------
+    const headerStates = []
+    const headerStateCounts = []
+
+    //initialize all the header states and styling to be not sorted
+    for (let i = 0; i < headerList.length; i++) {
+        headerStates.push(styles.notSorted)
+        headerStateCounts.push(0)
     }
+    var initHeaderStates = cloneDeep(headerStates)
+    var initHeaderStateCounts = cloneDeep(headerStateCounts)
+    var tempHeaderStates = cloneDeep(headerStates)
+    var tempHeaderStateCounts = cloneDeep(headerStateCounts)
 
-    function sortByName() {
-        if (sortedState.name == 0) {
-            setSortedState({...initSortedState, nameSortDir: styles.descending, name: 1})
-        } else if (sortedState.name == 1) {
-            setSortedState({...initSortedState, nameSortDir: styles.ascending, name: 0})
-        }
-    }
+    var initState = {headerStates, headerStateCounts}
+    const [sortState, setSortState] = useState(initState)
 
-    function sortByRenewalDate() {
-        if (sortedState.renewalDate == 0) {
-            setSortedState({...initSortedState, renewalDateSortDir: styles.descending, renewalDate: 1})
-        } else if (sortedState.renewalDate == 1) {
-            setSortedState({...initSortedState, renewalDateSortDir: styles.ascending, renewalDate: 0})
-        }
-    }
-
-    function sortByTotalUsers() {
-        if (sortedState.totalUsers == 0) {
-            setSortedState({...initSortedState, totalUsersSortDir: styles.descending, totalUsers: 1})
-        } else if (sortedState.totalUsers == 1) {
-            setSortedState({...initSortedState, totalUsersSortDir: styles.ascending, totalUsers: 0})
-        }
-    }
-
-    function sortByCost() {
-        if (sortedState.cost == 0) {
-            setSortedState({...initSortedState, costSortDir: styles.descending, cost: 1})
-        } else if (sortedState.cost == 1) {
-            setSortedState({...initSortedState, costSortDir: styles.ascending, cost: 0})
+    function sortStates(index: number) {
+        if (sortState.headerStateCounts[index] == 0) {
+            tempHeaderStates[index] = styles.descending
+            tempHeaderStateCounts[index] = 1
+            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
+            tempHeaderStateCounts = [...initHeaderStateCounts]
+        } else if (sortState.headerStateCounts[index] == 1) {
+            tempHeaderStates[index] = styles.ascending
+            tempHeaderStateCounts[index] = 0
+            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
+            tempHeaderStateCounts = [...initHeaderStateCounts]
         }
     }
 
     const renderHeaders = () => {
-        var nameHeader = (
+        var headers = []
+
+        var firstHeader = (
             <td
                 onClick={e => {
-                    setRows(sortTable(rows, 0, sortedState.name))
-                    sortByName()
+                    setRows(sortTable(rows, 0, sortState.headerStateCounts[0]))
+                    sortStates(0)
                 }}
             >
                 <div className={s(styles.header, styles.nameHeader)}>
-                    Programs
-                    <div className={sortedState.nameSortDir} />
+                    {headerList[0]}
+                    <div className={sortState.headerStates[0]} />
                 </div>
             </td>
         )
-        var renewalDateHeader = (
-            <td
-                onClick={e => {
-                    setRows(sortTable(rows, 1, sortedState.renewalDate))
-                    sortByRenewalDate()
-                }}
-            >
-                <div className={styles.header}>
-                    Renewal Date
-                    <div className={sortedState.renewalDateSortDir} />
-                </div>
-            </td>
-        )
-        var totalUsersHeader = (
-            <td
-                onClick={e => {
-                    setRows(sortTable(rows, 1, sortedState.totalUsers))
-                    sortByTotalUsers()
-                }}
-            >
-                <div className={styles.header}>
-                    Total Users
-                    <div className={sortedState.totalUsersSortDir} />
-                </div>
-            </td>
-        )
-        var costHeader = (
-            <td
-                onClick={e => {
-                    setRows(sortTable(rows, 2, sortedState.cost))
-                    sortByCost()
-                }}
-            >
-                <div className={styles.header}>
-                    Cost
-                    <div className={sortedState.costSortDir} />
-                </div>
-            </td>
-        )
-        return [nameHeader, renewalDateHeader, totalUsersHeader, costHeader]
+        headers.push(firstHeader)
+
+        for (let i = 1; i < headerList.length; i++) {
+            let header = (
+                <td
+                    onClick={e => {
+                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                        sortStates(i)
+                    }}
+                >
+                    <div className={styles.header}>
+                        {headerList[i]}
+                        <div className={sortState.headerStates[i]} />
+                    </div>
+                </td>
+            )
+            headers.push(header)
+        }
+
+        return headers
     }
 
     function concatenatedDept(row: any[]) {
