@@ -3,6 +3,7 @@ import {Route, Switch} from 'react-router-dom'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {cloneDeep} from 'lodash'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -91,105 +92,84 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }
 
     const [rows, setRows] = useState([
-        ['Bill Belichik', 0, 350],
-        ['Joe Montana', 1, 200],
-        ['Bob the Builder', 154, 575],
-        ['Anne Manion', 16, 154],
-        ['Sue Z', 15, 764],
-        ['Bill Belichik', 0, 350],
-        ['Joe Montana', 1, 200],
-        ['Bob the Builder', 154, 575],
-        ['Anne Manion', 16, 154],
-        ['Sue Z', 15, 764],
-        ['Bill Belichik', 0, 350],
-        ['Joe Montana', 1, 200],
+        ['Developers', 0, 350],
+        ['Information Technology', 1, 200],
+        ['Human Resources', 154, 575],
+        ['Designers', 16, 154],
+        ['Sales', 15, 764],
+        ['Project Managers', 0, 350],
     ])
 
-    //if it is 0 --> descending
-    //if it is 1 --> ascending
-    const [sortedState, setSortedState] = useState({
-        deptSortDir: styles.notSorted,
-        dept: 0,
-        totalEmployeesSortDir: styles.notSorted,
-        totalEmployees: 0,
-        costSortDir: styles.notSorted,
-        cost: 0,
-    })
+    //this is the only thing to change
+    const headerList = ['Departments', 'Total Employees', 'Cost']
 
-    const initSortedState = {
-        deptSortDir: styles.notSorted,
-        dept: 0,
-        totalEmployeesSortDir: styles.notSorted,
-        totalEmployees: 0,
-        costSortDir: styles.notSorted,
-        cost: 0,
+    //-------------- this will all be the same -------------
+    const headerStates = []
+    const headerStateCounts = []
+
+    //initialize all the header states and styling to be not sorted
+    for (let i = 0; i < headerList.length; i++) {
+        headerStates.push(styles.notSorted)
+        headerStateCounts.push(0)
     }
+    var initHeaderStates = cloneDeep(headerStates)
+    var initHeaderStateCounts = cloneDeep(headerStateCounts)
+    var tempHeaderStates = cloneDeep(headerStates)
+    var tempHeaderStateCounts = cloneDeep(headerStateCounts)
 
-    function sortByDept() {
-        if (sortedState.dept == 0) {
-            setSortedState({...initSortedState, deptSortDir: styles.descending, dept: 1})
-        } else if (sortedState.dept == 1) {
-            setSortedState({...initSortedState, deptSortDir: styles.ascending, dept: 0})
-        }
-    }
+    var initState = {headerStates, headerStateCounts}
+    const [sortState, setSortState] = useState(initState)
 
-    function sortByTotalEmployees() {
-        if (sortedState.totalEmployees == 0) {
-            setSortedState({...initSortedState, totalEmployeesSortDir: styles.descending, totalEmployees: 1})
-        } else if (sortedState.totalEmployees == 1) {
-            setSortedState({...initSortedState, totalEmployeesSortDir: styles.ascending, totalEmployees: 0})
-        }
-    }
-
-    function sortByCost() {
-        if (sortedState.cost == 0) {
-            setSortedState({...initSortedState, costSortDir: styles.descending, cost: 1})
-        } else if (sortedState.cost == 1) {
-            setSortedState({...initSortedState, costSortDir: styles.ascending, cost: 0})
+    function sortStates(index: number) {
+        if (sortState.headerStateCounts[index] == 0) {
+            tempHeaderStates[index] = styles.descending
+            tempHeaderStateCounts[index] = 1
+            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
+            tempHeaderStateCounts = [...initHeaderStateCounts]
+        } else if (sortState.headerStateCounts[index] == 1) {
+            tempHeaderStates[index] = styles.ascending
+            tempHeaderStateCounts[index] = 0
+            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
+            tempHeaderStateCounts = [...initHeaderStateCounts]
         }
     }
 
     const renderHeaders = () => {
-        var deptHeader = (
+        var headers = []
+
+        var firstHeader = (
             <td
                 onClick={e => {
-                    setRows(sortTable(rows, 0, sortedState.dept))
-                    sortByDept()
+                    setRows(sortTable(rows, 0, sortState.headerStateCounts[0]))
+                    sortStates(0)
                 }}
             >
-                <div className={s(styles.header, styles.deptHeader)}>
-                    Departments
-                    <div className={sortedState.deptSortDir} />
+                <div className={s(styles.header, styles.nameHeader)}>
+                    {headerList[0]}
+                    <div className={sortState.headerStates[0]} />
                 </div>
             </td>
         )
-        var totalEmployeesHeader = (
-            <td
-                onClick={e => {
-                    setRows(sortTable(rows, 1, sortedState.totalEmployees))
-                    sortByTotalEmployees()
-                }}
-            >
-                <div className={styles.header}>
-                    Total Employees
-                    <div className={sortedState.totalEmployeesSortDir} />
-                </div>
-            </td>
-        )
-        var costHeader = (
-            <td
-                onClick={e => {
-                    setRows(sortTable(rows, 2, sortedState.cost))
-                    sortByCost()
-                }}
-            >
-                <div className={styles.header}>
-                    Cost
-                    <div className={sortedState.costSortDir} />
-                </div>
-            </td>
-        )
-        return [deptHeader, totalEmployeesHeader, costHeader]
+        headers.push(firstHeader)
+
+        for (let i = 1; i < headerList.length; i++) {
+            let header = (
+                <td
+                    onClick={e => {
+                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                        sortStates(i)
+                    }}
+                >
+                    <div className={styles.header}>
+                        {headerList[i]}
+                        <div className={sortState.headerStates[i]} />
+                    </div>
+                </td>
+            )
+            headers.push(header)
+        }
+
+        return headers
     }
 
     function concatenatedDept(row: any[]) {
@@ -212,10 +192,8 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                 case 0:
                     transformedRow[0] = concatenatedDept(row)
                 case 1:
-                    break
-                case 2:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]} employees</td>
-                case 3:
+                case 2:
                     transformedRow[2] = <td className={styles.alignLeft}>${row[2]}</td>
             }
         }
@@ -225,7 +203,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
 
     return (
         <div className={styles.departmentsListMain}>
-            <Group direction='row' justify='between'>
+            <Group direction='row' justify='between' className={styles.group}>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
@@ -236,8 +214,6 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                     setSelected={setSelected}
                 />
             </Group>
-
-            {/*<List />*/}
 
             <div className={styles.page}>
                 <Table headers={renderHeaders()} rows={renderedRows} />

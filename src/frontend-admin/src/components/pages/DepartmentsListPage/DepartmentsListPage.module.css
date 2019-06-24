@@ -8,6 +8,10 @@
     justify-content: center;
 }
 
+.group {
+    padding-bottom: 60px;
+}
+
 .icon {
     max-height: 75px;
     max-width: 75px;

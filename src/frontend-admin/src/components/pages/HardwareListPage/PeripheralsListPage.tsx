@@ -169,7 +169,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
         return headers
     }
 
-    function concatenatedDept(row: any[]) {
+    function concatenatedName(row: any[]) {
         return (
             <td className={styles.hardware}>
                 <img className={styles.icon} src={icon} />
@@ -188,7 +188,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
-                    transformedRow[0] = concatenatedDept(row)
+                    transformedRow[0] = concatenatedName(row)
                 case 1:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:

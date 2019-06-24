@@ -1,3 +1,11 @@
+.programsListMain {
+    margin: 50px 85px;
+}
+
+.group {
+    padding-bottom: 60px;
+}
+
 .page {
     text-align: center;
     display: flex;

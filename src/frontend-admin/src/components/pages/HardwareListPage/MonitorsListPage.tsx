@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Route, Switch} from 'react-router-dom'
+import {Switch, Route} from 'react-router-dom'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
@@ -56,29 +56,26 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/programs/new')
+        history.push('/hardware/new')
     }
 
     const handleRowClick = (name: string) => {
-        history.push(`/programs/${name}`)
+        history.push(`/hardware/${name}`)
     }
 
     const [rows, setRows] = useState([
-        ['Jira', '2020/08/24', 'Joe'],
-        ['Atlassian', '2020/08/24', 'Bill'],
-        ['Minecraft', '2020/08/24', 'Bob'],
-        ['WoW', '2020/08/24', 'Su z'],
-        ['League', '2020/08/24', 'Joseph'],
-        ['Office 365', '2020/08/24', 'Anne'],
-        ['Jira', '2020/08/24', 'Bob e'],
-        ['Atlassian', '2020/08/24', 'Janet'],
-        ['Minecraft', '2020/08/24', 'Maggie'],
-        ['WoW', '2020/08/24', 'Zion'],
-        ['League', '2020/08/24', 'Link'],
-        ['Office 365', '2020/08/24', 'Zelda'],
+        ['HP', 'I7', 4, 256, 'Joe', 'hl;kjasdf'],
+        ['Dell', 'I7', 8, 200, 'Joe', 'hl;kjasdf'],
+        ['Dell', 'I9', 2, 575, 'Joe', 'hl;kjasdf'],
+        ['Asus', 'I5', 16, 154, 'Joe', 'hl;kjasdf'],
+        ['HP', 'I5', 16, 764, 'Joe', 'hl;kjasdf'],
+        ['Asus 365', 'I7', 0, 350, 'Joe', 'hl;kjasdf'],
     ])
 
-    const headerList = ['Peripherals', 'Purchase Date', 'Assigned to']
+    //this is the only thing to change
+    const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
+
+    //-------------- this will all be the same -------------
     const headerStates = []
     const headerStateCounts = []
 
@@ -131,7 +128,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
             let header = (
                 <td
                     onClick={e => {
-                        setRows(sortTable(rows, 0, sortState.headerStateCounts[i]))
+                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
                         sortStates(i)
                     }}
                 >
@@ -147,12 +144,12 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
         return headers
     }
 
-    function concatenatedDept(row: any[]) {
+    function concatenatedName(row: any[]) {
         return (
-            <td className={styles.peripherals}>
+            <td className={styles.hardware}>
                 <img className={styles.icon} src={icon} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.peripheralName}>{row[0]}</text>
+                    <text className={styles.hardwareName}>{row[0]}</text>
                 </div>
             </td>
         )
@@ -165,11 +162,15 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
-                    transformedRow[0] = concatenatedDept(row)
+                    transformedRow[0] = concatenatedName(row)
                 case 1:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[2]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
+                case 3:
+                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
+                case 4:
+                    transformedRow[4] = <td className={styles.alignLeft}>${row[4]}</td>
             }
         }
 
@@ -177,9 +178,11 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     })
 
     return (
-        <div className={styles.programsListMain}>
+        <div className={styles.listMain}>
             <Switch>
-                <Route path='/programs/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
+                {/*TODO: replace divs w/ detail page */}
+                <Route path='/hardware/new' render={props => <div>New Employee Detail Page</div>} />
+                <Route path='/hardware/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
             </Switch>
             <Group direction='row' justify='between'>
                 <Button text='Add' icon='add' onClick={handleClick} />
@@ -196,8 +199,6 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                     setSelected={setSelected}
                 />
             </Group>
-
-            {/*<List />*/}
 
             <div className={styles.page}>
                 <Table headers={renderHeaders()} rows={renderedRows} />
