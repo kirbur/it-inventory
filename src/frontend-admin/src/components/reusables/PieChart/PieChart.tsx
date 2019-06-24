@@ -46,7 +46,7 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
     // };
     // const [val, setVal] = useState(x);
     // useEffect(() => {
-    //   axios.get("cost/CostPieChart", setVal);
+    //   axios.get("dashboard/CostPieChart", setVal);
     // }, [setVal]);
     // console.log(val);
 
