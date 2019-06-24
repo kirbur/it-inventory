@@ -15,7 +15,7 @@ import icon from '../../../content/Images/CQL-favicon.png'
 import styles from './HardwareListPage.module.css'
 
 // Types
-interface IHardwareListPageProps {
+interface ILaptopsListPageProps {
     history: any
 }
 
@@ -23,7 +23,7 @@ interface IHardwareListPageProps {
 const initListData: any[] = []
 
 // Primary Component
-export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
+export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     const {history} = props
     const [listData, setListData] = useState(initListData)
     const [filtered, setFiltered] = useState(listData) //this is what is used in the list
@@ -61,22 +61,16 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     }
 
     const [rows, setRows] = useState([
-        ['Jira', 0, 350],
-        ['Atlassian', 1, 200],
-        ['Minecraft', 154, 575],
-        ['WoW', 16, 154],
-        ['League', 15, 764],
-        ['Office 365', 0, 350],
-        ['Joe Montana', 1, 200],
-        ['Bob the Builder', 154, 575],
-        ['Anne Manion', 16, 154],
-        ['Sue Z', 15, 764],
-        ['Bill Belichik', 0, 350],
-        ['Joe Montana', 1, 200],
+        ['HP', 'I7', 4, 256, 'Joe', 'hl;kjasdf'],
+        ['Dell', 'I7', 8, 200, 'Joe', 'hl;kjasdf'],
+        ['Dell', 'I9', 2, 575, 'Joe', 'hl;kjasdf'],
+        ['Asus', 'I5', 16, 154, 'Joe', 'hl;kjasdf'],
+        ['HP', 'I5', 16, 764, 'Joe', 'hl;kjasdf'],
+        ['Asus 365', 'I7', 0, 350, 'Joe', 'hl;kjasdf'],
     ])
 
     //this is the only thing to change
-    const headerList = ['Employees', 'Date Hired', 'Days Employed']
+    const headerList = ['Name', 'CPU', 'RAM', 'SSD', 'Assigned to', 'MFG Tag']
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -167,9 +161,15 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
                 case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[2]}</td>
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]} GB</td>
+                case 3:
+                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]} GB</td>
+                case 4:
+                    transformedRow[4] = <td className={styles.alignLeft}>{row[4]}</td>
+                case 5:
+                    transformedRow[5] = <td className={styles.alignLeft}>{row[5]}</td>
             }
         }
 

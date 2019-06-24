@@ -61,22 +61,22 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     }
 
     const [rows, setRows] = useState([
-        ['Jira', 0, 350],
-        ['Atlassian', 1, 200],
-        ['Minecraft', 154, 575],
-        ['WoW', 16, 154],
-        ['League', 15, 764],
-        ['Office 365', 0, 350],
-        ['Joe Montana', 1, 200],
-        ['Bob the Builder', 154, 575],
-        ['Anne Manion', 16, 154],
-        ['Sue Z', 15, 764],
-        ['Bill Belichik', 0, 350],
-        ['Joe Montana', 1, 200],
+        ['Jira', 0, 350, 0, 350],
+        ['Atlassian', 1, 200, 0, 350],
+        ['Minecraft', 154, 575, 0, 350],
+        ['WoW', 16, 154, 0, 350],
+        ['League', 15, 764, 0, 350],
+        ['Office 365', 0, 350, 0, 350],
+        ['Joe Montana', 1, 200, 0, 350],
+        ['Bob the Builder', 154, 575, 0, 350],
+        ['Anne Manion', 16, 154, 0, 350],
+        ['Sue Z', 15, 764, 0, 350],
+        ['Bill Belichik', 0, 350, 0, 350],
+        ['Joe Montana', 1, 200, 0, 350],
     ])
 
     //this is the only thing to change
-    const headerList = ['Employees', 'Date Hired', 'Days Employed']
+    const headerList = ['FGDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -152,7 +152,7 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
             <td className={styles.hardware}>
                 <img className={styles.icon} src={icon} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text>
+                    <text className={styles.hardwareNam}>{row[0]}</text>
                 </div>
             </td>
         )
@@ -167,9 +167,13 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
                 case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[2]}</td>
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
+                case 3:
+                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
+                case 4:
+                    transformedRow[4] = <td className={styles.alignLeft}>${row[4]}</td>
             }
         }
 

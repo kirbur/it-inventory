@@ -19,12 +19,12 @@
     color: #979797;
 }
 
-.departments {
+.hardware {
     display: flex;
     flex-direction: row;
     align-items: center;
 }
-.departmentName {
+.hardwareName {
     color: #009eff;
 }
 
