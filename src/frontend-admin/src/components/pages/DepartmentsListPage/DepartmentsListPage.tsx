@@ -70,12 +70,12 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         // Search through listData based on current value
         // of search bar and save results in filtered
         let filteredTableInput = listData.filter((row: any) => {
-            return row[selected.value]
-                ? row[selected.value]
+            return !row[selected.value]
+                ? false
+                : row[selected.value]
                       .toString()
                       .toLowerCase()
                       .search(search.toLowerCase()) !== -1
-                : false
         })
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])
@@ -88,7 +88,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const handleRowClick = (id: number) => {
         history.push(`${match.url}/${id}`)
     }
-    const {} = props
+
     function concatenateName(data: any) {
         return (
             <td className={styles.departments}>

@@ -6,13 +6,13 @@ import {DashboardPage} from '../pages/DashboardPage/DashboardPage'
 import {DepartmentsListPage} from '../pages/DepartmentsListPage/DepartmentsListPage'
 import {DepartmentDetailPage} from '../pages/DepartmentDetailPage/DepartmentDetailPage'
 import {EmployeesListPage} from '../pages/EmployeesListPage/EmployeesListPage'
+import {EmployeeDetailPage} from '../pages/EmployeeDetailPage/EmployeeDetailPage'
 import {HardwareListPage} from '../pages/HardwareListPage/HardwareListPage'
 import {HardwareDetailPage} from '../pages/HardwareDetailPage/HardwareDetailPage'
 import {ProgramsListPage} from '../pages/ProgramsListPage/ProgramsListPage'
+import {ProgramDetailPage} from '../pages/ProgramDetailPage/ProgramDetailPage'
 import {Login} from '../reusables/Login/Login'
 import {HelloUser} from '../HelloUser/HelloUser'
-
-import {EmployeeDetailPage} from '../pages/EmployeeDetailPage/EmployeeDetailPage'
 
 // Styles
 import styles from './App.module.css'
@@ -73,7 +73,6 @@ export const App: React.FC = () => {
                     {loginContextVariables.givenName === '' && <Redirect to='/login' />}
                     {loginContextVariables.givenName !== '' && (
                         <div className={styles.navContainer}>
-                            <Redirect to='/dashboard' />
                             <HelloUser name={loginContextVariables.givenName} className={styles.helloMesssage} />
                             <nav className={styles.navBar}>
                                 <h1>CQL</h1>
@@ -121,12 +120,11 @@ export const App: React.FC = () => {
                         <Route exact path='/hardware' component={HardwareListPage} />
                         <Route exact path='/departments' component={DepartmentsListPage} />
                         <Route exact path='/login' component={Login} />
-                        <Route exact path='/' component={Login} />
 
                         <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
                         <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
                         <Route path={'/hardware/:id'} render={props => <HardwareDetailPage {...props} />} />
-                        {/* <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />*/}
+                        <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
                     </Switch>
                 </Router>
 

@@ -158,12 +158,12 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
         // Search through listData based on current value
         // of search bar and save results in filtered
         let filteredTableInput = listData.filter((row: any) => {
-            return row[selected.value]
-                ? row[selected.value]
+            return !row[selected.value]
+                ? false
+                : row[selected.value]
                       .toString()
                       .toLowerCase()
                       .search(search.toLowerCase()) !== -1
-                : false
         })
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])

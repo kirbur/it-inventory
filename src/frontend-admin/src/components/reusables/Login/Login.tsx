@@ -8,13 +8,22 @@ import {Redirect} from 'react-router-dom'
 //styling
 import styles from './Login.module.css'
 import logo from '../../../content/Images/CQL-Logo-Reversed.png'
+interface ILoginProps {
+    history: any
+}
 
-export const Login: React.FunctionComponent = props => {
+export const Login: React.FunctionComponent<ILoginProps> = props => {
+    const {history} = props
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [failMssg, setFailMssg] = useState('')
 
     const currentLoginContext = useContext(LoginContext)
+
+    //if someone is logged in don't let them see the login page
+    if (currentLoginContext.loginContextVariables.accessToken !== '') {
+        history.push('/dashboard')
+    }
 
     const handleSubmit = (e: any) => {
         e.preventDefault()

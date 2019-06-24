@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react'
-import {Route, Switch} from 'react-router-dom'
+import React, {useState, useEffect, useContext} from 'react'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -8,45 +8,70 @@ import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
 import icon from '../../../content/Images/CQL-favicon.png'
 
+// Context
+import {LoginContext} from '../../App/App'
+
 // Styles
 import styles from './ProgramsListPage.module.css'
 
 // Types
 interface IProgramsListPageProps {
     history: any
+    match: any
 }
-
-//TODO: replace any w/ real type
-const initListData: any[] = []
 
 // Primary Component
 export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
-    const {history} = props
-    const [listData, setListData] = useState(initListData)
-    const [filtered, setFiltered] = useState(listData) //this is what is used in the list
+    const {history, match} = props
+    const {
+        loginContextVariables: {accessToken, refreshToken},
+    } = useContext(LoginContext)
+    const axios = new AxiosService(accessToken, refreshToken)
+
+    // state
+    const [listData, setListData] = useState<any[]>([])
+    const [filteredData, setFilteredData] = useState(listData)
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'name', value: 'name'})
+    const [selected, setSelected] = useState({label: 'Programs', value: 'name'})
+
+    const columns = ['name', 'renewalDate', 'totalUsers', 'cost']
+    const headers = ['Programs', 'Renewal Date', 'Total Users ', 'Cost']
+    const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
     useEffect(() => {
-        //TODO: replace w/ real type
-        let data: any[] = []
-        //TODO: fetch data
-        setListData(data)
+        axios
+            .get('/list/programs')
+            .then((data: any) => {
+                var programs: any[] = []
+                data.map((i: any) =>
+                    programs.push({
+                        name: i.programName,
+                        renewalDate: i.renewalDate,
+                        totalUsers: i.countProgInUse, //TODO: ask where this is
+                        //TODO: figure out which cost is necessary
+                        cost: i.progCostPerYear,
+                        perYear: i.progCostPerYear,
+                        perUse: i.progCostPerUse,
+                        isPerYear: i.isCostPerYear,
+                    })
+                )
+                setListData(programs)
+            })
+            .catch((err: any) => console.error(err))
     }, [setListData])
 
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        let filteredTableInput = listData
-        filteredTableInput = listData.filter((row: any) => {
-            return (
-                row[selected.value]
-                    .toString()
-                    .toLowerCase()
-                    .search(search.toLowerCase()) !== -1
-            )
+        var filteredTableInput = listData.filter((row: any) => {
+            return !row[selected.value]
+                ? false
+                : row[selected.value]
+                      .toString()
+                      .toLowerCase()
+                      .search(search.toLowerCase()) !== -1
         })
-        setFiltered(filteredTableInput)
+        setFilteredData(filteredTableInput)
     }, [search, selected, listData])
 
     const handleClick = () => {
@@ -77,42 +102,31 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         return <td className={styles.alignLeftAndPadding}>${data.cost}</td>
     }
 
+    console.log(filteredData)
+    const rows: any[] = []
+    filteredData.forEach(rowObj => {
+        rows.push(Object.values(rowObj).map((val: any) => <td>{val}</td>))
+    })
     return (
         <div className={styles.programsListMain}>
-            <Switch>
-                {/*TODO: replace divs w/ detail page */}
-                <Route path='/programs/new' render={props => <div>New Employee Detail Page</div>} />
-                <Route path='/programs/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
-            </Switch>
             <Group direction='row' justify='between'>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
                     search={search}
                     setSearch={setSearch}
-                    options={[
-                        //TODO: replace w/ real options
-                        {label: 'name', value: 'name'},
-                        {label: 'cost', value: 'cost'},
-                    ]}
+                    options={options}
                     selected={selected}
                     setSelected={setSelected}
                 />
             </Group>
 
-            {/*<List />*/}
-
             <Table
-                headers={['Programs', 'Renewal Date', 'Total Users', 'Cost']}
-                propData={[
-                    {name: 'Jira', renewalDate: '2012/09/12', totalUsers: 0, cost: 350},
-                    {name: 'Office 365', renewalDate: '2012/09/11', totalUsers: 1, cost: 200},
-                    {name: 'Minecraft', renewalDate: '2012/09/13', totalUsers: 154, cost: 575},
-                    {name: 'Adobe CC', renewalDate: '2010/09/12', totalUsers: 16, cost: 154},
-                    {name: 'Atlassian', renewalDate: '2014/09/12', totalUsers: 15, cost: 764},
-                ]}
-                dataKeys={['name', 'renewalDate', 'totalUsers', 'cost']}
+                headers={headers}
+                propData={filteredData}
+                dataKeys={columns}
                 concatonations={[concatenateName, concatenateRenewalDate, concatenateTotalUsers, concatenatedCost]}
+                onRowClick={handleRowClick}
             />
         </div>
     )

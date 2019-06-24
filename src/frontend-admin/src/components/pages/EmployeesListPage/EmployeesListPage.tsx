@@ -61,12 +61,12 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         // Search through listData based on current value
         // of search bar and save results in filtered
         var filteredTableInput = listData.filter((row: any) => {
-            return (
-                row[selected.value]
-                    .toString()
-                    .toLowerCase()
-                    .search(search.toLowerCase()) !== -1
-            )
+            return !row[selected.value]
+                ? false
+                : row[selected.value]
+                      .toString()
+                      .toLowerCase()
+                      .search(search.toLowerCase()) !== -1
         })
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])
