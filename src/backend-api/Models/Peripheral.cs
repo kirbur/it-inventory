@@ -18,6 +18,7 @@ namespace backend_api.Models
         public string Mfg { get; set; }
         public string Location { get; set; }
         public DateTime? RenewalDate { get; set; }
+        public string SerialNumber { get; set; }
 
         //public Employee Employee { get; set; }
     }
