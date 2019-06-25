@@ -119,7 +119,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
         deptList &&
             deptList.map(i =>
                 axios
-                    .get(`/departmentTable/${i.DepartmentId}`)
+                    .get(`/dashboard/departmentTable/${i.DepartmentId}`)
                     .then((data: any) => {
                         let y: IDashboardTableDatum[] = []
                         data &&
@@ -161,14 +161,14 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
     useEffect(() => {
         axios
-            .get('/Programs/Licenses')
+            .get('/dashboard/licenseTable')
             .then((data: any) => {
                 setLicenses(data)
             })
             .catch((err: any) => console.log(err))
 
         axios
-            .get('/Programs/softwareTable')
+            .get('/dashboard/softwareTable')
             .then((data: any) => {
                 let x: IDashboardTableDatum[] = []
                 data &&
@@ -185,14 +185,14 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
             .catch((err: any) => console.log(err))
 
         axios
-            .get('/Cost/CostBreakdown')
+            .get('/dashboard/CostBreakdown')
             .then((data: any) => {
                 data && setCosts(data[0])
             })
             .catch((err: any) => console.log(err))
 
         axios
-            .get('/Cost/CostPieCharts')
+            .get('/dashboard/CostPieCharts')
             .then((data: any) => {
                 let x: IPieDataProps[] = [
                     {
@@ -226,7 +226,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
             .catch((err: any) => console.log(err))
 
         axios
-            .get('/departmentTable?$select=departmentName,departmentID')
+            .get('/dashboard/departmentTable?$select=departmentName,departmentID')
             .then((data: any) => setDeptList(data))
             .catch((err: any) => console.log(err))
     }, [])
