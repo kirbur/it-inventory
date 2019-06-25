@@ -28,6 +28,6 @@ namespace backend_api.Models
         public string Model { get; set; }
 
 
-        public Employee Employee { get; set; }
+        //public Employee Employee { get; set; }
     }
 }

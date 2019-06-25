@@ -79,10 +79,10 @@ namespace backend_api.Models
 
                 entity.Property(e => e.Ssdgb).HasColumnName("SSDGB");
 
-                entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.Computer)
-                    .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK_Computer_Employee");
+                //entity.HasOne(d => d.Employee)
+                //    .WithMany(p => p.Computer)
+                //    .HasForeignKey(d => d.EmployeeId)
+                //    .HasConstraintName("FK_Computer_Employee");
             });
 
             modelBuilder.Entity<Department>(entity =>
@@ -189,10 +189,10 @@ namespace backend_api.Models
 
                 entity.Property(e => e.PurchaseDate).HasColumnType("date");
 
-                entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.Monitor)
-                    .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK_Monitor_Employee");
+                //entity.HasOne(d => d.Employee)
+                //    .WithMany(p => p.Monitor)
+                //    .HasForeignKey(d => d.EmployeeId)
+                //    .HasConstraintName("FK_Monitor_Employee");
             });
 
             modelBuilder.Entity<Peripheral>(entity =>
@@ -312,10 +312,10 @@ namespace backend_api.Models
 
                 entity.Property(e => e.RenewalDate).HasColumnType("date");
 
-                entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.Server)
-                    .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK_Server_Employee");
+                //entity.HasOne(d => d.Employee)
+                //    .WithMany(p => p.Server)
+                //    .HasForeignKey(d => d.EmployeeId)
+                //    .HasConstraintName("FK_Server_Employee");
             });
         }
     }
