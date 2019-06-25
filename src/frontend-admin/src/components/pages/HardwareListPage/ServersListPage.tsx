@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Route, Switch} from 'react-router-dom'
+import {Switch, Route} from 'react-router-dom'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
@@ -12,10 +12,10 @@ import {Table} from '../../reusables/Table/Table'
 import icon from '../../../content/Images/CQL-favicon.png'
 
 // Styles
-import styles from './DepartmentsListPage.module.css'
+import styles from './HardwareListPage.module.css'
 
 // Types
-interface IDepartmentsListPageProps {
+interface IHardwareListPageProps {
     history: any
 }
 
@@ -23,7 +23,7 @@ interface IDepartmentsListPageProps {
 const initListData: any[] = []
 
 // Primary Component
-export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props => {
+export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     const {history} = props
     const [listData, setListData] = useState(initListData)
     const [filtered, setFiltered] = useState(listData) //this is what is used in the list
@@ -53,24 +53,30 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/departments/new')
+        history.push('/hardware/new')
     }
 
     const handleRowClick = (name: string) => {
-        history.push(`/departments/${name}`)
+        history.push(`/hardware/${name}`)
     }
 
     const [rows, setRows] = useState([
-        ['Developers', 0, 350],
-        ['Information Technology', 1, 200],
-        ['Human Resources', 154, 575],
-        ['Designers', 16, 154],
-        ['Sales', 15, 764],
-        ['Project Managers', 0, 350],
+        ['Jira', 0, 350, 0, 350],
+        ['Atlassian', 1, 200, 0, 350],
+        ['Minecraft', 154, 575, 0, 350],
+        ['WoW', 16, 154, 0, 350],
+        ['League', 15, 764, 0, 350],
+        ['Office 365', 0, 350, 0, 350],
+        ['Joe Montana', 1, 200, 0, 350],
+        ['Bob the Builder', 154, 575, 0, 350],
+        ['Anne Manion', 16, 154, 0, 350],
+        ['Sue Z', 15, 764, 0, 350],
+        ['Bill Belichik', 0, 350, 0, 350],
+        ['Joe Montana', 1, 200, 0, 350],
     ])
 
     //this is the only thing to change
-    const headerList = ['Departments', 'Total Employees', 'Cost']
+    const headerList = ['FGDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -141,12 +147,12 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         return headers
     }
 
-    function concatenatedDept(row: any[]) {
+    function concatenatedName(row: any[]) {
         return (
-            <td className={styles.departments}>
+            <td className={styles.hardware}>
                 <img className={styles.icon} src={icon} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.departmentName}>{row[0]}</text>
+                    <text className={styles.hardwareNam}>{row[0]}</text>
                 </div>
             </td>
         )
@@ -159,11 +165,15 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
-                    transformedRow[0] = concatenatedDept(row)
+                    transformedRow[0] = concatenatedName(row)
                 case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]} employees</td>
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>${row[2]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
+                case 3:
+                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
+                case 4:
+                    transformedRow[4] = <td className={styles.alignLeft}>${row[4]}</td>
             }
         }
 
@@ -171,11 +181,11 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     })
 
     return (
-        <div className={styles.deptsListMain}>
+        <div className={styles.hardwareListMain}>
             <Switch>
                 {/*TODO: replace divs w/ detail page */}
-                <Route path='/departments/new' render={props => <div>New Department Detail Page</div>} />
-                <Route path='/departments/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
+                <Route path='/hardware/new' render={props => <div>New Employee Detail Page</div>} />
+                <Route path='/hardware/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
             </Switch>
             <Group direction='row' justify='between'>
                 <Button text='Add' icon='add' onClick={handleClick} />

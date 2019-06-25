@@ -12,10 +12,10 @@ import {Table} from '../../reusables/Table/Table'
 import icon from '../../../content/Images/CQL-favicon.png'
 
 // Styles
-import styles from './DepartmentsListPage.module.css'
+import styles from './HardwareListPage.module.css'
 
 // Types
-interface IDepartmentsListPageProps {
+interface IProgramsListPageProps {
     history: any
 }
 
@@ -23,7 +23,7 @@ interface IDepartmentsListPageProps {
 const initListData: any[] = []
 
 // Primary Component
-export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props => {
+export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const {history} = props
     const [listData, setListData] = useState(initListData)
     const [filtered, setFiltered] = useState(listData) //this is what is used in the list
@@ -53,24 +53,30 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/departments/new')
+        history.push('/programs/new')
     }
 
     const handleRowClick = (name: string) => {
-        history.push(`/departments/${name}`)
+        history.push(`/programs/${name}`)
     }
 
     const [rows, setRows] = useState([
-        ['Developers', 0, 350],
-        ['Information Technology', 1, 200],
-        ['Human Resources', 154, 575],
-        ['Designers', 16, 154],
-        ['Sales', 15, 764],
-        ['Project Managers', 0, 350],
+        ['Jira', '2020/08/24', 'Joe'],
+        ['Atlassian', '2020/08/24', 'Bill'],
+        ['Minecraft', '2020/08/24', 'Bob'],
+        ['WoW', '2020/08/24', 'Su z'],
+        ['League', '2020/08/24', 'Joseph'],
+        ['Office 365', '2020/08/24', 'Anne'],
+        ['Jira', '2020/08/24', 'Bob e'],
+        ['Atlassian', '2020/08/24', 'Janet'],
+        ['Minecraft', '2020/08/24', 'Maggie'],
+        ['WoW', '2020/08/24', 'Zion'],
+        ['League', '2020/08/24', 'Link'],
+        ['Office 365', '2020/08/23', 'Zelda'],
     ])
 
     //this is the only thing to change
-    const headerList = ['Departments', 'Total Employees', 'Cost']
+    const headerList = ['Peripherals', 'Purchase Date', 'Assigned to']
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -143,17 +149,18 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
 
     function concatenatedDept(row: any[]) {
         return (
-            <td className={styles.departments}>
+            <td className={styles.peripherals}>
                 <img className={styles.icon} src={icon} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.departmentName}>{row[0]}</text>
+                    <text className={styles.peripheralName}>{row[0]}</text>
                 </div>
             </td>
         )
     }
-
+    // ------------------------------------------------------------
     var renderedRows: any[] = []
 
+    //this is where the individual rows are rendered
     rows.forEach(row => {
         const transformedRow: any[] = []
         for (let i = 0; i < row.length; i++) {
@@ -161,9 +168,9 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                 case 0:
                     transformedRow[0] = concatenatedDept(row)
                 case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]} employees</td>
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>${row[2]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
             }
         }
 
@@ -171,11 +178,9 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     })
 
     return (
-        <div className={styles.deptsListMain}>
+        <div className={styles.programsListMain}>
             <Switch>
-                {/*TODO: replace divs w/ detail page */}
-                <Route path='/departments/new' render={props => <div>New Department Detail Page</div>} />
-                <Route path='/departments/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
+                <Route path='/programs/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
             </Switch>
             <Group direction='row' justify='between'>
                 <Button text='Add' icon='add' onClick={handleClick} />
