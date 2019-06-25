@@ -33,8 +33,8 @@ export const HelloUser: React.FC<IHelloUserProps> = props => {
                                 key={'logout'}
                                 onClick={() => {
                                     userContext.setLoginContextVariables(initialValues)
+                                    localStorage.removeItem('user')
                                     window.location.reload()
-                                    //return <Redirect to='/login' />
                                 }}
                             >
                                 <button className={dropdownStyles.dropdownListItemButton}>

@@ -19,40 +19,48 @@ interface IDropdownProps {
 export const Dropdown: React.FC<IDropdownProps> = props => {
     const {content, titleClassName} = props
     const [selected, setSelected] = useState(content[0])
+    if (content[0] === undefined) {
+        content.push({
+            id: -1,
+            name: '',
+        })
+    }
 
     return (
         <div className={styles.dropdownMain}>
             <Title
                 title={
                     <div className={styles.dropdownContainer}>
-                        <DropdownList
-                            triggerElement={({isOpen, toggle}) => (
-                                <button onClick={toggle} className={styles.dropdownButton}>
-                                    <div className={styles.dropdownTitle}>
-                                        <div className={titleClassName}>{selected.name}</div>
-                                        <div className={styles.dropdownArrow} />
-                                    </div>
-                                </button>
-                            )}
-                            choicesList={() => (
-                                <ul className={styles.dropdownList}>
-                                    {content.map(i => (
-                                        <li
-                                            className={styles.dropdownListItem}
-                                            key={i.name}
-                                            onClick={() => {
-                                                setSelected(i)
-                                                selected.onClick && selected.onClick()
-                                            }}
-                                        >
-                                            <button className={styles.dropdownListItemButton}>
-                                                <div className={styles.dropdownItemLabel}>{i.name}</div>
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        />
+                        {content && selected.name && (
+                            <DropdownList
+                                triggerElement={({isOpen, toggle}) => (
+                                    <button onClick={toggle} className={styles.dropdownButton}>
+                                        <div className={styles.dropdownTitle}>
+                                            <div className={titleClassName}>{selected.name}</div>
+                                            <div className={styles.dropdownArrow} />
+                                        </div>
+                                    </button>
+                                )}
+                                choicesList={() => (
+                                    <ul className={styles.dropdownList}>
+                                        {content.map(i => (
+                                            <li
+                                                className={styles.dropdownListItem}
+                                                key={i.name}
+                                                onClick={() => {
+                                                    setSelected(i)
+                                                    selected.onClick && selected.onClick()
+                                                }}
+                                            >
+                                                <button className={styles.dropdownListItemButton}>
+                                                    <div className={styles.dropdownItemLabel}>{i.name}</div>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            />
+                        )}
                         <div />
                     </div>
                 }

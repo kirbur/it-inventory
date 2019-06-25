@@ -262,7 +262,7 @@ namespace backend_api.Controllers
                 }
                 string icon = $"/image/server/{sv.ServerId}";
                 // Create a server object to be returned.
-                var Server = new { sv.ServerId, sv.Fqdn, sv.NumberOfCores, sv.Ram, sv.Mfg, employeeFirstName, employeeLastName, icon };
+                var Server = new { sv.ServerId, sv.Fqdn, sv.NumberOfCores, sv.Ram, sv.RenewalDate, sv.Mfg, employeeFirstName, employeeLastName, icon };
                 listOfservers.Add(Server);
             }
             return Ok(listOfservers);
@@ -310,7 +310,7 @@ namespace backend_api.Controllers
                 // NOTE: Laptop is used here for consistency with the front end.
                 string icon = $"/image/laptop/{cp.ComputerId}";
                 // Create a Computer object to be returned.
-                var Computer = new { cp.ComputerId, cp.Cpu, cp.Ramgb, cp.Ssdgb, cp.IsAssigned, cp.Mfg, employeeFirstName, employeeLastName, icon };
+                var Computer = new { cp.ComputerId, cp.Make, cp.Model, cp.Cpu, cp.Ramgb, cp.Ssdgb, cp.IsAssigned, cp.Mfg, employeeFirstName, employeeLastName, icon };
                 listOfComputers.Add(Computer);
             }
             return Ok(listOfComputers);
