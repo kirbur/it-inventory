@@ -1,22 +1,95 @@
-import React from "react";
-
-// Packages
+import React, {useState, useEffect, useContext} from 'react'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Components
-
-// Utils
+import {DropdownList} from '../../reusables/Dropdown/DropdownList'
+import {LaptopsListPage} from './LaptopsListPage'
+import {ServersListPage} from './ServersListPage'
+import {MonitorsListPage} from './MonitorsListPage'
+import {PeripheralListPage} from './PeripheralsListPage'
 
 // Styles
-import styles from "./HardwareListPage.module.css";
+import styles from './HardwareListPage.module.css'
+import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Types
-interface IHardwareListPageProps {}
 
-// Helpers
+interface IHardwareListPageProps {
+    history: any
+    match: any
+}
 
 // Primary Component
 export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
-  const {} = props;
+    const {history, match} = props
 
-  return <div>This is the hardware list page.</div>;
-};
+    // state
+    const currentList = localStorage.getItem('selectedHW')
+    const [selectedHW, setSelectedHW] = useState<{id: number; name: string}>(
+        currentList
+            ? JSON.parse(currentList)
+            : {
+                  id: 0,
+                  name: 'servers',
+              }
+    )
+
+    const dropdownContent = [
+        {id: 0, name: 'servers'},
+        {id: 1, name: 'laptops'},
+        {id: 2, name: 'monitors'},
+        {id: 3, name: 'peripherals'},
+    ]
+
+    const displayList = () => {
+        switch (selectedHW.name) {
+            case 'servers':
+                return <ServersListPage history={history} />
+            case 'laptops':
+                return <LaptopsListPage history={history} />
+
+            case 'monitors':
+                return <MonitorsListPage history={history} />
+            case 'peripherals':
+                return <PeripheralListPage history={history} />
+        }
+    }
+    return (
+        <div className={styles.hardwareListMain}>
+            <div className={styles.dropdown}>
+                <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                    <DropdownList
+                        triggerElement={({isOpen, toggle}) => (
+                            <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                    <div>{selectedHW.name}</div>
+                                    <div className={dropdownStyles.dropdownArrow} />
+                                </div>
+                            </button>
+                        )}
+                        choicesList={() => (
+                            <ul className={dropdownStyles.dropdownList}>
+                                {dropdownContent.map(i => (
+                                    <li
+                                        className={dropdownStyles.dropdownListItem}
+                                        key={i.name}
+                                        onClick={() => {
+                                            setSelectedHW(i)
+                                            localStorage.setItem('selectedHW', JSON.stringify(i))
+                                        }}
+                                    >
+                                        <button className={dropdownStyles.dropdownListItemButton}>
+                                            <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    />
+                    <div />
+                </div>
+            </div>
+            {displayList()}
+        </div>
+    )
+}

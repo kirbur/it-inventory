@@ -79,10 +79,10 @@ namespace backend_api.Models
 
                 entity.Property(e => e.Ssdgb).HasColumnName("SSDGB");
 
-               // entity.HasOne(d => d.Employee)
-               //     .WithMany(p => p.Computer)
-               //     .HasForeignKey(d => d.EmployeeId)
-               //     .HasConstraintName("FK_Computer_Employee");
+                //entity.HasOne(d => d.Employee)
+                //    .WithMany(p => p.Computer)
+                //    .HasForeignKey(d => d.EmployeeId)
+                //    .HasConstraintName("FK_Computer_Employee");
             });
 
             modelBuilder.Entity<Department>(entity =>
