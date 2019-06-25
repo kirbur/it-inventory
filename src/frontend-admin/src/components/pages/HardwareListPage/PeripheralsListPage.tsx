@@ -2,7 +2,8 @@ import React, {useState, useEffect, useContext} from 'react'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
-import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {format} from '../../../utilities/formatEmptyStrings'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -36,8 +37,8 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Name', value: 'name'})
 
-    const columns = ['name', 'purchaseDate', 'assigned']
-    const headerList = ['Name', 'Purchase Date', 'Assigned To']
+    const columns = ['name', 'id', 'purchaseDate', 'assigned']
+    const headerList = ['Name', 'ID', 'Purchase Date', 'Assigned To']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
@@ -45,15 +46,15 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
             .get('/list/peripherals')
             .then((data: any) => {
                 const peripherals: any[] = []
-                console.log(data)
-                data.map((i: any) => {
+                data.map((i: any) =>
                     peripherals.push({
-                        name: i.peripheralName,
-                        purchaseDate: formatDate(i.purchaseDate),
-                        assigned: i.isAssigned ? i.employeeFirstName + i.employeeLastName : '-',
-                        id: i.peripheralId,
+                        name: format(i.peripheralName),
+                        id: format(i.peripheralId),
+                        purchaseDate: format(i.purchaseDate),
+                        assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
+                        icon: i.icon,
                     })
-                })
+                )
                 setListData(peripherals)
             })
             .catch((err: any) => console.error(err))
@@ -80,12 +81,11 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/hardware/item/new')
+        history.push('/hardware/peripheral/new')
     }
 
     const handleRowClick = (row: any) => {
-        //TODO: find out where to get id from
-        //history.push(`hardware/item/${row[0].props.children}`)
+        history.push(`hardware/peripheral/${row[1].props.children}`)
     }
 
     var filteredRows: any[] = []
@@ -97,9 +97,6 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     useEffect(() => {
         setRows(filteredRows)
     }, [filteredData])
-
-    //this is the only thing to change
-    //const headerList = ['Peripherals', 'Purchase Date', 'Assigned to']
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -172,7 +169,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     function concatenatedName(row: any[]) {
         return (
             <td className={styles.hardware}>
-                <img className={styles.icon} src={icon} />
+                <img className={styles.icon} src={URL + row[4]} alt={icon} />
                 <div className={styles.alignLeft}>
                     <div className={styles.hardwareName}>{row[0]}</div>
                 </div>
@@ -191,8 +188,10 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                     transformedRow[0] = concatenatedName(row)
                 case 1:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
+                case 1:
+                    transformedRow[2] = <td className={styles.alignLeft}>{formatDate(row[2])}</td>
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
+                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
             }
         }
 

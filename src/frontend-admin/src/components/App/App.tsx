@@ -121,10 +121,11 @@ export const App: React.FC = () => {
 
                         <Route exact path='/departments' component={DepartmentsListPage} />
                         <Route exact path='/login' component={Login} />
+                        <Route exact path='/' component={Login} />
 
                         <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
                         <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
-                        <Route path={'/hardware/item/:id'} render={props => <HardwareDetailPage {...props} />} />
+                        <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
                         <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
                     </Switch>
                 </Router>

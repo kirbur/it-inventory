@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react'
-import {Switch, Route} from 'react-router-dom'
+import React, {useState, useEffect, useContext} from 'react'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {format} from '../../../utilities/formatEmptyStrings'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -11,70 +12,88 @@ import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
 import icon from '../../../content/Images/CQL-favicon.png'
 
-// Styles
-import styles from './HardwareListPage.module.css'
-
 // Context
 import {LoginContext} from '../../App/App'
+
+// Styles
+import styles from './HardwareListPage.module.css'
 
 // Types
 interface IMonitorsListPageProps {
     history: any
 }
 
-//TODO: replace any w/ real type
-const initListData: any[] = []
-
 // Primary Component
 export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     const {history} = props
-    const [listData, setListData] = useState(initListData)
-    const [filtered, setFiltered] = useState(listData) //this is what is used in the list
+    const {
+        loginContextVariables: {accessToken, refreshToken},
+    } = useContext(LoginContext)
+    const axios = new AxiosService(accessToken, refreshToken)
+
+    // state
+    const [listData, setListData] = useState<any[]>([])
+    const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'name', value: 'name'})
+    const [selected, setSelected] = useState({label: 'make', value: 'make'})
+
+    const columns = ['make', 'id', 'screenSize', 'resolution', 'inputs', 'assigned']
+    const headerList = ['Make', 'ID', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To']
+    const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
-        //TODO: replace w/ real type
-        let data: any[] = []
-        //TODO: fetch data
-        setListData(data)
-    }, [setListData])
+        axios
+            .get('/list/monitors')
+            .then((data: any) => {
+                const monitors: any[] = []
+                console.log(data)
+                data.map((i: any) => {
+                    monitors.push({
+                        make: format(i.make),
+                        id: format(i.monitorId),
+                        screenSize: format(i.screenSize),
+                        resolution: format(i.resolution),
+                        inputs: format(i.inputs),
+                        assigned: format(i.employeeFirstName) + ' ' + i.employeeLastName,
+                        icon: i.icon,
+                    })
+                })
+                setListData(monitors)
+            })
+            .catch((err: any) => console.error(err))
+    }, [])
 
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        let filteredTableInput = listData
-        filteredTableInput = listData.filter((row: any) => {
-            return (
-                row[selected.value]
-                    .toString()
-                    .toLowerCase()
-                    .search(search.toLowerCase()) !== -1
-            )
+        var filteredTableInput = listData.filter((row: any) => {
+            return !row[selected.value]
+                ? false
+                : row[selected.value]
+                      .toString()
+                      .toLowerCase()
+                      .search(search.toLowerCase()) !== -1
         })
-        setFiltered(filteredTableInput)
+        setFilteredData(filteredTableInput)
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/hardware/new')
+        history.push('/hardware/monitor/new')
     }
 
-    const handleRowClick = (name: string) => {
-        history.push(`/hardware/${name}`)
+    const handleRowClick = (row: any) => {
+        history.push(`hardware/monitor/${row[1].props.children}`)
     }
 
-    const [rows, setRows] = useState([
-        ['HP', 'I7', 4, 256, 'Joe', 'hl;kjasdf'],
-        ['Dell', 'I7', 8, 200, 'Joe', 'hl;kjasdf'],
-        ['Dell', 'I9', 2, 575, 'Joe', 'hl;kjasdf'],
-        ['Asus', 'I5', 16, 154, 'Joe', 'hl;kjasdf'],
-        ['HP', 'I5', 16, 764, 'Joe', 'hl;kjasdf'],
-        ['Asus 365', 'I7', 0, 350, 'Joe', 'hl;kjasdf'],
-    ])
+    var filteredRows: any[] = []
+    filteredData.forEach(rowObj => {
+        filteredRows.push(Object.values(rowObj))
+    })
 
-    //this is the only thing to change
-    const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
-
+    const [rows, setRows] = useState(filteredRows)
+    useEffect(() => {
+        setRows(filteredRows)
+    }, [filteredData])
     //-------------- this will all be the same -------------
     const headerStates = []
     const headerStateCounts = []
@@ -84,7 +103,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
         headerStates.push(styles.notSorted)
         headerStateCounts.push(0)
     }
-    var initHeaderStates = cloneDeep(headerStates)
+
     var initHeaderStateCounts = cloneDeep(headerStateCounts)
     var tempHeaderStates = cloneDeep(headerStates)
     var tempHeaderStateCounts = cloneDeep(headerStateCounts)
@@ -147,7 +166,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     function concatenatedName(row: any[]) {
         return (
             <td className={styles.hardware}>
-                <img className={styles.icon} src={icon} />
+                <img className={styles.icon} src={URL + row[6]} alt={icon} />
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text>
                 </div>
@@ -170,7 +189,10 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                 case 3:
                     transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
                 case 4:
-                    transformedRow[4] = <td className={styles.alignLeft}>${row[4]}</td>
+                    transformedRow[4] = <td className={styles.alignLeft}>{row[4]}</td>
+
+                case 5:
+                    transformedRow[5] = <td className={styles.alignLeft}>{row[5]}</td>
             }
         }
 
@@ -179,30 +201,19 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
 
     return (
         <div className={styles.listMain}>
-            <Switch>
-                {/*TODO: replace divs w/ detail page */}
-                <Route path='/hardware/new' render={props => <div>New Employee Detail Page</div>} />
-                <Route path='/hardware/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
-            </Switch>
             <Group direction='row' justify='between'>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
                     search={search}
                     setSearch={setSearch}
-                    options={[
-                        //TODO: replace w/ real options
-                        {label: 'name', value: 'name'},
-                        {label: 'cost', value: 'cost'},
-                    ]}
+                    options={options}
                     selected={selected}
                     setSelected={setSelected}
                 />
             </Group>
 
-            <div className={styles.page}>
-                <Table headers={renderHeaders()} rows={renderedRows} />
-            </div>
+            <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
         </div>
     )
 }

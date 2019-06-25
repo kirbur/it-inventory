@@ -21,5 +21,9 @@ interface IHardwareDetailPageProps {
 export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => {
     const {history, match} = props
 
-    return <div>The is {match.params.id}'s detail page</div>
+    return (
+        <div>
+            The is {match.params.id}'s {match.params.hw} detail page
+        </div>
+    )
 }

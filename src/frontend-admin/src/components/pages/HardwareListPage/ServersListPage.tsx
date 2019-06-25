@@ -2,7 +2,8 @@ import React, {useState, useEffect, useContext} from 'react'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
-import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {format} from '../../../utilities/formatEmptyStrings'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -20,7 +21,6 @@ import styles from './HardwareListPage.module.css'
 // Types
 interface IServersListPageProps {
     history: any
-    //match: any
 }
 
 // Primary Component
@@ -37,8 +37,8 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'FQDN', value: 'FQDN'})
 
-    const columns = ['FQDN', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag']
-    const headerList = ['FQDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
+    const columns = ['FQDN', 'id', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag']
+    const headerList = ['FQDN', 'ID', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
@@ -48,12 +48,13 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                 const servers: any[] = []
                 data.map((i: any) => {
                     servers.push({
-                        id: i.serverId,
-                        FQDN: i.fqdn,
-                        numberOfCores: i.numberOfCores,
-                        RAM: i.ram,
+                        FQDN: format(i.fqdn),
+                        id: format(i.serverId),
+                        numberOfCores: format(i.numberOfCores),
+                        RAM: format(i.ram),
                         renewalDate: formatDate(i.renewalDate),
-                        MFGTag: i.mfg ? i.mfg : '-',
+                        MFGTag: format(i.mfg),
+                        icon: i.icon,
                     })
                 })
                 setListData(servers)
@@ -82,11 +83,11 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }
 
     const handleClick = () => {
-        history.push(`hardware/items/new`)
+        history.push(`hardware/server/new`)
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/item/${row[0].props.children}`) //TODO: fix this, are names unique??
+        history.push(`hardware/server/${row[1].props.children}`) //TODO: fix this, need id
     }
 
     var filteredRows: any[] = []
@@ -95,8 +96,10 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     })
 
     const [rows, setRows] = useState(filteredRows)
+    useEffect(() => {
+        setRows(filteredRows)
+    }, [filteredData])
 
-    //-------------- this will all be the same -------------
     const headerStates = []
     const headerStateCounts = []
 
@@ -167,7 +170,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     function concatenatedName(row: any[]) {
         return (
             <td className={styles.hardware}>
-                <img className={styles.icon} src={icon} />
+                <img className={styles.icon} src={URL + row[6]} alt={icon} />
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text>
                 </div>
@@ -190,7 +193,9 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                 case 3:
                     transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
                 case 4:
-                    transformedRow[4] = <td className={styles.alignLeft}>${row[4]}</td>
+                    transformedRow[4] = <td className={styles.alignLeft}>{row[4]}</td>
+                case 5:
+                    transformedRow[5] = <td className={styles.alignLeft}>{row[5]}</td>
             }
         }
 

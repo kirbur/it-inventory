@@ -1,9 +1,9 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {Route, Switch} from 'react-router-dom'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
-import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {cloneDeep} from 'lodash'
+import {format} from '../../../utilities/formatEmptyStrings'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -14,7 +14,6 @@ import icon from '../../../content/Images/CQL-favicon.png'
 
 // Styles
 import styles from './DepartmentsListPage.module.css'
-import {MdFormatColorReset} from 'react-icons/md'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -39,39 +38,38 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'name', value: 'name'})
 
-    const columns = ['name', 'totalEmployees', 'cost']
-    const headers = ['Departments', 'Total Employees', 'Programs Cost']
-    const options = columns.map((c, i) => ({label: headers[i], value: c}))
+    const columns = ['name', 'id', 'totalEmployees', 'cost']
+    const headerList = ['Departments', 'ID', 'Total Employees', 'Programs Cost']
+    const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
         axios
             .get('/list/departments')
             .then((data: any) => {
                 var depts: any[] = []
-
-                console.log(data)
                 data.map((i: any) =>
                     depts.push({
-                        id: i.departmentId,
-                        name: i.departmentName,
-                        totalEmployees: i.numOfEmp === 1 ? i.numOfEmp + ' employee' : i.numOfEmp + ' employees',
+                        name: format(i.departmentName),
+                        id: format(i.departmentId),
+                        totalEmployees: format(i.numOfEmp),
                         //TODO: verify that this recieves a cost per year
-                        cost: formatCost(i.costOfPrograms),
+                        cost: format(i.costOfPrograms),
+                        icon: i.icon,
                     })
                 )
                 setListData(depts)
             })
             .catch((err: any) => console.error(err))
-    }, [setListData])
+    }, [])
 
     const formatCost = (cost: number) => {
-        return '$' + Math.round((cost / 12) * 100) / 100 + '/mo|$' + cost + '/yr'
+        return '$' + Math.round((cost / 12) * 100) / 100 + ' /mo | $' + cost + ' /yr'
     }
 
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        let filteredTableInput = listData.filter((row: any) => {
+        var filteredTableInput = listData.filter((row: any) => {
             return !row[selected.value]
                 ? false
                 : row[selected.value]
@@ -86,22 +84,19 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         history.push(`${match.url}/new`)
     }
 
-    //TODO: verify that table will pass back the id
-    const handleRowClick = (id: number) => {
-        history.push(`${match.url}/${id}`)
+    const handleRowClick = (row: any) => {
+        history.push(`${match.url}/${row[1].props.children}`)
     }
 
-    const [rows, setRows] = useState([
-        ['Developers', 0, 350],
-        ['Information Technology', 1, 200],
-        ['Human Resources', 154, 575],
-        ['Designers', 16, 154],
-        ['Sales', 15, 764],
-        ['Project Managers', 0, 350],
-    ])
+    var filteredRows: any[] = []
+    filteredData.forEach(rowObj => {
+        filteredRows.push(Object.values(rowObj))
+    })
 
-    //this is the only thing to change
-    const headerList = ['Departments', 'Total Employees', 'Cost']
+    const [rows, setRows] = useState(filteredRows)
+    useEffect(() => {
+        setRows(filteredRows)
+    }, [filteredData])
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -112,7 +107,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         headerStates.push(styles.notSorted)
         headerStateCounts.push(0)
     }
-    var initHeaderStates = cloneDeep(headerStates)
+    //var initHeaderStates = cloneDeep(headerStates)
     var initHeaderStateCounts = cloneDeep(headerStateCounts)
     var tempHeaderStates = cloneDeep(headerStates)
     var tempHeaderStateCounts = cloneDeep(headerStateCounts)
@@ -175,7 +170,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     function concatenatedDept(row: any[]) {
         return (
             <td className={styles.departments}>
-                <img className={styles.icon} src={icon} />
+                <img className={styles.icon} src={URL + row[4]} alt={icon} />
                 <div className={styles.alignLeft}>
                     <text className={styles.departmentName}>{row[0]}</text>
                 </div>
@@ -192,9 +187,15 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                 case 0:
                     transformedRow[0] = concatenatedDept(row)
                 case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]} employees</td>
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>${row[2]}</td>
+                    transformedRow[2] = (
+                        <td className={styles.alignLeft}>
+                            {row[2] === 1 ? row[2] + ' employee' : row[2] + ' employees'}
+                        </td>
+                    )
+                case 3:
+                    transformedRow[3] = <td className={styles.alignLeft}>{formatCost(row[3])}</td>
             }
         }
 
@@ -216,7 +217,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
             </Group>
 
             <div className={styles.page}>
-                <Table headers={renderHeaders()} rows={renderedRows} />
+                <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
             </div>
         </div>
     )

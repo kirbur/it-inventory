@@ -15,5 +15,5 @@ interface IDepartmentDetailPageProps {
 export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props => {
     const {history, match} = props
 
-    return <div>The is the {match.params.id} department detail page</div>
+    return <div>This is {match.params.id}'s department detail page</div>
 }
