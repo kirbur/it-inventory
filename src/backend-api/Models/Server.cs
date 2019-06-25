@@ -27,6 +27,7 @@ namespace backend_api.Models
         public string SAN { get; set; }
         public string LocalHHD { get; set; }
         public string Location { get; set; }
+        public string SerialNumber { get; set; }
 
         //public Employee Employee { get; set; }
     }

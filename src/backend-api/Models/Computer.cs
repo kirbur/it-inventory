@@ -26,6 +26,7 @@ namespace backend_api.Models
         public string Fqdn { get; set; }
         public string Location { get; set; }
         public string Model { get; set; }
+        public string SerialNumber { get; set; }
 
 
         //public Employee Employee { get; set; }
