@@ -1,0 +1,15 @@
+.table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.tr {
+    color: #a5a5a5;
+    font-size: 20px;
+    cursor: pointer;
+    height: 100px;
+}
+.tr:hover {
+    background-color: rgba(151, 151, 151, 0.15);
+}
