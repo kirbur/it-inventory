@@ -1,6 +1,7 @@
 ﻿using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.IdentityModel.Tokens.Jwt;
@@ -29,25 +30,35 @@ namespace backend_api.Controllers
         {
             // Take the bearer token string, convert it to a Jwt, and find the username from the claims.
             var TokenList = Request.Headers["Authorization"].ToString().Split(" ");
-            var JwtToken = new JwtSecurityTokenHandler().ReadJwtToken(TokenList[1]);
-            var username = JwtToken.Claims.First().Value;
 
-            // Check to see if the username is in our AD.
-            using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
+            // If there was no bearer token give, an out of range index error will be thrown.
+            try
             {
-                var user = UserPrincipal.FindByIdentity(adContext, username);
-                if (user != null)
+                var JwtToken = new JwtSecurityTokenHandler().ReadJwtToken(TokenList[1]);
+                var username = JwtToken.Claims.First().Value;
+
+                // Check to see if the username is in our AD.
+                using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
                 {
-                    // Return the isAdmin field from the AuthIDServer matching the Guid.
-                    string adGUID = user.Guid.ToString();
-                    return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == adGUID).First().IsAdmin;
-                }
-                else
-                {
-                    // Return false if the user is not in AuthID.
-                    return false;
+                    var user = UserPrincipal.FindByIdentity(adContext, username);
+                    if (user != null)
+                    {
+                        // Return the isAdmin field from the AuthIDServer matching the Guid.
+                        string adGUID = user.Guid.ToString();
+                        return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == adGUID).First().IsAdmin;
+                    }
+                    else
+                    {
+                        // Return false if the user is not in AuthID.
+                        return false;
+                    }
                 }
             }
+            catch (IndexOutOfRangeException e)
+            {
+                return false;
+            }
+            
         }
 
         // TODO: Abstract this reused code from this and the image controller.
