@@ -7,7 +7,7 @@ namespace backend_api.Models
     {
         public Department()
         {
-            Employee = new HashSet<Employee>();
+           // Employee = new HashSet<Employee>();
         }
 
         public int DepartmentId { get; set; }
