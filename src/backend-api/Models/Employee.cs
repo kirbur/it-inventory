@@ -7,15 +7,15 @@ namespace backend_api.Models
     {
         public Employee()
         {
-            Computer = new HashSet<Computer>();
-            HardwareHistoryCurrentOwner = new HashSet<HardwareHistory>();
-            HardwareHistoryPreviousOwner = new HashSet<HardwareHistory>();
-            Monitor = new HashSet<Monitor>();
-            Peripheral = new HashSet<Peripheral>();
-            //Program = new HashSet<Program>();
-            //ProgramHistoryCurrentOwner = new HashSet<ProgramHistory>();
-            //ProgramHistoryPreviousOwner = new HashSet<ProgramHistory>();
-            Server = new HashSet<Server>();
+            //Computer = new HashSet<Computer>();
+            //HardwareHistoryCurrentOwner = new HashSet<HardwareHistory>();
+            //HardwareHistoryPreviousOwner = new HashSet<HardwareHistory>();
+            //Monitor = new HashSet<Monitor>();
+            //Peripheral = new HashSet<Peripheral>();
+            ////Program = new HashSet<Program>();
+            ////ProgramHistoryCurrentOwner = new HashSet<ProgramHistory>();
+            ////ProgramHistoryPreviousOwner = new HashSet<ProgramHistory>();
+            //Server = new HashSet<Server>();
         }
 
         public int EmployeeId { get; set; }
@@ -29,18 +29,18 @@ namespace backend_api.Models
         public string Role { get; set; }
         public string Adguid { get; set; }
 
-        public Department Department { get; set; }
-        public ICollection<Computer> Computer { get; set; }
-        public ICollection<HardwareHistory> HardwareHistoryCurrentOwner { get; set; }
-        public ICollection<HardwareHistory> HardwareHistoryPreviousOwner { get; set; }
-        public ICollection<Monitor> Monitor { get; set; }
-        public ICollection<Peripheral> Peripheral { get; set; }
+        //public Department Department { get; set; }
+        //public ICollection<Computer> Computer { get; set; }
+        //public ICollection<HardwareHistory> HardwareHistoryCurrentOwner { get; set; }
+        //public ICollection<HardwareHistory> HardwareHistoryPreviousOwner { get; set; }
+        //public ICollection<Monitor> Monitor { get; set; }
+        //public ICollection<Peripheral> Peripheral { get; set; }
 
-        // TODO: This might need to be commented out because the context won't load.
-        // An error could occur if the foreign key (EmployeeID) is null in the program history.
-        //public ICollection<Program> Program { get; set; }
-        //public ICollection<ProgramHistory> ProgramHistoryCurrentOwner { get; set; }
-        //public ICollection<ProgramHistory> ProgramHistoryPreviousOwner { get; set; }
-        public ICollection<Server> Server { get; set; }
+        //// TODO: This might need to be commented out because the context won't load.
+        //// An error could occur if the foreign key (EmployeeID) is null in the program history.
+        ////public ICollection<Program> Program { get; set; }
+        ////public ICollection<ProgramHistory> ProgramHistoryCurrentOwner { get; set; }
+        ////public ICollection<ProgramHistory> ProgramHistoryPreviousOwner { get; set; }
+        //public ICollection<Server> Server { get; set; }
     }
 }

@@ -23,6 +23,6 @@ namespace backend_api.Models
         public string Location { get; set; }
         public string SerialNumber { get; set; }
 
-        //public Employee Employee { get; set; }
+        // public Employee Employee { get; set; }
     }
 }

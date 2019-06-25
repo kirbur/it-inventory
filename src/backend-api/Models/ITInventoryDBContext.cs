@@ -137,11 +137,11 @@ namespace backend_api.Models
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.HasOne(d => d.Department)
-                    .WithMany(p => p.Employee)
-                    .HasForeignKey(d => d.DepartmentId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Employee_Department");
+                //entity.HasOne(d => d.Department)
+                //    .WithMany(p => p.Employee)
+                //    .HasForeignKey(d => d.DepartmentId)
+                //    .OnDelete(DeleteBehavior.ClientSetNull)
+                //    .HasConstraintName("FK_Employee_Department");
             });
 
             modelBuilder.Entity<HardwareHistory>(entity =>
@@ -160,15 +160,15 @@ namespace backend_api.Models
 
                 entity.Property(e => e.PreviousOwnerId).HasColumnName("PreviousOwnerID");
 
-                entity.HasOne(d => d.CurrentOwner)
-                    .WithMany(p => p.HardwareHistoryCurrentOwner)
-                    .HasForeignKey(d => d.CurrentOwnerId)
-                    .HasConstraintName("FK_HardwareHistory_Employee");
+                //entity.HasOne(d => d.CurrentOwner)
+                //    .WithMany(p => p.HardwareHistoryCurrentOwner)
+                //    .HasForeignKey(d => d.CurrentOwnerId)
+                //    .HasConstraintName("FK_HardwareHistory_Employee");
 
-                entity.HasOne(d => d.PreviousOwner)
-                    .WithMany(p => p.HardwareHistoryPreviousOwner)
-                    .HasForeignKey(d => d.PreviousOwnerId)
-                    .HasConstraintName("FK_HardwareHistory_Employee1");
+                //entity.HasOne(d => d.PreviousOwner)
+                //    .WithMany(p => p.HardwareHistoryPreviousOwner)
+                //    .HasForeignKey(d => d.PreviousOwnerId)
+                //    .HasConstraintName("FK_HardwareHistory_Employee1");
             });
 
             modelBuilder.Entity<Monitor>(entity =>
