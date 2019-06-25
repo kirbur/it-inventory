@@ -19,6 +19,6 @@ namespace backend_api.Models
         // TODO: These navigation attributes break the API call when requesting GET all in a table.
         //public Department DepartmentNavigation { get; set; }
         //public Department InverseDepartmentNavigation { get; set; }
-        public ICollection<Employee> Employee { get; set; }
+      //  public ICollection<Employee> Employee { get; set; }
     }
 }

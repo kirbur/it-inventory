@@ -27,7 +27,7 @@ namespace backend_api.Controllers
          */
         private string VerbatimMatch(string routeModel)
         {
-            return routeModel.ToLower() == "laptop" ? "computer" : routeModel;
+            return routeModel.ToLower() == "laptop" ? "computer" : routeModel.ToLower();
         }
 
         /* GET: api/detail/{model}/{id}
@@ -42,7 +42,7 @@ namespace backend_api.Controllers
             switch (model)
             {
                 case "employee":
-                    return Ok("employee");
+                    return Ok(_context.Employee.Where(x=>x.EmployeeId == id));
                 case "program":
                     return Ok("program");
                 case "department":

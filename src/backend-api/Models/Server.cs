@@ -28,6 +28,6 @@ namespace backend_api.Models
         public string LocalHHD { get; set; }
         public string Location { get; set; }
 
-        public Employee Employee { get; set; }
+       // public Employee Employee { get; set; }
     }
 }
