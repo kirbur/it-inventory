@@ -8,6 +8,7 @@
     display: inline-block;
     position: relative;
     align-self: flex-start;
+    z-index: 99;
 }
 
 .dropdownButton {
@@ -21,6 +22,7 @@
     text-align: left;
     position: relative;
     align-self: left;
+    padding-left: 0;
 }
 
 .dropdownTitle {

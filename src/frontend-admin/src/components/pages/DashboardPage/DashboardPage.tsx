@@ -141,7 +141,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const updateDropdownContent = () => {
         initDropdownContent.length = 0
 
-        deptTableData.map((i: any) => {
+        deptTableData.map((i: any) =>
             initDropdownContent.push({
                 id: i.id,
                 name: i.name,
@@ -154,7 +154,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                     </div>
                 ),
             })
-        })
+        )
         //console.log(initDropdownContent)
         setDropdownContent(initDropdownContent)
     }
