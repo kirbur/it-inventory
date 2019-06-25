@@ -21,26 +21,33 @@ namespace backend_api.Controllers
             _context = context;
         }
 
+        /* isAdmin determines if the username from the AccessToken is an admin user.
+         *  If the user is an admin, we can choose to return specific values to the front end.
+         * Return: boolean
+         */
         private bool isAdmin()
         {
-            //Take the token from the bearer header and split it from the bearer title
+            // Take the bearer token string, convert it to a Jwt, and find the username from the claims.
             var TokenList = Request.Headers["Authorization"].ToString().Split(" ");
-            //turn stringifyed token into a JWT token
             var JwtToken = new JwtSecurityTokenHandler().ReadJwtToken(TokenList[1]);
             var username = JwtToken.Claims.First().Value;
 
-            bool isAdmin = false;
+            // Check to see if the username is in our AD.
             using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
             {
                 var user = UserPrincipal.FindByIdentity(adContext, username);
                 if (user != null)
                 {
+                    // Return the isAdmin field from the AuthIDServer matching the Guid.
                     string adGUID = user.Guid.ToString();
-                    isAdmin = _context.AuthIdserver.Where(x => x.ActiveDirectoryId == adGUID).First().IsAdmin;
+                    return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == adGUID).First().IsAdmin;
+                }
+                else
+                {
+                    // Return false if the user is not in AuthID.
+                    return false;
                 }
             }
-
-            return isAdmin;
         }
 
         // TODO: Abstract this reused code from this and the image controller.
@@ -129,6 +136,7 @@ namespace backend_api.Controllers
         {
             bool isAdmin = this.isAdmin();
 
+            // Find the requested employee
             var emp = _context.Employee.Find(id);
             if (emp == null)
             {
@@ -136,9 +144,11 @@ namespace backend_api.Controllers
             }
             else
             {
-                // Make sure the thing is not deleted.
+                // Initialize return elements.
                 decimal totalHardwareCost = 0.0m;
                 List<object> hardware = new List<object>();
+
+                // For every server the employee is assigned to, create custom objects to return and add to the hardware list.
                 foreach (Server sv in _context.Server.Where(server => server.EmployeeId == id && !server.IsDeleted))
                 {
                     object tooltip = new
@@ -161,6 +171,8 @@ namespace backend_api.Controllers
                     hardware.Add(server);
                     totalHardwareCost += sv.FlatCost ?? 0.0m;
                 }
+
+                // For every computer the employee is assigned to, create custom objects to return and add to the hardware list.
                 foreach (Computer cp in _context.Computer.Where(computer => computer.EmployeeId == id && !computer.IsDeleted))
                 {
                     object tooltip = new
@@ -183,6 +195,8 @@ namespace backend_api.Controllers
                     hardware.Add(computer);
                     totalHardwareCost += cp.FlatCost ?? 0.0m;
                 }
+
+                // For every monitor the employee is assigned to, create custom objects to return and add to the hardware list.
                 foreach (Monitor mn in _context.Monitor.Where(monitor => monitor.EmployeeId == id && !monitor.IsDeleted))
                 {
                     object tooltip = new
@@ -202,6 +216,8 @@ namespace backend_api.Controllers
                     hardware.Add(monitor);
                     totalHardwareCost += mn.FlatCost ?? 0.0m;
                 }
+
+                // For every peripheral the employee is assigned to, create custom objects to return and add to the hardware list.
                 foreach (Peripheral pr in _context.Peripheral.Where(peripheral => peripheral.EmployeeId == id && !peripheral.IsDeleted))
                 {
                     // NOTE: Peripheral does not have make and model, but instead has name and type.
@@ -223,16 +239,17 @@ namespace backend_api.Controllers
                     totalHardwareCost += pr.FlatCost ?? 0.0m;
                 }
 
-                // Lists to return for programs.
+                // Initialize elements to return for programs.
                 List<object> software = new List<object>();
                 List<object> licenses = new List<object>();
                 decimal totalProgramCostPerMonth = 0.0m;
 
-                // For each program that is not deleted and is assigned to the employee
+                // For each program that is not deleted and is assigned to the employee, create an object to add to the list.
                 foreach (Models.Program prog in _context.Program.Where(prog => !prog.IsDeleted && prog.EmployeeId == id))
                 {
                     decimal costPerMonth = prog.ProgramCostPerYear / 12 ?? 0.0m;
                     totalProgramCostPerMonth += costPerMonth;
+
                     if (prog.IsLicense)
                     {
                         object license = new
@@ -245,6 +262,7 @@ namespace backend_api.Controllers
                         };
                         licenses.Add(license);
                     }
+                    // If not a license, then a software.
                     else
                     {
                         object sw = new
@@ -265,6 +283,7 @@ namespace backend_api.Controllers
                 // Get the department name
                 var department = _context.Department.Where(dep => dep.DepartmentId == emp.DepartmentId && !dep.IsDeleted).FirstOrDefault().DepartmentName;
 
+                // Combine it all into a nice JSON :)
                 object employeeDetail = new
                 {
                     picture,
