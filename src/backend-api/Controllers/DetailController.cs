@@ -203,7 +203,7 @@ namespace backend_api.Controllers
 
             // loop through every plug-in and if they are a plug-in of the current overview program add all the info that we need about them
             // to the list of plug-ins
-            foreach (var plugin in _context.Plugins.Where(x => (!x.IsDeleted)))
+            foreach (var plugin in _context.Plugins.Where(x=>(!x.IsDeleted)))
             {
                 if (programIds.Contains(plugin.ProgramId))
                 {
