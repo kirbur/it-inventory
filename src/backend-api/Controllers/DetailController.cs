@@ -58,7 +58,7 @@ namespace backend_api.Controllers
             {
                 return false;
             }
-            
+
         }
 
         // TODO: Abstract this reused code from this and the image controller.
@@ -83,11 +83,7 @@ namespace backend_api.Controllers
             switch (model)
             {
                 case "employee":
-<<<<<<< HEAD
-                    return Ok(_context.Employee.Where(x => x.EmployeeId == id));
-=======
                     return GetEmployeeDetail(id);
->>>>>>> Develop
                 case "program":
                     return Ok("program");
                 case "department":
@@ -106,7 +102,6 @@ namespace backend_api.Controllers
 
         }
 
-<<<<<<< HEAD
         /* GET: api/detail/ProgramOverview/{program}
          * Function returns the program overview information     
          * Returns:{
@@ -168,7 +163,7 @@ namespace backend_api.Controllers
             var ProgFlatCost = _context.Program.Where(x => x.ProgramName == program && x.ProgramFlatCost != null && x.IsDeleted != true).Sum(x => x.ProgramFlatCost);
 
             // This lambda returns true if all the license keys are the same from the current program
-            var LicenseKeySame = !(_context.Program.Where(x => x.ProgramName == program && x.IsDeleted == false).ToList().Any(x => x.ProgramLicenseKey != _context.Program.ToList()[0].ProgramLicenseKey));
+            var LicenseKeySame = !(_context.Program.Where(x => x.ProgramName == program && x.IsDeleted == false).ToList().Any(x => x.ProgramLicenseKey != _context.Program.ToList().First().ProgramLicenseKey));
 
             // if all the license keys are the same then find the license key that they all are
             if (LicenseKeySame == true)
@@ -208,7 +203,7 @@ namespace backend_api.Controllers
 
             // loop through every plug-in and if they are a plug-in of the current overview program add all the info that we need about them
             // to the list of plug-ins
-            foreach (var plugin in _context.Plugins)
+            foreach (var plugin in _context.Plugins.Where(x => (!x.IsDeleted)))
             {
                 if (programIds.Contains(plugin.ProgramId))
                 {
@@ -240,7 +235,6 @@ namespace backend_api.Controllers
             var ProgramOverViewPage = new { programOverview, inDivPrograms, ListOfPlugins };
             return Ok(ProgramOverViewPage);
         }
-=======
         /*
          * GET: api/detail/employee/{id}
          * Function returns the employee detail information.
@@ -452,6 +446,5 @@ namespace backend_api.Controllers
             }
         }
 
->>>>>>> Develop
     }
 }
