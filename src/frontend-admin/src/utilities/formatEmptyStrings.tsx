@@ -1,19 +1,14 @@
-export const format = (str?: string | null, num?: number | null) => {
-    if (str !== undefined) {
-        //if str is empty, null, or only whitespace
-        if (str === '' || str === null) {
+export const format = (x: string | null | number) => {
+    if (typeof x === 'string') {
+        //if x is empty, null, or only whitespace
+        if (x === '') {
             return '-'
         } else {
-            return str
+            return x
         }
     }
-
-    if (num !== undefined) {
-        if (num === null) {
-            return '-'
-        } else {
-            return num
-        }
+    if (typeof x === 'number') {
+        return x
     }
 
     return '-'

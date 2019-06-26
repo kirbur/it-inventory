@@ -32,6 +32,7 @@ export class AxiosService {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
+                crossdomain: true,
             },
         })
     }
@@ -41,13 +42,14 @@ export class AxiosService {
         return this.instance
             .get(
                 url /*, {
-                    headers: {
-                    Authorization: `Bearer ${this.user.accessToken}`
-                    }
-                }*/
+                headers: {
+                    Authorization: `Bearer ${this.user.accessToken}`,
+                },
+            }*/
             )
             .then(response => {
                 this.checkTokenExpired(url)
+                //console.log(response)
                 return response.data
             })
             .catch(err => console.log(err))
