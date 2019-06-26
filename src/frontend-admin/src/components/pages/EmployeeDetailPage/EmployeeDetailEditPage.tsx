@@ -41,9 +41,14 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         }
     }
 
-    // --------------- rendering rows and headers for the tables ------------ //
+    function deleteSummin(value: any) {
+        console.log(value)
+        //remove the row from the array to trigger a re render
+    }
 
-    const [rows, setRows] = useState([
+    // --------------- rendering rows and headers for the hardware table ------------ //
+
+    const [hardwareRows, setHardwareRows] = useState([
         ['Bill Belichik', 'Sales', '2012/09/12', 0],
         ['Joe Montana', 'Sales', '2012/09/11', 1],
         ['Bob the Builder', 'Developer', '2012/09/13', 154],
@@ -52,94 +57,306 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     ])
 
     //this is the only thing to change
-    const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
+    const hardwareHeadersList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
 
     //initialize all the header states and styling to be not sorted
-    const headerStates = []
-    const headerStateCounts = []
+    const hardwareHeaderStates = []
+    const hardwareHeaderStateCounts = []
 
-    for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
-        headerStateCounts.push(0)
+    for (let i = 0; i < hardwareHeadersList.length; i++) {
+        hardwareHeaderStates.push(styles.notSorted)
+        hardwareHeaderStateCounts.push(0)
     }
 
-    var initHeaderStateCounts = cloneDeep(headerStateCounts)
-    var tempHeaderStates = cloneDeep(headerStates)
-    var tempHeaderStateCounts = cloneDeep(headerStateCounts)
+    var initHardwareHeaderStateCounts = cloneDeep(hardwareHeaderStateCounts)
+    var tempHardwareHeaderStates = cloneDeep(hardwareHeaderStates)
+    var tempHardwareHeaderStateCounts = cloneDeep(hardwareHeaderStateCounts)
 
-    var initState = {headerStates, headerStateCounts}
-    const [sortState, setSortState] = useState(initState)
+    var initHardwareState = {hardwareHeaderStates, hardwareHeaderStateCounts}
+    const [hardwareSortState, setHardwareSortState] = useState(initHardwareState)
 
-    function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
-            tempHeaderStates[index] = styles.descending
-            tempHeaderStateCounts[index] = 1
-            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
-            tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
-            tempHeaderStates[index] = styles.ascending
-            tempHeaderStateCounts[index] = 0
-            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
-            tempHeaderStateCounts = [...initHeaderStateCounts]
+    function sortHardwareStates(index: number) {
+        if (hardwareSortState.hardwareHeaderStateCounts[index] == 0) {
+            tempHardwareHeaderStates[index] = styles.descending
+            tempHardwareHeaderStateCounts[index] = 1
+            setHardwareSortState({
+                hardwareHeaderStates: tempHardwareHeaderStates,
+                hardwareHeaderStateCounts: tempHardwareHeaderStateCounts,
+            })
+            tempHardwareHeaderStateCounts = [...initHardwareHeaderStateCounts]
+        } else if (hardwareSortState.hardwareHeaderStateCounts[index] == 1) {
+            tempHardwareHeaderStates[index] = styles.ascending
+            tempHardwareHeaderStateCounts[index] = 0
+            setHardwareSortState({
+                hardwareHeaderStates: tempHardwareHeaderStates,
+                hardwareHeaderStateCounts: tempHardwareHeaderStateCounts,
+            })
+            tempHardwareHeaderStateCounts = [...initHardwareHeaderStateCounts]
         }
     }
 
     //returns an array of <td> elements based on the array of strings of headers
-    const renderHeaders = () => {
-        var headers = []
-        headers.push(<td></td>)
-        for (let i = 0; i < headerList.length; i++) {
+    const renderHardwareHeaders = () => {
+        var hardwareHeaders = []
+        hardwareHeaders.push(<td></td>)
+        for (let i = 0; i < hardwareHeadersList.length; i++) {
             let header = (
                 <td
                     onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
-                        sortStates(i)
+                        setHardwareRows(sortTable(hardwareRows, i, hardwareSortState.hardwareHeaderStateCounts[i]))
+                        sortHardwareStates(i)
                     }}
                     className={styles.header}
                 >
                     <div className={styles.headerContainer}>
-                        {headerList[i]}
-                        <div className={sortState.headerStates[i]} />
+                        {hardwareHeadersList[i]}
+                        <div className={hardwareSortState.hardwareHeaderStates[i]} />
                     </div>
                 </td>
             )
-            headers.push(header)
+            hardwareHeaders.push(header)
         }
-        return headers
-    }
-
-    function deleteSummin(value: any) {
-        console.log(value)
-        //remove the row from the array to trigger a re render
+        return hardwareHeaders
     }
 
     //returns matrix of <td> elements from the provided data
-    var renderedRows: any[] = []
-    rows.forEach(row => {
-        const transformedRow: any[] = []
+    var renderedHardwareRows: any[] = []
+    hardwareRows.forEach(row => {
+        const transformedHardwareRow: any[] = []
         for (let i = 0; i < row.length + 1; i++) {
             switch (i) {
                 case 0:
-                    transformedRow[0] = (
+                    transformedHardwareRow[0] = (
                         <td onClick={e => deleteSummin(row[0])}>
                             <div className={styles.delete} />
                             <div className={styles.whiteLine} />
                         </td>
                     )
                 case 1:
-                    transformedRow[1] = <td className={styles.rowData}>{row[0]} </td>
+                    transformedHardwareRow[1] = <td className={styles.rowData}>{row[0]} </td>
                 case 2:
-                    transformedRow[2] = <td className={styles.rowData}>{row[1]}</td>
+                    transformedHardwareRow[2] = <td className={styles.rowData}>{row[1]}</td>
                 case 3:
-                    transformedRow[3] = <td className={styles.rowData}>{row[2]}</td>
+                    transformedHardwareRow[3] = <td className={styles.rowData}>{row[2]}</td>
                 case 4:
-                    transformedRow[4] = <td className={styles.rowData}>{row[3]}</td>
+                    transformedHardwareRow[4] = <td className={styles.rowData}>{row[3]}</td>
                 case 5:
-                    transformedRow[5] = <td>{row[4]}</td>
+                    transformedHardwareRow[5] = <td>{row[4]}</td>
             }
         }
-        renderedRows.push(transformedRow)
+        renderedHardwareRows.push(transformedHardwareRow)
     })
+    // ---------------------------------------------------------------------- //
+
+    // --------------- rendering rows and headers for the hardware table ------------ //
+
+    const [softwareRows, setSoftwareRows] = useState([
+        ['Bill Belichik', 'Sales', '2012/09/12', 0],
+        ['Joe Montana', 'Sales', '2012/09/11', 1],
+        ['Bob the Builder', 'Developer', '2012/09/13', 154],
+        ['Anne Manion', 'PM', '2010/09/12', 16],
+        ['Sue Z', 'Designer', '2014/09/12', 15],
+    ])
+
+    //this is the only thing to change
+    const softwareHeadersList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
+
+    //initialize all the header states and styling to be not sorted
+    const softwareHeaderStates = []
+    const softwareHeaderStateCounts = []
+
+    for (let i = 0; i < softwareHeadersList.length; i++) {
+        softwareHeaderStates.push(styles.notSorted)
+        softwareHeaderStateCounts.push(0)
+    }
+
+    var initSoftwareHeaderStateCounts = cloneDeep(softwareHeaderStateCounts)
+    var tempSoftwareHeaderStates = cloneDeep(softwareHeaderStates)
+    var tempSoftwareHeaderStateCounts = cloneDeep(softwareHeaderStateCounts)
+
+    var initSoftwareState = {
+        softwareHeaderStates: softwareHeaderStates,
+        softwareHeaderStateCounts: softwareHeaderStateCounts,
+    }
+    const [softwareSortState, setSoftwareSortState] = useState(initSoftwareState)
+
+    function sortSoftwareStates(index: number) {
+        if (softwareSortState.softwareHeaderStateCounts[index] == 0) {
+            tempSoftwareHeaderStates[index] = styles.descending
+            tempSoftwareHeaderStateCounts[index] = 1
+            setSoftwareSortState({
+                softwareHeaderStates: tempSoftwareHeaderStates,
+                softwareHeaderStateCounts: tempSoftwareHeaderStateCounts,
+            })
+            tempSoftwareHeaderStateCounts = [...initSoftwareHeaderStateCounts]
+        } else if (softwareSortState.softwareHeaderStateCounts[index] == 1) {
+            tempSoftwareHeaderStates[index] = styles.ascending
+            tempSoftwareHeaderStateCounts[index] = 0
+            setSoftwareSortState({
+                softwareHeaderStates: tempSoftwareHeaderStates,
+                softwareHeaderStateCounts: tempSoftwareHeaderStateCounts,
+            })
+            tempSoftwareHeaderStateCounts = [...initSoftwareHeaderStateCounts]
+        }
+    }
+
+    //returns an array of <td> elements based on the array of strings of headers
+    const renderSoftwareHeaders = () => {
+        var softwareHeaders = []
+        softwareHeaders.push(<td></td>)
+        for (let i = 0; i < softwareHeadersList.length; i++) {
+            let header = (
+                <td
+                    onClick={e => {
+                        setSoftwareRows(sortTable(softwareRows, i, softwareSortState.softwareHeaderStateCounts[i]))
+                        sortSoftwareStates(i)
+                    }}
+                    className={styles.header}
+                >
+                    <div className={styles.headerContainer}>
+                        {softwareHeadersList[i]}
+                        <div className={softwareSortState.softwareHeaderStates[i]} />
+                    </div>
+                </td>
+            )
+            softwareHeaders.push(header)
+        }
+        return softwareHeaders
+    }
+
+    //returns matrix of <td> elements from the provided data
+    var renderedSoftwareRows: any[] = []
+    softwareRows.forEach(row => {
+        const transformedSoftwareRow: any[] = []
+        for (let i = 0; i < row.length + 1; i++) {
+            switch (i) {
+                case 0:
+                    transformedSoftwareRow[0] = (
+                        <td onClick={e => deleteSummin(row[0])}>
+                            <div className={styles.delete} />
+                            <div className={styles.whiteLine} />
+                        </td>
+                    )
+                case 1:
+                    transformedSoftwareRow[1] = <td className={styles.rowData}>{row[0]} </td>
+                case 2:
+                    transformedSoftwareRow[2] = <td className={styles.rowData}>{row[1]}</td>
+                case 3:
+                    transformedSoftwareRow[3] = <td className={styles.rowData}>{row[2]}</td>
+                case 4:
+                    transformedSoftwareRow[4] = <td className={styles.rowData}>{row[3]}</td>
+                case 5:
+                    transformedSoftwareRow[5] = <td>{row[4]}</td>
+            }
+        }
+        renderedSoftwareRows.push(transformedSoftwareRow)
+    })
+    // ---------------------------------------------------------------------- //
+
+    // --------------- rendering rows and headers for the hardware table ------------ //
+
+    const [licenseRows, setLicenseRows] = useState([
+        ['Bill Belichik', 'Sales', '2012/09/12', 0],
+        ['Joe Montana', 'Sales', '2012/09/11', 1],
+        ['Bob the Builder', 'Developer', '2012/09/13', 154],
+        ['Anne Manion', 'PM', '2010/09/12', 16],
+        ['Sue Z', 'Designer', '2014/09/12', 15],
+    ])
+
+    //this is the only thing to change
+    const licenseHeadersList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
+
+    //initialize all the header states and styling to be not sorted
+    const licenseHeaderStates = []
+    const licenseHeaderStateCounts = []
+
+    for (let i = 0; i < licenseHeadersList.length; i++) {
+        licenseHeaderStates.push(styles.notSorted)
+        licenseHeaderStateCounts.push(0)
+    }
+
+    var initLicenseHeaderStateCounts = cloneDeep(licenseHeaderStateCounts)
+    var tempLicenseHeaderStates = cloneDeep(licenseHeaderStates)
+    var tempLicenseHeaderStateCounts = cloneDeep(licenseHeaderStateCounts)
+
+    var initLicenseState = {
+        licenseHeaderStates: licenseHeaderStates,
+        licenseHeaderStateCounts: licenseHeaderStateCounts,
+    }
+    const [licenseSortState, setLicenseSortState] = useState(initLicenseState)
+
+    function sortLicenseStates(index: number) {
+        if (licenseSortState.licenseHeaderStateCounts[index] == 0) {
+            tempLicenseHeaderStates[index] = styles.descending
+            tempLicenseHeaderStateCounts[index] = 1
+            setLicenseSortState({
+                licenseHeaderStates: tempLicenseHeaderStates,
+                licenseHeaderStateCounts: tempLicenseHeaderStateCounts,
+            })
+            tempLicenseHeaderStateCounts = [...initLicenseHeaderStateCounts]
+        } else if (licenseSortState.licenseHeaderStateCounts[index] == 1) {
+            tempLicenseHeaderStates[index] = styles.ascending
+            tempLicenseHeaderStateCounts[index] = 0
+            setLicenseSortState({
+                licenseHeaderStates: tempLicenseHeaderStates,
+                licenseHeaderStateCounts: tempLicenseHeaderStateCounts,
+            })
+            tempLicenseHeaderStateCounts = [...initLicenseHeaderStateCounts]
+        }
+    }
+
+    //returns an array of <td> elements based on the array of strings of headers
+    const renderLicenseHeaders = () => {
+        var licenseHeaders = []
+        licenseHeaders.push(<td></td>)
+        for (let i = 0; i < licenseHeadersList.length; i++) {
+            let header = (
+                <td
+                    onClick={e => {
+                        setLicenseRows(sortTable(licenseRows, i, licenseSortState.licenseHeaderStateCounts[i]))
+                        sortLicenseStates(i)
+                    }}
+                    className={styles.header}
+                >
+                    <div className={styles.headerContainer}>
+                        {licenseHeadersList[i]}
+                        <div className={licenseSortState.licenseHeaderStates[i]} />
+                    </div>
+                </td>
+            )
+            licenseHeaders.push(header)
+        }
+        return licenseHeaders
+    }
+
+    //returns matrix of <td> elements from the provided data
+    var renderedLicenseRows: any[] = []
+    licenseRows.forEach(row => {
+        const transformedLicenseRow: any[] = []
+        for (let i = 0; i < row.length + 1; i++) {
+            switch (i) {
+                case 0:
+                    transformedLicenseRow[0] = (
+                        <td onClick={e => deleteSummin(row[0])}>
+                            <div className={styles.delete} />
+                            <div className={styles.whiteLine} />
+                        </td>
+                    )
+                case 1:
+                    transformedLicenseRow[1] = <td className={styles.rowData}>{row[0]} </td>
+                case 2:
+                    transformedLicenseRow[2] = <td className={styles.rowData}>{row[1]}</td>
+                case 3:
+                    transformedLicenseRow[3] = <td className={styles.rowData}>{row[2]}</td>
+                case 4:
+                    transformedLicenseRow[4] = <td className={styles.rowData}>{row[3]}</td>
+                case 5:
+                    transformedLicenseRow[5] = <td>{row[4]}</td>
+            }
+        }
+        renderedLicenseRows.push(transformedLicenseRow)
+    })
+    // ---------------------------------------------------------------------- //
 
     return (
         <div className={styles.columns}>
@@ -241,7 +458,25 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 {/* Tables */}
                 <div className={styles.paddingTop}>
-                    <DetailPageTable headers={renderHeaders()} rows={renderedRows} style={styles.newRowThing} />
+                    <DetailPageTable
+                        headers={renderHardwareHeaders()}
+                        rows={renderedHardwareRows}
+                        style={styles.newRowThing}
+                    />
+                </div>
+                <div className={styles.addContainer}>
+                    <div className={styles.addIconBorder}>
+                        <IoMdAdd className={styles.addIcon} />
+                    </div>
+                    <div className={styles.assignText}>Assign new hardware</div>
+                </div>
+
+                <div className={styles.paddingTop}>
+                    <DetailPageTable
+                        headers={renderSoftwareHeaders()}
+                        rows={renderedSoftwareRows}
+                        style={styles.newRowThing}
+                    />
                 </div>
                 <div className={styles.addContainer}>
                     <div className={styles.addIconBorder}>
@@ -251,23 +486,17 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 </div>
 
                 <div className={styles.paddingTop}>
-                    <DetailPageTable headers={renderHeaders()} rows={renderedRows} style={styles.newRowThing} />
+                    <DetailPageTable
+                        headers={renderLicenseHeaders()}
+                        rows={renderedLicenseRows}
+                        style={styles.newRowThing}
+                    />
                 </div>
                 <div className={styles.addContainer}>
                     <div className={styles.addIconBorder}>
                         <IoMdAdd className={styles.addIcon} />
                     </div>
                     <div className={styles.assignText}>Assign new licenses</div>
-                </div>
-
-                <div className={styles.paddingTop}>
-                    <DetailPageTable headers={renderHeaders()} rows={renderedRows} style={styles.newRowThing} />
-                </div>
-                <div className={styles.addContainer}>
-                    <div className={styles.addIconBorder}>
-                        <IoMdAdd className={styles.addIcon} />
-                    </div>
-                    <div className={styles.assignText}>Assign new hardware</div>
                 </div>
 
                 <div className={styles.submitContainer}>
