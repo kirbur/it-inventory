@@ -58,7 +58,7 @@ namespace backend_api.Controllers
             {
                 return false;
             }
-
+            
         }
 
         // TODO: Abstract this reused code from this and the image controller.
@@ -445,6 +445,5 @@ namespace backend_api.Controllers
                 return Ok(employeeDetail);
             }
         }
-
     }
 }
