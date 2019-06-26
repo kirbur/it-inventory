@@ -119,7 +119,7 @@ namespace backend_api.Controllers
                         // Copy the file to the local hard drive.
                         await file.CopyToAsync(fs);
                     }
-                    return Ok(modelPath + $"\\{id}");
+                    return Ok();
                 }
                 else
                 {
