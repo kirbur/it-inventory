@@ -194,12 +194,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             <input type='text' className={styles.input} />
                         </div>
                         <div>
-                            <div className={styles.text}>Date Hired</div>
+                            <div className={styles.text}>Last Name</div>
                             <input type='text' className={styles.input} />
                         </div>
                     </div>
                     <div>
-                        <div className={styles.text}>Last Name</div>
+                        <div className={styles.text}>Date Hired</div>
                         <input type='text' className={styles.input} />
                     </div>
                 </div>
