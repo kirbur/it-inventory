@@ -238,7 +238,7 @@ namespace backend_api.Controllers
         /*
          * GET: api/detail/employee/{id}
          * Function returns the employee detail information.
-         * Returns: {
+         * Returns: [ {
          *      picture: partial URL (as string),
          *      totalProgramCostPerMonth: decimal,
          *      totalHardwareCost: decimal,
@@ -274,7 +274,7 @@ namespace backend_api.Controllers
          *          costPerMonth: decimal,
          *          flatCost: decimal,
          *      } ,.. ],
-         *  }            
+         *  } ]           
          */
         private IActionResult GetEmployeeDetail(int id)
         {
@@ -442,7 +442,9 @@ namespace backend_api.Controllers
                     software,
                     licenses,
                 };
-                return Ok(employeeDetail);
+                List<object> returnList = new List<object>();
+                returnList.Add(employeeDetail);
+                return Ok(returnList);
             }
         }
         /*
