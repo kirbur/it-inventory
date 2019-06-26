@@ -83,11 +83,7 @@ namespace backend_api.Controllers
             switch (model)
             {
                 case "employee":
-<<<<<<< HEAD
-                    return Ok(_context.Employee.Where(x => x.EmployeeId == id));
-=======
                     return GetEmployeeDetail(id);
->>>>>>> Develop
                 case "program":
                     return Ok("program");
                 case "department":
@@ -106,7 +102,6 @@ namespace backend_api.Controllers
 
         }
 
-<<<<<<< HEAD
         /* GET: api/detail/ProgramOverview/{program}
          * Function returns the program overview information     
          * Returns:{
@@ -240,7 +235,6 @@ namespace backend_api.Controllers
             var ProgramOverViewPage = new { programOverview, inDivPrograms, ListOfPlugins };
             return Ok(ProgramOverViewPage);
         }
-=======
         /*
          * GET: api/detail/employee/{id}
          * Function returns the employee detail information.
@@ -451,7 +445,5 @@ namespace backend_api.Controllers
                 return Ok(employeeDetail);
             }
         }
-
->>>>>>> Develop
     }
 }
