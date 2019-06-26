@@ -7,10 +7,11 @@ interface ITableProps {
     headers: any[]
     rows: any[][]
     onRowClick?: (datum: any) => void
+    style?: string
 }
 
 export const DetailPageTable = (props: ITableProps) => {
-    const {headers, rows, onRowClick} = props
+    const {style, headers, rows, onRowClick} = props
     const isClickable = Boolean(onRowClick)
 
     return (
@@ -22,7 +23,7 @@ export const DetailPageTable = (props: ITableProps) => {
             <tbody>
                 {rows.map(row => (
                     <tr
-                        className={s(styles.tr, isClickable && styles.clickable)}
+                        className={s(style, styles.tr, isClickable && styles.clickable)}
                         onClick={
                             onRowClick
                                 ? e => {

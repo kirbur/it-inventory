@@ -12,6 +12,8 @@ import {HelloUser} from '../HelloUser/HelloUser'
 
 import {EmployeeDetailPage} from '../pages/EmployeeDetailPage/EmployeeDetailPage'
 
+import {EmployeeDetailEditPage} from '../pages/EmployeeDetailPage/EmployeeDetailEditPage'
+
 // Styles
 import styles from './App.module.css'
 
@@ -112,10 +114,16 @@ export const App: React.FC = () => {
                         <Route exact path='/login' component={Login} />
                         <Route exact path='/' component={Login} />
 
-                        <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
+                        <Route exact path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
                         {/* <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
                         <Route path={'/hardware/:id'} render={props => <HardwareDetailPage {...props} />} />
                         <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} /> */}
+
+                        <Route
+                            exact
+                            path={'/employees/edit/:id'}
+                            render={props => <EmployeeDetailEditPage {...props} />}
+                        />
                     </Switch>
                 </Router>
 

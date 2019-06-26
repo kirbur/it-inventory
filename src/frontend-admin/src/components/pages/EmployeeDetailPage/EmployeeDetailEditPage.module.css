@@ -1,0 +1,302 @@
+.columns {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.firstColumn {
+    min-width: 300px;
+    padding: 25px;
+}
+.secondColumn {
+    min-width: 700px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+}
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.imgPadding {
+    padding: 25px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+    width: 300px;
+    height: 300px;
+}
+.img {
+    position: relative;
+    top: 50px;
+    transform: scale(1.5, 1.5);
+}
+.title {
+    text-align: left;
+    font-size: 24px;
+}
+.paddingTop {
+    padding-top: 50px;
+}
+.paddingBottom {
+    padding-bottom: 25px;
+}
+.paddingRight {
+    padding-right: 50px;
+}
+.line {
+    border-bottom: 2px solid #a5a5a5;
+    width: 100%;
+    height: 10px;
+    margin-top: 50px;
+}
+
+/* admin/nonadmin cards */
+.adminCardContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-bottom: 25px;
+}
+.adminCard {
+    border: 2px solid #979797;
+    border-radius: 2px;
+    width: 390px;
+    height: 200px;
+    display: flex;
+    flex-direction: row;
+}
+.card {
+    text-align: left;
+    padding: 15px;
+    width: 300px;
+}
+.adminIcon {
+    transform: scale(3.75, 3.75);
+    position: relative;
+    top: 40px;
+    left: 5px;
+}
+.adminIconShield {
+    transform: scale(4.5, 4.5);
+    position: relative;
+    top: 40px;
+    left: 5px;
+}
+.adminText {
+    color: #a5a5a5;
+    font-size: 18px;
+}
+
+/* name and date */
+.input {
+    width: 390px;
+    height: 45px;
+    border: 1.5px solid #a5a5a5;
+    border-radius: 3px;
+}
+.text {
+    color: #a5a5a5;
+    font-size: 24px;
+    text-align: left;
+}
+
+/* styling for radio buttons */
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+.card input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+.container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    width: 450px;
+}
+.checkmark {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    border: 2px solid #979797;
+}
+.insideCheckmark {
+    z-index: 1;
+    position: relative;
+    right: 25px;
+    border-radius: 50%;
+    height: 21px;
+    width: 21px;
+    background-color: white;
+}
+.insideCheckmarkAdmin {
+    z-index: 1;
+    position: relative;
+    /* right: 25px; */
+    bottom: 25px;
+    left: 4px;
+    border-radius: 50%;
+    height: 21px;
+    width: 21px;
+    background-color: white;
+}
+/* changes checkmark after input clicked */
+input:checked ~ .checkmark {
+    border-color: #2196f3;
+}
+input:checked ~ .insideCheckmark {
+    background-color: #2196f3;
+}
+input:checked ~ .insideCheckmarkAdmin {
+    background-color: #2196f3;
+}
+
+.employeeDepartment {
+    display: flex;
+    flex-direction: row;
+}
+.deptIcon {
+    width: 75px;
+    height: 75px;
+    margin: 25px;
+}
+.deptName {
+    color: #636363;
+    font-size: 22px;
+}
+
+/* styling for table headers - will have to go on every page with a table*/
+.headerContainer {
+    color: #a5a5a5;
+    font-size: 24px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+    display: flex;
+    cursor: pointer;
+}
+.header {
+    text-align: left;
+    border-bottom: 1px solid #979797;
+}
+.rowData {
+    text-align: left;
+    color: #4a4a4a;
+}
+.notSorted {
+    border-left: 8px solid #636363;
+    border-right: 8px solid #636363;
+    border-top: 2px solid #636363;
+    border-bottom: none;
+    height: 2px;
+    position: relative;
+    top: 15px;
+    left: 5px;
+}
+.ascending {
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid #636363;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: relative;
+    bottom: 10px;
+    left: 5px;
+}
+.descending {
+    border-top: 8px solid #636363;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: relative;
+    top: 15px;
+    left: 5px;
+}
+
+/* delete icon next to row */
+.delete {
+    background-color: red;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+}
+.delete:hover {
+    background-color: maroon;
+}
+.whiteLine {
+    width: 18px;
+    height: 2px;
+    background-color: white;
+    position: relative;
+    bottom: 16px;
+    left: 6px;
+}
+
+/* so the table doesnt highlight on hover */
+.newRowThing:hover {
+    background-color: white;
+}
+
+/* add to table text and icon */
+.addContainer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.addIconBorder:hover {
+    background-color: #a5a5a577;
+    cursor: pointer;
+}
+.addIconBorder {
+    border: 2px solid #2196f3;
+    border-radius: 3px;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.addIcon {
+    color: #2196f3;
+    transform: scale(2, 2);
+}
+.assignText {
+    padding-left: 5px;
+    color: #2196f3;
+    font-size: 20px;
+}
+
+/* submit button at the bottom */
+.submitContainer {
+    padding-top: 50px;
+    display: flex;
+    justify-content: center;
+}
+.submitButton {
+    border: 2px solid #2196f3;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 35px;
+}
+.submitButton:hover {
+    background-color: #a5a5a577;
+    cursor: pointer;
+}
+.submitText {
+    color: #2196f3;
+    font-size: 24px;
+}
+.personIcon {
+    color: #2196f3;
+    transform: scale(1.5, 1.5);
+    position: relative;
+    left: 10px;
+}

@@ -105,7 +105,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }, [columns])
 
     const handleClick = () => {
-        history.push(`${match.url}/new`)
+        history.push(`/employees/edit/new`)
     }
 
     const handleRowClick = (id: number) => {
