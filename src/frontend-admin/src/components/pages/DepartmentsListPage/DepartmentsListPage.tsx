@@ -10,6 +10,7 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import icon from '../../../content/Images/CQL-favicon.png'
 
 // Styles
 import styles from './DepartmentsListPage.module.css'
@@ -169,7 +170,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     function concatenatedDept(row: any[]) {
         return (
             <td className={styles.departments}>
-                <img className={styles.icon} src={URL + row[4]} onError={(e: any)=>{e.target.onerror = null; e.target.src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Filing_cabinet_icon.svg/480px-Filing_cabinet_icon.svg.png"}} alt="Department Picture" />
+                <img className={styles.icon} src={URL + row[4]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.departmentName}>{row[0]}</text>
                 </div>

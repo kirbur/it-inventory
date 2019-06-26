@@ -174,7 +174,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     function concatenatedName(row: any[]) {
         return (
             <td className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[7]} alt="Laptop Picture" />
+                <img className={styles.icon} src={URL + row[7]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text>
                 </div>

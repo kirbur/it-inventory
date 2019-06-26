@@ -58,7 +58,7 @@ namespace backend_api.Controllers
             {
                 return false;
             }
-            
+
         }
 
         // TODO: Abstract this reused code from this and the image controller.
@@ -85,7 +85,7 @@ namespace backend_api.Controllers
                 case "employee":
                     return GetEmployeeDetail(id);
                 case "program":
-                    return Ok("program");
+                    return GetProgramDetail(id);
                 case "department":
                     return Ok("department");
                 case "server":
@@ -203,7 +203,7 @@ namespace backend_api.Controllers
 
             // loop through every plug-in and if they are a plug-in of the current overview program add all the info that we need about them
             // to the list of plug-ins
-            foreach (var plugin in _context.Plugins.Where(x=>(!x.IsDeleted)))
+            foreach (var plugin in _context.Plugins.Where(x => (!x.IsDeleted)))
             {
                 if (programIds.Contains(plugin.ProgramId))
                 {
@@ -282,7 +282,7 @@ namespace backend_api.Controllers
 
             // Find the requested employee
             var emp = _context.Employee.Find(id);
-            if (emp == null)
+            if (emp == null || emp.IsDeleted ==true)
             {
                 return NotFound();
             }
@@ -446,6 +446,61 @@ namespace backend_api.Controllers
                 returnList.Add(employeeDetail);
                 return Ok(returnList);
             }
+        }
+        /*
+        * GET: api/detail/program/{id}
+        * Function returns the program detail information.
+        * Returns: {
+        * 
+        */
+        private IActionResult GetProgramDetail(int id)
+        {
+            //finding the program
+            var prog = _context.Program.Find(id);
+            // checking if the program actually exists and isn't deleted
+            if (prog == null || prog.IsDeleted == true)
+            {
+                return NotFound();
+            }
+            // if the program does exist...
+            else
+            {
+                // Partial path for picture
+                string picture = $"/images/program/{id}";
+
+
+                // holds the employee name for concatenation purposes 
+                var employeeName = "";
+                // Concatenating employees first and last name of the employee who owns the program if the program is assigned
+                // and if the program is not deleted
+                if (prog.EmployeeId != null && prog.IsDeleted == false)
+                {
+                    var empFirst = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.FirstName).FirstOrDefault();
+                    var empLast = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.LastName).FirstOrDefault();
+                    employeeName = empFirst + " " + empLast;
+                }
+                // find all the events/history of the current program
+                var ProgHistory = _context.ProgramHistory.Where(x => x.ProgramId == prog.ProgramId);
+
+                // Returning the details of the program into a nice JSON object :)
+                var ProgramDetails = new
+                {
+                    prog.ProgramName,
+                    picture,
+                    prog.RenewalDate,
+                    prog.DateBought,
+                    employeeName,
+                    ProgHistory,
+                    prog.ProgramCostPerYear,
+                    prog.ProgramFlatCost,
+                    prog.IsCostPerYear,
+                    prog.Description,
+                    prog.ProgramPurchaseLink
+                };
+
+                return Ok(ProgramDetails);
+            }
+
         }
     }
 }
