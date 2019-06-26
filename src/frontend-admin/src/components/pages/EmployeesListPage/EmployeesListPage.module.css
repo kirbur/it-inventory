@@ -1,7 +1,15 @@
+.employeesListMain {
+    margin: 50px 85px;
+}
+
 .page {
     text-align: center;
     display: flex;
     justify-content: center;
+}
+
+.group {
+    padding-bottom: 60px;
 }
 
 .icon {
@@ -39,6 +47,16 @@
     padding-top: 16px;
     display: flex;
     cursor: pointer;
+
+    text-transform: uppercase;
+
+    /*No selecting*/
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .nameHeader {
     padding-left: 24px;

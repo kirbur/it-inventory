@@ -1,8 +1,10 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {Route, Switch} from 'react-router-dom'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
+import {format} from '../../../utilities/formatEmptyStrings'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -11,72 +13,94 @@ import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
 import icon from '../../../content/Images/CQL-favicon.png'
 
+// Context
+import {LoginContext} from '../../App/App'
+
 // Styles
 import styles from './ProgramsListPage.module.css'
 
 // Types
 interface IProgramsListPageProps {
     history: any
+    match: any
 }
-
-//TODO: replace any w/ real type
-const initListData: any[] = []
 
 // Primary Component
 export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
-    const {history} = props
-    const [listData, setListData] = useState(initListData)
-    const [filtered, setFiltered] = useState(listData) //this is what is used in the list
+    const {history, match} = props
+    const {
+        loginContextVariables: {accessToken, refreshToken},
+    } = useContext(LoginContext)
+    const axios = new AxiosService(accessToken, refreshToken)
+
+    // state
+    const [listData, setListData] = useState<any[]>([])
+    const [filteredData, setFilteredData] = useState(listData)
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'name', value: 'name'})
+    const [selected, setSelected] = useState({label: 'Programs', value: 'name'})
+
+    const columns = ['name', 'renewalDate', 'totalUsers', 'cost']
+    const headerList = ['Programs', 'Renewal Date', 'Total Users ', 'Cost']
+    const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
-        //TODO: replace w/ real type
-        let data: any[] = []
-        //TODO: fetch data
-        setListData(data)
+        axios
+            .get('/list/programs')
+            .then((data: any) => {
+                var programs: any[] = []
+                data.map((i: any) =>
+                    programs.push({
+                        name: format(i.programName),
+                        renewalDate: format(i.renewalDate),
+                        totalUsers: format(i.countProgInUse),
+                        perYear: i.progCostPerYear,
+                        perUse: i.progCostPerUse,
+                        isPerYear: i.isCostPerYear,
+                        icon: format(i.icon),
+                        cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
+                    })
+                )
+                setListData(programs)
+            })
+            .catch((err: any) => console.error(err))
     }, [setListData])
+
+    const formatCost = (isPerYear: boolean, perYear: number, perUse: number) => {
+        return isPerYear ? '$' + perYear + ' /yr' : perYear === 0 ? '$' + perUse + ' paid' : '$' + perYear + ' /mo'
+    }
 
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        let filteredTableInput = listData
-        filteredTableInput = listData.filter((row: any) => {
-            return (
-                row[selected.value]
-                    .toString()
-                    .toLowerCase()
-                    .search(search.toLowerCase()) !== -1
-            )
+        var filteredTableInput = listData.filter((row: any) => {
+            return !row[selected.value]
+                ? false
+                : row[selected.value]
+                      .toString()
+                      .toLowerCase()
+                      .search(search.toLowerCase()) !== -1
         })
-        setFiltered(filteredTableInput)
+        setFilteredData(filteredTableInput)
     }, [search, selected, listData])
 
     const handleClick = () => {
         history.push('/programs/new')
     }
 
-    const handleRowClick = (name: string) => {
-        history.push(`/programs/${name}`)
+    const handleRowClick = (row: any) => {
+        // go to prog overview
+        history.push(`/programs/${row[0].props.children[1].props.children.props.children}`)
     }
 
-    const [rows, setRows] = useState([
-        ['Jira', '2020/08/24', 0, 350],
-        ['Atlassian', '2020/08/24', 1, 200],
-        ['Minecraft', '2020/08/24', 154, 575],
-        ['WoW', '2020/08/24', 16, 154],
-        ['League', '2020/08/24', 15, 764],
-        ['Office 365', '2020/08/23', 0, 350],
-        ['Jira', '2020/08/24', 0, 350],
-        ['Atlassian', '2020/08/24', 1, 200],
-        ['Minecraft', '2020/08/24', 154, 575],
-        ['WoW', '2020/08/24', 16, 154],
-        ['League', '2020/08/24', 15, 764],
-        ['Office 365', '2020/08/24', 0, 350],
-    ])
+    var filteredRows: any[] = []
+    filteredData.forEach(rowObj => {
+        filteredRows.push(Object.values(rowObj))
+    })
 
-    //this is the only thing to change
-    const headerList = ['Programs', 'Renewal Date', 'Total Users', 'Cost']
+    const [rows, setRows] = useState(filteredRows)
+    useEffect(() => {
+        setRows(filteredRows)
+    }, [filteredData])
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -128,19 +152,32 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         headers.push(firstHeader)
 
         for (let i = 1; i < headerList.length; i++) {
-            let header = (
-                <td
-                    onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
-                        sortStates(i)
-                    }}
-                >
-                    <div className={styles.header}>
-                        {headerList[i]}
-                        <div className={sortState.headerStates[i]} />
-                    </div>
-                </td>
-            )
+            let header =
+                i === 3 ? (
+                    <td
+                        onClick={e => {
+                            setRows(sortTable(rows, 4, sortState.headerStateCounts[i]))
+                            sortStates(i)
+                        }}
+                    >
+                        <div className={styles.header}>
+                            {headerList[i]}
+                            <div className={sortState.headerStates[i]} />
+                        </div>
+                    </td>
+                ) : (
+                    <td
+                        onClick={e => {
+                            setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                            sortStates(i)
+                        }}
+                    >
+                        <div className={styles.header}>
+                            {headerList[i]}
+                            <div className={sortState.headerStates[i]} />
+                        </div>
+                    </td>
+                )
             headers.push(header)
         }
 
@@ -150,9 +187,9 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     function concatenatedDept(row: any[]) {
         return (
             <td className={styles.programs}>
-                <img className={styles.icon} src={icon} />
+                <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.programName}>{row[0]}</text>
+                    <div className={styles.programName}>{row[0]}</div>
                 </div>
             </td>
         )
@@ -169,9 +206,11 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                 case 1:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]} employees</td>
+                    transformedRow[2] = (
+                        <td className={styles.alignLeft}>{row[2] === 1 ? row[2] + ' user' : row[2] + ' users'}</td>
+                    )
                 case 3:
-                    transformedRow[3] = <td className={styles.alignLeft}>${row[3]}</td>
+                    transformedRow[3] = <td className={styles.alignLeft}>{formatCost(row[5], row[3], row[4])}</td>
             }
         }
 
@@ -183,26 +222,20 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             <Switch>
                 <Route path='/programs/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
             </Switch>
-            <Group direction='row' justify='between'>
+            <Group direction='row' justify='between' className={styles.group}>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
                     search={search}
                     setSearch={setSearch}
-                    options={[
-                        //TODO: replace w/ real options
-                        {label: 'name', value: 'name'},
-                        {label: 'cost', value: 'cost'},
-                    ]}
+                    options={options}
                     selected={selected}
                     setSelected={setSelected}
                 />
             </Group>
 
-            {/*<List />*/}
-
             <div className={styles.page}>
-                <Table headers={renderHeaders()} rows={renderedRows} />
+                <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
             </div>
         </div>
     )

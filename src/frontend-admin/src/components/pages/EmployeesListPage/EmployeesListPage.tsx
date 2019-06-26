@@ -1,9 +1,9 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {Route, Switch, BrowserRouter as Router} from 'react-router-dom'
-import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
+import {format} from '../../../utilities/formatEmptyStrings'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -24,21 +24,6 @@ interface IEmployeesListPageProps {
     match: any
 }
 
-interface ITableDatum {
-    name: string
-    role: string
-    dateHired: string
-    daysEmployed: number
-    hardwareCost: number
-    programsCost: number
-}
-
-const initListData: ITableDatum[] = [
-    // {name: '', role: '', dateHired: '', daysEmployed: 0, hardwareCost: 0, programCost: 0},
-]
-const initColumns: string[] = []
-const initOptions: {value: string; label: string}[] = []
-
 // Primary Component
 export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const {history, match} = props
@@ -48,92 +33,107 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const axios = new AxiosService(accessToken, refreshToken)
 
     // state
-    const [listData, setListData] = useState(initListData)
-    const [columns, setColumns] = useState(initColumns)
-    const [options, setOptions] = useState(initOptions)
-    const [filtered, setFiltered] = useState(listData) //this is what is used in the list
+    const [listData, setListData] = useState<any[]>([])
+    const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'name', value: 'name'})
 
+    const columns = ['name', 'role', 'dateHired', 'daysEmployed', 'cost', 'hardware', 'programs']
+    const headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
+    const options = columns.map((c, i) => ({label: headers[i], value: c}))
+
     useEffect(() => {
-        initListData.length = 0
         axios
             .get('/list/employees')
-            .then((data: any) =>
-                data.map((i: any) =>
-                    initListData.push({
-                        name: i.employeeName,
-                        role: i.role,
-                        dateHired: i.hireDate,
-                        daysEmployed: 0,
-                        hardwareCost: i.hardwareCostForEmp,
-                        programsCost: i.programCostForEmp,
-                    })
-                )
-            )
-            .catch((err: any) => console.log(err))
+            .then((data: any) => {
+                const employees: any[] = []
+                data.map((i: any) => {
+                    employees.push({
+                        name: format(i.employeeName),
+                        dateHired: formatDate(i.hireDate),
+                        daysEmployedNumber: getDays(i.hireDate),
+                        cost: formatCost(i.hardwareCostForEmp, i.programCostForEmp),
+                        hwCost: i.hardwareCostForEmp,
+                        swCost: i.programCostForEmp,
+                        role: format(i.role),
+                        icon: format(i.photo),
 
-        setListData(initListData)
-    }, [setListData])
+                        //for searching
+                        hardware: i.hardwareList.join(', '),
+                        programs: i.progForEmp.join(', '),
+                        daysEmployed: calculateDaysEmployed(getDays(i.hireDate)),
+                    })
+                })
+                setListData(employees)
+            })
+            .catch((err: any) => console.error(err))
+    }, [])
 
     useEffect(() => {
-        console.log(listData)
         // Search through listData based on current value
         // of search bar and save results in filtered
-        let filteredTableInput = listData
-        filteredTableInput = listData.filter((row: any) => {
-            console.log(row)
-            return (
-                row[selected.value]
-                    .toString()
-                    .toLowerCase()
-                    .search(search.toLowerCase()) !== -1
-            )
+        var filteredTableInput = listData.filter((row: any) => {
+            return !row[selected.value]
+                ? false
+                : row[selected.value]
+                      .toString()
+                      .toLowerCase()
+                      .search(search.toLowerCase()) !== -1
         })
-        console.log(listData)
-        setFiltered(filteredTableInput)
-        listData[0] && setColumns(Object.keys(listData[0]))
-        // setColumns(['name', 'role', 'dateHired', 'daysEmployed', 'hardwareCost', 'programsCost'])
+        setFilteredData(filteredTableInput)
     }, [search, selected, listData])
 
-    useEffect(() => {
-        initOptions.length = 0
-        columns.map(i => {
-            initOptions.push({value: i, label: i.replace(/([a-zA-Z])(?=[A-Z])/g, '$1 ').toLowerCase()})
-        })
-        setOptions(initOptions)
-    }, [columns])
+    const formatDate = (hireDate: string) => {
+        const hired = new Date(hireDate)
+        const date = hired.getFullYear() + '/' + (hired.getMonth() + 1) + '/' + hired.getDate()
+        return date
+    }
+
+    const getDays = (hireDate: string) => {
+        const today = new Date()
+        const hired = new Date(hireDate)
+        return Math.round(Math.abs(today.getTime() - hired.getTime()))
+    }
+
+    //does not account for leap years or variable # of days in a month
+    const calculateDaysEmployed = (dif: number) => {
+        var oneDay = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
+
+        var days = Math.floor(dif / oneDay)
+        var months = Math.floor(days / 31)
+        var years = Math.floor(months / 12)
+
+        months = Math.floor(months % 12)
+        days = Math.floor(days % 31)
+
+        var ret: string = ''
+        ret += years !== 0 ? (years === 1 ? years + ' year, ' : years + ' years, ') : ''
+        ret += months !== 0 ? (months === 1 ? months + ' month, ' : months + ' months, ') : ''
+        ret += days === 1 ? days + ' day' : days + ' days'
+        return ret
+    }
+
+    const formatCost = (hwCpost: number, progCost: number) => {
+        return 'HW: $' + hwCpost + ' | SW: $' + progCost //TODO: SW or PROG? or something else??
+    }
 
     const handleClick = () => {
         history.push(`/employees/edit/new`)
     }
 
-    const handleRowClick = (id: number) => {
-        history.push(`${match.url}/${id}`)
+    const handleRowClick = (row: any) => {
+        history.push(`${match.url}/${row[0].props.children[1].props.children[0].props.children}`)
     }
 
-    const [rows, setRows] = useState([
-        ['Bill Belichik', 'Sales', '2012/09/12', 0, 350],
-        ['Joe Montana', 'Sales', '2012/09/11', 1, 200],
-        ['Bob the Builder', 'Developer', '2012/09/13', 154, 575],
-        ['Anne Manion', 'PM', '2010/09/12', 16, 154],
-        ['Sue Z', 'Designer', '2014/09/12', 15, 764],
-        ['Bill Belichik', 'Sales', '2012/09/12', 0, 350],
-        ['Joe Montana', 'Sales', '2012/09/11', 1, 200],
-        ['Bob the Builder', 'Developer', '2012/09/13', 154, 575],
-        ['Anne Manion', 'PM', '2010/09/12', 16, 154],
-        ['Sue Z', 'Designer', '2014/09/12', 15, 764],
-        ['Bill Belichik', 'Sales', '2012/09/12', 0, 350],
-        ['Joe Montana', 'Sales', '2012/09/11', 1, 200],
-        ['Bob the Builder', 'Developer', '2012/09/13', 154, 575],
-        ['Anne Manion', 'PM', '2010/09/12', 16, 154],
-        ['Sue Z', 'Designer', '2014/09/12', 15, 764],
-        ['Bill Belichik', 'Sales', '2012/09/12', 0, 350],
-        ['Joe Montana', 'Sales', '2012/09/11', 1, 200],
-        ['Bob the Builder', 'Developer', '2012/09/13', 154, 575],
-        ['Anne Manion', 'PM', '2010/09/12', 16, 154],
-        ['Sue Z', 'Designer', '2014/09/12', 15, 764],
-    ])
+    var filteredRows: any[] = []
+    filteredData.forEach(rowObj => {
+        filteredRows.push(Object.values(rowObj))
+    })
+
+    const [rows, setRows] = useState(filteredRows)
+    useEffect(() => {
+        setRows(filteredRows)
+    }, [filteredData])
 
     //this is the only thing to change
     const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
@@ -147,7 +147,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         headerStates.push(styles.notSorted)
         headerStateCounts.push(0)
     }
-    var initHeaderStates = cloneDeep(headerStates)
+    //var initHeaderStates = cloneDeep(headerStates)
     var initHeaderStateCounts = cloneDeep(headerStateCounts)
     var tempHeaderStates = cloneDeep(headerStates)
     var tempHeaderStateCounts = cloneDeep(headerStateCounts)
@@ -168,7 +168,6 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             tempHeaderStateCounts = [...initHeaderStateCounts]
         }
     }
-
     const renderHeaders = () => {
         var headers = []
 
@@ -188,19 +187,32 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         headers.push(firstHeader)
 
         for (let i = 1; i < headerList.length; i++) {
-            let header = (
-                <td
-                    onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
-                        sortStates(i)
-                    }}
-                >
-                    <div className={styles.header}>
-                        {headerList[i]}
-                        <div className={sortState.headerStates[i]} />
-                    </div>
-                </td>
-            )
+            let header =
+                i === 3 ? (
+                    <td
+                        onClick={e => {
+                            setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
+                            sortStates(i)
+                        }}
+                    >
+                        <div className={styles.header}>
+                            {headerList[i]}
+                            <div className={sortState.headerStates[i]} />
+                        </div>
+                    </td>
+                ) : (
+                    <td
+                        onClick={e => {
+                            setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                            sortStates(i)
+                        }}
+                    >
+                        <div className={styles.header}>
+                            {headerList[i]}
+                            <div className={sortState.headerStates[i]} />
+                        </div>
+                    </td>
+                )
             headers.push(header)
         }
 
@@ -210,31 +222,28 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     function concatenatedName(row: any[]) {
         return (
             <td className={styles.employees}>
-                <img className={styles.icon} src={icon} />
+                <img className={styles.icon} src={URL + row[7]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
-                    <text className={styles.role}>{row[1]}</text>
+                    <text className={styles.role}>{row[6]}</text>
                 </div>
             </td>
         )
     }
-
     var renderedRows: any[] = []
-
     rows.forEach(row => {
         const transformedRow: any[] = []
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
-                case 1:
-                    break
+
                 case 2:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[2]}</td>
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 3:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[2])}</td>
                 case 4:
-                    transformedRow[3] = <td className={styles.alignLeft}>${row[4]}</td>
+                    transformedRow[3] = <td className={styles.alignLeft}>{formatCost(row[4], row[5])}</td>
             }
         }
 
@@ -243,7 +252,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     return (
         <div className={styles.employeesListMain}>
-            <Group direction='row' justify='between'>
+            <Group direction='row' justify='between' className={styles.group}>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
@@ -255,9 +264,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                 />
             </Group>
 
-            <div className={styles.page}>
-                <Table headers={renderHeaders()} rows={renderedRows} />
-            </div>
+            <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
         </div>
     )
 }

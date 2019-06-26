@@ -57,7 +57,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     ])
 
     //this is the only thing to change
-    const hardwareHeadersList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
+    const hardwareHeadersList = ['Hardware', 'Serial No.', 'Warranty', 'Year']
 
     //initialize all the header states and styling to be not sorted
     const hardwareHeaderStates = []
@@ -148,7 +148,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     })
     // ---------------------------------------------------------------------- //
 
-    // --------------- rendering rows and headers for the hardware table ------------ //
+    // --------------- rendering rows and headers for the software table ------------ //
 
     const [softwareRows, setSoftwareRows] = useState([
         ['Bill Belichik', 'Sales', '2012/09/12', 0],
@@ -159,7 +159,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     ])
 
     //this is the only thing to change
-    const softwareHeadersList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
+    const softwareHeadersList = ['Software', 'Key/Username', 'Cost']
 
     //initialize all the header states and styling to be not sorted
     const softwareHeaderStates = []
@@ -242,18 +242,14 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 case 2:
                     transformedSoftwareRow[2] = <td className={styles.rowData}>{row[1]}</td>
                 case 3:
-                    transformedSoftwareRow[3] = <td className={styles.rowData}>{row[2]}</td>
-                case 4:
-                    transformedSoftwareRow[4] = <td className={styles.rowData}>{row[3]}</td>
-                case 5:
-                    transformedSoftwareRow[5] = <td>{row[4]}</td>
+                    transformedSoftwareRow[3] = <td className={styles.rowData}>${row[2]}</td>
             }
         }
         renderedSoftwareRows.push(transformedSoftwareRow)
     })
     // ---------------------------------------------------------------------- //
 
-    // --------------- rendering rows and headers for the hardware table ------------ //
+    // --------------- rendering rows and headers for the license table ------------ //
 
     const [licenseRows, setLicenseRows] = useState([
         ['Bill Belichik', 'Sales', '2012/09/12', 0],
@@ -264,7 +260,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     ])
 
     //this is the only thing to change
-    const licenseHeadersList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
+    const licenseHeadersList = ['License', 'CALs', 'Cost']
 
     //initialize all the header states and styling to be not sorted
     const licenseHeaderStates = []
@@ -347,11 +343,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 case 2:
                     transformedLicenseRow[2] = <td className={styles.rowData}>{row[1]}</td>
                 case 3:
-                    transformedLicenseRow[3] = <td className={styles.rowData}>{row[2]}</td>
-                case 4:
-                    transformedLicenseRow[4] = <td className={styles.rowData}>{row[3]}</td>
-                case 5:
-                    transformedLicenseRow[5] = <td>{row[4]}</td>
+                    transformedLicenseRow[3] = <td className={styles.rowData}>${row[2]}</td>
             }
         }
         renderedLicenseRows.push(transformedLicenseRow)
