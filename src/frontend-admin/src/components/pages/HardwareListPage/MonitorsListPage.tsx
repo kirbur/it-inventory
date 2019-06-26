@@ -166,7 +166,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     function concatenatedName(row: any[]) {
         return (
             <td className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[6]} alt={icon} />
+                <img className={styles.icon} src={URL + row[6]} alt="Monitor Picture" />
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text>
                 </div>

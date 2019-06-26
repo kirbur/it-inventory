@@ -8,6 +8,7 @@ using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
+using backend_api.Helpers;
 
 namespace backend_api.Controllers
 {
@@ -16,6 +17,14 @@ namespace backend_api.Controllers
     [ApiController]
     public class UploadController : ControllerBase
     {
+        public IConfiguration Configuration { get; }
+        public string UploadedFileRootPath { get; set; }
+        public UploadController(IConfiguration configuration)
+        {
+            Configuration = configuration;
+            UploadedFileRootPath = Configuration.GetSection("EnvironmentVariables").Get<EnvironmentVariables>().UploadedFileRootPath;
+        }
+
         private string[] models = new string[] { "employee", "department", "program", "server", "computer", "server", "monitor", "peripheral" };
 
         /*  ValidModel ensures the model requested is an actual model
@@ -52,9 +61,7 @@ namespace backend_api.Controllers
         public IActionResult GetPicture([FromRoute] string model, int id)
         {
             model = VerbatimMatch(model);
-            // TODO: Replace Environment.CurrentDirectory?
-            string folderPath = Path.Combine(Environment.CurrentDirectory, $"..\\images\\{model}");
-            string imagePath = Path.Combine(folderPath, $"{id}");
+            string imagePath = Path.Combine(UploadedFileRootPath, "images", model, $"{id}");
 
             // Check that the model name is valid.
             if (ValidModel(model))
@@ -66,15 +73,8 @@ namespace backend_api.Controllers
                 }
                 else
                 {
-                    // Return a placeholder image if file does not exist.
-                    if (System.IO.File.Exists(folderPath + "\\placeholder"))
-                    {
-                        return new PhysicalFileResult(folderPath + "\\placeholder", "image/jpeg");
-                    }
-                    else
-                    {
-                        return NoContent();
-                    }
+                    // TODO: Placeholders should be handled on the front end.
+                    return NoContent();
                 }
             }
             else
@@ -99,15 +99,21 @@ namespace backend_api.Controllers
             model = VerbatimMatch(model);
 
             // Check that the model is valid and there is content in the file.
-            if (ValidModel(model) && file.Length > 0)
+            if (ValidModel(model) && file != null && file.Length > 0)
             {
-                // Path to where the file is saved locally. Folder needs to exist before picture can be saved.
-                // TODO: Create an environment variable for the image path?
-                string folderPath = Path.Combine(Environment.CurrentDirectory, $"..\\images\\{model}");
-                if (Directory.Exists(folderPath))
+                // Create the images folder if not already there.
+                string imagesPath = Path.Combine(UploadedFileRootPath, "images");
+                Directory.CreateDirectory(imagesPath);
+
+                // Create model folder if not already there
+                string modelPath = Path.Combine(imagesPath, model);
+                Directory.CreateDirectory(modelPath);
+
+                // Check that the directory exists. Write permissions could influence the creation.
+                if (Directory.Exists(modelPath))
                 {
                     // Create a fileStream used to store.
-                    using (var fs = new FileStream(folderPath + $"\\{id}", FileMode.Create))
+                    using (var fs = new FileStream(modelPath + $"\\{id}", FileMode.Create))
                     {
                         // Copy the file to the local hard drive.
                         await file.CopyToAsync(fs);
@@ -121,7 +127,7 @@ namespace backend_api.Controllers
             }
             else
             {
-                return BadRequest();
+                return BadRequest("Invalid model or file is null");
             }
         }
     }

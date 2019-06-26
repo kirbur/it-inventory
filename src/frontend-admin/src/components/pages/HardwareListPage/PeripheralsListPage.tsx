@@ -169,7 +169,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     function concatenatedName(row: any[]) {
         return (
             <td className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[4]} alt={icon} />
+                <img className={styles.icon} src={URL + row[4]} alt="Peripheral Picture" />
                 <div className={styles.alignLeft}>
                     <div className={styles.hardwareName}>{row[0]}</div>
                 </div>
