@@ -38,8 +38,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'name', value: 'name'})
 
-    const columns = ['name', 'role', 'dateHired', 'daysEmployed', 'cost']
-    const headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost']
+    const columns = ['name', 'role', 'dateHired', 'daysEmployed', 'cost', 'hardware', 'programs']
+    const headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
     const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
     useEffect(() => {
@@ -58,7 +58,10 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         role: format(i.role),
                         icon: format(i.photo),
 
-                        daysEmployed: calculateDaysEmployed(getDays(i.hireDate)), //for searching
+                        //for searching
+                        hardware: i.hardwareList.join(', '),
+                        programs: i.progForEmp.join(', '),
+                        daysEmployed: calculateDaysEmployed(getDays(i.hireDate)),
                     })
                 })
                 setListData(employees)
@@ -219,7 +222,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     function concatenatedName(row: any[]) {
         return (
             <td className={styles.employees}>
-                <img className={styles.icon} src={URL + row[7]} alt={icon} />
+                <img className={styles.icon} src={URL + row[7]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
                     <text className={styles.role}>{row[6]}</text>
