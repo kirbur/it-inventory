@@ -69,11 +69,12 @@ namespace backend_api.Controllers
                 // Check that the file exists.
                 if (System.IO.File.Exists(imagePath))
                 {
-                    return new PhysicalFileResult(imagePath, "image/jpeg");
+                    // Return the file.
+                    byte[] bytes = System.IO.File.ReadAllBytes(imagePath);
+                    return File(bytes, "image/jpeg");
                 }
                 else
                 {
-                    // TODO: Placeholders should be handled on the front end.
                     return NoContent();
                 }
             }
@@ -118,7 +119,7 @@ namespace backend_api.Controllers
                         // Copy the file to the local hard drive.
                         await file.CopyToAsync(fs);
                     }
-                    return Ok();
+                    return Ok(modelPath + $"\\{id}");
                 }
                 else
                 {
