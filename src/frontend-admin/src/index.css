@@ -7,3 +7,8 @@ body {
     font-family: cqlRegularFont;
     src: url('./content/Fonts/CQL-Regular.otf');
 }
+
+@font-face {
+    font-family: cqlbold;
+    src: url('./content/Fonts/CQL-Bold.otf');
+}

@@ -19,8 +19,8 @@
 }
 
 .buttonText {
+    font-family: cqlbold;
     line-height: 45px;
-    font-weight: bold;
     font-size: 22px;
 }
 
