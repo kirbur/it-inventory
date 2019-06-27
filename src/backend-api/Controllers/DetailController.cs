@@ -90,9 +90,9 @@ namespace backend_api.Controllers
                 case "department":
                     return GetDepartmentDetail(id);
                 case "server":
-                    return Ok("server");
+                    return Ok();
                 case "computer":
-                    return Ok("laptop");
+                    return GetComputerDetail(model, id);
                 case "monitor":
                     return Ok("monitor");
                 case "peripheral":
@@ -428,6 +428,92 @@ namespace backend_api.Controllers
                 // Get the department name
                 var department = _context.Department.Where(dep => dep.DepartmentId == emp.DepartmentId && !dep.IsDeleted).FirstOrDefault().DepartmentName;
 
+                // list that will hold the unassigned hardware
+                List<object> UnassignedHardware = new List<object>();
+
+                // loop with lambda that finds the unassigned, not deleted monitors and adds the necessary returnables of them into a list 
+                foreach (var mon in _context.Monitor.Where(x => x.EmployeeId == null && x.IsDeleted == false))
+                {
+                    var monitorName = mon.Make + " " + mon.Model;
+                    var monitor = new
+                    {
+                        mon.MonitorId,
+                        type = nameof(Monitor),
+                        monitorName
+                    };
+                    UnassignedHardware.Add(monitor);
+                }
+                // loop with lambda that finds the unassigned, not deleted servers and adds the necessary returnables of them into a list 
+                foreach (var serv in _context.Server.Where(x => x.EmployeeId == null && x.IsDeleted == false))
+                {
+                    var serverName = serv.Make + " " + serv.Model;
+                    var server = new
+                    {
+                        serv.ServerId,
+                        type = nameof(Server),
+                        serverName
+                    };
+                    UnassignedHardware.Add(server);
+                }
+
+                // loop with lambda that finds the unassigned, not deleted computers and adds the necessary returnables of them into a list 
+                foreach (var comp in _context.Computer.Where(x => x.EmployeeId == null && x.IsDeleted == false))
+                {
+                    var compName = comp.Make + " " + comp.Model;
+                    var computer = new
+                    {
+                        comp.ComputerId,
+                        type = nameof(Computer),
+                        compName
+                    };
+                    UnassignedHardware.Add(computer);
+                }
+
+                // loop with lambda that finds the unassigned, not deleted peripherals and adds the necessary returnables of them into a list 
+                foreach (var periph in _context.Peripheral.Where(x => x.EmployeeId == null && x.IsDeleted == false))
+                {
+                    var periphName = periph.PeripheralName + " " + periph.PeripheralType;
+                    var peripheral = new
+                    {
+                        periph.PeripheralId,
+                        type = nameof(Peripheral),
+                        periphName
+                    };
+                    UnassignedHardware.Add(peripheral);
+                }
+
+                // Unassigned programs lists for returning purposes
+                List<object> UnassignedSoftware = new List<object>();
+                List<object> UnassignedLicenses = new List<object>();
+
+                // loop and lambda to find all the distinct programs that have any of their individual programs unassigned and loop though them
+                foreach (var prog in _context.Program.Where(x => x.EmployeeId == null && x.IsDeleted == false).GroupBy(prog => prog.ProgramName).Select(x => x.FirstOrDefault()).ToList())
+                {
+                    // for the licenses list
+                    if (prog.IsLicense == false)
+                    {
+                        var SW = new
+                        {
+                            prog.ProgramName,
+                            prog.ProgramId,
+                            type = nameof(Program)
+                        };
+                        UnassignedSoftware.Add(SW);
+                    }
+                    // for the software list
+                    else
+                    {
+                        var license = new
+                        {
+                            prog.ProgramName,
+                            prog.ProgramId,
+                            type = nameof(Program)
+                        };
+                        UnassignedLicenses.Add(license);
+                    }
+                }
+
+
                 // Combine it all into a nice JSON :)
                 object employeeDetail = new
                 {
@@ -442,6 +528,9 @@ namespace backend_api.Controllers
                     hardware,
                     software,
                     licenses,
+                    UnassignedHardware,
+                    UnassignedSoftware,
+                    UnassignedLicenses
                 };
                 List<object> returnList = new List<object>();
                 returnList.Add(employeeDetail);
@@ -768,8 +857,79 @@ namespace backend_api.Controllers
                 };
                 return Ok(DepartmentDetailPage);
             }
+        }
+        /*
+         * GET: api/detail/computer/{id}
+       * Function returns the program detail information.
+       * Returns : {
+       *    "computer": {
+                "serverId": int,
+                "fqdn": string,
+                "numberOfCores": int,
+                "operatingSystem": string,
+                "ram": int,
+                "virtualize": bool,
+                "renewalDate": date,
+                "employeeId": int,
+                "purchaseDate": date,
+                "flatCost": int,
+                "endOfLife": date,
+                "isAssigned": bool,
+                "textField": string,
+                "costPerYear": int,
+                "isDeleted": bool,
+                "mfg": string,
+                "make": string,
+                "model": string,
+                "ipAddress": string,
+                "san": string,
+                "localHHD": string,
+                "location": string,
+                "serialNumber": string
+            },
+            "icon": partial URL (as string),
+            "employeeAssignedName": string,
+            "compHistory": [
+                {
+                "hardwareHistoryId": int,
+                "currentOwnerId": int,
+                "currentOwnerStartDate": string,
+                "previousOwnerId": int,
+                "hardwareType": string,
+                "hardwareId": int,
+                "eventName": string,
+                "eventDescription": string
+                }
+            ]
+        }
+       */
+        private IActionResult GetComputerDetail(string model, int ComputerID)
+        {
+            // Find the requested server
+            var comp = _context.Server.Find(ComputerID);
+            if (comp == null || comp.IsDeleted == true)
+            {
+                return NotFound();
+            }
+            else
+            {
+                // Partial image string
+                var icon = $"/image/laptop/{ComputerID}";
 
+                // Employee the computer is assigned to.
+                var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == comp.EmployeeId).FirstOrDefault();
 
+                // Computer History
+                var compHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == ComputerID);
+
+                return Ok(new
+                {
+                    computer = comp,
+                    icon,
+                    employeeAssignedName =employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    compHistory,
+                });
+            }
         }
     }
 }
