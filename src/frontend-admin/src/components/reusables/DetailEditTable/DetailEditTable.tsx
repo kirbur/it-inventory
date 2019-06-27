@@ -19,7 +19,7 @@ interface ITableProps {
     style?: string
 }
 
-export const DetailPageTable = (props: ITableProps) => {
+export const DetailEditTable = (props: ITableProps) => {
     const {style, headers, rows, setRows, onRowClick} = props
     const isClickable = Boolean(onRowClick)
 
