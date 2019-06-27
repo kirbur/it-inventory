@@ -2,6 +2,12 @@
     text-align: center;
 }
 
+.navBarLogo {
+    align-self: flex-start;
+    margin: auto;
+    width: 100px;
+}
+
 .appHeader {
     background-color: #282c34;
     min-height: 100vh;
@@ -28,24 +34,13 @@
 
 .navBar {
     width: 100%;
+    min-width: 1070px;
     height: 65px;
     background: #f4f4f4;
     position: relative;
     top: 75px;
     display: flex;
     z-index: 2;
-}
-
-.navBar h1 {
-    flex-grow: 1;
-    align-self: flex-start;
-    margin: auto;
-    color: #000000;
-    /*TODO: uncomment when cql fonts are added to project*/
-    /*font-family: CQL;*/
-    font-size: 36px;
-    font-weight: bold;
-    letter-spacing: -1.38px;
 }
 
 .navEllipse {
@@ -112,8 +107,6 @@
     line-height: 18px;
     text-transform: uppercase;
     color: #ffffff;
-    /*TODO: uncomment when cql fonts are added to project*/
-    /*font-family: CQL;*/
     font-size: 15px;
     font-weight: bold;
     letter-spacing: -0.49px;

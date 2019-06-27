@@ -4,11 +4,16 @@ import {Route, NavLink, BrowserRouter as Router, Switch, Redirect} from 'react-r
 // Components
 import {DashboardPage} from '../pages/DashboardPage/DashboardPage'
 import {DepartmentsListPage} from '../pages/DepartmentsListPage/DepartmentsListPage'
+import {DepartmentDetailPage} from '../pages/DepartmentDetailPage/DepartmentDetailPage'
 import {EmployeesListPage} from '../pages/EmployeesListPage/EmployeesListPage'
+import {EmployeeDetailPage} from '../pages/EmployeeDetailPage/EmployeeDetailPage'
 import {HardwareListPage} from '../pages/HardwareListPage/HardwareListPage'
+import {HardwareDetailPage} from '../pages/HardwareDetailPage/HardwareDetailPage'
 import {ProgramsListPage} from '../pages/ProgramsListPage/ProgramsListPage'
+import {ProgramDetailPage} from '../pages/ProgramDetailPage/ProgramDetailPage'
 import {Login} from '../reusables/Login/Login'
 import {HelloUser} from '../HelloUser/HelloUser'
+import logo from '../../content/Images/CQL-Logo-Color.png'
 
 // Styles
 import styles from './App.module.css'
@@ -43,13 +48,18 @@ export const App: React.FC = () => {
     useEffect(() => {
         document.title = 'CQL'
     })
-    const [loginContextVariables, setLoginContextVariables] = useState({
-        refreshToken: '',
-        accessToken: '',
-        validTo: '',
-        givenName: '',
-        isAdmin: false,
-    })
+    const user = localStorage.getItem('user')
+    const [loginContextVariables, setLoginContextVariables] = useState(
+        user
+            ? JSON.parse(user)
+            : {
+                  refreshToken: '',
+                  accessToken: '',
+                  validTo: '',
+                  givenName: '',
+                  isAdmin: false,
+              }
+    )
 
     var contextValue = {
         loginContextVariables: loginContextVariables,
@@ -64,10 +74,9 @@ export const App: React.FC = () => {
                     {loginContextVariables.givenName === '' && <Redirect to='/login' />}
                     {loginContextVariables.givenName !== '' && (
                         <div className={styles.navContainer}>
-                            <Redirect to='/dashboard' />
                             <HelloUser name={loginContextVariables.givenName} className={styles.helloMesssage} />
                             <nav className={styles.navBar}>
-                                <h1>CQL</h1>
+                                <img className={styles.navBarLogo} src={logo} alt={'CQL'} />
                                 <div className={styles.navEllipse} />
                                 <div className={styles.navRectangle} />
 
@@ -107,11 +116,18 @@ export const App: React.FC = () => {
                     <Switch>
                         {/* <Route />'s go here */}
                         <Route path='/dashboard' component={DashboardPage} />
-                        <Route path='/employees' component={EmployeesListPage} />
-                        <Route path='/programs' component={ProgramsListPage} />
-                        <Route path='/hardware' component={HardwareListPage} />
-                        <Route path='/departments' component={DepartmentsListPage} />
-                        <Route path='/login' component={Login} />
+                        <Route exact path='/employees' component={EmployeesListPage} />
+                        <Route exact path='/programs' component={ProgramsListPage} />
+                        <Route exact path='/hardware' component={HardwareListPage} />
+
+                        <Route exact path='/departments' component={DepartmentsListPage} />
+                        <Route exact path='/login' component={Login} />
+                        <Route exact path='/' component={Login} />
+
+                        <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
+                        <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
+                        <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
+                        <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
                     </Switch>
                 </Router>
 

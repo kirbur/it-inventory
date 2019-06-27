@@ -76,14 +76,9 @@ namespace backend_api.Controllers
                     var ProgCostPerUse = _context.Program.Where(x => x.EmployeeId == emp.EmployeeId && x.ProgramFlatCost != null && x.IsDeleted != true).Sum(x => x.ProgramFlatCost);
 
                     // Dividing the yearly cost into months Adding the programs costs into one variable if the values are not null
-                    decimal? ProgramCostForEmp = 0;
+                    decimal ProgramCostForEmp = 0;
 
-                    if (ProgCostPerUse != null)
-                    {
-                        ProgramCostForEmp = ProgCostPerUse;
-                    }
-                    else if (ProgramCostForEmp != null)
-                        ProgramCostForEmp = ProgCostForEmpPerYear / 12;
+                    ProgramCostForEmp = Math.Round(System.Convert.ToDecimal(ProgCostForEmpPerYear / 12), 2, MidpointRounding.ToEven);
 
                     // concatenating the first and the last name
                     var EmployeeName = emp.FirstName + " " + emp.LastName;
@@ -262,7 +257,7 @@ namespace backend_api.Controllers
                 }
                 string icon = $"/image/server/{sv.ServerId}";
                 // Create a server object to be returned.
-                var Server = new { sv.ServerId, sv.Fqdn, sv.NumberOfCores, sv.Ram, sv.Mfg, employeeFirstName, employeeLastName, icon };
+                var Server = new { sv.ServerId, sv.Fqdn, sv.NumberOfCores, sv.Ram, sv.RenewalDate, sv.Mfg, employeeFirstName, employeeLastName, icon };
                 listOfservers.Add(Server);
             }
             return Ok(listOfservers);
@@ -310,7 +305,7 @@ namespace backend_api.Controllers
                 // NOTE: Laptop is used here for consistency with the front end.
                 string icon = $"/image/laptop/{cp.ComputerId}";
                 // Create a Computer object to be returned.
-                var Computer = new { cp.ComputerId, cp.Cpu, cp.Ramgb, cp.Ssdgb, cp.IsAssigned, cp.Mfg, employeeFirstName, employeeLastName, icon };
+                var Computer = new { cp.ComputerId, cp.Make, cp.Model, cp.Cpu, cp.Ramgb, cp.Ssdgb, cp.IsAssigned, cp.Mfg, employeeFirstName, employeeLastName, icon };
                 listOfComputers.Add(Computer);
             }
             return Ok(listOfComputers);
@@ -437,7 +432,7 @@ namespace backend_api.Controllers
             foreach (var prog in DistinctUsefulPrograms)
             {
                 // calculate the count of programs under this specific distinct program name that are in use
-                var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId!= null).Count();
+                var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId != null).Count();
 
                 // calculate the count of programs under this specific distinct program name
                 var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName).Count();

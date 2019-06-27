@@ -1,0 +1,151 @@
+.hardwareListMain {
+    margin: 50px 85px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.listMain {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.group {
+    position: absolute;
+    margin-top: -48px;
+    flex-wrap: nowrap;
+    left: 260px;
+    right: 85px;
+    width: calc(100% - 345px);
+    align-self: flex-end;
+}
+
+/* .search {
+    margin-left: -260px;
+} */
+
+.table {
+    width: 100%;
+    margin-top: 60px;
+}
+
+.dropdownButton {
+    display: flex;
+    justify-content: center;
+    width: 150px;
+}
+
+.dropdownContainer {
+    margin: auto;
+}
+
+.dropdownButton:hover .dropdownTitle {
+    color: white;
+}
+
+.dropdownButton:hover .dropdownArrow {
+    border-left: 2px solid white;
+    border-top: 2px solid white;
+}
+
+.dropdownTitle {
+    font-family: cqlmedium;
+    margin: auto;
+    line-height: 40px;
+    color: #009eff;
+}
+
+.dropdownArrow {
+    top: 13px;
+    border-left: 2px solid #009eff;
+    border-top: 2px solid #009eff;
+}
+
+.page {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.icon {
+    max-height: 75px;
+    max-width: 75px;
+    min-height: 50px;
+    min-width: 50px;
+    padding: 25px;
+}
+
+.alignLeft {
+    text-align: left;
+    min-width: 100px;
+}
+.alignLeftAndPadding {
+    text-align: left;
+    padding-left: 34px;
+    color: #979797;
+}
+
+.hardware {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.hardwareName {
+    color: #009eff;
+}
+
+.header {
+    text-align: left;
+    color: #a5a5a5;
+    font-size: 24px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+    display: flex;
+    cursor: pointer;
+
+    text-transform: uppercase;
+
+    /*No selecting*/
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.nameHeader {
+    padding-left: 24px;
+}
+
+/* sorting states */
+.notSorted {
+    border-left: 8px solid #636363;
+    border-right: 8px solid #636363;
+    border-top: 2px solid #636363;
+    border-bottom: none;
+    height: 2px;
+    position: relative;
+    top: 15px;
+    left: 5px;
+}
+.ascending {
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid #636363;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: relative;
+    bottom: 10px;
+    left: 5px;
+}
+.descending {
+    border-top: 8px solid #636363;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: relative;
+    top: 15px;
+    left: 5px;
+}
