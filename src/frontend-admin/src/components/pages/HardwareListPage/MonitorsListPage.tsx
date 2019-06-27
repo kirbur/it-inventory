@@ -37,8 +37,8 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'make', value: 'make'})
 
-    const columns = ['make', 'id', 'screenSize', 'resolution', 'inputs', 'assigned']
-    const headerList = ['Make', 'ID', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To']
+    const columns = ['make', 'screenSize', 'resolution', 'inputs', 'assigned']
+    const headerList = ['Make', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
@@ -82,7 +82,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/monitor/${row[1].props.children}`)
+        history.push(`hardware/monitor/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -147,7 +147,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
             let header = (
                 <td
                     onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                        setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                         sortStates(i)
                     }}
                 >
@@ -165,7 +165,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         return (
-            <td className={styles.hardware}>
+            <td key={row[1]} className={styles.hardware}>
                 <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text>
@@ -182,8 +182,6 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
-                case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
                     transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
                 case 3:

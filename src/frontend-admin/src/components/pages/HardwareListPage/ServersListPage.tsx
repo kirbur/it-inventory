@@ -37,8 +37,8 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'FQDN', value: 'FQDN'})
 
-    const columns = ['FQDN', 'id', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag']
-    const headerList = ['FQDN', 'ID', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
+    const columns = ['FQDN', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag']
+    const headerList = ['FQDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
@@ -87,7 +87,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/server/${row[1].props.children}`) //TODO: fix this, need id
+        history.push(`hardware/server/${row[0].key}`) //TODO: fix this, need id
     }
 
     var filteredRows: any[] = []
@@ -152,7 +152,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             let header = (
                 <td
                     onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                        setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                         sortStates(i)
                     }}
                 >
@@ -169,7 +169,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         return (
-            <td className={styles.hardware}>
+            <td key={row[1]} className={styles.hardware}>
                 <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text>
@@ -186,8 +186,6 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
-                case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
                     transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
                 case 3:

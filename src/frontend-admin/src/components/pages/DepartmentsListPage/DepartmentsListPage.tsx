@@ -38,8 +38,8 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Departments', value: 'name'})
 
-    const columns = ['name', 'id', 'totalEmployees', 'cost']
-    const headerList = ['Departments', 'ID', 'Total Employees', 'Programs Cost']
+    const columns = ['name', 'totalEmployees', 'cost']
+    const headerList = ['Departments', 'Total Employees', 'Programs Cost']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
@@ -85,7 +85,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`${match.url}/${row[1].props.children}`)
+        history.push(`${match.url}/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -151,7 +151,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
             let header = (
                 <td
                     onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                        setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                         sortStates(i)
                     }}
                 >
@@ -169,7 +169,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
 
     function concatenatedDept(row: any[]) {
         return (
-            <td className={styles.departments}>
+            <td key={row[1]} className={styles.departments}>
                 <img className={styles.icon} src={URL + row[4]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.departmentName}>{row[0]}</text>
@@ -186,8 +186,6 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedDept(row)
-                case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
                     transformedRow[2] = (
                         <td className={styles.alignLeft}>

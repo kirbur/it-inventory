@@ -38,8 +38,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Employees', value: 'name'})
 
-    const columns = ['name', 'role', 'id', 'dateHired', 'daysEmployed', 'cost', 'hardware', 'programs']
-    const headers = ['Employees', 'Role', 'ID', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
+    const columns = ['name', 'role', 'dateHired', 'daysEmployed', 'cost', 'hardware', 'programs']
+    const headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
     const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
     useEffect(() => {
@@ -125,7 +125,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     const handleRowClick = (row: any) => {
         // history.push(`${match.url}/${row[0].props.children[1].props.children[0].props.children}`)
-        history.push(`${match.url}/${row[1].props.children}`)
+        history.push(`${match.url}/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -139,7 +139,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }, [filteredData])
 
     //this is the only thing to change
-    const headerList = ['Employees', 'ID', 'Date Hired', 'Days Employed', 'Cost']
+    const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -224,7 +224,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         return (
-            <td className={styles.employees}>
+            <td key={row[8]} className={styles.employees}>
                 <img className={styles.icon} src={URL + row[7]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
@@ -241,13 +241,11 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
                 case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[8]}</td>
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[1]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[2])}</td>
                 case 3:
-                    transformedRow[3] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[2])}</td>
-                case 4:
-                    transformedRow[4] = <td className={styles.alignLeft}>{formatCost(row[4], row[5])}</td>
+                    transformedRow[3] = <td className={styles.alignLeft}>{formatCost(row[4], row[5])}</td>
             }
         }
 
