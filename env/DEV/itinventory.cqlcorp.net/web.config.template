@@ -12,6 +12,7 @@
                     <environmentVariable name="CONNSTRING_ITINVENTORY_MIGRATIONS_DBO" value="_ITINVENTORYDB_DBO_CONNSTRING_" />
                     <environmentVariable name="SQLCONNSTR_ITInventoryDb" value="_ITINVENTORYDB_APPUSER_CONNSTRING_" />
                     <environmentVariable name="AppSettings__Secret" value="_JWT_SECRET_" />
+                    <environmentVariable name="UploadedFileRootPath" value=".\images" />
                 </environmentVariables>
             </aspNetCore>
             <rewrite>

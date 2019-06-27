@@ -59,6 +59,7 @@ export const DetailPageTable = (props: ITableProps) => {
     //returns an array of <td> elements based on the array of strings of headers
     // const renderHardwareHeaders = () => {
     var renderedHeaders = []
+    renderedHeaders.push(<td></td>)
     for (let i = 0; i < headers.length; i++) {
         let header = (
             <td
@@ -87,14 +88,21 @@ export const DetailPageTable = (props: ITableProps) => {
         for (let i = 0; i < row.length + 1; i++) {
             switch (i) {
                 case 0:
-                    transformedRow[1] = <td className={styles.rowData}>{row[0]} </td>
+                    transformedRow[0] = (
+                        <td onClick={e => deleteSummin(row[0])}>
+                            <div className={styles.delete} />
+                            <div className={styles.whiteLine} />
+                        </td>
+                    )
                 case 1:
-                    transformedRow[2] = <td className={styles.rowData}>{row[1]}</td>
+                    transformedRow[1] = <td className={styles.rowData}>{row[0]} </td>
                 case 2:
-                    transformedRow[3] = <td className={styles.rowData}>{row[2]}</td>
+                    transformedRow[2] = <td className={styles.rowData}>{row[1]}</td>
                 case 3:
-                    transformedRow[4] = <td className={styles.rowData}>{row[3]}</td>
+                    transformedRow[3] = <td className={styles.rowData}>{row[2]}</td>
                 case 4:
+                    transformedRow[4] = <td className={styles.rowData}>{row[3]}</td>
+                case 5:
                     transformedRow[5] = <td>{row[4]}</td>
             }
         }

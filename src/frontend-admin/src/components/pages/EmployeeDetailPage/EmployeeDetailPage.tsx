@@ -1,17 +1,24 @@
-import React, {useState} from 'react'
-
-// Packages
-import {cloneDeep} from 'lodash'
+import React, {useState, useEffect, useContext} from 'react'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 
 // Components
 import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import ReactTooltip from 'react-tooltip'
+import {IoMdAdd} from 'react-icons/io'
+import {Button} from '../../reusables/Button/Button'
+import {Group} from '../../reusables/Group/Group'
 
 // Utils
-import {sortTable} from '../../../utilities/quickSort'
+import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
+import {format} from '../../../utilities/formatEmptyStrings'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './EmployeeDetailPage.module.css'
+
+// Context
+import {LoginContext} from '../../App/App'
 
 // Types
 interface IEmployeeDetailPageProps {
@@ -25,116 +32,157 @@ interface IEmployeeDetailPageProps {
 export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => {
     const {history, match} = props
 
-    const [rows, setRows] = useState([
-        ['Bill Belichik', 'Sales', '2012/09/12', 0, 350],
-        ['Joe Montana', 'Sales', '2012/09/11', 1, 200],
-        ['Bob the Builder', 'Developer', '2012/09/13', 154, 575],
-        ['Anne Manion', 'PM', '2010/09/12', 16, 154],
-        ['Sue Z', 'Designer', '2014/09/12', 15, 764],
-    ])
+    const {
+        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+    } = useContext(LoginContext)
+    const isAdmin = true //TODO: remove
 
-    //this is the only thing to change
-    const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
+    const axios = new AxiosService(accessToken, refreshToken)
+    const [userData, setUserData] = useState<any>({})
+    const [hardwareRows, setHardwareRows] = useState<any[]>([])
+    const [softwareRows, setSoftwareRows] = useState<any[]>([])
+    const [licenseRows, setLicenseRows] = useState<any[]>([])
 
-    //-------------- this will all be the same -------------
-    const headerStates = []
-    const headerStateCounts = []
+    const hardwareHeaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
+    const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
+    const licenseHeaders = ['Licenses', 'CALs']
 
-    //initialize all the header states and styling to be not sorted
-    for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
-        headerStateCounts.push(0)
-    }
-    var initHeaderStates = cloneDeep(headerStates)
-    var initHeaderStateCounts = cloneDeep(headerStateCounts)
-    var tempHeaderStates = cloneDeep(headerStates)
-    var tempHeaderStateCounts = cloneDeep(headerStateCounts)
+    const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
-    var initState = {headerStates, headerStateCounts}
-    const [sortState, setSortState] = useState(initState)
+    useEffect(() => {
+        axios
+            .get(`/detail/employee/${match.params.id}`)
+            .then((data: any) => {
+                console.log(data)
+                let user: any = {
+                    photo: data[0].picture,
+                    name: data[0].firstName + ' ' + data[0].lastName,
+                    department: data[0].department,
+                    role: data[0].role,
+                    hireDate: formatDate(data[0].hireDate),
+                    hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
+                    swCost: Math.round(data[0].totalProgramCostPerMonth * 100) / 100,
+                }
+                setUserData(user)
 
-    function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
-            tempHeaderStates[index] = styles.descending
-            tempHeaderStateCounts[index] = 1
-            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
-            tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
-            tempHeaderStates[index] = styles.ascending
-            tempHeaderStateCounts[index] = 0
-            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
-            tempHeaderStateCounts = [...initHeaderStateCounts]
-        }
-    }
+                let hw: any[] = []
+                data[0].hardware.map((i: any) =>
+                    hw.push([
+                        format(i.make + ' ' + i.model),
+                        format(i.serialNumber),
+                        format(i.mfg),
+                        formatDate(i.purchaseDate),
+                        format(i.id),
+                        i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
+                    ])
+                )
+                setHardwareRows(hw)
+                let sw: any[] = []
+                data[0].software.map((i: any) =>
+                    sw.push([
+                        format(i.name),
+                        format(i.licenseKey),
+                        format(Math.round(i.costPerMonth * 100) / 100),
+                        format(i.flatCost),
+                        format(i.id),
+                    ])
+                )
+                setSoftwareRows(sw)
 
-    const renderHeaders = () => {
-        var headers = []
+                let l: any[] = []
+                data[0].licenses.map((i: any) =>
+                    l.push([
+                        format(i.name),
+                        format(i.cals),
+                        format(i.licenseKey),
+                        format(Math.round(i.costPerMonth * 100) / 100),
+                        format(i.flatCost),
+                        format(i.id),
+                    ])
+                )
+                setLicenseRows(l)
+            })
+            .catch((err: any) => console.error(err))
+    }, [])
 
-        for (let i = 0; i < headerList.length; i++) {
-            let header = (
-                <td
-                    onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
-                        sortStates(i)
-                    }}
-                    className={styles.header}
-                >
-                    <div className={styles.headerContainer}>
-                        {headerList[i]}
-                        <div className={sortState.headerStates[i]} />
-                    </div>
-                </td>
-            )
-            headers.push(header)
-        }
-
-        return headers
-    }
-
-    var renderedRows: any[] = []
-
-    rows.forEach(row => {
-        const transformedRow: any[] = []
-        for (let i = 0; i < row.length; i++) {
-            switch (i) {
-                case 0:
-                    transformedRow[0] = <td className={styles.rowData}>{row[0]} </td>
-                case 1:
-                    transformedRow[1] = <td className={styles.rowData}>{row[1]}</td>
-                case 2:
-                    transformedRow[2] = <td className={styles.rowData}>{row[2]}</td>
-                case 3:
-                    transformedRow[3] = <td className={styles.rowData}>{row[3]}</td>
-            }
-        }
-
-        renderedRows.push(transformedRow)
-    })
+    console.log(URL + userData.photo)
 
     return (
-        <div className={styles.columns}>
-            {/* column 1 */}
-            <div className={styles.firstColumn}>
-                <div className={styles.imgPadding}>
-                    <img className={styles.img} src={icon} />
+        <div className={styles.empDetailMain}>
+            <div className={styles.columns}>
+                {/* column 1 */}
+                <div className={styles.firstColumn}>
+                    <Button
+                        text='All Employees'
+                        icon='back'
+                        onClick={() => {
+                            history.push('/employees')
+                        }}
+                        className={styles.backButton}
+                        textClassName={styles.backButtonText}
+                    />
+                    <div className={styles.imgPadding}>
+                        <img className={styles.img} src={URL + userData.photo} alt={''} />
+                    </div>
+                    <div className={styles.costText}>
+                        <p>Software ---------------- ${userData.swCost} /month</p>
+                        <p>Hardware --------------- ${userData.hwCost}</p>
+                    </div>
                 </div>
-                <div className={styles.costText}>
-                    <p>Software ---------------- $200 /month</p>
-                    <p>Hardware --------------- $300</p>
+                {/* column 2 */}
+                <div className={styles.secondColumn}>
+                    {isAdmin && (
+                        <Group direction='row' justify='start' className={styles.group}>
+                            <Button text='Edit' icon='edit' onClick={() => {}} className={styles.editbutton} />
+
+                            <Button text='Archive' icon='archive' onClick={() => {}} className={styles.archivebutton} />
+                        </Group>
+                    )}
+                    <div className={styles.titleText}>
+                        <div className={styles.employeeName}>{userData.name}</div>
+                        <div className={styles.employeeText}>
+                            {userData.department} | {userData.role}
+                        </div>
+                        <div className={styles.employeeText}>
+                            Hired: {userData.hireDate} | {calculateDaysEmployed(getDays(userData.hireDate))}
+                        </div>
+                    </div>
+                    <DetailPageTable headers={hardwareHeaders} rows={hardwareRows} setRows={setHardwareRows} />
+                    {isAdmin && (
+                        <Button
+                            text='Assign new hardware'
+                            icon='add'
+                            onClick={() => {}}
+                            className={styles.addContainer}
+                            textInside={false}
+                            textClassName={styles.assignText}
+                        />
+                    )}
+
+                    <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
+                    {isAdmin && (
+                        <Button
+                            text='Assign new software'
+                            icon='add'
+                            onClick={() => {}}
+                            className={styles.addContainer}
+                            textInside={false}
+                            textClassName={styles.assignText}
+                        />
+                    )}
+
+                    <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
+                    {isAdmin && (
+                        <Button
+                            text='Assign new license'
+                            icon='add'
+                            onClick={() => {}}
+                            className={styles.addContainer}
+                            textInside={false}
+                            textClassName={styles.assignText}
+                        />
+                    )}
                 </div>
-            </div>
-            {/* column 2 */}
-            <div className={styles.secondColumn}>
-                <div className={styles.titleText}>
-                    <div className={styles.employeeName}>Employee's Name</div>
-                    <div className={styles.employeeText}>their position</div>
-                    <div className={styles.employeeText}>some dates</div>
-                </div>
-                {/* <DetailPageTable headers={renderHeaders()} rows={renderedRows} /> <br />
-                <DetailPageTable headers={renderHeaders()} rows={renderedRows} />
-                <br />
-                <DetailPageTable headers={renderHeaders()} rows={renderedRows} /> */}
-                <br />
             </div>
         </div>
     )

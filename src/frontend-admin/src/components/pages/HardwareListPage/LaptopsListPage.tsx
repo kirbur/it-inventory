@@ -108,7 +108,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
+        headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
     var initHeaderStates = cloneDeep(headerStates)
