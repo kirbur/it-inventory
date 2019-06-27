@@ -1,209 +1,95 @@
-import React, {useState, useEffect} from 'react'
-import {Switch, Route} from 'react-router-dom'
-import {sortTable} from '../../../utilities/quickSort'
+import React, {useState, useEffect, useContext} from 'react'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
-import {cloneDeep} from 'lodash'
 
 // Components
-import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
-import {Button} from '../../reusables/Button/Button'
-import {Group} from '../../reusables/Group/Group'
-import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
+import {DropdownList} from '../../reusables/Dropdown/DropdownList'
+import {LaptopsListPage} from './LaptopsListPage'
+import {ServersListPage} from './ServersListPage'
+import {MonitorsListPage} from './MonitorsListPage'
+import {PeripheralListPage} from './PeripheralsListPage'
 
 // Styles
 import styles from './HardwareListPage.module.css'
+import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Types
+
 interface IHardwareListPageProps {
     history: any
+    match: any
 }
-
-//TODO: replace any w/ real type
-const initListData: any[] = []
 
 // Primary Component
 export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
-    const {history} = props
-    const [listData, setListData] = useState(initListData)
-    const [filtered, setFiltered] = useState(listData) //this is what is used in the list
-    const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'name', value: 'name'})
+    const {history, match} = props
 
-    useEffect(() => {
-        //TODO: replace w/ real type
-        let data: any[] = []
-        //TODO: fetch data
-        setListData(data)
-    }, [setListData])
+    // state
+    const currentList = localStorage.getItem('selectedHW')
+    const [selectedHW, setSelectedHW] = useState<{id: number; name: string}>(
+        currentList
+            ? JSON.parse(currentList)
+            : {
+                  id: 0,
+                  name: 'servers',
+              }
+    )
 
-    useEffect(() => {
-        // Search through listData based on current value
-        // of search bar and save results in filtered
-        let filteredTableInput = listData
-        filteredTableInput = listData.filter((row: any) => {
-            return (
-                row[selected.value]
-                    .toString()
-                    .toLowerCase()
-                    .search(search.toLowerCase()) !== -1
-            )
-        })
-        setFiltered(filteredTableInput)
-    }, [search, selected, listData])
+    const dropdownContent = [
+        {id: 0, name: 'servers'},
+        {id: 1, name: 'laptops'},
+        {id: 2, name: 'monitors'},
+        {id: 3, name: 'peripherals'},
+    ]
 
-    const handleClick = () => {
-        history.push('/hardware/new')
-    }
+    const displayList = () => {
+        switch (selectedHW.name) {
+            case 'servers':
+                return <ServersListPage history={history} />
+            case 'laptops':
+                return <LaptopsListPage history={history} />
 
-    const handleRowClick = (name: string) => {
-        history.push(`/hardware/${name}`)
-    }
-
-    const [rows, setRows] = useState([
-        ['Jira', 0, 350],
-        ['Atlassian', 1, 200],
-        ['Minecraft', 154, 575],
-        ['WoW', 16, 154],
-        ['League', 15, 764],
-        ['Office 365', 0, 350],
-        ['Joe Montana', 1, 200],
-        ['Bob the Builder', 154, 575],
-        ['Anne Manion', 16, 154],
-        ['Sue Z', 15, 764],
-        ['Bill Belichik', 0, 350],
-        ['Joe Montana', 1, 200],
-    ])
-
-    //this is the only thing to change
-    const headerList = ['Employees', 'Date Hired', 'Days Employed']
-
-    //-------------- this will all be the same -------------
-    const headerStates = []
-    const headerStateCounts = []
-
-    //initialize all the header states and styling to be not sorted
-    for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
-        headerStateCounts.push(0)
-    }
-    var initHeaderStates = cloneDeep(headerStates)
-    var initHeaderStateCounts = cloneDeep(headerStateCounts)
-    var tempHeaderStates = cloneDeep(headerStates)
-    var tempHeaderStateCounts = cloneDeep(headerStateCounts)
-
-    var initState = {headerStates, headerStateCounts}
-    const [sortState, setSortState] = useState(initState)
-
-    function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
-            tempHeaderStates[index] = styles.descending
-            tempHeaderStateCounts[index] = 1
-            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
-            tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
-            tempHeaderStates[index] = styles.ascending
-            tempHeaderStateCounts[index] = 0
-            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
-            tempHeaderStateCounts = [...initHeaderStateCounts]
+            case 'monitors':
+                return <MonitorsListPage history={history} />
+            case 'peripherals':
+                return <PeripheralListPage history={history} />
         }
     }
-
-    const renderHeaders = () => {
-        var headers = []
-
-        var firstHeader = (
-            <td
-                onClick={e => {
-                    setRows(sortTable(rows, 0, sortState.headerStateCounts[0]))
-                    sortStates(0)
-                }}
-            >
-                <div className={s(styles.header, styles.nameHeader)}>
-                    {headerList[0]}
-                    <div className={sortState.headerStates[0]} />
-                </div>
-            </td>
-        )
-        headers.push(firstHeader)
-
-        for (let i = 1; i < headerList.length; i++) {
-            let header = (
-                <td
-                    onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
-                        sortStates(i)
-                    }}
-                >
-                    <div className={styles.header}>
-                        {headerList[i]}
-                        <div className={sortState.headerStates[i]} />
-                    </div>
-                </td>
-            )
-            headers.push(header)
-        }
-
-        return headers
-    }
-
-    function concatenatedName(row: any[]) {
-        return (
-            <td className={styles.hardware}>
-                <img className={styles.icon} src={icon} />
-                <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text>
-                </div>
-            </td>
-        )
-    }
-
-    var renderedRows: any[] = []
-
-    rows.forEach(row => {
-        const transformedRow: any[] = []
-        for (let i = 0; i < row.length; i++) {
-            switch (i) {
-                case 0:
-                    transformedRow[0] = concatenatedName(row)
-                case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[2]}</td>
-                case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]}</td>
-            }
-        }
-
-        renderedRows.push(transformedRow)
-    })
-
     return (
         <div className={styles.hardwareListMain}>
-            <Switch>
-                {/*TODO: replace divs w/ detail page */}
-                <Route path='/hardware/new' render={props => <div>New Employee Detail Page</div>} />
-                <Route path='/hardware/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
-            </Switch>
-            <Group direction='row' justify='between'>
-                <Button text='Add' icon='add' onClick={handleClick} />
-
-                <FilteredSearch
-                    search={search}
-                    setSearch={setSearch}
-                    options={[
-                        //TODO: replace w/ real options
-                        {label: 'name', value: 'name'},
-                        {label: 'cost', value: 'cost'},
-                    ]}
-                    selected={selected}
-                    setSelected={setSelected}
-                />
-            </Group>
-
-            {/*<List />*/}
-
-            <div className={styles.page}>
-                <Table headers={renderHeaders()} rows={renderedRows} />
+            <div className={styles.dropdown}>
+                <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                    <DropdownList
+                        triggerElement={({isOpen, toggle}) => (
+                            <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                    <div>{selectedHW.name}</div>
+                                    <div className={dropdownStyles.dropdownArrow} />
+                                </div>
+                            </button>
+                        )}
+                        choicesList={() => (
+                            <ul className={dropdownStyles.dropdownList}>
+                                {dropdownContent.map(i => (
+                                    <li
+                                        className={dropdownStyles.dropdownListItem}
+                                        key={i.name}
+                                        onClick={() => {
+                                            setSelectedHW(i)
+                                            localStorage.setItem('selectedHW', JSON.stringify(i))
+                                        }}
+                                    >
+                                        <button className={dropdownStyles.dropdownListItemButton}>
+                                            <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    />
+                    <div />
+                </div>
             </div>
+            {displayList()}
         </div>
     )
 }

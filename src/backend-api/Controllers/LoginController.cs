@@ -68,7 +68,12 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
 
                     // Create a list of claims that we could add to the token. 
                     // Currently we are not embedding any claims in our tokens but we might later on
-                    var claims = new[]
+                    //var RefreshClaims = new[]
+                    //{
+                    //    // Get the user's Name (this can be whatever claims you wish)
+                    //    //new Claim(ClaimTypes.Name, request.username)
+                    //    };
+                    var AccessClaims = new[]
                     {
                         // Get the user's Name (this can be whatever claims you wish)
                         new Claim(ClaimTypes.Name, request.username)
@@ -86,7 +91,6 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                     var refreshToken = new JwtSecurityToken(
                         issuer: "CQLCORP",
                         audience: "Refresh",
-                        claims: claims, // the claims listed above
                         expires: DateTime.Now.AddMinutes(10000), // how long you wish the token to be active for
                         signingCredentials: creds);
 
@@ -95,7 +99,7 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                     var accessToken = new JwtSecurityToken(
                        issuer: "CQLCORP",
                        audience: "Access",
-                       claims: claims, // the claims listed above
+                       claims: AccessClaims, // the claims listed above
                        expires: DateTime.Now.AddMinutes(15), // how long you wish the token to be active for
                        signingCredentials: creds);
 

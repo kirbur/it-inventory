@@ -1,66 +1,52 @@
-.programsListMain {
-    margin: 50px 85px;
+.table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
 }
 
-.group {
-    padding-bottom: 60px;
+.tr {
+    color: #a5a5a5;
+    font-size: 20px;
+    cursor: pointer;
+    height: 100px;
 }
 
-.page {
-    text-align: center;
-    display: flex;
-    justify-content: center;
+/* delete icon next to row */
+.delete {
+    background-color: red;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+}
+.delete:hover {
+    background-color: maroon;
+}
+.whiteLine {
+    width: 18px;
+    height: 2px;
+    background-color: white;
+    position: relative;
+    bottom: 16px;
+    left: 6px;
 }
 
-.icon {
-    max-height: 75px;
-    max-width: 75px;
-    padding: 25px;
-}
-
-.alignLeft {
-    text-align: left;
-    min-width: 100px;
-}
-.alignLeftAndPadding {
-    text-align: left;
-    padding-left: 34px;
-    color: #979797;
-}
-
-.programs {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-.programName {
-    color: #009eff;
-}
-
-.header {
-    text-align: left;
+/* styling for table headers - will have to go on every page with a table*/
+.headerContainer {
     color: #a5a5a5;
     font-size: 24px;
     padding-bottom: 16px;
     padding-top: 16px;
     display: flex;
     cursor: pointer;
-
-    text-transform: uppercase;
-
-    /*No selecting*/
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
-.nameHeader {
-    padding-left: 24px;
+.header {
+    text-align: left;
+    border-bottom: 1px solid #979797;
 }
-
-/* sorting states */
+.rowData {
+    text-align: left;
+    color: #4a4a4a;
+}
 .notSorted {
     border-left: 8px solid #636363;
     border-right: 8px solid #636363;

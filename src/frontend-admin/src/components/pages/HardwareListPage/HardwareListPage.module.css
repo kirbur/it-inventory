@@ -1,4 +1,31 @@
+.hardwareListMain {
+    margin: 20px 85px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.listMain {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.group {
+    padding-bottom: 20px;
+}
+
+.dropdown {
+    padding: 20px 0;
+}
+
+/* .dropdownTitle {
+    font-size: 36px;
+} */
+
 .page {
+    width: 100%;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -12,6 +39,7 @@
 
 .alignLeft {
     text-align: left;
+    min-width: 100px;
 }
 .alignLeftAndPadding {
     text-align: left;
@@ -36,6 +64,16 @@
     padding-top: 16px;
     display: flex;
     cursor: pointer;
+
+    text-transform: uppercase;
+
+    /*No selecting*/
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .nameHeader {
     padding-left: 24px;

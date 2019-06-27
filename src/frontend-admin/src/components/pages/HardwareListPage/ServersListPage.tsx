@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react'
-import {Switch, Route} from 'react-router-dom'
+import React, {useState, useEffect, useContext} from 'react'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {format} from '../../../utilities/formatEmptyStrings'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -11,80 +12,100 @@ import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
 import icon from '../../../content/Images/CQL-favicon.png'
 
+// Context
+import {LoginContext} from '../../App/App'
+
 // Styles
 import styles from './HardwareListPage.module.css'
 
 // Types
-interface IHardwareListPageProps {
+interface IServersListPageProps {
     history: any
 }
 
-//TODO: replace any w/ real type
-const initListData: any[] = []
-
 // Primary Component
-export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
+export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const {history} = props
-    const [listData, setListData] = useState(initListData)
-    const [filtered, setFiltered] = useState(listData) //this is what is used in the list
+    const {
+        loginContextVariables: {accessToken, refreshToken},
+    } = useContext(LoginContext)
+    const axios = new AxiosService(accessToken, refreshToken)
+
+    // state
+    const [listData, setListData] = useState<any[]>([])
+    const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'name', value: 'name'})
+    const [selected, setSelected] = useState({label: 'FQDN', value: 'FQDN'})
+
+    const columns = ['FQDN', 'id', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag']
+    const headerList = ['FQDN', 'ID', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
+    const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
-        //TODO: replace w/ real type
-        let data: any[] = []
-        //TODO: fetch data
-        setListData(data)
-    }, [setListData])
+        axios
+            .get('/list/servers')
+            .then((data: any) => {
+                const servers: any[] = []
+                data.map((i: any) => {
+                    servers.push({
+                        FQDN: format(i.fqdn),
+                        id: format(i.serverId),
+                        numberOfCores: format(i.numberOfCores),
+                        RAM: format(i.ram),
+                        renewalDate: formatDate(i.renewalDate),
+                        MFGTag: format(i.mfg),
+                        icon: i.icon,
+                    })
+                })
+                setListData(servers)
+            })
+            .catch((err: any) => console.error(err))
+    }, [])
 
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        let filteredTableInput = listData
-        filteredTableInput = listData.filter((row: any) => {
-            return (
-                row[selected.value]
-                    .toString()
-                    .toLowerCase()
-                    .search(search.toLowerCase()) !== -1
-            )
+        var filteredTableInput = listData.filter((row: any) => {
+            return !row[selected.value]
+                ? false
+                : row[selected.value]
+                      .toString()
+                      .toLowerCase()
+                      .search(search.toLowerCase()) !== -1
         })
-        setFiltered(filteredTableInput)
+        setFilteredData(filteredTableInput)
     }, [search, selected, listData])
 
+    const formatDate = (hireDate: string) => {
+        const hired = new Date(hireDate)
+        const date = hired.getFullYear() + '/' + (hired.getMonth() + 1) + '/' + hired.getDate()
+        return date
+    }
+
     const handleClick = () => {
-        history.push('/hardware/new')
+        history.push(`hardware/server/new`)
     }
 
-    const handleRowClick = (name: string) => {
-        history.push(`/hardware/${name}`)
+    const handleRowClick = (row: any) => {
+        history.push(`hardware/server/${row[1].props.children}`) //TODO: fix this, need id
     }
 
-    const [rows, setRows] = useState([
-        ['Jira', 0, 350, 0, 350],
-        ['Atlassian', 1, 200, 0, 350],
-        ['Minecraft', 154, 575, 0, 350],
-        ['WoW', 16, 154, 0, 350],
-        ['League', 15, 764, 0, 350],
-        ['Office 365', 0, 350, 0, 350],
-        ['Joe Montana', 1, 200, 0, 350],
-        ['Bob the Builder', 154, 575, 0, 350],
-        ['Anne Manion', 16, 154, 0, 350],
-        ['Sue Z', 15, 764, 0, 350],
-        ['Bill Belichik', 0, 350, 0, 350],
-        ['Joe Montana', 1, 200, 0, 350],
-    ])
+    var filteredRows: any[] = []
+    filteredData.forEach(rowObj => {
+        filteredRows.push(Object.values(rowObj))
+    })
 
-    //this is the only thing to change
-    const headerList = ['FGDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
+    const [rows, setRows] = useState(filteredRows)
+    useEffect(() => {
+        setRows(filteredRows)
+    }, [filteredData])
 
-    //-------------- this will all be the same -------------
     const headerStates = []
     const headerStateCounts = []
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
+        headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
     var initHeaderStates = cloneDeep(headerStates)
@@ -143,16 +164,15 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
             )
             headers.push(header)
         }
-
         return headers
     }
 
     function concatenatedName(row: any[]) {
         return (
             <td className={styles.hardware}>
-                <img className={styles.icon} src={icon} />
+                <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareNam}>{row[0]}</text>
+                    <text className={styles.hardwareName}>{row[0]}</text>
                 </div>
             </td>
         )
@@ -173,7 +193,9 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                 case 3:
                     transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
                 case 4:
-                    transformedRow[4] = <td className={styles.alignLeft}>${row[4]}</td>
+                    transformedRow[4] = <td className={styles.alignLeft}>{row[4]}</td>
+                case 5:
+                    transformedRow[5] = <td className={styles.alignLeft}>{row[5]}</td>
             }
         }
 
@@ -181,33 +203,20 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     })
 
     return (
-        <div className={styles.hardwareListMain}>
-            <Switch>
-                {/*TODO: replace divs w/ detail page */}
-                <Route path='/hardware/new' render={props => <div>New Employee Detail Page</div>} />
-                <Route path='/hardware/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
-            </Switch>
-            <Group direction='row' justify='between'>
+        <div className={styles.listMain}>
+            <Group direction='row' justify='between' className={styles.group}>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
                     search={search}
                     setSearch={setSearch}
-                    options={[
-                        //TODO: replace w/ real options
-                        {label: 'name', value: 'name'},
-                        {label: 'cost', value: 'cost'},
-                    ]}
+                    options={options}
                     selected={selected}
                     setSelected={setSelected}
                 />
             </Group>
 
-            {/*<List />*/}
-
-            <div className={styles.page}>
-                <Table headers={renderHeaders()} rows={renderedRows} />
-            </div>
+            <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
         </div>
     )
 }
