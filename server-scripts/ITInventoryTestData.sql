@@ -14,18 +14,19 @@ DELETE FROM [Program];
 DELETE FROM [Employee];
 DELETE FROM [Department];
 
-SET IDENTITY_INSERT [Department] ON 
+SET IDENTITY_INSERT [dbo].[Department] ON 
 
-INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (8, N'Mouse, Keyboard, Monitor', N'Office, Jira, Admintools', N'IT', 0)
-INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (13, N'Mouse, Keyboard, Monitor', N'Office, Jira, Confluence, Visual Studio', N'Developer', 0)
-INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (14, N'Mouse, Keyboard, Monitor', N'Office, Jira, Confluence, Sketch', N'Design', 0)
-INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (15, N'Mouse, Keyboard', N'Office, Jira, Confluence, Calendar', N'Project Manager', 0)
-INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (16, N'CQL', N'CQL', N'Utilities', 0)
-INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (17, N'Mouse, Keyboard, Monitor', N'Office, Confluence, Viper', N'Sales', 0)
-INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (20, N'Mouse, Keyboard, Monitor', N'Office, Jira, Calendar', N'DevOps', 0)
-INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (22, N'Mouse', N'Jira', N'Depreciated Department', 1)
-INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (23, N'Monitor', N'Jira', N'Admin', 0)
-SET IDENTITY_INSERT [Department] OFF
+INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (8, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'IT', 0)
+INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (13, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Developer', 0)
+INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (14, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Design', 0)
+INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (15, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Project Manager', 0)
+INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (16, N'CQL', N'CQL', N'Utilities', 0)
+INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (17, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Sales', 0)
+INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (20, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'DevOps', 0)
+INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (22, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Depreciated Department', 1)
+INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (23, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Admin', 0)
+SET IDENTITY_INSERT [dbo].[Department] OFF
+
 SET IDENTITY_INSERT [Employee] ON 
 
 INSERT [Employee] ([EmployeeID], [HireDate], [DepartmentID], [IsDeleted], [UserSettings], [FirstName], [LastName], [Email], [Role], [ADGUID]) VALUES (1, CAST(N'2012-05-05' AS Date), 8, 0, N'{"license":["Sketch","Bitbucket User", "Jira Software"],"software":["Confluence User","Parallels (Business Edition)"]}', N'Dan', N'TheMan', N'dan.theman@email.com', N'Admin', N'811cbf54-2913-4ffc-8f33-6418ddb4e06d')

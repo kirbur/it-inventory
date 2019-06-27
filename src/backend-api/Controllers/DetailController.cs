@@ -92,7 +92,7 @@ namespace backend_api.Controllers
                 case "server":
                     return GetServerDetail(model, id);
                 case "computer":
-                    return Ok("laptop");
+                    return GetComputerDetail(model, id);
                 case "monitor":
                     return GetMonitorDetail(model, id);
                 case "peripheral":
@@ -142,98 +142,107 @@ namespace backend_api.Controllers
             // Holds the license key of the program overview if they are all the same.
             string ProgramLicenseKey = null;
             //lambda to get the id of any of the first program with that name
-            var id = _context.Program.Where(x => x.ProgramName == program).Select(x => x.ProgramId).FirstOrDefault();
+            int id = _context.Program.Where(x => x.ProgramName == program).Select(x => x.ProgramId).FirstOrDefault();
 
-            //creating string icon
-            string icon = $"/image/program/{id}";
-
-            // list of all programs that are not deleted
-            var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == false && x.ProgramName == program);
-
-            // calculate the count of programs under this specific distinct program name that are in use
-            var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == program && x.EmployeeId != null && x.IsDeleted == false).Count();
-
-            // calculate the count of programs under this specific distinct program name
-            var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == program).Count();
-
-            // calculate the cost of each distinct program if it is charged yearly 
-            var ProgCostPerYear = _context.Program.Where(x => x.ProgramName == program && x.ProgramCostPerYear != null && x.IsDeleted != true).Sum(x => x.ProgramCostPerYear);
-
-            // calculate the cost of each distinct program if it is charged as a flat rate 
-            var ProgFlatCost = _context.Program.Where(x => x.ProgramName == program && x.ProgramFlatCost != null && x.IsDeleted != true).Sum(x => x.ProgramFlatCost);
-
-            // This lambda returns true if all the license keys are the same from the current program
-            var LicenseKeySame = !(_context.Program.Where(x => x.ProgramName == program && x.IsDeleted == false).ToList().Any(x => x.ProgramLicenseKey != _context.Program.ToList().First().ProgramLicenseKey));
-
-            // if all the license keys are the same then find the license key that they all are
-            if (LicenseKeySame == true)
-                ProgramLicenseKey = UsefulProgramsList.Select(x => x.ProgramLicenseKey).FirstOrDefault();
-
-            // Lambda to collect all the ids of the programs that belong this program overview
-            var programIds = UsefulProgramsList.Where(x => x.ProgramName == program).Select(x => x.ProgramId).ToList();
-
-            // list to hold the individual programs from the program overview
-            List<object> inDivPrograms = new List<object>();
-
-            //loop through all the individual programs that are under of the current overview program
-            foreach (var prog in UsefulProgramsList)
+            // Return not found if id is the default value.
+            if (id == 0)
             {
-                // holds the employee name for concatenation purposes 
-                var employeeName = "";
-                // Concatenating employees first and last name of the employee who owns the program if the program is assigned
-                // and if the program is not deleted
-                if (prog.EmployeeId != null && prog.IsDeleted == false)
-                {
-                    var empFirst = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.FirstName).FirstOrDefault();
-                    var empLast = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.LastName).FirstOrDefault();
-                    employeeName = empFirst + " " + empLast;
-                }
-                // Creating the list of individual programs with the necessary returnables. 
-                // Only returning license key if the account that hits the endpoint is an admin.
-                inDivPrograms.Add(new
-                {
-                    prog.ProgramId,
-                    employeeName,
-                    ProgramlicenseKey = isAdmin() ? prog.ProgramLicenseKey : null,
-                    prog.RenewalDate
-                });
+                return NotFound();
             }
-            // creating a list of plug-ins that will be returned
-            List<object> ListOfPlugins = new List<object>();
-
-            // loop through every plug-in and if they are a plug-in of the current overview program add all the info that we need about them
-            // to the list of plug-ins
-            foreach (var plugin in _context.Plugins.Where(x => (!x.IsDeleted)))
+            else
             {
-                if (programIds.Contains(plugin.ProgramId))
+                //creating string icon
+                string icon = $"/image/program/{id}";
+
+                // list of all programs that are not deleted
+                var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == false && x.ProgramName == program);
+
+                // calculate the count of programs under this specific distinct program name that are in use
+                var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == program && x.EmployeeId != null && x.IsDeleted == false).Count();
+
+                // calculate the count of programs under this specific distinct program name
+                var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == program).Count();
+
+                // calculate the cost of each distinct program if it is charged yearly 
+                var ProgCostPerYear = _context.Program.Where(x => x.ProgramName == program && x.ProgramCostPerYear != null && x.IsDeleted != true).Sum(x => x.ProgramCostPerYear);
+
+                // calculate the cost of each distinct program if it is charged as a flat rate 
+                var ProgFlatCost = _context.Program.Where(x => x.ProgramName == program && x.ProgramFlatCost != null && x.IsDeleted != true).Sum(x => x.ProgramFlatCost);
+
+                // This lambda returns true if all the license keys are the same from the current program
+                var LicenseKeySame = !(_context.Program.Where(x => x.ProgramName == program && x.IsDeleted == false).ToList().Any(x => x.ProgramLicenseKey != _context.Program.ToList().First().ProgramLicenseKey));
+
+                // if all the license keys are the same then find the license key that they all are
+                if (LicenseKeySame == true)
+                    ProgramLicenseKey = UsefulProgramsList.Select(x => x.ProgramLicenseKey).FirstOrDefault();
+
+                // Lambda to collect all the ids of the programs that belong this program overview
+                var programIds = UsefulProgramsList.Where(x => x.ProgramName == program).Select(x => x.ProgramId).ToList();
+
+                // list to hold the individual programs from the program overview
+                List<object> inDivPrograms = new List<object>();
+
+                //loop through all the individual programs that are under of the current overview program
+                foreach (var prog in UsefulProgramsList)
                 {
-                    ListOfPlugins.Add(new
+                    // holds the employee name for concatenation purposes 
+                    var employeeName = "";
+                    // Concatenating employees first and last name of the employee who owns the program if the program is assigned
+                    // and if the program is not deleted
+                    if (prog.EmployeeId != null && prog.IsDeleted == false)
                     {
-                        plugin.PluginName,
-                        plugin.RenewalDate,
-                        plugin.PluginFlatCost,
-                        plugin.PluginCostPerYear,
-                        plugin.IsCostPerYear
+                        var empFirst = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.FirstName).FirstOrDefault();
+                        var empLast = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.LastName).FirstOrDefault();
+                        employeeName = empFirst + " " + empLast;
+                    }
+                    // Creating the list of individual programs with the necessary returnables. 
+                    // Only returning license key if the account that hits the endpoint is an admin.
+                    inDivPrograms.Add(new
+                    {
+                        prog.ProgramId,
+                        employeeName,
+                        ProgramlicenseKey = isAdmin() ? prog.ProgramLicenseKey : null,
+                        prog.RenewalDate
                     });
                 }
+                // creating a list of plug-ins that will be returned
+                List<object> ListOfPlugins = new List<object>();
+
+                // loop through every plug-in and if they are a plug-in of the current overview program add all the info that we need about them
+                // to the list of plug-ins
+                foreach (var plugin in _context.Plugins.Where(x => (!x.IsDeleted)))
+                {
+                    if (programIds.Contains(plugin.ProgramId))
+                    {
+                        ListOfPlugins.Add(new
+                        {
+                            plugin.PluginName,
+                            plugin.RenewalDate,
+                            plugin.PluginFlatCost,
+                            plugin.PluginCostPerYear,
+                            plugin.IsCostPerYear
+                        });
+                    }
+                }
+
+                // Creating the list of returnables that is for the program overview page. 
+                // Again license key is only returned to an authorized user.
+                var programOverview = new
+                {
+                    icon,
+                    CountProgInUse,
+                    CountProgOverall,
+                    program,
+                    ProgFlatCost,
+                    ProgCostPerYear,
+                    UsefulProgramsList.FirstOrDefault().IsCostPerYear,
+                    ProgramlicenseKey = isAdmin() ? ProgramLicenseKey : null,
+                };
+                // returning the amalgamation of the various returnables into a nice JSON object :)
+                var ProgramOverViewPage = new { programOverview, inDivPrograms, ListOfPlugins };
+                return Ok(ProgramOverViewPage);
             }
 
-            // Creating the list of returnables that is for the program overview page. 
-            // Again license key is only returned to an authorized user.
-            var programOverview = new
-            {
-                icon,
-                CountProgInUse,
-                CountProgOverall,
-                program,
-                ProgFlatCost,
-                ProgCostPerYear,
-                UsefulProgramsList.FirstOrDefault().IsCostPerYear,
-                ProgramlicenseKey = isAdmin() ? ProgramLicenseKey : null,
-            };
-            // returning the amalgamation of the various returnables into a nice JSON object :)
-            var ProgramOverViewPage = new { programOverview, inDivPrograms, ListOfPlugins };
-            return Ok(ProgramOverViewPage);
         }
         /*
          * GET: api/detail/employee/{id}
@@ -427,6 +436,92 @@ namespace backend_api.Controllers
                 // Get the department name
                 var department = _context.Department.Where(dep => dep.DepartmentId == emp.DepartmentId && !dep.IsDeleted).FirstOrDefault().DepartmentName;
 
+                // list that will hold the unassigned hardware
+                List<object> UnassignedHardware = new List<object>();
+
+                // loop with lambda that finds the unassigned, not deleted monitors and adds the necessary returnables of them into a list 
+                foreach (var mon in _context.Monitor.Where(x => x.EmployeeId == null && x.IsDeleted == false))
+                {
+                    var monitorName = mon.Make + " " + mon.Model;
+                    var monitor = new
+                    {
+                        mon.MonitorId,
+                        type = nameof(Monitor),
+                        monitorName
+                    };
+                    UnassignedHardware.Add(monitor);
+                }
+                // loop with lambda that finds the unassigned, not deleted servers and adds the necessary returnables of them into a list 
+                foreach (var serv in _context.Server.Where(x => x.EmployeeId == null && x.IsDeleted == false))
+                {
+                    var serverName = serv.Make + " " + serv.Model;
+                    var server = new
+                    {
+                        serv.ServerId,
+                        type = nameof(Server),
+                        serverName
+                    };
+                    UnassignedHardware.Add(server);
+                }
+
+                // loop with lambda that finds the unassigned, not deleted computers and adds the necessary returnables of them into a list 
+                foreach (var comp in _context.Computer.Where(x => x.EmployeeId == null && x.IsDeleted == false))
+                {
+                    var compName = comp.Make + " " + comp.Model;
+                    var computer = new
+                    {
+                        comp.ComputerId,
+                        type = nameof(Computer),
+                        compName
+                    };
+                    UnassignedHardware.Add(computer);
+                }
+
+                // loop with lambda that finds the unassigned, not deleted peripherals and adds the necessary returnables of them into a list 
+                foreach (var periph in _context.Peripheral.Where(x => x.EmployeeId == null && x.IsDeleted == false))
+                {
+                    var periphName = periph.PeripheralName + " " + periph.PeripheralType;
+                    var peripheral = new
+                    {
+                        periph.PeripheralId,
+                        type = nameof(Peripheral),
+                        periphName
+                    };
+                    UnassignedHardware.Add(peripheral);
+                }
+
+                // Unassigned programs lists for returning purposes
+                List<object> UnassignedSoftware = new List<object>();
+                List<object> UnassignedLicenses = new List<object>();
+
+                // loop and lambda to find all the distinct programs that have any of their individual programs unassigned and loop though them
+                foreach (var prog in _context.Program.Where(x => x.EmployeeId == null && x.IsDeleted == false).GroupBy(prog => prog.ProgramName).Select(x => x.FirstOrDefault()).ToList())
+                {
+                    // for the licenses list
+                    if (prog.IsLicense == false)
+                    {
+                        var SW = new
+                        {
+                            prog.ProgramName,
+                            prog.ProgramId,
+                            type = nameof(Program)
+                        };
+                        UnassignedSoftware.Add(SW);
+                    }
+                    // for the software list
+                    else
+                    {
+                        var license = new
+                        {
+                            prog.ProgramName,
+                            prog.ProgramId,
+                            type = nameof(Program)
+                        };
+                        UnassignedLicenses.Add(license);
+                    }
+                }
+
+
                 // Combine it all into a nice JSON :)
                 object employeeDetail = new
                 {
@@ -441,6 +536,9 @@ namespace backend_api.Controllers
                     hardware,
                     software,
                     licenses,
+                    UnassignedHardware,
+                    UnassignedSoftware,
+                    UnassignedLicenses
                 };
                 List<object> returnList = new List<object>();
                 returnList.Add(employeeDetail);
@@ -770,6 +868,7 @@ namespace backend_api.Controllers
         }
 
         /* GET: api/detail/server/{id}
+         * Function returns the server detail information.
          * Return: 
           {
                 "server": {
@@ -841,7 +940,81 @@ namespace backend_api.Controllers
             }
         }
 
+        /*
+         * GET: api/detail/computer/{id}
+            * Function returns the computer detail information.
+            * Returns : {
+            *    "computer": {
+                        "serverId": int,
+                        "fqdn": string,
+                        "numberOfCores": int,
+                        "operatingSystem": string,
+                        "ram": int,
+                        "virtualize": bool,
+                        "renewalDate": date,
+                        "employeeId": int,
+                        "purchaseDate": date,
+                        "flatCost": int,
+                        "endOfLife": date,
+                        "isAssigned": bool,
+                        "textField": string,
+                        "costPerYear": int,
+                        "isDeleted": bool,
+                        "mfg": string,
+                        "make": string,
+                        "model": string,
+                        "ipAddress": string,
+                        "san": string,
+                        "localHHD": string,
+                        "location": string,
+                        "serialNumber": string
+                    },
+                    "icon": partial URL (as string),
+                    "employeeAssignedName": string,
+                    "compHistory": [
+                        {
+                        "hardwareHistoryId": int,
+                        "currentOwnerId": int,
+                        "currentOwnerStartDate": string,
+                        "previousOwnerId": int,
+                        "hardwareType": string,
+                        "hardwareId": int,
+                        "eventName": string,
+                        "eventDescription": string
+                        }
+                    ]
+                }
+       */
+        private IActionResult GetComputerDetail(string model, int ComputerID)
+        {
+            // Find the requested server
+            var comp = _context.Server.Find(ComputerID);
+            if (comp == null || comp.IsDeleted == true)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var icon = $"/image/laptop/{ComputerID}";
+
+                // Employee the computer is assigned to.
+                var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == comp.EmployeeId).FirstOrDefault();
+
+                // Computer History
+                var compHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == ComputerID);
+
+                return Ok(new
+                {
+                    computer = comp,
+                    icon,
+                    employeeAssignedName =employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    compHistory,
+                });
+            }
+        }
+
         /* GET: api/detail/monitor/{id}
+         * Function returns the monitor detail information.
          * Return: 
           {
                 "monitor": {
@@ -909,6 +1082,7 @@ namespace backend_api.Controllers
         }
 
         /* GET: api/detail/peripheral/{id}
+         * Function returns the peripheral detail information.
          * Return: 
           {
                 "peripheral": {
@@ -972,5 +1146,7 @@ namespace backend_api.Controllers
                 });
             }
         }
+
+
     }
 }
