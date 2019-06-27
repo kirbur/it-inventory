@@ -10,8 +10,24 @@
     cursor: pointer;
     height: 100px;
 }
-.tr:hover {
-    background-color: rgba(151, 151, 151, 0.15);
+
+/* delete icon next to row */
+.delete {
+    background-color: red;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+}
+.delete:hover {
+    background-color: maroon;
+}
+.whiteLine {
+    width: 18px;
+    height: 2px;
+    background-color: white;
+    position: relative;
+    bottom: 16px;
+    left: 6px;
 }
 
 /* styling for table headers - will have to go on every page with a table*/

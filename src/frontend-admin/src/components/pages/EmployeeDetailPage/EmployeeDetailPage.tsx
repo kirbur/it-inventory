@@ -1,19 +1,15 @@
 import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 
-// Packages
-import {cloneDeep} from 'lodash'
-
 // Components
 import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
-// import ReactTooltip from 'react-tooltip'
+import ReactTooltip from 'react-tooltip'
 import {IoMdAdd} from 'react-icons/io'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 
 // Utils
-import {sortTable} from '../../../utilities/quickSort'
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -151,7 +147,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                             Hired: {userData.hireDate} | {calculateDaysEmployed(getDays(userData.hireDate))}
                         </div>
                     </div>
-                    <DetailPageTable headers={hardwareHeaders} data={hardwareRows} />
+                    <DetailPageTable headers={hardwareHeaders} rows={hardwareRows} setRows={setHardwareRows} />
                     {isAdmin && (
                         <Button
                             text='Assign new hardware'
@@ -163,7 +159,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         />
                     )}
 
-                    <DetailPageTable headers={softwareHeaders} data={softwareRows} />
+                    <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
                     {isAdmin && (
                         <Button
                             text='Assign new software'
@@ -175,7 +171,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         />
                     )}
 
-                    <DetailPageTable headers={licenseHeaders} data={licenseRows} />
+                    <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
                     {isAdmin && (
                         <Button
                             text='Assign new license'
