@@ -41,8 +41,6 @@
 }
 
 .img {
-    /* height: 200px;
-    width: 200px; */
     position: relative;
     top: 50px;
     transform: scale(1.5, 1.5);

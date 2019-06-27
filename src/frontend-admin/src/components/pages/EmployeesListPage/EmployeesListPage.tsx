@@ -120,7 +120,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     const handleClick = () => {
-        history.push(`${match.url}/new`)
+        history.push(`/newEmployee`)
     }
 
     const handleRowClick = (row: any) => {
