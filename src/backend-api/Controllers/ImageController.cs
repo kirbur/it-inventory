@@ -18,9 +18,10 @@ namespace backend_api.Controllers
     [ApiController]
     public class UploadController : ControllerBase
     {
+        // UploadController constructor.
         public UploadController(IOptions<UploadOptions> uploadOptions)
         {
-            UploadOptions = uploadOptions;
+            this.UploadOptions = uploadOptions;
         }
 
         public IOptions<UploadOptions> UploadOptions { get; }
