@@ -41,6 +41,8 @@
 }
 
 .img {
+    max-width: 300px;
+    max-height: 300px;
     position: relative;
     top: 50px;
     transform: scale(1.5, 1.5);
@@ -133,8 +135,16 @@
     border-radius: 15px;
 }
 
+.dropdownTitle {
+    margin-top: -3px;
+    font-family: cqlmedium;
+    text-transform: none;
+    color: #009eff;
+    font-size: 20px;
+}
+
 .addContainer {
-    padding: 5px 0 15px;
+    margin: 5px 0 15px;
     align-self: flex-end;
 }
 .addIconBorder:hover {

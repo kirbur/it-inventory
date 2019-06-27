@@ -5,12 +5,14 @@ import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {IoIosPersonAdd, IoMdAdd} from 'react-icons/io'
 import {FaUserShield, FaUser} from 'react-icons/fa'
+import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './EmployeeDetailEditPage.module.css'
+import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 import {Button} from '../../reusables/Button/Button'
 import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {LoginContext} from '../../App/App'
@@ -57,6 +59,23 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const hardwareHeaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
     const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
     const licenseHeaders = ['Licenses', 'CALs']
+
+    //TODO: remove default options
+    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([
+        {name: 'option 1', id: 1},
+        {name: 'option 2', id: 1},
+        {name: 'option 3', id: 2},
+    ])
+    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([
+        {name: 'option 1', id: 1},
+        {name: 'option 2', id: 1},
+        {name: 'option 3', id: 2},
+    ])
+    const [licenseDropdown, setLicenseDropdown] = useState<any[]>([
+        {name: 'option 1', id: 1},
+        {name: 'option 2', id: 1},
+        {name: 'option 3', id: 2},
+    ])
 
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
@@ -122,7 +141,25 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             .get('/dashboard/departmentTable?$select=departmentName,departmentID')
             .then((data: any) => setDeptList(data))
             .catch((err: any) => console.log(err))
+
+        //TODO: get dropdown content for all 3 dropdowns
     }, [])
+
+    const handleAddHardware = (id: number) => {
+        //TODO: post request to assign hardware to user w/ id match.params.id
+    }
+
+    const handleAddSoftware = (id: number) => {
+        //TODO: post request to assign software to user w/ id match.params.id
+    }
+
+    const handleAddLicense = (id: number) => {
+        //TODO: post request to assign license to user w/ id match.params.id
+    }
+
+    const handleSubmit = () => {
+        //TODO: post request
+    }
 
     return (
         <div className={styles.columns}>
@@ -256,12 +293,35 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         style={styles.newRowThing}
                     />
                 </div>
-                <div className={styles.addContainer}>
-                    <div className={styles.addIconBorder}>
-                        <IoMdAdd className={styles.addIcon} />
+                <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                        <DropdownList
+                            triggerElement={({isOpen, toggle}) => (
+                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                        Assign new hardware
+                                    </div>
+                                </button>
+                            )}
+                            choicesList={() => (
+                                <ul className={dropdownStyles.dropdownList}>
+                                    {hardwareDropdown.map(i => (
+                                        <li
+                                            className={dropdownStyles.dropdownListItem}
+                                            key={i.name}
+                                            onClick={() => handleAddHardware(i.id)}
+                                        >
+                                            <button className={dropdownStyles.dropdownListItemButton}>
+                                                <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        />
+                        <div />
                     </div>
-                    <div className={styles.assignText}>Assign new hardware</div>
-                </div>
+                </Button>
 
                 <div className={styles.paddingTop}>
                     <DetailPageTable
@@ -271,12 +331,35 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         style={styles.newRowThing}
                     />
                 </div>
-                <div className={styles.addContainer}>
-                    <div className={styles.addIconBorder}>
-                        <IoMdAdd className={styles.addIcon} />
+                <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                        <DropdownList
+                            triggerElement={({isOpen, toggle}) => (
+                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                        Assign new software
+                                    </div>
+                                </button>
+                            )}
+                            choicesList={() => (
+                                <ul className={dropdownStyles.dropdownList}>
+                                    {softwareDropdown.map(i => (
+                                        <li
+                                            className={dropdownStyles.dropdownListItem}
+                                            key={i.name}
+                                            onClick={() => handleAddSoftware(i.id)}
+                                        >
+                                            <button className={dropdownStyles.dropdownListItemButton}>
+                                                <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        />
+                        <div />
                     </div>
-                    <div className={styles.assignText}>Assign new software</div>
-                </div>
+                </Button>
 
                 <div className={styles.paddingTop}>
                     <DetailPageTable
@@ -286,18 +369,43 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         style={styles.newRowThing}
                     />
                 </div>
-                <div className={styles.addContainer}>
-                    <div className={styles.addIconBorder}>
-                        <IoMdAdd className={styles.addIcon} />
+                <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                        <DropdownList
+                            triggerElement={({isOpen, toggle}) => (
+                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                        Assign new license
+                                    </div>
+                                </button>
+                            )}
+                            choicesList={() => (
+                                <ul className={dropdownStyles.dropdownList}>
+                                    {licenseDropdown.map(i => (
+                                        <li
+                                            className={dropdownStyles.dropdownListItem}
+                                            key={i.name}
+                                            onClick={() => handleAddLicense(i.id)}
+                                        >
+                                            <button className={dropdownStyles.dropdownListItemButton}>
+                                                <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        />
+                        <div />
                     </div>
-                    <div className={styles.assignText}>Assign new licenses</div>
-                </div>
+                </Button>
 
                 <div className={styles.submitContainer}>
-                    <div className={styles.submitButton}>
+                    {/* <div className={styles.submitButton}>
                         <div className={styles.submitText}>Submit </div>
                         <IoIosPersonAdd className={styles.personIcon} />
-                    </div>
+                    </div> */}
+
+                    <Button text='Submit' icon='submit' onClick={handleSubmit} className={styles.submitbutton} />
                 </div>
             </div>
         </div>

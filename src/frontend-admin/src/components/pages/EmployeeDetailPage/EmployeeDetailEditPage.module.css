@@ -251,3 +251,21 @@ input:checked ~ .insideCheckmarkAdmin {
     position: relative;
     left: 10px;
 }
+
+.submitbutton {
+    width: 200px;
+}
+
+/*dropdown styles*/
+.dropdownTitle {
+    margin-top: -3px;
+    font-family: cqlmedium;
+    text-transform: none;
+    color: #009eff;
+    font-size: 20px;
+}
+
+.addContainer {
+    margin: 5px 0 15px;
+    align-self: flex-end;
+}
