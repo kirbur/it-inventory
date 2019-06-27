@@ -20,6 +20,9 @@
 .even {
     justify-content: space-evenly;
 }
+.center {
+    justify-content: center;
+}
 
 .row {
     flex-direction: row;

@@ -113,7 +113,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     const formatCost = (hwCpost: number, progCost: number) => {
-        return 'HW: $' + hwCpost + ' | SW: $' + progCost //TODO: SW or PROG? or something else??
+        return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo' //TODO: SW or PROG? or something else??
     }
 
     const handleClick = () => {

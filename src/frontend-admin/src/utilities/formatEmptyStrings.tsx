@@ -1,4 +1,4 @@
-export const format = (x: string | null | number) => {
+export const format = (x: string | number | null) => {
     if (typeof x === 'string') {
         //if x is empty, null, or only whitespace
         if (x === '') {

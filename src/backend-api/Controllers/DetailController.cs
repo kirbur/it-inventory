@@ -309,7 +309,10 @@ namespace backend_api.Controllers
                     software,
                     licenses,
                 };
-                return Ok(employeeDetail);
+                // return Ok(employeeDetail);
+                List<object> returnList = new List<object>();
+                returnList.Add(employeeDetail);
+                return Ok(returnList);
             }
         }
 

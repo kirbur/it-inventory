@@ -7,6 +7,10 @@ import {cloneDeep} from 'lodash'
 // Components
 import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import ReactTooltip from 'react-tooltip'
+import {IoMdAdd} from 'react-icons/io'
+import {Button} from '../../reusables/Button/Button'
+import {Group} from '../../reusables/Group/Group'
 
 // Utils
 import {sortTable} from '../../../utilities/quickSort'
@@ -31,31 +35,23 @@ interface IEmployeeDetailPageProps {
 // Primary Component
 export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => {
     const {history, match} = props
+
     const {
-        loginContextVariables: {accessToken, refreshToken},
+        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
     } = useContext(LoginContext)
+    const isAdmin = true //TODO: remove
+
     const axios = new AxiosService(accessToken, refreshToken)
     const [userData, setUserData] = useState<any>({})
     const [hwdata, setHWData] = useState<any[]>([])
     const [swdata, setSWData] = useState<any[]>([])
     const [ldata, setLData] = useState<any[]>([])
 
-    const hwheaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Year']
+    const hwheaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
     const swheaders = ['Software', 'Key/Username', 'Monthly Cost']
     const lheaders = ['Licenses', 'CALs']
 
-    const func = (x: string | number) => {
-        return x
-    }
-    const hwRowFormats = [func, func, func, func]
-    const swRowFormats = [
-        func,
-        func,
-        (x: number) => {
-            return '$' + x
-        },
-    ]
-    const lRowFormats = [func, func]
+    const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
     useEffect(() => {
         axios
@@ -81,7 +77,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         mfg: format(i.mfg),
                         purchaseDate: formatDate(i.purchaseDate),
                         id: format(i.id),
-                        // tooltip: format(i.tooltip),
+                        tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
                     })
                 )
                 setHWData(hw)
@@ -113,27 +109,6 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
             })
             .catch((err: any) => console.error(err))
     }, [])
-
-    // function sortStates(
-    //     index: number,
-    //     sortState: any,
-    //     tempHeaderStates: any,
-    //     tempHeaderStateCounts: any,
-    //     setSortState: any,
-    //     initHeaderStateCounts: any
-    // ) {
-    //     if (sortState.headerStateCounts[index] == 0) {
-    //         tempHeaderStates[index] = styles.descending
-    //         tempHeaderStateCounts[index] = 1
-    //         setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
-    //         tempHeaderStateCounts = [...initHeaderStateCounts]
-    //     } else if (sortState.headerStateCounts[index] == 1) {
-    //         tempHeaderStates[index] = styles.ascending
-    //         tempHeaderStateCounts[index] = 0
-    //         setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
-    //         tempHeaderStateCounts = [...initHeaderStateCounts]
-    //     }
-    // }
 
     //-------------- Hardware Table -------------
     var hwtemp: any[] = []
@@ -181,14 +156,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 <td
                     onClick={e => {
                         sethwRows(sortTable(hwrows, i, hwsortState.hwheaderStateCounts[i]))
-                        hwsortStates(
-                            i
-                            // hwsortState,
-                            // hwtempHeaderStates,
-                            // hwtempHeaderStateCounts,
-                            // hwsetSortState,
-                            // hwinitHeaderStateCounts
-                        )
+                        hwsortStates(i)
                     }}
                     className={styles.header}
                 >
@@ -204,6 +172,17 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         return headers
     }
 
+    const toolTip = (row: any[]) => {
+        return (
+            <td className={styles.rowData}>
+                <a data-tip={row[5]} className={row[5] === '' ? '' : styles.rowTitle}>
+                    {row[0]}
+                </a>
+                <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
+            </td>
+        )
+    }
+
     var hwRenderedRows: any[] = []
 
     hwrows.forEach(row => {
@@ -211,7 +190,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
-                    transformedRow[0] = <td className={styles.rowData}>{row[0]} </td>
+                    transformedRow[0] = toolTip(row)
                 case 1:
                     transformedRow[1] = <td className={styles.rowData}>{row[1]}</td>
                 case 2:
@@ -293,7 +272,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
-                    transformedRow[0] = <td className={styles.rowData}>{row[0]} </td>
+                    transformedRow[0] = <td className={s(styles.rowData, styles.rowTitle)}>{row[0]} </td>
                 case 1:
                     transformedRow[1] = <td className={styles.rowData}>{row[1]}</td>
                 case 2:
@@ -373,7 +352,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
-                    transformedRow[0] = <td className={styles.rowData}>{row[0]} </td>
+                    transformedRow[0] = <td className={s(styles.rowData, styles.rowTitle)}>{row[0]} </td>
                 case 1:
                     transformedRow[1] = <td className={styles.rowData}>{row[1]}</td>
             }
@@ -381,33 +360,84 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
 
         lRenderedRows.push(transformedRow)
     })
+    console.log(URL + userData.photo)
 
     return (
-        <div className={styles.columns}>
-            {/* column 1 */}
-            <div className={styles.firstColumn}>
-                <div className={styles.imgPadding}>
-                    <img className={styles.img} src={URL + userData.photo} alt={''} />
-                </div>
-                <div className={styles.costText}>
-                    <p>Software ---------------- ${userData.swCost} /month</p>
-                    <p>Hardware --------------- ${userData.hwCost}</p>
-                </div>
-            </div>
-            {/* column 2 */}
-            <div className={styles.secondColumn}>
-                <div className={styles.titleText}>
-                    <div className={styles.employeeName}>{userData.name}</div>
-                    <div className={styles.employeeText}>
-                        {userData.department} | {userData.role}
+        <div className={styles.empDetailMain}>
+            <div className={styles.columns}>
+                {/* column 1 */}
+                <div className={styles.firstColumn}>
+                    <Button
+                        text='All Employees'
+                        icon='back'
+                        onClick={() => {
+                            history.push('/employees')
+                        }}
+                        className={styles.backButton}
+                        textClassName={styles.backButtonText}
+                    />
+                    <div className={styles.imgPadding}>
+                        <img className={styles.img} src={URL + userData.photo} alt={''} />
                     </div>
-                    <div className={styles.employeeText}>
-                        Hired: {userData.hireDate} | {calculateDaysEmployed(getDays(userData.hireDate))}
+                    <div className={styles.costText}>
+                        <p>Software ---------------- ${userData.swCost} /month</p>
+                        <p>Hardware --------------- ${userData.hwCost}</p>
                     </div>
                 </div>
-                <DetailPageTable headers={hwrenderHeaders()} rows={hwRenderedRows} />
-                <DetailPageTable headers={swrenderHeaders()} rows={swRenderedRows} />
-                <DetailPageTable headers={lrenderHeaders()} rows={lRenderedRows} />
+                {/* column 2 */}
+                <div className={styles.secondColumn}>
+                    {isAdmin && (
+                        <Group direction='row' justify='start' className={styles.group}>
+                            <Button text='Edit' icon='edit' onClick={() => {}} className={styles.editbutton} />
+
+                            <Button text='Archive' icon='archive' onClick={() => {}} className={styles.archivebutton} />
+                        </Group>
+                    )}
+                    <div className={styles.titleText}>
+                        <div className={styles.employeeName}>{userData.name}</div>
+                        <div className={styles.employeeText}>
+                            {userData.department} | {userData.role}
+                        </div>
+                        <div className={styles.employeeText}>
+                            Hired: {userData.hireDate} | {calculateDaysEmployed(getDays(userData.hireDate))}
+                        </div>
+                    </div>
+                    <DetailPageTable headers={hwrenderHeaders()} rows={hwRenderedRows} />
+                    {isAdmin && (
+                        <Button
+                            text='Assign new hardware'
+                            icon='add'
+                            onClick={() => {}}
+                            className={styles.addContainer}
+                            textInside={false}
+                            textClassName={styles.assignText}
+                        />
+                    )}
+
+                    <DetailPageTable headers={swrenderHeaders()} rows={swRenderedRows} />
+                    {isAdmin && (
+                        <Button
+                            text='Assign new software'
+                            icon='add'
+                            onClick={() => {}}
+                            className={styles.addContainer}
+                            textInside={false}
+                            textClassName={styles.assignText}
+                        />
+                    )}
+
+                    <DetailPageTable headers={lrenderHeaders()} rows={lRenderedRows} />
+                    {isAdmin && (
+                        <Button
+                            text='Assign new license'
+                            icon='add'
+                            onClick={() => {}}
+                            className={styles.addContainer}
+                            textInside={false}
+                            textClassName={styles.assignText}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     )

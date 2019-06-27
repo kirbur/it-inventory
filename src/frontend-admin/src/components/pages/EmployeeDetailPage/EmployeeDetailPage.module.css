@@ -1,3 +1,12 @@
+.empDetailMain {
+    margin: 50px 85px;
+}
+
+.archivebutton {
+    margin-left: 18px;
+    padding: 0 5px;
+}
+
 .columns {
     display: flex;
     flex-direction: row;
@@ -8,11 +17,19 @@
 .firstColumn {
     min-width: 300px;
     padding: 25px;
+    flex-grow: 1;
+}
+
+.backButton {
+    margin-bottom: 30px;
 }
 
 .secondColumn {
     min-width: 700px;
     padding: 25px;
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
 }
 
 .imgPadding {
@@ -104,14 +121,48 @@
     left: 5px;
 }
 
-/* .rowTitle {
+.rowTitle {
     color: #009eff;
 }
 
-.hwRowTitle {
-    color: #009eff;
+.tooltip {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.52px;
+    line-height: 30px;
+    color: black !important;
+    box-shadow: 1px 1px 6px 0 rgba(114, 114, 114, 0.2) !important;
+    border-radius: 15px;
 }
 
-.hwRowTitle {
+.addContainer {
+    padding: 5px 0 15px;
+    align-self: flex-end;
+}
+.addIconBorder:hover {
+    background-color: #009eff;
+    color: white;
+    cursor: pointer;
+}
+
+.addIconBorder:hover .addIcon {
+    color: white;
+}
+.addIconBorder {
+    border: 2px solid #009eff;
+    border-radius: 3px;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.addIcon {
     color: #009eff;
-} */
+    transform: scale(2, 2);
+}
+.assignText {
+    padding-left: 5px;
+    color: #009eff;
+    font-size: 20px;
+}
