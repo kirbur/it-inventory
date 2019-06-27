@@ -46,7 +46,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
             .get('/list/peripherals')
             .then((data: any) => {
                 const peripherals: any[] = []
-                console.log(data)
+                //console.log(data)
                 data.map((i: any) =>
                     peripherals.push({
                         name: format(i.peripheralName + ' ' + i.peripheralType),

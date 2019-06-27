@@ -46,7 +46,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
             .get('/list/laptops')
             .then((data: any) => {
                 const laptops: any[] = []
-                console.log(data)
+                //console.log(data)
                 data.map((i: any) => {
                     laptops.push({
                         makeModel: format(i.make) + ' ' + i.model,

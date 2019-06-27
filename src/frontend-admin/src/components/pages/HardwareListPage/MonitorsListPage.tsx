@@ -46,7 +46,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
             .get('/list/monitors')
             .then((data: any) => {
                 const monitors: any[] = []
-                console.log(data)
+                //console.log(data)
                 data.map((i: any) => {
                     monitors.push({
                         make: format(i.make),
