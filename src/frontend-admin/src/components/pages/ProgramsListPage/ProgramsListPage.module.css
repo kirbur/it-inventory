@@ -15,11 +15,14 @@
 .icon {
     max-height: 75px;
     max-width: 75px;
+    min-height: 50px;
+    min-width: 50px;
     padding: 25px;
 }
 
 .alignLeft {
     text-align: left;
+    min-width: 100px;
 }
 .alignLeftAndPadding {
     text-align: left;
