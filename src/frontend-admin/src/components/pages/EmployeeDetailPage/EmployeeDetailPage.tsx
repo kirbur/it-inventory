@@ -57,7 +57,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         axios
             .get(`/detail/employee/${match.params.id}`)
             .then((data: any) => {
-                //console.log(data)
+                console.log(data)
                 let user: any = {
                     photo: data[0].picture,
                     name: data[0].firstName + ' ' + data[0].lastName,
@@ -71,39 +71,38 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
 
                 let hw: any[] = []
                 data[0].hardware.map((i: any) =>
-                    hw.push({
-                        name: format(i.make + ' ' + i.model),
-                        serial: format(i.serialNumber),
-                        mfg: format(i.mfg),
-                        purchaseDate: formatDate(i.purchaseDate),
-                        id: format(i.id),
-                        tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
-                    })
+                    hw.push([
+                        format(i.make + ' ' + i.model),
+                        format(i.serialNumber),
+                        format(i.mfg),
+                        formatDate(i.purchaseDate),
+                        format(i.id),
+                        i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
+                    ])
                 )
                 setHardwareRows(hw)
-
                 let sw: any[] = []
                 data[0].software.map((i: any) =>
-                    sw.push({
-                        name: format(i.name),
-                        licenseKey: format(i.licenseKey),
-                        costPerMonth: format(Math.round(i.costPerMonth * 100) / 100),
-                        flatCost: format(i.flatCost),
-                        id: format(i.id),
-                    })
+                    sw.push([
+                        format(i.name),
+                        format(i.licenseKey),
+                        format(Math.round(i.costPerMonth * 100) / 100),
+                        format(i.flatCost),
+                        format(i.id),
+                    ])
                 )
                 setSoftwareRows(sw)
 
                 let l: any[] = []
                 data[0].licenses.map((i: any) =>
-                    l.push({
-                        name: format(i.name),
-                        cals: format(i.cals),
-                        licenseKey: format(i.licenseKey),
-                        costPerMonth: format(Math.round(i.costPerMonth * 100) / 100),
-                        flatCost: format(i.flatCost),
-                        id: format(i.id),
-                    })
+                    l.push([
+                        format(i.name),
+                        format(i.cals),
+                        format(i.licenseKey),
+                        format(Math.round(i.costPerMonth * 100) / 100),
+                        format(i.flatCost),
+                        format(i.id),
+                    ])
                 )
                 setLicenseRows(l)
             })
