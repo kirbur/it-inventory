@@ -90,7 +90,7 @@ namespace backend_api.Controllers
                 case "department":
                     return GetDepartmentDetail(id);
                 case "server":
-                    return Ok("server");
+                    return GetServerDetail(model, id);
                 case "computer":
                     return Ok("laptop");
                 case "monitor":
@@ -768,8 +768,78 @@ namespace backend_api.Controllers
                 };
                 return Ok(DepartmentDetailPage);
             }
+        }
 
+        /* GET: api/detail/server/{id}
+         * Return: 
+          {
+                "server": {
+                    "serverId": int,
+                    "fqdn": string,
+                    "numberOfCores": int,
+                    "operatingSystem": string,
+                    "ram": int,
+                    "virtualize": bool,
+                    "renewalDate": date (as string),
+                    "employeeId": int,
+                    "purchaseDate": date (as string),
+                    "flatCost": decimal,
+                    "endOfLife": date (as string),
+                    "isAssigned": bool,
+                    "textField": string,
+                    "costPerYear": decimal,
+                    "isDeleted": bool,
+                    "mfg": string,
+                    "make": string,
+                    "model": string,
+                    "ipAddress": string,
+                    "san": string,
+                    "localHHD": string,
+                    "location": string,
+                    "serialNumber": string,
+                },
+                "icon": partial URL (as string),
+                "employeeAssignedName": string,
+                "serverHistory": [
+                    {
+                        "hardwareHistoryId": int,
+                        "currentOwnerId": int,
+                        "currentOwnerStartDate": date (as string),
+                        "previousOwnerId": int,
+                        "hardwareType": string,
+                        "hardwareId": int,
+                        "eventName": string,
+                        "eventDescription": string,
+                    },
+                ]
+            }
+         */
+        private IActionResult GetServerDetail(string model, int serverID)
+        {
+            // Find the requested server
+            var sv = _context.Server.Find(serverID);
+            if (sv == null || sv.IsDeleted == true)
+            {
+                return NotFound();
+            }
+            else
+            {
+                // Partial image string
+                var icon = $"/image/server/{serverID}";
 
+                // Employee the server is assigned to.
+                var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == sv.EmployeeId).FirstOrDefault();
+
+                // Server History
+                var serverHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == serverID);
+
+                return Ok(new {
+                    server = sv,
+                    icon,
+                    employeeAssignedName = employeeAssigned.FirstName + " " + employeeAssigned.LastName,
+                    serverHistory,
+                });
+            }
         }
     }
 }
