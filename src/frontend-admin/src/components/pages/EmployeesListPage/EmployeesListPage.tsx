@@ -38,8 +38,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Employees', value: 'name'})
 
-    const columns = ['name', 'role', 'dateHired', 'daysEmployed', 'cost', 'hardware', 'programs']
-    const headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
+    const columns = ['name', 'role', 'id', 'dateHired', 'daysEmployed', 'cost', 'hardware', 'programs']
+    const headers = ['Employees', 'Role', 'ID', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
     const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
     useEffect(() => {
@@ -47,6 +47,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             .get('/list/employees')
             .then((data: any) => {
                 const employees: any[] = []
+                console.log(data)
                 data.map((i: any) => {
                     employees.push({
                         name: format(i.employeeName),
@@ -57,6 +58,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         swCost: i.programCostForEmp,
                         role: format(i.role),
                         icon: format(i.photo),
+                        id: i.employeeId,
 
                         //for searching
                         hardware: i.hardwareList.join(', '),
@@ -114,15 +116,16 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     const formatCost = (hwCpost: number, progCost: number) => {
-        return 'HW: $' + hwCpost + ' | SW: $' + progCost //TODO: SW or PROG? or something else??
+        return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo' //TODO: SW or PROG? or something else??
     }
 
     const handleClick = () => {
-        history.push(`${match.url}/new`)
+        history.push(`/editEmployee/new`)
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`${match.url}/${row[0].props.children[1].props.children[0].props.children}`)
+        // history.push(`${match.url}/${row[0].props.children[1].props.children[0].props.children}`)
+        history.push(`${match.url}/${row[1].props.children}`)
     }
 
     var filteredRows: any[] = []
@@ -136,7 +139,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }, [filteredData])
 
     //this is the only thing to change
-    const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
+    const headerList = ['Employees', 'ID', 'Date Hired', 'Days Employed', 'Cost']
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -144,7 +147,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
+        headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
     //var initHeaderStates = cloneDeep(headerStates)
@@ -156,12 +159,12 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const [sortState, setSortState] = useState(initState)
 
     function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
+        if (sortState.headerStateCounts[index] === 0) {
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
             tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
+        } else if (sortState.headerStateCounts[index] === 1) {
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
@@ -237,13 +240,14 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
-
+                case 1:
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[8]}</td>
                 case 2:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 3:
-                    transformedRow[2] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[2])}</td>
+                    transformedRow[3] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[2])}</td>
                 case 4:
-                    transformedRow[3] = <td className={styles.alignLeft}>{formatCost(row[4], row[5])}</td>
+                    transformedRow[4] = <td className={styles.alignLeft}>{formatCost(row[4], row[5])}</td>
             }
         }
 
