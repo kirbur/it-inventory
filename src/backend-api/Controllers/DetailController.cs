@@ -590,14 +590,14 @@ namespace backend_api.Controllers
                 // cost of hardware per department value
                 decimal? TotalCostOfActHardwareInDep = 0;
 
-                // lambda to get the ids of the all the employees in the current department
-                var empsIDsInDep = _context.Employee.Where(x => x.DepartmentId == DepId && x.IsDeleted == false).Select(x => x.EmployeeId).ToList();
-
-                // lambda to count the number of employees in the current department
-                var CountEmpsInDep = _context.Employee.Where(x => x.DepartmentId == DepId && x.IsDeleted == false).Count();
-
                 // lambda to collect all the employees in the current department into a list
                 var empsInDep = _context.Employee.Where(x => x.DepartmentId == DepId && x.IsDeleted == false);
+
+                // lambda to get the ids of the all the employees in the current department
+                var empsIDsInDep = empsInDep.Select(x => x.EmployeeId).ToList();
+
+                // lambda to count the number of employees in the current department
+                var CountEmpsInDep = empsInDep.Count();
 
                 // Need to qualify Program with Models
                 // so it does not conflict with Program.cs that runs the program.
