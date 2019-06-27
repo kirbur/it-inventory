@@ -1,8 +1,5 @@
 import React, {useState, useEffect} from 'react'
 
-// Packages
-import {cloneDeep} from 'lodash'
-
 // Components
 import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
@@ -10,7 +7,6 @@ import {IoIosPersonAdd, IoMdAdd} from 'react-icons/io'
 import {FaUserShield, FaUser} from 'react-icons/fa'
 
 // Utils
-import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
@@ -21,8 +17,6 @@ interface IEmployeeDetailEditPageProps {
     match: any
     history: any
 }
-
-// Helpers
 
 // Primary Component
 export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = props => {
