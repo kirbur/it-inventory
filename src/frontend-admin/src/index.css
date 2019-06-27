@@ -9,6 +9,6 @@ body {
 }
 
 @font-face {
-    font-family: cqlbold;
-    src: url('./content/Fonts/CQL-Bold.otf');
+    font-family: cqlmedium;
+    src: url('./content/Fonts/CQL-Medium.otf');
 }
