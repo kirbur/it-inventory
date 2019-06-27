@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using backend_api.Helpers;
+using Microsoft.Extensions.Options;
 
 namespace backend_api.Controllers
 {
@@ -17,13 +18,12 @@ namespace backend_api.Controllers
     [ApiController]
     public class UploadController : ControllerBase
     {
-        public IConfiguration Configuration { get; }
-        public string UploadedFileRootPath { get; set; }
-        public UploadController(IConfiguration configuration)
+        public UploadController(IOptions<UploadOptions> uploadOptions)
         {
-            Configuration = configuration;
-            UploadedFileRootPath = Configuration.GetSection("EnvironmentVariables").Get<EnvironmentVariables>().UploadedFileRootPath;
+            UploadOptions = uploadOptions;
         }
+
+        public IOptions<UploadOptions> UploadOptions { get; }
 
         private string[] models = new string[] { "employee", "department", "program", "server", "computer", "server", "monitor", "peripheral" };
 
@@ -61,7 +61,7 @@ namespace backend_api.Controllers
         public IActionResult GetPicture([FromRoute] string model, int id)
         {
             model = VerbatimMatch(model);
-            string imagePath = Path.Combine(UploadedFileRootPath, "images", model, $"{id}");
+            string imagePath = Path.Combine(UploadOptions.Value.UploadedFileRootPath, "images", model, $"{id}");
 
             // Check that the model name is valid.
             if (ValidModel(model))
@@ -103,7 +103,7 @@ namespace backend_api.Controllers
             if (ValidModel(model) && file != null && file.Length > 0)
             {
                 // Create the images folder if not already there.
-                string imagesPath = Path.Combine(UploadedFileRootPath, "images");
+                string imagesPath = Path.Combine(UploadOptions.Value.UploadedFileRootPath, "images");
                 Directory.CreateDirectory(imagesPath);
 
                 // Create model folder if not already there
