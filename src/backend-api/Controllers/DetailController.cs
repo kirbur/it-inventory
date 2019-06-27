@@ -1,6 +1,7 @@
 ﻿using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
@@ -54,7 +55,7 @@ namespace backend_api.Controllers
                     }
                 }
             }
-            catch (IndexOutOfRangeException e)
+            catch (IndexOutOfRangeException)
             {
                 return false;
             }
@@ -87,7 +88,7 @@ namespace backend_api.Controllers
                 case "program":
                     return GetProgramDetail(id);
                 case "department":
-                    return Ok("department");
+                    return GetDepartmentDetail(id);
                 case "server":
                     return Ok("server");
                 case "computer":
@@ -282,7 +283,7 @@ namespace backend_api.Controllers
 
             // Find the requested employee
             var emp = _context.Employee.Find(id);
-            if (emp == null || emp.IsDeleted ==true)
+            if (emp == null || emp.IsDeleted == true)
             {
                 return NotFound();
             }
@@ -451,6 +452,29 @@ namespace backend_api.Controllers
         * GET: api/detail/program/{id}
         * Function returns the program detail information.
         * Returns: {
+        *    "programName": string,
+        *    "picture: partial URL (as string),
+        *    "renewalDate": date,
+        *    "dateBought": date,
+        *    "employeeName": string,
+        *    "progHistory": [
+        *           {
+        *        "programHistoryId": int,
+        *        "currentOwnerId": int,
+        *        "currentOwnerStartDate": date,
+        *        "previousOwnerId": int,
+        *        "programId": int,
+        *        "eventName": string,
+        *        "eventDescription": string
+        *               ] for the events of this specific program
+        *           }
+        *    "programCostPerYear": int,
+        *    "programFlatCost": int,
+        *    "isCostPerYear": bool,
+        *    "description": string,
+        *    "programPurchaseLink": string
+        *   }
+        * 
         * 
         */
         private IActionResult GetProgramDetail(int id)
@@ -485,12 +509,14 @@ namespace backend_api.Controllers
                 // Returning the details of the program into a nice JSON object :)
                 var ProgramDetails = new
                 {
+                    prog.ProgramId,
                     prog.ProgramName,
                     picture,
                     prog.RenewalDate,
                     prog.DateBought,
                     employeeName,
                     ProgHistory,
+                    ProgramLicenseKey = isAdmin() ? prog.ProgramLicenseKey : null,
                     prog.ProgramCostPerYear,
                     prog.ProgramFlatCost,
                     prog.IsCostPerYear,
@@ -500,6 +526,249 @@ namespace backend_api.Controllers
 
                 return Ok(ProgramDetails);
             }
+
+        }
+
+        /*
+       * GET: api/detail/department/{id}
+       * Function returns the program detail information.
+       * Returns : {
+       *    "departmentName": String,
+       *    "totalCostOfActHardwareInDep": decimal,
+       *    "totalCostOfProgramsInDep": decimal,
+       *    "picture: partial URL (as string),
+       *    "countempsIDsInDep": int,
+       *    "jsonHardware": {
+       *        DefaultHardware [
+       *        ] list with all the default hardware
+       *     },
+       *     "jsonSoftware": {
+       *        DefaultSoftware [
+       *        ] list with all the default software
+       *     },
+       *     "listOfEmployees": [
+       *        {
+       *             "employeeName": string,
+       *             "hireDate": date,
+       *             "hardwareCostForEmp": decimal,
+       *             "programCostForEmp": decimal
+       *         },
+       *     ], For all the employees in this department
+       *      "listOfTablePrograms": [
+       *         {
+       *             "programName": string,
+       *             "programCount": int,
+       *             "programCostPerYear": decimal,
+       *             "programIsCostPerYear": bool
+       *         }, 
+       *     ], For all the programs that owned by this department that are not licenses,
+       *     "licensesList": [
+       *         {
+       *         "progName": string,
+       *         "countOfThatLicense": int
+       *         },
+       *     ] For all the programs that owned by this department that are licenses
+       * }
+       */
+        private IActionResult GetDepartmentDetail(int DepId)
+        {
+
+            //finding the department
+            var dep = _context.Department.Find(DepId);
+            // checking if the department actually exists and isn't deleted
+            if (dep == null || dep.IsDeleted == true)
+            {
+                return NotFound();
+            }
+            // if the department does exist...
+            else
+            {
+                // storing the partial picture url
+                string picture = $"/images/department/{DepId}";
+
+                //Cost of Programs per department value
+                decimal? TotalCostOfProgramsInDep = 0;
+
+                // cost of hardware per department value
+                decimal? TotalCostOfActHardwareInDep = 0;
+
+                // lambda to collect all the employees in the current department into a list
+                var empsInDep = _context.Employee.Where(x => x.DepartmentId == DepId && x.IsDeleted == false);
+
+                // lambda to get the ids of the all the employees in the current department
+                var empsIDsInDep = empsInDep.Select(x => x.EmployeeId).ToList();
+
+                // lambda to count the number of employees in the current department
+                var CountEmpsInDep = empsInDep.Count();
+
+                // Need to qualify Program with Models
+                // so it does not conflict with Program.cs that runs the program.
+                List<Models.Program> programsOfEmpsInDepartment = new List<Models.Program>();
+
+
+                // Make sure the program is not deleted and the employeeID is not null
+                foreach (var prog in _context.Program.Where(x => x.IsDeleted == false && x.EmployeeId != null))
+                {
+                    // Checks to see if the program employee ID is in the department and if it is,
+                    // collect all the programs from this current department
+                    if (empsIDsInDep.Contains(System.Convert.ToInt32(prog.EmployeeId)))
+                    {
+                        programsOfEmpsInDepartment.Add(prog);
+                    }
+                }
+
+                // lambda to calculate the total cost of the programs in the current department
+                TotalCostOfProgramsInDep = System.Convert.ToInt32(programsOfEmpsInDepartment.Where(x => x.IsDeleted == false && x.ProgramCostPerYear != null).Sum(x => x.ProgramCostPerYear));
+
+                // loop to calculate the cost of monitors that employees from the current department are accumulating 
+                foreach (var mon in _context.Monitor.Where(x => x.IsDeleted == false && x.FlatCost != null))
+                {
+                    if (empsIDsInDep.Contains(System.Convert.ToInt32(mon.EmployeeId)))
+                    {
+                        TotalCostOfActHardwareInDep += mon.FlatCost;
+                    }
+                }
+
+                // loop to calculate the cost of computers that employees from the current department are accumulating 
+                foreach (var Comp in _context.Computer.Where(x => x.IsDeleted == false && x.FlatCost != null))
+                {
+                    if (empsIDsInDep.Contains(System.Convert.ToInt32(Comp.EmployeeId)))
+                    {
+                        TotalCostOfActHardwareInDep += Comp.FlatCost;
+                    }
+                }
+
+                // loop to calculate the cost of peripheral that employees from the current department are accumulating 
+                foreach (var peripheral in _context.Peripheral.Where(x => x.IsDeleted == false && x.FlatCost != null))
+                {
+                    if (empsIDsInDep.Contains(System.Convert.ToInt32(peripheral.EmployeeId)))
+                    {
+                        TotalCostOfActHardwareInDep += peripheral.FlatCost;
+                    }
+
+                }
+
+                // loop to calculate the cost of servers that employees from the current department are accumulating 
+                foreach (var server in _context.Server.Where(x => x.IsDeleted == false && x.FlatCost != null))
+                {
+                    if (empsIDsInDep.Contains(System.Convert.ToInt32(server.EmployeeId)))
+                    {
+                        TotalCostOfActHardwareInDep += server.FlatCost;
+                    }
+
+                }
+                // list of employees that will hold the info for the employees list that on the table as specified in the method comment header
+                var ListOfEmployees = new List<object>();
+
+
+                // loop through all the employees and find how much they are costing individually costing in their programs and hardware
+                foreach (var emp in empsInDep.Where(x => x.IsDeleted == false))
+                {
+                    // Sum the costs of all the computers owned by the current employee where the computer is not deleted and the cost is not null
+                    var CostComputerOwnedByEmployee = _context.Computer.Where(x => x.EmployeeId == emp.EmployeeId && x.FlatCost != null && x.IsDeleted != true).Sum(x => x.FlatCost);
+
+                    // Sum the costs of all the peripherals owned by the current employee where the peripheral is not deleted and the cost is not null
+                    var CostPeripheralOwnedByEmployee = _context.Peripheral.Where(x => x.EmployeeId == emp.EmployeeId && x.FlatCost != null && x.IsDeleted != true).Sum(x => x.FlatCost);
+
+                    // Sum the costs of all the monitors owned by the current employee where the monitor is not deleted and the cost is not null
+                    var CostMonitorOwnedByEmployee = _context.Monitor.Where(x => x.EmployeeId == emp.EmployeeId && x.FlatCost != null && x.IsDeleted != true).Sum(x => x.FlatCost);
+
+                    // Sum the costs of all the servers owned by the current employee where the server is not deleted and the cost is not null
+                    var CostServerOwnedByEmployee = _context.Server.Where(x => x.EmployeeId == emp.EmployeeId && x.FlatCost != null && x.IsDeleted != true).Sum(x => x.FlatCost);
+
+                    //Adding up all the costs into one variable
+                    var HardwareCostForEmp = CostComputerOwnedByEmployee + CostMonitorOwnedByEmployee + CostPeripheralOwnedByEmployee + CostServerOwnedByEmployee;
+
+                    // Sum the costs of all the programs that are charged as cost per year owned by the current employee where the program is not deleted and the cost is not null
+                    var ProgCostForEmpPerYear = _context.Program.Where(x => x.EmployeeId == emp.EmployeeId && x.ProgramCostPerYear != null && x.IsDeleted != true).Sum(x => x.ProgramCostPerYear);
+
+                    // Dividing the yearly cost into months Adding the programs costs into one variable if the values are not null
+                    decimal ProgramCostForEmp = Math.Round(System.Convert.ToDecimal(ProgCostForEmpPerYear / 12), 2, MidpointRounding.ToEven);
+
+                    // concatenating the first and the last name
+                    var EmployeeName = emp.FirstName + " " + emp.LastName;
+
+                    // building employee object
+                    var Employee = new
+                    {
+                        EmployeeName,
+                        emp.HireDate,
+                        HardwareCostForEmp,
+                        ProgramCostForEmp
+                    };
+
+                    ListOfEmployees.Add(Employee);
+                }
+
+
+
+                // Make a list of the distinct programs of the employees
+                // in the department.
+                var distinctPrograms = programsOfEmpsInDepartment.Where(x => x.IsLicense == false).GroupBy(prog => prog.ProgramName).Select(name => name.FirstOrDefault()).Select(program => program.ProgramName);
+
+                // Create a list with name, count, costPerYear containing the unique programs in the department
+                List<DepartmentTableProgram> listOfTablePrograms = new List<DepartmentTableProgram>();
+                foreach (var name in distinctPrograms)
+                {
+                    // Construct a new object to be added to the list.
+                    listOfTablePrograms.Add(new DepartmentTableProgram(name, 0, 0.0m, true));
+                }
+
+                // Aggregate the programs in the department that are the same name.
+                // Count the programs and add the cost.
+                foreach (Models.Program departmentProgram in programsOfEmpsInDepartment.Where(x => x.IsLicense == false))
+                {
+                    // The index of the unique program that has the same name as the employee's program in the department
+                    int index = listOfTablePrograms.FindIndex(uniqueProgram => uniqueProgram.ProgramName == departmentProgram.ProgramName);
+                    if (index >= 0)
+                    {
+                        listOfTablePrograms[index].ProgramCount += 1;
+                        // ?? operator to make sure CostPerYear is not null. If it is, add 0.
+                        listOfTablePrograms[index].ProgramCostPerYear += departmentProgram.ProgramCostPerYear ?? 0.0m;
+                        listOfTablePrograms[index].ProgramIsCostPerYear = departmentProgram.IsCostPerYear ? true : false;
+                    }
+                }
+
+                // lambda to find the distinct licenses from all the programs
+                var distinctLicensePrograms = programsOfEmpsInDepartment.Where(x => x.IsLicense == true).GroupBy(prog => prog.ProgramName).Select(name => name.FirstOrDefault()).Select(program => program.ProgramName).ToList();
+
+                // list that will contain the licenses and how many licenses this current department is using
+                List<object> LicensesList = new List<object>();
+
+                // loop though distinct licenses name and count how many programs that belong to this current have that specific name
+                foreach (var progName in distinctLicensePrograms)
+                {
+                    var CountOfThatLicense = programsOfEmpsInDepartment.Where(x => x.IsDeleted == false && x.IsLicense == true && x.ProgramName == progName).Count();
+
+                    // creating license object that contains the necessary returnables.
+                    var License = new
+                    {
+                        progName,
+                        CountOfThatLicense
+                    };
+                    LicensesList.Add(License);
+                }
+                // pull stringifyed default hardware and software out into a nice JSON object :) using JSON package.
+                JObject jsonHardware = JObject.Parse(dep.DefaultHardware);
+                JObject jsonPrograms = JObject.Parse(dep.DefaultPrograms);
+
+                // creating list of necessary returnables that are specified in the method comment header
+                var DepartmentDetailPage = new
+                {
+                    dep.DepartmentName,
+                    TotalCostOfActHardwareInDep,
+                    TotalCostOfProgramsInDep,
+                    picture,
+                    CountEmpsInDep,
+                    jsonHardware,
+                    jsonPrograms,
+                    ListOfEmployees,
+                    listOfTablePrograms,
+                    LicensesList
+                };
+                return Ok(DepartmentDetailPage);
+            }
+
 
         }
     }
