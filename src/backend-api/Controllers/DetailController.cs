@@ -145,8 +145,7 @@ namespace backend_api.Controllers
             var id = _context.Program.Where(x => x.ProgramName == program).Select(x => x.ProgramId).FirstOrDefault();
 
             //creating string icon
-            string icon = $"/image/programOverview/{id}";
-
+            string icon = $"/image/program/{id}";
 
             // list of all programs that are not deleted
             var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == false && x.ProgramName == program);
@@ -909,7 +908,7 @@ namespace backend_api.Controllers
             }
         }
 
-        /* GET: api/detail/monitor/{id}
+        /* GET: api/detail/peripheral/{id}
          * Return: 
           {
                 "peripheral": {
