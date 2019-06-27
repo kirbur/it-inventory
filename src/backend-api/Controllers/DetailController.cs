@@ -836,7 +836,7 @@ namespace backend_api.Controllers
                 return Ok(new {
                     server = sv,
                     icon,
-                    employeeAssignedName = employeeAssigned.FirstName + " " + employeeAssigned.LastName,
+                    employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     serverHistory,
                 });
             }
