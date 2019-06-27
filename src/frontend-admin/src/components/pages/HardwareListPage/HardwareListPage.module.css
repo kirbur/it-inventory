@@ -1,5 +1,5 @@
 .hardwareListMain {
-    margin: 20px 85px;
+    margin: 50px 85px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -13,16 +13,52 @@
 }
 
 .group {
-    padding-bottom: 20px;
+    position: absolute;
+    margin-top: -48px;
+    /* margin-left: 30px;*/
+    flex-wrap: nowrap;
+    left: 260px;
+    width: 78%;
+
+    /* padding-left: 180px; */
+    align-self: flex-end;
 }
 
-.dropdown {
-    padding: 20px 0;
+.table {
+    width: 100%;
+    margin-top: 60px;
 }
 
-/* .dropdownTitle {
-    font-size: 36px;
-} */
+.dropdownButton {
+    display: flex;
+    justify-content: center;
+    width: 150px;
+}
+
+.dropdownContainer {
+    margin: auto;
+}
+
+.dropdownButton:hover .dropdownTitle {
+    color: white;
+}
+
+.dropdownButton:hover .dropdownArrow {
+    border-left: 2px solid white;
+    border-top: 2px solid white;
+}
+.dropdownTitle {
+    font-weight: bold;
+    margin: auto;
+    line-height: 40px;
+    color: #009eff;
+}
+
+.dropdownArrow {
+    top: 13px;
+    border-left: 2px solid #009eff;
+    border-top: 2px solid #009eff;
+}
 
 .page {
     width: 100%;

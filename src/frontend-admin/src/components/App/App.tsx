@@ -13,6 +13,7 @@ import {ProgramsListPage} from '../pages/ProgramsListPage/ProgramsListPage'
 import {ProgramDetailPage} from '../pages/ProgramDetailPage/ProgramDetailPage'
 import {Login} from '../reusables/Login/Login'
 import {HelloUser} from '../HelloUser/HelloUser'
+import logo from '../../content/Images/CQL-Logo-Color.png'
 
 // Styles
 import styles from './App.module.css'
@@ -75,7 +76,7 @@ export const App: React.FC = () => {
                         <div className={styles.navContainer}>
                             <HelloUser name={loginContextVariables.givenName} className={styles.helloMesssage} />
                             <nav className={styles.navBar}>
-                                <h1>CQL</h1>
+                                <img className={styles.navBarLogo} src={logo} alt={'CQL'} />
                                 <div className={styles.navEllipse} />
                                 <div className={styles.navRectangle} />
 

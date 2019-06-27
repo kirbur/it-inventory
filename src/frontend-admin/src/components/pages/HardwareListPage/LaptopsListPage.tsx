@@ -35,7 +35,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'makeModel', value: 'makeModel'})
+    const [selected, setSelected] = useState({label: 'Make & Model', value: 'makeModel'})
 
     const columns = ['makeModel', 'id', 'cpu', 'ram', 'ssd', 'assigned', 'mfgtag']
     const headerList = ['Make & Model', 'ID', 'CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag']
@@ -211,7 +211,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
 
     return (
         <div className={styles.listMain}>
-            <Group direction='row' justify='between'>
+            <Group direction='row' justify='between' className={styles.group}>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
@@ -222,8 +222,9 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
                     setSelected={setSelected}
                 />
             </Group>
-
-            <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            <div className={styles.table}>
+                <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            </div>
         </div>
     )
 }

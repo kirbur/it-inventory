@@ -201,7 +201,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
 
     return (
         <div className={styles.listMain}>
-            <Group direction='row' justify='between'>
+            <Group direction='row' justify='between' className={styles.group}>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
@@ -212,8 +212,9 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                     setSelected={setSelected}
                 />
             </Group>
-
-            <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            <div className={styles.table}>
+                <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            </div>
         </div>
     )
 }

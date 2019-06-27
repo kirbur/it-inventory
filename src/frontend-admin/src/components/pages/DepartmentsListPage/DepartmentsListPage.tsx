@@ -36,7 +36,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([])
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'name', value: 'name'})
+    const [selected, setSelected] = useState({label: 'Departments', value: 'name'})
 
     const columns = ['name', 'id', 'totalEmployees', 'cost']
     const headerList = ['Departments', 'ID', 'Total Employees', 'Programs Cost']
