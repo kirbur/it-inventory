@@ -7,7 +7,7 @@ import {cloneDeep} from 'lodash'
 // Components
 import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
-import ReactTooltip from 'react-tooltip'
+// import ReactTooltip from 'react-tooltip'
 import {IoMdAdd} from 'react-icons/io'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
@@ -43,13 +43,13 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
 
     const axios = new AxiosService(accessToken, refreshToken)
     const [userData, setUserData] = useState<any>({})
-    const [hwdata, setHWData] = useState<any[]>([])
-    const [swdata, setSWData] = useState<any[]>([])
-    const [ldata, setLData] = useState<any[]>([])
+    const [hardwareRows, setHardwareRows] = useState<any[]>([])
+    const [softwareRows, setSoftwareRows] = useState<any[]>([])
+    const [licenseRows, setLicenseRows] = useState<any[]>([])
 
-    const hwheaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
-    const swheaders = ['Software', 'Key/Username', 'Monthly Cost']
-    const lheaders = ['Licenses', 'CALs']
+    const hardwareHeaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
+    const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
+    const licenseHeaders = ['Licenses', 'CALs']
 
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
@@ -80,7 +80,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
                     })
                 )
-                setHWData(hw)
+                setHardwareRows(hw)
 
                 let sw: any[] = []
                 data[0].software.map((i: any) =>
@@ -92,7 +92,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         id: format(i.id),
                     })
                 )
-                setSWData(sw)
+                setSoftwareRows(sw)
 
                 let l: any[] = []
                 data[0].licenses.map((i: any) =>
@@ -105,7 +105,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         id: format(i.id),
                     })
                 )
-                setLData(l)
+                setLicenseRows(l)
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -152,7 +152,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                             Hired: {userData.hireDate} | {calculateDaysEmployed(getDays(userData.hireDate))}
                         </div>
                     </div>
-                    <DetailPageTable headers={hwrenderHeaders()} rows={hwRenderedRows} />
+                    <DetailPageTable headers={hardwareHeaders} data={hardwareRows} />
                     {isAdmin && (
                         <Button
                             text='Assign new hardware'
@@ -164,7 +164,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         />
                     )}
 
-                    <DetailPageTable headers={swrenderHeaders()} rows={swRenderedRows} />
+                    <DetailPageTable headers={softwareHeaders} data={softwareRows} />
                     {isAdmin && (
                         <Button
                             text='Assign new software'
@@ -176,7 +176,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         />
                     )}
 
-                    <DetailPageTable headers={lrenderHeaders()} rows={lRenderedRows} />
+                    <DetailPageTable headers={licenseHeaders} data={licenseRows} />
                     {isAdmin && (
                         <Button
                             text='Assign new license'
