@@ -38,8 +38,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'name', value: 'name'})
 
-    const columns = ['name', 'role', 'id', 'dateHired', 'daysEmployed', 'cost']
-    const headers = ['Employees', 'Role', 'id', 'Date Hired', 'Days Employed', 'Cost']
+    const columns = ['name', 'role', 'id', 'dateHired', 'daysEmployed', 'cost', 'hardware', 'programs']
+    const headers = ['Employees', 'Role', 'ID', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
     const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
     useEffect(() => {
@@ -60,7 +60,10 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         icon: format(i.photo),
                         id: i.employeeId,
 
-                        daysEmployed: calculateDaysEmployed(getDays(i.hireDate)), //for searching
+                        //for searching
+                        hardware: i.hardwareList.join(', '),
+                        programs: i.progForEmp.join(', '),
+                        daysEmployed: calculateDaysEmployed(getDays(i.hireDate)),
                     })
                 })
                 setListData(employees)
