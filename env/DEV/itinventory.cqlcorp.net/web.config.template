@@ -5,6 +5,9 @@
             <handlers>
                 <add name="aspNetCore" path="*" verb="*" modules="AspNetCoreModule" resourceType="Unspecified" />
             </handlers>
+            <modules runAllManagedModulesForAllRequests="false">
+                <remove name="WebDAVModule" />
+            </modules>
             <aspNetCore processPath=".\_APPDIR_\backend-api.exe" stdoutLogEnabled="true" stdoutLogFile=".\logs\stdout\">
                 <environmentVariables>
                     <environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Development" />
