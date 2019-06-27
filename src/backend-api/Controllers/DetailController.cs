@@ -90,11 +90,11 @@ namespace backend_api.Controllers
                 case "department":
                     return GetDepartmentDetail(id);
                 case "server":
-                    return Ok("server");
+                    return GetServerDetail(model, id);
                 case "computer":
                     return Ok("laptop");
                 case "monitor":
-                    return Ok("monitor");
+                    return GetMonitorDetail(model, id);
                 case "peripheral":
                     return Ok("peripheral");
                 default:
@@ -768,8 +768,145 @@ namespace backend_api.Controllers
                 };
                 return Ok(DepartmentDetailPage);
             }
+        }
 
+        /* GET: api/detail/server/{id}
+         * Return: 
+          {
+                "server": {
+                    "serverId": int,
+                    "fqdn": string,
+                    "numberOfCores": int,
+                    "operatingSystem": string,
+                    "ram": int,
+                    "virtualize": bool,
+                    "renewalDate": date (as string),
+                    "employeeId": int,
+                    "purchaseDate": date (as string),
+                    "flatCost": decimal,
+                    "endOfLife": date (as string),
+                    "isAssigned": bool,
+                    "textField": string,
+                    "costPerYear": decimal,
+                    "isDeleted": bool,
+                    "mfg": string,
+                    "make": string,
+                    "model": string,
+                    "ipAddress": string,
+                    "san": string,
+                    "localHHD": string,
+                    "location": string,
+                    "serialNumber": string,
+                },
+                "icon": partial URL (as string),
+                "employeeAssignedName": string,
+                "serverHistory": [
+                    {
+                        "hardwareHistoryId": int,
+                        "currentOwnerId": int,
+                        "currentOwnerStartDate": date (as string),
+                        "previousOwnerId": int,
+                        "hardwareType": string,
+                        "hardwareId": int,
+                        "eventName": string,
+                        "eventDescription": string,
+                    },
+                ]
+            }
+         */
+        private IActionResult GetServerDetail(string model, int serverID)
+        {
+            // Find the requested server
+            var sv = _context.Server.Find(serverID);
+            if (sv == null || sv.IsDeleted == true)
+            {
+                return NotFound();
+            }
+            else
+            {
+                // Partial image string
+                var icon = $"/image/server/{serverID}";
 
+                // Employee the server is assigned to.
+                var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == sv.EmployeeId).FirstOrDefault();
+
+                // Server History
+                var serverHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == serverID);
+
+                return Ok(new {
+                    server = sv,
+                    icon,
+                    employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    serverHistory,
+                });
+            }
+        }
+
+        /* GET: api/detail/monitor/{id}
+         * Return: 
+          {
+                "monitor": {
+                    "monitorId": int,
+                    "make": string,
+                    "model": string,
+                    "resolution": int,
+                    "inputs": string,
+                    "employeeId": int,
+                    "isAssigned": bool,
+                    "textField": string,
+                    "purchaseDate": date (as string),
+                    "flatCost": decimal,
+                    "costPerYear": decimal,
+                    "isDeleted": bool,
+                    "screenSize": int,
+                    "mfg": string,
+                    "renewalDate": date (as string),
+                    "location": string,
+                    "serialNumber": string,
+                },
+                "icon": partial URL (as string),
+                "employeeAssignedName": string,
+                "monitorHistory": [
+                    {
+                        "hardwareHistoryId": int,
+                        "currentOwnerId": int,
+                        "currentOwnerStartDate": date (as string),
+                        "previousOwnerId": int,
+                        "hardwareType": string,
+                        "hardwareId": int,
+                        "eventName": string,
+                        "eventDescription": string,
+                    },
+                ]
+            }
+         */
+        private IActionResult GetMonitorDetail(string model, int monitorID)
+        {
+            // Find the requested monitor
+            var mn = _context.Monitor.Find(monitorID);
+            if (mn == null || mn.IsDeleted == true)
+            {
+                return NotFound();
+            }
+            else
+            {
+                // Partial image string
+                var icon = $"/image/monitor/{monitorID}";
+
+                // Employee the monitor is assigned to.
+                var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == mn.EmployeeId).FirstOrDefault();
+
+                // Monitor History
+                var monitorHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == monitorID);
+
+                return Ok(new
+                {
+                    monitor = mn,
+                    icon,
+                    employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    monitorHistory,
+                });
+            }
         }
     }
 }
