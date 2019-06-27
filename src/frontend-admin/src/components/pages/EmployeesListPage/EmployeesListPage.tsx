@@ -118,7 +118,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     const handleClick = () => {
-        history.push(`/employees/edit/new`)
+        history.push(`/newEmployee`)
     }
 
     const handleRowClick = (row: any) => {
@@ -219,7 +219,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         return headers
     }
 
-    function concatenatedName(row: any[]) {
+    function icon(row: any[]) {
         return (
             <td className={styles.employees}>
                 <img className={styles.icon} src={URL + row[7]} alt={''} />
@@ -236,7 +236,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
-                    transformedRow[0] = concatenatedName(row)
+                    transformedRow[0] = icon(row)
 
                 case 2:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>

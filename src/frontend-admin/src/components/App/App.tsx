@@ -16,6 +16,7 @@ import {HelloUser} from '../HelloUser/HelloUser'
 
 // Styles
 import styles from './App.module.css'
+import {EmployeeDetailEditPage} from '../pages/EmployeeDetailPage/EmployeeDetailEditPage'
 
 //types
 export interface ILoginContext {
@@ -127,6 +128,8 @@ export const App: React.FC = () => {
                         <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
                         <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
                         <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
+
+                        <Route exact path={'/newEmployee'} render={props => <EmployeeDetailEditPage {...props} />} />
                     </Switch>
                 </Router>
 

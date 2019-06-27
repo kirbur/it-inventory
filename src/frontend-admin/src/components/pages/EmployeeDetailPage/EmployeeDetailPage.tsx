@@ -130,10 +130,10 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     <div className={styles.employeeText}>their position</div>
                     <div className={styles.employeeText}>some dates</div>
                 </div>
-                <DetailPageTable headers={renderHeaders()} rows={renderedRows} /> <br />
+                {/* <DetailPageTable headers={renderHeaders()} rows={renderedRows} /> <br />
                 <DetailPageTable headers={renderHeaders()} rows={renderedRows} />
                 <br />
-                <DetailPageTable headers={renderHeaders()} rows={renderedRows} />
+                <DetailPageTable headers={renderHeaders()} rows={renderedRows} /> */}
                 <br />
             </div>
         </div>
