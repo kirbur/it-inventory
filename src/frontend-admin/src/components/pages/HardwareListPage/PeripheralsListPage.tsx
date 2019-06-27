@@ -35,10 +35,10 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'Name', value: 'name'})
+    const [selected, setSelected] = useState({label: 'Make & Model', value: 'name'})
 
     const columns = ['name', 'id', 'purchaseDate', 'assigned']
-    const headerList = ['Name', 'ID', 'Purchase Date', 'Assigned To']
+    const headerList = ['Make & Model', 'ID', 'Purchase Date', 'Assigned To']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
@@ -46,9 +46,10 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
             .get('/list/peripherals')
             .then((data: any) => {
                 const peripherals: any[] = []
+                console.log(data)
                 data.map((i: any) =>
                     peripherals.push({
-                        name: format(i.peripheralName),
+                        name: format(i.peripheralName + ' ' + i.peripheralType),
                         id: format(i.peripheralId),
                         purchaseDate: format(i.purchaseDate),
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
