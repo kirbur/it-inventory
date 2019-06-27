@@ -94,7 +94,7 @@ namespace backend_api.Controllers
                 case "computer":
                     return Ok("laptop");
                 case "monitor":
-                    return Ok("monitor");
+                    return GetMonitorDetail(model, id);
                 case "peripheral":
                     return Ok("peripheral");
                 default:
@@ -838,6 +838,73 @@ namespace backend_api.Controllers
                     icon,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     serverHistory,
+                });
+            }
+        }
+
+        /* GET: api/detail/monitor/{id}
+         * Return: 
+          {
+                "monitor": {
+                    "monitorId": int,
+                    "make": string,
+                    "model": string,
+                    "resolution": int,
+                    "inputs": string,
+                    "employeeId": int,
+                    "isAssigned": bool,
+                    "textField": string,
+                    "purchaseDate": date (as string),
+                    "flatCost": decimal,
+                    "costPerYear": decimal,
+                    "isDeleted": bool,
+                    "screenSize": int,
+                    "mfg": string,
+                    "renewalDate": date (as string),
+                    "location": string,
+                    "serialNumber": string,
+                },
+                "icon": partial URL (as string),
+                "employeeAssignedName": string,
+                "monitorHistory": [
+                    {
+                        "hardwareHistoryId": int,
+                        "currentOwnerId": int,
+                        "currentOwnerStartDate": date (as string),
+                        "previousOwnerId": int,
+                        "hardwareType": string,
+                        "hardwareId": int,
+                        "eventName": string,
+                        "eventDescription": string,
+                    },
+                ]
+            }
+         */
+        private IActionResult GetMonitorDetail(string model, int monitorID)
+        {
+            // Find the requested monitor
+            var mn = _context.Monitor.Find(monitorID);
+            if (mn == null || mn.IsDeleted == true)
+            {
+                return NotFound();
+            }
+            else
+            {
+                // Partial image string
+                var icon = $"/image/monitor/{monitorID}";
+
+                // Employee the monitor is assigned to.
+                var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == mn.EmployeeId).FirstOrDefault();
+
+                // Monitor History
+                var monitorHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == monitorID);
+
+                return Ok(new
+                {
+                    monitor = mn,
+                    icon,
+                    employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    monitorHistory,
                 });
             }
         }
