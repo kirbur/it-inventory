@@ -85,25 +85,20 @@ export const DetailPageTable = (props: ITableProps) => {
     var renderedRows: any[] = []
     rows.forEach(row => {
         const transformedRow: any[] = []
-        for (let i = 0; i < row.length + 1; i++) {
-            switch (i) {
-                case 0:
-                    transformedRow[0] = (
-                        <td onClick={e => deleteSummin(row[0])}>
-                            <div className={styles.delete} />
-                            <div className={styles.whiteLine} />
-                        </td>
-                    )
-                case 1:
-                    transformedRow[1] = <td className={styles.rowData}>{row[0]} </td>
-                case 2:
-                    transformedRow[2] = <td className={styles.rowData}>{row[1]}</td>
-                case 3:
-                    transformedRow[3] = <td className={styles.rowData}>{row[2]}</td>
-                case 4:
-                    transformedRow[4] = <td className={styles.rowData}>{row[3]}</td>
-                case 5:
-                    transformedRow[5] = <td>{row[4]}</td>
+
+        transformedRow[0] = (
+            <td onClick={e => deleteSummin(row[0])}>
+                <div className={styles.delete} />
+                <div className={styles.whiteLine} />
+            </td>
+        )
+        for (let i = 1; i < headers.length + 1; i++) {
+            if (headers[i - 1] == 'Cost') {
+                transformedRow[i] = <td className={styles.rowData}>${row[i]}</td>
+            } else if (headers[i - 1] == 'Monthly Cost') {
+                transformedRow[i] = <td className={styles.rowData}>${row[i]} /month</td>
+            } else {
+                transformedRow[i] = <td className={styles.rowData}>{row[i]}</td>
             }
         }
         renderedRows.push(transformedRow)

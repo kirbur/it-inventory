@@ -68,11 +68,11 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 let hw: any[] = []
                 data[0].hardware.map((i: any) =>
                     hw.push([
+                        format(i.id),
                         format(i.make + ' ' + i.model),
                         format(i.serialNumber),
                         format(i.mfg),
                         formatDate(i.purchaseDate),
-                        format(i.id),
                         i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
                     ])
                 )
@@ -80,11 +80,11 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 let sw: any[] = []
                 data[0].software.map((i: any) =>
                     sw.push([
+                        format(i.id),
                         format(i.name),
                         format(i.licenseKey),
                         format(Math.round(i.costPerMonth * 100) / 100),
                         format(i.flatCost),
-                        format(i.id),
                     ])
                 )
                 setSoftwareRows(sw)
@@ -92,12 +92,12 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 let l: any[] = []
                 data[0].licenses.map((i: any) =>
                     l.push([
+                        format(i.id),
                         format(i.name),
                         format(i.cals),
                         format(i.licenseKey),
                         format(Math.round(i.costPerMonth * 100) / 100),
                         format(i.flatCost),
-                        format(i.id),
                     ])
                 )
                 setLicenseRows(l)
@@ -133,7 +133,14 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 <div className={styles.secondColumn}>
                     {isAdmin && (
                         <Group direction='row' justify='start' className={styles.group}>
-                            <Button text='Edit' icon='edit' onClick={() => {}} className={styles.editbutton} />
+                            <Button
+                                text='Edit'
+                                icon='edit'
+                                onClick={() => {
+                                    history.push('/editEmployee/' + match.params.id)
+                                }}
+                                className={styles.editbutton}
+                            />
 
                             <Button text='Archive' icon='archive' onClick={() => {}} className={styles.archivebutton} />
                         </Group>
