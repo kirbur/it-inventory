@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from 'react'
 
 // Components
 import icon from '../../../content/Images/CQL-favicon.png'
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {DetailEditTable} from '../../reusables/DetailEditTable/DetailEditTable'
 import {IoIosPersonAdd, IoMdAdd} from 'react-icons/io'
 import {FaUserShield, FaUser} from 'react-icons/fa'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
@@ -185,6 +185,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 <div className={s(styles.title, styles.paddingBottom)}>Employee Information</div>
 
                 {/* Admin/nonadmin radio cards */}
+
+                {/* TODO:
+                pull in bool from backend to set default on admin radio cards
+                */}
+
                 <div className={styles.adminCardContainer}>
                     {/* admin card */}
                     <div className={styles.paddingRight}>
@@ -243,10 +248,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 {/* Employee Dept radio buttons */}
                 <div className={s(styles.title, styles.paddingTop, styles.paddingBottom)}>Employee Department</div>
-                {/* TODO: pull list of depts from backend 
-                     - make for loop and push every other to different arrays and then
-                       put each array in its own column
-                */}
                 <div className={styles.employeeDepartment}>
                     <div>
                         {deptsRowOne.map(dept => (
@@ -255,7 +256,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     type='radio'
                                     name='employeeDept'
                                     className={styles.checkmark}
-                                    checked={{dept} == userData.department}
+                                    checked={dept === userData.department}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmark} />
@@ -271,7 +272,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     type='radio'
                                     name='employeeDept'
                                     className={styles.checkmark}
-                                    checked={{dept} == userData.department}
+                                    checked={dept === userData.department}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmark} />
@@ -286,7 +287,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 {/* Tables */}
                 <div className={styles.paddingTop}>
-                    <DetailPageTable
+                    <DetailEditTable
                         headers={hardwareHeaders}
                         rows={hardwareRows}
                         setRows={setHardwareRows}
@@ -324,7 +325,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 </Button>
 
                 <div className={styles.paddingTop}>
-                    <DetailPageTable
+                    <DetailEditTable
                         headers={softwareHeaders}
                         rows={softwareRows}
                         setRows={setSoftwareRows}
@@ -362,7 +363,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 </Button>
 
                 <div className={styles.paddingTop}>
-                    <DetailPageTable
+                    <DetailEditTable
                         headers={licenseHeaders}
                         rows={licenseRows}
                         setRows={setLicenseRows}

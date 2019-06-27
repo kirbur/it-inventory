@@ -96,6 +96,10 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     ])
                 )
                 setHardwareRows(hw)
+
+                // var toolTipArray = []
+                // data[0].hardware.map((i: any) => toolTipArray.push(i.tooltip.cpu ? formatToolTip(i.tooltip) : ''))
+
                 let sw: any[] = []
                 data[0].software.map((i: any) =>
                     sw.push([
