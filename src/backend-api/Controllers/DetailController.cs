@@ -96,7 +96,7 @@ namespace backend_api.Controllers
                 case "monitor":
                     return GetMonitorDetail(model, id);
                 case "peripheral":
-                    return Ok("peripheral");
+                    return GetPeripheralDetail(model, id);
                 default:
                     return BadRequest("Invalid Model");
             }
@@ -145,8 +145,7 @@ namespace backend_api.Controllers
             var id = _context.Program.Where(x => x.ProgramName == program).Select(x => x.ProgramId).FirstOrDefault();
 
             //creating string icon
-            string icon = $"/images/employee/{id}";
-
+            string icon = $"/image/program/{id}";
 
             // list of all programs that are not deleted
             var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == false && x.ProgramName == program);
@@ -423,7 +422,7 @@ namespace backend_api.Controllers
                 }
 
                 // Partial path for picture
-                string picture = $"/images/employee/{id}";
+                string picture = $"/image/employee/{id}";
 
                 // Get the department name
                 var department = _context.Department.Where(dep => dep.DepartmentId == emp.DepartmentId && !dep.IsDeleted).FirstOrDefault().DepartmentName;
@@ -490,7 +489,7 @@ namespace backend_api.Controllers
             else
             {
                 // Partial path for picture
-                string picture = $"/images/program/{id}";
+                string picture = $"/image/program/{id}";
 
 
                 // holds the employee name for concatenation purposes 
@@ -584,7 +583,7 @@ namespace backend_api.Controllers
             else
             {
                 // storing the partial picture url
-                string picture = $"/images/department/{DepId}";
+                string picture = $"/image/department/{DepId}";
 
                 //Cost of Programs per department value
                 decimal? TotalCostOfProgramsInDep = 0;
@@ -905,6 +904,71 @@ namespace backend_api.Controllers
                     icon,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     monitorHistory,
+                });
+            }
+        }
+
+        /* GET: api/detail/peripheral/{id}
+         * Return: 
+          {
+                "peripheral": {
+                    "peripheralId": int,
+                    "peripheralName": string,
+                    "peripheralType": string,
+                    "textField": string,
+                    "employeeId": int,
+                    "isAssigned": bool,
+                    "flatCost": decimal,
+                    "purchaseDate": date (as string),
+                    "costPerYear": decimal,
+                    "isDeleted": bool,
+                    "mfg": string,
+                    "location": string,
+                    "renewalDate": date (as string),
+                    "serialNumber": string,
+                },
+                "icon": partial URL (as string),
+                "employeeAssignedName": string,
+                "monitorHistory": [
+                    {
+                        "hardwareHistoryId": int,
+                        "currentOwnerId": int,
+                        "currentOwnerStartDate": date (as string),
+                        "previousOwnerId": int,
+                        "hardwareType": string,
+                        "hardwareId": int,
+                        "eventName": string,
+                        "eventDescription": string,
+                    },
+                ]
+            }
+         */
+        // TODO: Make the hardware getter generic.
+        private IActionResult GetPeripheralDetail(string model, int peripheralID)
+        {
+            // Find the requested peripheral
+            var pr = _context.Peripheral.Find(peripheralID);
+            if (pr == null || pr.IsDeleted == true)
+            {
+                return NotFound();
+            }
+            else
+            {
+                // Partial image string
+                var icon = $"/image/peripheral/{peripheralID}";
+
+                // Employee the peripheral is assigned to.
+                var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == pr.EmployeeId).FirstOrDefault();
+
+                // Peripheral History
+                var peripheralHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == peripheralID);
+
+                return Ok(new
+                {
+                    peripheral = pr,
+                    icon,
+                    employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    peripheralHistory,
                 });
             }
         }
