@@ -1,10 +1,14 @@
 import React, {useState} from 'react'
 
+//components
+import ReactTooltip from 'react-tooltip'
+
+//styling
 import {concatStyles as s} from '../../../utilities/mikesConcat'
-import styles from './DetailPageTable.module.css'
+import styles from './DetailEditTable.module.css'
 
+//utilities
 import {cloneDeep} from 'lodash'
-
 import {sortTable} from '../../../utilities/quickSort'
 
 interface ITableProps {
@@ -82,6 +86,17 @@ export const DetailPageTable = (props: ITableProps) => {
         //nothing for now
     }
 
+    const toolTip = (row: any[], index: number) => {
+        return (
+            <td className={styles.rowData}>
+                <a data-tip={row[row.length - 1]} className={row[row.length - 1] === '' ? '' : styles.rowTitle}>
+                    {row[index]}
+                </a>
+                <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
+            </td>
+        )
+    }
+
     var renderedRows: any[] = []
     rows.forEach(row => {
         const transformedRow: any[] = []
@@ -95,6 +110,8 @@ export const DetailPageTable = (props: ITableProps) => {
         for (let i = 1; i < headers.length + 1; i++) {
             if (headers[i - 1] == 'Cost') {
                 transformedRow[i] = <td className={styles.rowData}>${row[i]}</td>
+            } else if (headers[i - 1] == 'Hardware') {
+                transformedRow[i] = toolTip(row, i)
             } else if (headers[i - 1] == 'Monthly Cost') {
                 transformedRow[i] = <td className={styles.rowData}>${row[i]} /month</td>
             } else {
