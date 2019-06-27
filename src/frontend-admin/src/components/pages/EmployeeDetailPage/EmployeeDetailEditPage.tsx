@@ -11,6 +11,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './EmployeeDetailEditPage.module.css'
+import {Button} from '../../reusables/Button/Button'
 
 // Types
 interface IEmployeeDetailEditPageProps {
@@ -40,36 +41,46 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const hardwareHeaders = ['Hardware', 'Serial No.', 'Warranty', 'Year']
-    const hardwareRows = [
+    const [hardwareRows, setHardwareRows] = useState([
         ['Bill Belichik', 'Sales', '2012/09/12', 0],
         ['Joe Montana', 'Sales', '2012/09/11', 1],
         ['Bob the Builder', 'Developer', '2012/09/13', 154],
         ['Anne Manion', 'PM', '2010/09/12', 16],
         ['Sue Z', 'Designer', '2014/09/12', 15],
-    ]
+    ])
 
     const softwareHeaders = ['Software', 'Key/Username', 'Cost']
-    const softwareRows = [
+    const [softwareRows, setSoftwareRows] = useState([
         ['Bill Belichik', 'Sales', '2012/09/12'],
         ['Joe Montana', 'Sales', '2012/09/11'],
         ['Bob the Builder', 'Developer', '2012/09/13'],
         ['Anne Manion', 'PM', '2010/09/12'],
         ['Sue Z', 'Designer', '2014/09/12'],
-    ]
+    ])
 
     const licenseHeaders = ['License', 'CALs', 'Cost']
-    const licenseRows = [
+    const [licenseRows, setLicenseRows] = useState([
         ['Bill Belichik', 'Sales', '2012/09/12'],
         ['Joe Montana', 'Sales', '2012/09/11'],
         ['Bob the Builder', 'Developer', '2012/09/13'],
         ['Anne Manion', 'PM', '2010/09/12'],
         ['Sue Z', 'Designer', '2014/09/12'],
-    ]
+    ])
 
     return (
         <div className={styles.columns}>
             {/* column 1 */}
+
             <div className={styles.firstColumn}>
+                <Button
+                    text='All Employees'
+                    icon='back'
+                    onClick={() => {
+                        history.push('/employees')
+                    }}
+                    className={styles.backButton}
+                    textClassName={styles.backButtonText}
+                />
                 <div className={styles.imgPadding}>
                     <img className={styles.img} src={icon} />
                 </div>
@@ -103,7 +114,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             <input type='radio' name='admin' className={styles.checkmark} />
                             <div className={styles.checkmark} />
                             <div className={styles.insideCheckmarkAdmin} />
-                            <div className={styles.title}>Admin User</div>
+                            <div className={styles.title}>Non Admin User</div>
                             <div className={styles.adminText}>
                                 This user will be able to view all content and review the overall company as it grows.
                             </div>
@@ -166,7 +177,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 {/* Tables */}
                 <div className={styles.paddingTop}>
-                    <DetailPageTable headers={hardwareHeaders} data={hardwareRows} style={styles.newRowThing} />
+                    <DetailPageTable
+                        headers={hardwareHeaders}
+                        rows={hardwareRows}
+                        setRows={setHardwareRows}
+                        style={styles.newRowThing}
+                    />
                 </div>
                 <div className={styles.addContainer}>
                     <div className={styles.addIconBorder}>
@@ -176,7 +192,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 </div>
 
                 <div className={styles.paddingTop}>
-                    <DetailPageTable headers={softwareHeaders} data={softwareRows} style={styles.newRowThing} />
+                    <DetailPageTable
+                        headers={softwareHeaders}
+                        rows={softwareRows}
+                        setRows={setSoftwareRows}
+                        style={styles.newRowThing}
+                    />
                 </div>
                 <div className={styles.addContainer}>
                     <div className={styles.addIconBorder}>
@@ -186,7 +207,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 </div>
 
                 <div className={styles.paddingTop}>
-                    <DetailPageTable headers={licenseHeaders} data={licenseRows} style={styles.newRowThing} />
+                    <DetailPageTable
+                        headers={licenseHeaders}
+                        rows={licenseRows}
+                        setRows={setLicenseRows}
+                        style={styles.newRowThing}
+                    />
                 </div>
                 <div className={styles.addContainer}>
                     <div className={styles.addIconBorder}>

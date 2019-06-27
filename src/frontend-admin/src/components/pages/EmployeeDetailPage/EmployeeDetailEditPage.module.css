@@ -7,10 +7,12 @@
 .firstColumn {
     min-width: 300px;
     padding: 25px;
+    padding-right: 75px;
 }
 .secondColumn {
     min-width: 700px;
     padding: 25px;
+    padding-top: 100px;
     display: flex;
     flex-direction: column;
 }
@@ -19,6 +21,9 @@
     flex-direction: row;
 }
 
+.backButton {
+    margin-bottom: 50px;
+}
 .imgPadding {
     padding: 25px;
     background-color: #f4f4f4;

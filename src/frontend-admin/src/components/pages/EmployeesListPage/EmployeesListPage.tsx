@@ -222,7 +222,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         return headers
     }
 
-    function icon(row: any[]) {
+    function concatenatedName(row: any[]) {
         return (
             <td className={styles.employees}>
                 <img className={styles.icon} src={URL + row[7]} alt={''} />
