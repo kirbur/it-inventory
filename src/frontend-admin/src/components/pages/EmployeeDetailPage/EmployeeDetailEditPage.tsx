@@ -218,7 +218,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     type='radio'
                                     name='employeeDept'
                                     className={styles.checkmark}
-                                    checked={{dept} == userData.department}
+                                    checked={dept === userData.department}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmark} />
@@ -234,7 +234,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     type='radio'
                                     name='employeeDept'
                                     className={styles.checkmark}
-                                    checked={{dept} == userData.department}
+                                    checked={dept === userData.department}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmark} />
