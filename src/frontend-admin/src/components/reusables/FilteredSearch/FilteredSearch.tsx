@@ -21,7 +21,7 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
     const customStyles = {
         container: (provided: any, state: any) => ({
             ...provided,
-            width: `${8 * (selected.label.length + 10)}px`,
+            width: `${200}px`,
             border: '0px',
             height: '45px',
             color: '#9b9b9b',

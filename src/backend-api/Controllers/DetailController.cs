@@ -600,8 +600,13 @@ namespace backend_api.Controllers
                     var empLast = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.LastName).FirstOrDefault();
                     employeeName = empFirst + " " + empLast;
                 }
+                List<object> entries = new List<object>();
                 // find all the events/history of the current program
-                var ProgHistory = _context.ProgramHistory.Where(x => x.ProgramId == prog.ProgramId);
+                foreach(var entry in _context.ProgramHistory.Where(x => x.ProgramId == prog.ProgramId))
+                {
+                    var singleEntry = new { entry.EventName, entry.EventDescription, entry.EventDate };
+                    entries.Add(singleEntry);
+                }
 
                 // Returning the details of the program into a nice JSON object :)
                 var ProgramDetails = new
@@ -612,7 +617,7 @@ namespace backend_api.Controllers
                     prog.RenewalDate,
                     prog.DateBought,
                     employeeName,
-                    ProgHistory,
+                    entries,
                     ProgramLicenseKey = isAdmin() ? prog.ProgramLicenseKey : null,
                     prog.ProgramCostPerYear,
                     prog.ProgramFlatCost,

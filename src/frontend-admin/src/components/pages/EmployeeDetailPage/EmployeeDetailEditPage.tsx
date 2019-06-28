@@ -112,43 +112,44 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 setUserData(user)
                 setAdminInput(data[0].isAdmin)
                 setDateInput(new Date(formatDate(data[0].hireDate)))
+                if (match.params.id !== 'new') {
+                    let hw: any[] = []
+                    data[0].hardware.map((i: any) =>
+                        hw.push([
+                            format(i.id),
+                            format(i.make + ' ' + i.model),
+                            format(i.serialNumber),
+                            format(i.mfg),
+                            formatDate(i.purchaseDate),
+                            i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
+                        ])
+                    )
+                    setHardwareRows(hw)
+                    let sw: any[] = []
+                    data[0].software.map((i: any) =>
+                        sw.push([
+                            format(i.id),
+                            format(i.name),
+                            format(i.licenseKey),
+                            format(Math.round(i.costPerMonth * 100) / 100),
+                            format(i.flatCost),
+                        ])
+                    )
+                    setSoftwareRows(sw)
 
-                let hw: any[] = []
-                data[0].hardware.map((i: any) =>
-                    hw.push([
-                        format(i.id),
-                        format(i.make + ' ' + i.model),
-                        format(i.serialNumber),
-                        format(i.mfg),
-                        formatDate(i.purchaseDate),
-                        i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
-                    ])
-                )
-                setHardwareRows(hw)
-                let sw: any[] = []
-                data[0].software.map((i: any) =>
-                    sw.push([
-                        format(i.id),
-                        format(i.name),
-                        format(i.licenseKey),
-                        format(Math.round(i.costPerMonth * 100) / 100),
-                        format(i.flatCost),
-                    ])
-                )
-                setSoftwareRows(sw)
-
-                let l: any[] = []
-                data[0].licenses.map((i: any) =>
-                    l.push([
-                        format(i.id),
-                        format(i.name),
-                        format(i.cals),
-                        format(i.licenseKey),
-                        format(Math.round(i.costPerMonth * 100) / 100),
-                        format(i.flatCost),
-                    ])
-                )
-                setLicenseRows(l)
+                    let l: any[] = []
+                    data[0].licenses.map((i: any) =>
+                        l.push([
+                            format(i.id),
+                            format(i.name),
+                            format(i.cals),
+                            format(i.licenseKey),
+                            format(Math.round(i.costPerMonth * 100) / 100),
+                            format(i.flatCost),
+                        ])
+                    )
+                    setLicenseRows(l)
+                }
             })
             .catch((err: any) => console.error(err))
 
@@ -161,6 +162,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         //     })
         //     .catch((err: any) => console.error(err))
 
+        if (match.params.id === 'new') {
+            //TODO:
+        }
         //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
@@ -170,7 +174,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             .then((data: any) => {
                 setDeptList(data)
                 var d = data.filter((i: any) => i.DepartmentName === userData.department)
-                setDeptInput({DepartmentName: userData.department, DepartmentId: d[0].DepartmentId})
+                d[0]
+                    ? setDeptInput({DepartmentName: userData.department, DepartmentId: d[0].DepartmentId})
+                    : setDeptInput({DepartmentName: data[0].departmentName, DepartmentId: data[0].DepartmentId})
             })
             .catch((err: any) => console.error(err))
     }, [userData])
@@ -280,52 +286,66 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 <div className={styles.row}>
                     <div className={styles.paddingRight}>
                         <div className={styles.paddingBottom}>
-                            <div className={styles.text}>First Name</div>
+                            <div className={styles.text}>Employee Name</div>
                             {/* <input type='text' className={styles.input} placeholder={userData.firstName} />
                         </div>
                         <div>
                             <div className={styles.text}>Last Name</div>
                             <input type='text' className={styles.input} placeholder={userData.lastName} /> */}
 
-                            <Button className={s(styles.input, styles.employeeDropdownButton)}>
-                                <div className={s(dropdownStyles.dropdownContainer, styles.employeeDropdownContainer)}>
-                                    <DropdownList
-                                        triggerElement={({isOpen, toggle}) => (
-                                            <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                                <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                                    <div>Select an employee</div>
+                            {match.params.id === 'new' ? (
+                                <Button className={s(styles.input, styles.employeeDropdownButton)}>
+                                    <div
+                                        className={s(
+                                            dropdownStyles.dropdownContainer,
+                                            styles.employeeDropdownContainer
+                                        )}
+                                    >
+                                        <DropdownList
+                                            triggerElement={({isOpen, toggle}) => (
+                                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
                                                     <div
                                                         className={s(
-                                                            dropdownStyles.dropdownArrow,
-                                                            styles.dropdownArrow
+                                                            dropdownStyles.dropdownTitle,
+                                                            styles.employeeDropdownTitle
                                                         )}
-                                                    />
-                                                </div>
-                                            </button>
-                                        )}
-                                        choicesList={() => (
-                                            <ul className={dropdownStyles.dropdownList}>
-                                                {employeeDropdown.map(i => (
-                                                    <li
-                                                        className={dropdownStyles.dropdownListItem}
-                                                        key={i.name}
-                                                        onClick={() => {
-                                                            setSelectedEmployee(i)
-                                                        }}
                                                     >
-                                                        <button className={dropdownStyles.dropdownListItemButton}>
-                                                            <div className={dropdownStyles.dropdownItemLabel}>
-                                                                {i.name}
-                                                            </div>
-                                                        </button>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    />
-                                    <div />
-                                </div>
-                            </Button>
+                                                        <div>Select an employee</div>
+                                                        <div
+                                                            className={s(
+                                                                dropdownStyles.dropdownArrow,
+                                                                styles.employeeDropdownArrow
+                                                            )}
+                                                        />
+                                                    </div>
+                                                </button>
+                                            )}
+                                            choicesList={() => (
+                                                <ul className={dropdownStyles.dropdownList}>
+                                                    {employeeDropdown.map(i => (
+                                                        <li
+                                                            className={dropdownStyles.dropdownListItem}
+                                                            key={i.name}
+                                                            onClick={() => {
+                                                                setSelectedEmployee(i)
+                                                            }}
+                                                        >
+                                                            <button className={dropdownStyles.dropdownListItemButton}>
+                                                                <div className={dropdownStyles.dropdownItemLabel}>
+                                                                    {i.name}
+                                                                </div>
+                                                            </button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        />
+                                        <div />
+                                    </div>
+                                </Button>
+                            ) : (
+                                <input type='text' className={styles.input} value={userData.name} />
+                            )}
                         </div>
                     </div>
                     <div>

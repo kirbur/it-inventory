@@ -114,6 +114,7 @@
     border-radius: 3px;
     font-size: 18px;
     padding-left: 12px;
+    font-family: cqlRegularFont;
 }
 .text {
     color: #a5a5a5;
@@ -292,7 +293,14 @@ input:checked ~ .insideCheckmarkAdmin {
     background: white;
 }
 
-.employeeDropdownContainer {
+.employeeDropdownTitle {
+    line-height: 40px;
     width: 380px;
     height: 45px;
+    font-size: 18px;
+    font-family: cqlRegularFont;
+}
+
+.employeeDropdownArrow {
+    top: 14px;
 }
