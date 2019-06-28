@@ -72,7 +72,6 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         axios
             .get(`/detail/employee/${match.params.id}`)
             .then((data: any) => {
-                //console.log(data)
                 let user: any = {
                     photo: data[0].picture,
                     name: data[0].firstName + ' ' + data[0].lastName,
@@ -203,15 +202,6 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     </div>
                     <DetailPageTable headers={hardwareHeaders} rows={hardwareRows} setRows={setHardwareRows} />
                     {isAdmin && (
-                        // <Button
-                        //     text='Assign new hardware'
-                        //     icon='add'
-                        //     onClick={() => {}}
-                        //     className={styles.addContainer}
-                        //     textInside={false}
-                        //     textClassName={styles.assignText}
-                        // />
-
                         <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
@@ -245,14 +235,6 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
 
                     <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
                     {isAdmin && (
-                        // <Button
-                        //     text='Assign new software'
-                        //     icon='add'
-                        //     onClick={() => {}}
-                        //     className={styles.addContainer}
-                        //     textInside={false}
-                        //     textClassName={styles.assignText}
-                        // />
                         <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
@@ -286,14 +268,6 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
 
                     <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
                     {isAdmin && (
-                        // <Button
-                        //     text='Assign new license'
-                        //     icon='add'
-                        //     onClick={() => {}}
-                        //     className={styles.addContainer}
-                        //     textInside={false}
-                        //     textClassName={styles.assignText}
-                        // />
                         <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList

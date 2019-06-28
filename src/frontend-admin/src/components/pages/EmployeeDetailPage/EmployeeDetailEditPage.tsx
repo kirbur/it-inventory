@@ -83,7 +83,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         axios
             .get(`/detail/employee/${match.params.id}`)
             .then((data: any) => {
-                console.log(data)
                 let user: any = {
                     isAdmin: data[0].isAdmin,
                     photo: data[0].picture,
@@ -140,7 +139,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         axios
             .get('/dashboard/departmentTable?$select=departmentName,departmentID')
             .then((data: any) => setDeptList(data))
-            .catch((err: any) => console.log(err))
+            .catch((err: any) => console.error(err))
 
         //TODO: get dropdown content for all 3 dropdowns
     }, [])
@@ -401,11 +400,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 </Button>
 
                 <div className={styles.submitContainer}>
-                    {/* <div className={styles.submitButton}>
-                        <div className={styles.submitText}>Submit </div>
-                        <IoIosPersonAdd className={styles.personIcon} />
-                    </div> */}
-
                     <Button text='Submit' icon='submit' onClick={handleSubmit} className={styles.submitbutton} />
                 </div>
             </div>

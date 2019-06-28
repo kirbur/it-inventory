@@ -124,7 +124,7 @@ export const DetailPageTable = (props: ITableProps) => {
                         onClick={
                             onRowClick
                                 ? e => {
-                                      console.log(rows[i][0])
+                                      onRowClick(rows[i][0])
                                   }
                                 : undefined
                         }

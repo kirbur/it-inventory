@@ -10,7 +10,6 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -46,7 +45,6 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
             .get('/list/monitors')
             .then((data: any) => {
                 const monitors: any[] = []
-                //console.log(data)
                 data.map((i: any) => {
                     monitors.push({
                         make: format(i.make),

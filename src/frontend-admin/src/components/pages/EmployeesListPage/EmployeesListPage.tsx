@@ -10,7 +10,6 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -47,7 +46,6 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             .get('/list/employees')
             .then((data: any) => {
                 const employees: any[] = []
-                console.log(data)
                 data.map((i: any) => {
                     employees.push({
                         name: format(i.employeeName),
@@ -116,7 +114,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     const formatCost = (hwCpost: number, progCost: number) => {
-        return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo' //TODO: SW or PROG? or something else??
+        return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo'
     }
 
     const handleClick = () => {
@@ -124,7 +122,6 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     const handleRowClick = (row: any) => {
-        // history.push(`${match.url}/${row[0].props.children[1].props.children[0].props.children}`)
         history.push(`${match.url}/${row[0].key}`)
     }
 
@@ -138,7 +135,6 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         setRows(filteredRows)
     }, [filteredData])
 
-    //this is the only thing to change
     const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
 
     //-------------- this will all be the same -------------

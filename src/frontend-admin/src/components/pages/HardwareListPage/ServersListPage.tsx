@@ -10,7 +10,6 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -87,7 +86,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/server/${row[0].key}`) //TODO: fix this, need id
+        history.push(`hardware/server/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
