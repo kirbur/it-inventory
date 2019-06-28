@@ -1,10 +1,14 @@
 import React, {useState} from 'react'
 
+//components
+import ReactTooltip from 'react-tooltip'
+
+//styling
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import styles from './DetailPageTable.module.css'
 
+//utilities
 import {cloneDeep} from 'lodash'
-
 import {sortTable} from '../../../utilities/quickSort'
 
 interface ITableProps {
@@ -13,6 +17,7 @@ interface ITableProps {
     setRows: any
     onRowClick?: (datum: any) => void
     style?: string
+    toolTipRows?: any[]
 }
 
 export const DetailPageTable = (props: ITableProps) => {
@@ -56,8 +61,7 @@ export const DetailPageTable = (props: ITableProps) => {
             tempHeaderStateCounts = [...initHeaderStateCounts]
         }
     }
-    //returns an array of <td> elements based on the array of strings of headers
-    // const renderHardwareHeaders = () => {
+
     var renderedHeaders = []
     for (let i = 0; i < headers.length; i++) {
         let header = (
@@ -80,22 +84,29 @@ export const DetailPageTable = (props: ITableProps) => {
     function deleteSummin(value: any) {
         //nothing for now
     }
+    const toolTip = (row: any[], index: number) => {
+        return (
+            <td className={styles.rowData}>
+                <a data-tip={row[row.length - 1]} className={row[row.length - 1] === '' ? '' : styles.rowTitle}>
+                    {row[index]}
+                </a>
+                <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
+            </td>
+        )
+    }
 
     var renderedRows: any[] = []
     rows.forEach(row => {
         const transformedRow: any[] = []
-        for (let i = 0; i < row.length + 1; i++) {
-            switch (i) {
-                case 0:
-                    transformedRow[1] = <td className={styles.rowData}>{row[0]} </td>
-                case 1:
-                    transformedRow[2] = <td className={styles.rowData}>{row[1]}</td>
-                case 2:
-                    transformedRow[3] = <td className={styles.rowData}>{row[2]}</td>
-                case 3:
-                    transformedRow[4] = <td className={styles.rowData}>{row[3]}</td>
-                case 4:
-                    transformedRow[5] = <td>{row[4]}</td>
+        for (let i = 1; i < headers.length + 1; i++) {
+            if (headers[i - 1] == 'Cost') {
+                transformedRow[i] = <td className={styles.rowData}>${row[i]}</td>
+            } else if (headers[i - 1] == 'Hardware') {
+                transformedRow[i] = toolTip(row, i)
+            } else if (headers[i - 1] == 'Monthly Cost') {
+                transformedRow[i] = <td className={styles.rowData}>${row[i]} /month</td>
+            } else {
+                transformedRow[i] = <td className={styles.rowData}>{row[i]}</td>
             }
         }
         renderedRows.push(transformedRow)
@@ -107,13 +118,13 @@ export const DetailPageTable = (props: ITableProps) => {
             </thead>
 
             <tbody>
-                {renderedRows.map(row => (
+                {renderedRows.map((row, i) => (
                     <tr
                         className={s(style, styles.tr, isClickable && styles.clickable)}
                         onClick={
                             onRowClick
                                 ? e => {
-                                      onRowClick(row)
+                                      onRowClick(rows[i][0])
                                   }
                                 : undefined
                         }

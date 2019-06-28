@@ -38,12 +38,18 @@
     border-radius: 10px;
     width: 300px;
     height: 300px;
+    display: flex;
 }
 
 .img {
-    position: relative;
-    top: 50px;
-    transform: scale(1.5, 1.5);
+    max-width: 300px;
+    max-height: 300px;
+    min-width: 250px;
+    min-height: 250px;
+    margin: auto;
+    /* position: relative; */
+
+    /* transform: scale(1.5, 1.5); */
 }
 
 .costText {
@@ -61,6 +67,7 @@
 .employeeName {
     font-size: 36px;
     color: #000000;
+    font-weight: bold;
 }
 
 .employeeText {
@@ -133,8 +140,16 @@
     border-radius: 15px;
 }
 
+.dropdownTitle {
+    margin-top: -3px;
+    font-family: cqlmedium;
+    text-transform: none;
+    color: #009eff;
+    font-size: 20px;
+}
+
 .addContainer {
-    padding: 5px 0 15px;
+    margin: 5px 0 55px;
     align-self: flex-end;
 }
 .addIconBorder:hover {

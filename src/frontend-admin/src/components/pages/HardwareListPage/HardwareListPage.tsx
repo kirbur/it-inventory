@@ -7,6 +7,7 @@ import {LaptopsListPage} from './LaptopsListPage'
 import {ServersListPage} from './ServersListPage'
 import {MonitorsListPage} from './MonitorsListPage'
 import {PeripheralListPage} from './PeripheralsListPage'
+import {Button} from '../../reusables/Button/Button'
 
 // Styles
 import styles from './HardwareListPage.module.css'
@@ -57,37 +58,39 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     return (
         <div className={styles.hardwareListMain}>
             <div className={styles.dropdown}>
-                <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                    <DropdownList
-                        triggerElement={({isOpen, toggle}) => (
-                            <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                    <div>{selectedHW.name}</div>
-                                    <div className={dropdownStyles.dropdownArrow} />
-                                </div>
-                            </button>
-                        )}
-                        choicesList={() => (
-                            <ul className={dropdownStyles.dropdownList}>
-                                {dropdownContent.map(i => (
-                                    <li
-                                        className={dropdownStyles.dropdownListItem}
-                                        key={i.name}
-                                        onClick={() => {
-                                            setSelectedHW(i)
-                                            localStorage.setItem('selectedHW', JSON.stringify(i))
-                                        }}
-                                    >
-                                        <button className={dropdownStyles.dropdownListItemButton}>
-                                            <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    />
-                    <div />
-                </div>
+                <Button className={styles.dropdownButton}>
+                    <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                        <DropdownList
+                            triggerElement={({isOpen, toggle}) => (
+                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitleContainer)}>
+                                        <div className={styles.dropdownTitle}>{selectedHW.name}</div>
+                                        <div className={s(dropdownStyles.dropdownArrow, styles.dropdownArrow)} />
+                                    </div>
+                                </button>
+                            )}
+                            choicesList={() => (
+                                <ul className={dropdownStyles.dropdownList}>
+                                    {dropdownContent.map(i => (
+                                        <li
+                                            className={dropdownStyles.dropdownListItem}
+                                            key={i.name}
+                                            onClick={() => {
+                                                setSelectedHW(i)
+                                                localStorage.setItem('selectedHW', JSON.stringify(i))
+                                            }}
+                                        >
+                                            <button className={dropdownStyles.dropdownListItemButton}>
+                                                <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        />
+                        <div />
+                    </div>
+                </Button>
             </div>
             {displayList()}
         </div>

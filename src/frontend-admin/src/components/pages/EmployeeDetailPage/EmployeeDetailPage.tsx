@@ -8,6 +8,7 @@ import ReactTooltip from 'react-tooltip'
 import {IoMdAdd} from 'react-icons/io'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
+import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 
 // Utils
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
@@ -16,6 +17,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './EmployeeDetailPage.module.css'
+import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -47,13 +49,29 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
     const licenseHeaders = ['Licenses', 'CALs']
 
+    //TODO: remove default options
+    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([
+        {name: 'option 1', id: 1},
+        {name: 'option 2', id: 1},
+        {name: 'option 3', id: 2},
+    ])
+    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([
+        {name: 'option 1', id: 1},
+        {name: 'option 2', id: 1},
+        {name: 'option 3', id: 2},
+    ])
+    const [licenseDropdown, setLicenseDropdown] = useState<any[]>([
+        {name: 'option 1', id: 1},
+        {name: 'option 2', id: 1},
+        {name: 'option 3', id: 2},
+    ])
+
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
     useEffect(() => {
         axios
             .get(`/detail/employee/${match.params.id}`)
             .then((data: any) => {
-                console.log(data)
                 let user: any = {
                     photo: data[0].picture,
                     name: data[0].firstName + ' ' + data[0].lastName,
@@ -68,23 +86,27 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 let hw: any[] = []
                 data[0].hardware.map((i: any) =>
                     hw.push([
+                        format(i.id),
                         format(i.make + ' ' + i.model),
                         format(i.serialNumber),
                         format(i.mfg),
                         formatDate(i.purchaseDate),
-                        format(i.id),
                         i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
                     ])
                 )
                 setHardwareRows(hw)
+
+                // var toolTipArray = []
+                // data[0].hardware.map((i: any) => toolTipArray.push(i.tooltip.cpu ? formatToolTip(i.tooltip) : ''))
+
                 let sw: any[] = []
                 data[0].software.map((i: any) =>
                     sw.push([
+                        format(i.id),
                         format(i.name),
                         format(i.licenseKey),
                         format(Math.round(i.costPerMonth * 100) / 100),
                         format(i.flatCost),
-                        format(i.id),
                     ])
                 )
                 setSoftwareRows(sw)
@@ -92,20 +114,39 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 let l: any[] = []
                 data[0].licenses.map((i: any) =>
                     l.push([
+                        format(i.id),
                         format(i.name),
                         format(i.cals),
                         format(i.licenseKey),
                         format(Math.round(i.costPerMonth * 100) / 100),
                         format(i.flatCost),
-                        format(i.id),
                     ])
                 )
                 setLicenseRows(l)
             })
             .catch((err: any) => console.error(err))
+
+        //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
-    console.log(URL + userData.photo)
+    const handleArchive = () => {
+        if (window.confirm(`Are you sure you want to archive ${userData.name}?`)) {
+            //TODO: a post request to archive user w/ id match.params.id
+            history.push('/employees')
+        }
+    }
+
+    const handleAddHardware = (id: number) => {
+        //TODO: post request to assign hardware to user w/ id match.params.id
+    }
+
+    const handleAddSoftware = (id: number) => {
+        //TODO: post request to assign software to user w/ id match.params.id
+    }
+
+    const handleAddLicense = (id: number) => {
+        //TODO: post request to assign license to user w/ id match.params.id
+    }
 
     return (
         <div className={styles.empDetailMain}>
@@ -133,9 +174,21 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 <div className={styles.secondColumn}>
                     {isAdmin && (
                         <Group direction='row' justify='start' className={styles.group}>
-                            <Button text='Edit' icon='edit' onClick={() => {}} className={styles.editbutton} />
+                            <Button
+                                text='Edit'
+                                icon='edit'
+                                onClick={() => {
+                                    history.push('/editEmployee/' + match.params.id)
+                                }}
+                                className={styles.editbutton}
+                            />
 
-                            <Button text='Archive' icon='archive' onClick={() => {}} className={styles.archivebutton} />
+                            <Button
+                                text='Archive'
+                                icon='archive'
+                                onClick={handleArchive}
+                                className={styles.archivebutton}
+                            />
                         </Group>
                     )}
                     <div className={styles.titleText}>
@@ -149,38 +202,101 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     </div>
                     <DetailPageTable headers={hardwareHeaders} rows={hardwareRows} setRows={setHardwareRows} />
                     {isAdmin && (
-                        <Button
-                            text='Assign new hardware'
-                            icon='add'
-                            onClick={() => {}}
-                            className={styles.addContainer}
-                            textInside={false}
-                            textClassName={styles.assignText}
-                        />
+                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                            <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                                <DropdownList
+                                    triggerElement={({isOpen, toggle}) => (
+                                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                                Assign new hardware
+                                            </div>
+                                        </button>
+                                    )}
+                                    choicesList={() => (
+                                        <ul className={dropdownStyles.dropdownList}>
+                                            {hardwareDropdown.map(i => (
+                                                <li
+                                                    className={dropdownStyles.dropdownListItem}
+                                                    key={i.name}
+                                                    onClick={() => handleAddHardware(i.id)}
+                                                >
+                                                    <button className={dropdownStyles.dropdownListItemButton}>
+                                                        <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                />
+                                <div />
+                            </div>
+                        </Button>
                     )}
 
                     <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
                     {isAdmin && (
-                        <Button
-                            text='Assign new software'
-                            icon='add'
-                            onClick={() => {}}
-                            className={styles.addContainer}
-                            textInside={false}
-                            textClassName={styles.assignText}
-                        />
+                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                            <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                                <DropdownList
+                                    triggerElement={({isOpen, toggle}) => (
+                                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                                Assign new software
+                                            </div>
+                                        </button>
+                                    )}
+                                    choicesList={() => (
+                                        <ul className={dropdownStyles.dropdownList}>
+                                            {softwareDropdown.map(i => (
+                                                <li
+                                                    className={dropdownStyles.dropdownListItem}
+                                                    key={i.name}
+                                                    onClick={() => handleAddSoftware(i.id)}
+                                                >
+                                                    <button className={dropdownStyles.dropdownListItemButton}>
+                                                        <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                />
+                                <div />
+                            </div>
+                        </Button>
                     )}
 
                     <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
                     {isAdmin && (
-                        <Button
-                            text='Assign new license'
-                            icon='add'
-                            onClick={() => {}}
-                            className={styles.addContainer}
-                            textInside={false}
-                            textClassName={styles.assignText}
-                        />
+                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                            <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                                <DropdownList
+                                    triggerElement={({isOpen, toggle}) => (
+                                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                                Assign new license
+                                            </div>
+                                        </button>
+                                    )}
+                                    choicesList={() => (
+                                        <ul className={dropdownStyles.dropdownList}>
+                                            {licenseDropdown.map(i => (
+                                                <li
+                                                    className={dropdownStyles.dropdownListItem}
+                                                    key={i.name}
+                                                    onClick={() => handleAddLicense(i.id)}
+                                                >
+                                                    <button className={dropdownStyles.dropdownListItemButton}>
+                                                        <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                />
+                                <div />
+                            </div>
+                        </Button>
                     )}
                 </div>
             </div>
