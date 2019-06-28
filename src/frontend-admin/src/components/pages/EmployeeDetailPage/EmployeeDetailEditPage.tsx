@@ -4,6 +4,7 @@ import React, {useState, useEffect, useContext} from 'react'
 import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailEditTable} from '../../reusables/DetailEditTable/DetailEditTable'
 import {IoIosPersonAdd, IoMdAdd} from 'react-icons/io'
+import {GoCloudUpload} from 'react-icons/go'
 import {FaUserShield, FaUser, FaUserGraduate} from 'react-icons/fa'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import DatePicker from 'react-datepicker'
@@ -43,9 +44,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     //push them into alternating rows so that rows are equal
     for (let i = 0; i < deptList.length; i++) {
         if (i % 2 == 0) {
-            deptsRowOne.push(deptList[i].DepartmentName)
+            deptsRowOne.push(deptList[i] /*.DepartmentName*/)
         } else {
-            deptsRowTwo.push(deptList[i].DepartmentName)
+            deptsRowTwo.push(deptList[i] /*.DepartmentName*/)
         }
     }
 
@@ -65,7 +66,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
     //input feild states:
     const [dateInput, setDateInput] = useState<Date>(new Date())
-    const [deptInput, setDeptInput] = useState<{name: string; id: number}>()
+    const [deptInput, setDeptInput] = useState<{DepartmentName: string; DepartmentId: number}>()
+    const [adminInput, setAdminInput] = useState<boolean>()
+    const [imgInput, setImgInput] = useState<File>()
     //TODO: add states for the rest of the inputs
 
     //TODO: remove default options
@@ -85,10 +88,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         {name: 'option 3', id: 2},
     ])
 
+    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'First Last', id: 1}])
+    const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>()
+
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
     useEffect(() => {
-        axios
+        axios //TODO: get from edit endpoint
             .get(`/detail/employee/${match.params.id}`)
             .then((data: any) => {
                 let user: any = {
@@ -104,6 +110,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     swCost: Math.round(data[0].totalProgramCostPerMonth * 100) / 100,
                 }
                 setUserData(user)
+                setAdminInput(data[0].isAdmin)
+                setDateInput(new Date(formatDate(data[0].hireDate)))
 
                 let hw: any[] = []
                 data[0].hardware.map((i: any) =>
@@ -144,18 +152,28 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             })
             .catch((err: any) => console.error(err))
 
-        axios
-            .get('/dashboard/departmentTable?$select=departmentName,departmentID')
-            .then((data: any) => setDeptList(data))
-            .catch((err: any) => console.error(err))
+        // axios
+        //     .get('/dashboard/departmentTable?$select=departmentName,departmentID')
+        //     .then((data: any) => {
+        //         setDeptList(data)
+        //         var d = data.filter((i: any) => (i.departmentName = userData.department))
+        //         setDeptInput({name: userData.department, id: d[0].departmentID})
+        //     })
+        //     .catch((err: any) => console.error(err))
 
         //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
-    // useEffect(() => {
-    //     var d = deptList.filter((i: any) => (i.departmentName = userData.department))
-    //     d[0] && setDeptInput({name: userData.department, id: d[0].departmentID})
-    // }, [deptList, userData])
+    useEffect(() => {
+        axios
+            .get('/dashboard/departmentTable?$select=departmentName,departmentID')
+            .then((data: any) => {
+                setDeptList(data)
+                var d = data.filter((i: any) => i.DepartmentName === userData.department)
+                setDeptInput({DepartmentName: userData.department, DepartmentId: d[0].DepartmentId})
+            })
+            .catch((err: any) => console.error(err))
+    }, [userData])
 
     const handleAddHardware = (id: number) => {
         //TODO: post request to assign hardware to user w/ id match.params.id
@@ -173,8 +191,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         //TODO: post request
     }
 
-    console.log(deptInput)
-
     return (
         <div className={styles.columns}>
             {/* column 1 */}
@@ -190,7 +206,20 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     textClassName={styles.backButtonText}
                 />
                 <div className={styles.imgPadding}>
-                    <img className={styles.img} src={icon} />
+                    {/* <img className={styles.img} src={icon} /> */}
+                    <GoCloudUpload size={300} className={styles.cloudIcon} onClick={() => {}} />
+                    <input
+                        className={styles.imgInput}
+                        type='file'
+                        accept='image/*'
+                        onClick={event => {
+                            //console.log(event)
+                        }}
+                        onChange={e => {
+                            var files = e.target.files
+                            files && files[0] && setImgInput(files[0])
+                        }}
+                    />
                 </div>
             </div>
             {/* column 2 */}
@@ -213,7 +242,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     type='radio'
                                     name='admin'
                                     className={styles.checkmark}
-                                    checked={userData.isAdmin}
+                                    checked={adminInput}
+                                    onChange={() => setAdminInput(true)}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmarkAdmin} />
@@ -229,7 +259,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     {/* non admin card */}
                     <div className={styles.adminCard}>
                         <div className={styles.card}>
-                            <input type='radio' name='admin' className={styles.checkmark} checked={userData.isAdmin} />
+                            <input
+                                type='radio'
+                                name='admin'
+                                className={styles.checkmark}
+                                checked={!adminInput}
+                                onChange={() => setAdminInput(false)}
+                            />
                             <div className={styles.checkmark} />
                             <div className={styles.insideCheckmarkAdmin} />
                             <div className={styles.title}>Non Admin User</div>
@@ -245,11 +281,51 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     <div className={styles.paddingRight}>
                         <div className={styles.paddingBottom}>
                             <div className={styles.text}>First Name</div>
-                            <input type='text' className={styles.input} placeholder={userData.firstName} />
+                            {/* <input type='text' className={styles.input} placeholder={userData.firstName} />
                         </div>
                         <div>
                             <div className={styles.text}>Last Name</div>
-                            <input type='text' className={styles.input} placeholder={userData.lastName} />
+                            <input type='text' className={styles.input} placeholder={userData.lastName} /> */}
+
+                            <Button className={s(styles.input, styles.employeeDropdownButton)}>
+                                <div className={s(dropdownStyles.dropdownContainer, styles.employeeDropdownContainer)}>
+                                    <DropdownList
+                                        triggerElement={({isOpen, toggle}) => (
+                                            <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                                <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                                    <div>Select an employee</div>
+                                                    <div
+                                                        className={s(
+                                                            dropdownStyles.dropdownArrow,
+                                                            styles.dropdownArrow
+                                                        )}
+                                                    />
+                                                </div>
+                                            </button>
+                                        )}
+                                        choicesList={() => (
+                                            <ul className={dropdownStyles.dropdownList}>
+                                                {employeeDropdown.map(i => (
+                                                    <li
+                                                        className={dropdownStyles.dropdownListItem}
+                                                        key={i.name}
+                                                        onClick={() => {
+                                                            setSelectedEmployee(i)
+                                                        }}
+                                                    >
+                                                        <button className={dropdownStyles.dropdownListItemButton}>
+                                                            <div className={dropdownStyles.dropdownItemLabel}>
+                                                                {i.name}
+                                                            </div>
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    />
+                                    <div />
+                                </div>
+                            </Button>
                         </div>
                     </div>
                     <div>
@@ -269,42 +345,44 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 {/* Employee Dept radio buttons */}
                 <div className={s(styles.title, styles.paddingTop, styles.paddingBottom)}>Employee Department</div>
-                <div className={styles.employeeDepartment}>
-                    <div>
-                        {deptsRowOne.map(dept => (
-                            <div className={styles.container}>
-                                <input
-                                    type='radio'
-                                    name='employeeDept'
-                                    className={styles.checkmark}
-                                    checked={dept === userData.department}
-                                    onChange={() => setDeptInput(dept)}
-                                />
-                                <div className={styles.checkmark} />
-                                <div className={styles.insideCheckmark} />
-                                <img src={icon} className={styles.deptIcon} />
-                                <div className={styles.deptName}>{dept}</div>
-                            </div>
-                        ))}
+                {deptInput && (
+                    <div className={styles.employeeDepartment}>
+                        <div>
+                            {deptsRowOne.map(dept => (
+                                <div className={styles.container}>
+                                    <input
+                                        type='radio'
+                                        name='employeeDept'
+                                        className={styles.checkmark}
+                                        checked={dept.DepartmentId === deptInput.DepartmentId /*userData.department*/}
+                                        onChange={() => setDeptInput(dept)}
+                                    />
+                                    <div className={styles.checkmark} />
+                                    <div className={styles.insideCheckmark} />
+                                    <img src={icon} className={styles.deptIcon} />
+                                    <div className={styles.deptName}>{dept.DepartmentName}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <div>
+                            {deptsRowTwo.map(dept => (
+                                <div className={styles.container}>
+                                    <input
+                                        type='radio'
+                                        name='employeeDept'
+                                        className={styles.checkmark}
+                                        checked={dept.DepartmentId === deptInput.DepartmentId /*userData.department*/}
+                                        onChange={() => setDeptInput(dept)}
+                                    />
+                                    <div className={styles.checkmark} />
+                                    <div className={styles.insideCheckmark} />
+                                    <img src={icon} className={styles.deptIcon} />
+                                    <div className={styles.deptName}>{dept.DepartmentName}</div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <div>
-                        {deptsRowTwo.map(dept => (
-                            <div className={styles.container}>
-                                <input
-                                    type='radio'
-                                    name='employeeDept'
-                                    className={styles.checkmark}
-                                    checked={dept === userData.department}
-                                    onChange={() => setDeptInput(dept)}
-                                />
-                                <div className={styles.checkmark} />
-                                <div className={styles.insideCheckmark} />
-                                <img src={icon} className={styles.deptIcon} />
-                                <div className={styles.deptName}>{dept}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                )}
 
                 <div className={styles.line} />
 

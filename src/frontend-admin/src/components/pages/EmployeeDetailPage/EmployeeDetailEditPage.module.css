@@ -30,7 +30,20 @@
     border-radius: 10px;
     width: 300px;
     height: 300px;
+
+    color: #009eff;
 }
+
+.imgInput {
+    position: relative;
+    top: -300px;
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+    background: #636363;
+    cursor: pointer;
+}
+
 .img {
     position: relative;
     top: 50px;
@@ -268,4 +281,18 @@ input:checked ~ .insideCheckmarkAdmin {
 .addContainer {
     margin: 5px 0 15px;
     align-self: flex-end;
+}
+
+/*Employee Dropdown Style*/
+.employeeDropdownButton {
+    background: white;
+}
+
+.employeeDropdownButton:hover {
+    background: white;
+}
+
+.employeeDropdownContainer {
+    width: 380px;
+    height: 45px;
 }
