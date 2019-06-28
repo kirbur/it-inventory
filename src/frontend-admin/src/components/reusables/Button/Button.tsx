@@ -2,6 +2,8 @@ import React from 'react'
 
 // icons
 import {FaArchive, FaEdit} from 'react-icons/fa'
+import {GoPlus} from 'react-icons/go'
+import {IoIosPersonAdd} from 'react-icons/io'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -10,7 +12,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import styles from './Button.module.css'
 
 // Types
-type ButtonIcon = 'add' | 'archive' | 'edit' | 'back'
+type ButtonIcon = 'add' | 'archive' | 'edit' | 'back' | 'submit'
 interface IButtonProps {
     onClick?: any
     className?: string
@@ -36,16 +38,19 @@ export const Button: React.SFC<IButtonProps> = props => {
     ) : textInside ? (
         <div onClick={onClick} className={s(styles.buttonMain, className)}>
             <div className={s(styles.buttonText, textClassName)}>{text}</div>
-            {icon === 'add' && <div className={styles.addIcon} />}
+            {/* {icon === 'add' && <div className={styles.addIcon} />} */}
+            {icon === 'add' && <GoPlus className={styles.icon} size={20} />}
             {icon === 'archive' && <FaArchive className={styles.icon} size={20} />}
             {icon === 'edit' && <FaEdit className={styles.icon} size={20} />}
+            {icon === 'submit' && <IoIosPersonAdd className={styles.icon} size={20} />}
 
             {children}
         </div>
     ) : (
         <div onClick={onClick} className={s(styles.iconButtonContainer, className)}>
             <div className={styles.iconbuttonMain}>
-                {icon === 'add' && <div className={styles.addIcon} />}
+                {/* {icon === 'add' && <div className={styles.addIcon} />} */}
+                {icon === 'add' && <GoPlus className={styles.icon} size={20} />}
                 {icon === 'archive' && <FaArchive className={styles.icon} size={20} />}
                 {icon === 'edit' && <FaEdit className={styles.icon} size={20} />}
             </div>

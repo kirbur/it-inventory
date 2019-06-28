@@ -133,7 +133,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                             )
                         initDeptTable.push({id: i.DepartmentId, name: i.DepartmentName, tableData: y})
                     })
-                    .catch((err: any) => console.log(err))
+                    .catch((err: any) => console.error(err))
             )
         setDeptTableData(initDeptTable)
     }
@@ -165,7 +165,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
             .then((data: any) => {
                 setLicenses(data)
             })
-            .catch((err: any) => console.log(err))
+            .catch((err: any) => console.error(err))
 
         axios
             .get('/dashboard/softwareTable')
@@ -182,14 +182,14 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                     )
                 setSoftwareTableData(x)
             })
-            .catch((err: any) => console.log(err))
+            .catch((err: any) => console.error(err))
 
         axios
             .get('/dashboard/CostBreakdown')
             .then((data: any) => {
                 data && setCosts(data[0])
             })
-            .catch((err: any) => console.log(err))
+            .catch((err: any) => console.error(err))
 
         axios
             .get('/dashboard/CostPieCharts')
@@ -223,12 +223,12 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                     )
                 setPieData(x)
             })
-            .catch((err: any) => console.log(err))
+            .catch((err: any) => console.error(err))
 
         axios
             .get('/dashboard/departmentTable?$select=departmentName,departmentID')
             .then((data: any) => setDeptList(data))
-            .catch((err: any) => console.log(err))
+            .catch((err: any) => console.error(err))
     }, [])
 
     useEffect(getDeptTables, [deptList])

@@ -76,14 +76,9 @@ namespace backend_api.Controllers
                     var ProgCostPerUse = _context.Program.Where(x => x.EmployeeId == emp.EmployeeId && x.ProgramFlatCost != null && x.IsDeleted != true).Sum(x => x.ProgramFlatCost);
 
                     // Dividing the yearly cost into months Adding the programs costs into one variable if the values are not null
-                    decimal? ProgramCostForEmp = 0;
+                    decimal ProgramCostForEmp = 0;
 
-                    if (ProgCostPerUse != null)
-                    {
-                        ProgramCostForEmp = ProgCostPerUse;
-                    }
-                    else if (ProgramCostForEmp != null)
-                        ProgramCostForEmp = ProgCostForEmpPerYear / 12;
+                    ProgramCostForEmp = Math.Round(System.Convert.ToDecimal(ProgCostForEmpPerYear / 12), 2, MidpointRounding.ToEven);
 
                     // concatenating the first and the last name
                     var EmployeeName = emp.FirstName + " " + emp.LastName;
@@ -437,7 +432,7 @@ namespace backend_api.Controllers
             foreach (var prog in DistinctUsefulPrograms)
             {
                 // calculate the count of programs under this specific distinct program name that are in use
-                var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId!= null).Count();
+                var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId != null).Count();
 
                 // calculate the count of programs under this specific distinct program name
                 var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName).Count();
