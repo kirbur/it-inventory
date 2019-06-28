@@ -64,7 +64,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const licenseHeaders = ['Licenses', 'CALs']
 
     //input feild states:
-    const [dateInput, setDateInput] = useState<Date>()
+    const [dateInput, setDateInput] = useState<Date>(new Date())
     const [deptInput, setDeptInput] = useState<{name: string; id: number}>()
     //TODO: add states for the rest of the inputs
 
@@ -257,7 +257,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         {/* <input type='text' className={styles.input} placeholder={userData.hireDate} /> */}
                         <DatePicker
                             dateFormat='yyyy/MM/dd'
-                            selected={new Date()}
+                            placeholderText={userData.hireDate}
+                            selected={dateInput}
                             onChange={e => e && setDateInput(e)}
                             className={styles.input}
                         />
