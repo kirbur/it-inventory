@@ -5,13 +5,13 @@ import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {formatDate} from '../../../utilities/FormatDate'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -51,7 +51,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                 data.map((i: any) =>
                     programs.push({
                         name: format(i.programName),
-                        renewalDate: format(i.renewalDate),
+                        renewalDate: formatDate(i.renewalDate),
                         totalUsers: format(i.countProgInUse),
                         perYear: i.progCostPerYear,
                         perUse: i.progCostPerUse,
@@ -66,7 +66,11 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }, [setListData])
 
     const formatCost = (isPerYear: boolean, perYear: number, perUse: number) => {
-        return isPerYear ? '$' + perYear + ' /yr' : perYear === 0 ? '$' + perUse + ' paid' : '$' + perYear + ' /mo'
+        return isPerYear
+            ? '$' + perYear + ' /yr'
+            : perYear === 0
+            ? '$' + perUse + ' paid'
+            : '$' + Math.round((perYear / 12) * 100) / 100 + ' /mo'
     }
 
     useEffect(() => {
@@ -89,7 +93,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
 
     const handleRowClick = (row: any) => {
         // go to prog overview
-        history.push(`/programs/${row[0].props.children[1].props.children.props.children}`)
+        history.push(`/programs/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -108,10 +112,9 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
+        headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
-    var initHeaderStates = cloneDeep(headerStates)
     var initHeaderStateCounts = cloneDeep(headerStateCounts)
     var tempHeaderStates = cloneDeep(headerStates)
     var tempHeaderStateCounts = cloneDeep(headerStateCounts)
@@ -186,7 +189,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
 
     function concatenatedDept(row: any[]) {
         return (
-            <td className={styles.programs}>
+            <td key={row[0]} className={styles.programs}>
                 <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
                     <div className={styles.programName}>{row[0]}</div>

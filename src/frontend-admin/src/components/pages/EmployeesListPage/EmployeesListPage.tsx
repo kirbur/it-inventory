@@ -10,7 +10,6 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -57,6 +56,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         swCost: i.programCostForEmp,
                         role: format(i.role),
                         icon: format(i.photo),
+                        id: i.employeeId,
 
                         //for searching
                         hardware: i.hardwareList.join(', '),
@@ -114,15 +114,15 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     const formatCost = (hwCpost: number, progCost: number) => {
-        return 'HW: $' + hwCpost + ' | SW: $' + progCost //TODO: SW or PROG? or something else??
+        return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo'
     }
 
     const handleClick = () => {
-        history.push(`${match.url}/new`)
+        history.push(`/editEmployee/new`)
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`${match.url}/${row[0].props.children[1].props.children[0].props.children}`)
+        history.push(`${match.url}/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -135,7 +135,6 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         setRows(filteredRows)
     }, [filteredData])
 
-    //this is the only thing to change
     const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
 
     //-------------- this will all be the same -------------
@@ -144,7 +143,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
+        headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
     //var initHeaderStates = cloneDeep(headerStates)
@@ -156,12 +155,12 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const [sortState, setSortState] = useState(initState)
 
     function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
+        if (sortState.headerStateCounts[index] === 0) {
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
             tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
+        } else if (sortState.headerStateCounts[index] === 1) {
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
@@ -221,7 +220,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         return (
-            <td className={styles.employees}>
+            <td key={row[8]} className={styles.employees}>
                 <img className={styles.icon} src={URL + row[7]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
@@ -237,12 +236,11 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
-
-                case 2:
+                case 1:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
-                case 3:
+                case 2:
                     transformedRow[2] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[2])}</td>
-                case 4:
+                case 3:
                     transformedRow[3] = <td className={styles.alignLeft}>{formatCost(row[4], row[5])}</td>
             }
         }
