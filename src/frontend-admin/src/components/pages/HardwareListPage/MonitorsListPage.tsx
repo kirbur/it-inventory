@@ -183,7 +183,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                 case 2:
                     transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
                 case 3:
-                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
+                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]}k</td>
                 case 4:
                     transformedRow[4] = <td className={styles.alignLeft}>{row[4]}</td>
 
