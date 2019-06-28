@@ -10,7 +10,6 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -37,8 +36,8 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'FQDN', value: 'FQDN'})
 
-    const columns = ['FQDN', 'id', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag']
-    const headerList = ['FQDN', 'ID', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
+    const columns = ['FQDN', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag']
+    const headerList = ['FQDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
@@ -87,7 +86,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/server/${row[1].props.children}`) //TODO: fix this, need id
+        history.push(`hardware/server/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -105,7 +104,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
+        headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
     var initHeaderStates = cloneDeep(headerStates)
@@ -152,7 +151,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             let header = (
                 <td
                     onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                        setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                         sortStates(i)
                     }}
                 >
@@ -169,8 +168,8 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         return (
-            <td className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[6]} alt={icon} />
+            <td key={row[1]} className={styles.hardware}>
+                <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text>
                 </div>
@@ -186,8 +185,6 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
-                case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
                     transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
                 case 3:
@@ -215,8 +212,9 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                     setSelected={setSelected}
                 />
             </Group>
-
-            <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            <div className={styles.table}>
+                <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            </div>
         </div>
     )
 }

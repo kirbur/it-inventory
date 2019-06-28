@@ -40,7 +40,7 @@ export const Login: React.FunctionComponent<ILoginProps> = props => {
                 //succesful login, so set context to response data and route to dash
                 currentLoginContext.setLoginContextVariables(response.data[0])
                 localStorage.setItem('user', JSON.stringify(response.data[0]))
-                console.log(response.data)
+                //console.log(response.data)
                 return <Redirect to='/dashboard' />
             })
             .catch(error => {

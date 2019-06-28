@@ -10,7 +10,6 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -35,10 +34,10 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'Name', value: 'name'})
+    const [selected, setSelected] = useState({label: 'Make & Model', value: 'name'})
 
-    const columns = ['name', 'id', 'purchaseDate', 'assigned']
-    const headerList = ['Name', 'ID', 'Purchase Date', 'Assigned To']
+    const columns = ['name', 'purchaseDate', 'assigned']
+    const headerList = ['Make & Model', 'Purchase Date', 'Assigned To']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
     useEffect(() => {
@@ -48,7 +47,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                 const peripherals: any[] = []
                 data.map((i: any) =>
                     peripherals.push({
-                        name: format(i.peripheralName),
+                        name: format(i.peripheralName + ' ' + i.peripheralType),
                         id: format(i.peripheralId),
                         purchaseDate: format(i.purchaseDate),
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
@@ -85,7 +84,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/peripheral/${row[1].props.children}`)
+        history.push(`hardware/peripheral/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -104,7 +103,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
+        headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
     //var initHeaderStates = cloneDeep(headerStates)
@@ -151,7 +150,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
             let header = (
                 <td
                     onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                        setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                         sortStates(i)
                     }}
                 >
@@ -168,8 +167,8 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
 
     function concatenatedName(row: any[]) {
         return (
-            <td className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[4]} alt={icon} />
+            <td key={row[1]} className={styles.hardware}>
+                <img className={styles.icon} src={URL + row[4]} alt={''} />
                 <div className={styles.alignLeft}>
                     <div className={styles.hardwareName}>{row[0]}</div>
                 </div>
@@ -187,8 +186,6 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                 case 0:
                     transformedRow[0] = concatenatedName(row)
                 case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
-                case 1:
                     transformedRow[2] = <td className={styles.alignLeft}>{formatDate(row[2])}</td>
                 case 2:
                     transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
@@ -200,7 +197,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
 
     return (
         <div className={styles.listMain}>
-            <Group direction='row' justify='between'>
+            <Group direction='row' justify='between' className={styles.group}>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
@@ -211,8 +208,9 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                     setSelected={setSelected}
                 />
             </Group>
-
-            <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            <div className={styles.table}>
+                <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            </div>
         </div>
     )
 }
