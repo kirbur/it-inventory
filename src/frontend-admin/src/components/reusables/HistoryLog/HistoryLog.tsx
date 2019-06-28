@@ -22,17 +22,47 @@ export const HistoryLog = (props: IHistoryLogProps) => {
 
     for (let i = 0; i < historyLog.length; i++) {
         if (historyLog[i].event === 'Assigned') {
-            rows.push(historyLog[i].date + ' | Assigned to ' + historyLog[i].user)
+            rows.push(
+                <div className={styles.rowData}>
+                    <div className={styles.date}>{historyLog[i].date + ' | '} </div>
+                    <div className={styles.description}>{' Assigned to ' + historyLog[i].user}</div>
+                </div>
+            )
         } else if (historyLog[i].event === 'Unassigned') {
-            rows.push(historyLog[i].date + ' | Unassigned from ' + historyLog[i].user)
+            rows.push(
+                <div className={styles.rowData}>
+                    <div className={styles.date}>{historyLog[i].date + ' | '} </div>
+                    <div className={styles.description}>{'Unassigned from ' + historyLog[i].user}</div>
+                </div>
+            )
         } else if (historyLog[i].event === 'Bought') {
-            rows.push(historyLog[i].date + ' | Purchased and left unassigned')
+            rows.push(
+                <div className={styles.rowData}>
+                    <div className={styles.date}>{historyLog[i].date + ' | '} </div>
+                    <div className={styles.description}>{'Purchased'}</div>
+                </div>
+            )
         } else if (historyLog[i].event === 'Obsolete') {
-            rows.push(historyLog[i].date + ' | Rendered obsolete')
+            rows.push(
+                <div className={styles.rowData}>
+                    <div className={styles.date}>{historyLog[i].date + ' | '} </div>
+                    <div className={styles.description}>{'Rendered obsolete'}</div>
+                </div>
+            )
         } else if (historyLog[i].event === 'Broken') {
-            rows.push(historyLog[i].date + ' | Broken under the care of ' + historyLog[i].user)
+            rows.push(
+                <div className={styles.rowData}>
+                    <div className={styles.date}>{historyLog[i].date + ' | '} </div>
+                    <div className={styles.description}>{'Broken under the care of ' + historyLog[i].user}</div>
+                </div>
+            )
         } else if (historyLog[i].event === 'Repaired') {
-            rows.push(historyLog[i].date + ' | ' + historyLog[i].event)
+            rows.push(
+                <div className={styles.rowData}>
+                    <div className={styles.date}>{historyLog[i].date + ' | '} </div>
+                    <div className={styles.description}>{'Repaired'}</div>
+                </div>
+            )
         }
     }
 
@@ -46,7 +76,7 @@ export const HistoryLog = (props: IHistoryLogProps) => {
 
             <tbody>
                 {rows.map(row => (
-                    <tr className={styles.rowData}>{row}</tr>
+                    <tr>{row}</tr>
                 ))}
             </tbody>
         </table>

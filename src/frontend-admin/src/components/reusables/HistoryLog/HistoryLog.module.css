@@ -22,11 +22,24 @@
     color: #a5a5a5;
     border-bottom: 1px solid #979797;
 }
-.rowData {
+.description {
+    text-align: left;
+    color: #a5a5a5;
+    height: 35px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    padding-left: 4px;
+}
+.date {
     text-align: left;
     color: #4a4a4a;
     height: 35px;
     font-size: 20px;
     display: flex;
     align-items: center;
+}
+.rowData {
+    display: flex;
+    flex-direction: row;
 }
