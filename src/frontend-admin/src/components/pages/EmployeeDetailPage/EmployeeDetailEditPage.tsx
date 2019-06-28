@@ -152,10 +152,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
-    useEffect(() => {
-        var d = deptList.filter((i: any) => (i.departmentName = userData.department))
-        d[0] && setDeptInput({name: userData.department, id: d[0].departmentID})
-    }, [deptList, userData])
+    // useEffect(() => {
+    //     var d = deptList.filter((i: any) => (i.departmentName = userData.department))
+    //     d[0] && setDeptInput({name: userData.department, id: d[0].departmentID})
+    // }, [deptList, userData])
 
     const handleAddHardware = (id: number) => {
         //TODO: post request to assign hardware to user w/ id match.params.id
@@ -276,7 +276,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     type='radio'
                                     name='employeeDept'
                                     className={styles.checkmark}
-                                    checked={dept === deptInput /*userData.department*/}
+                                    checked={dept === userData.department}
                                     onChange={() => setDeptInput(dept)}
                                 />
                                 <div className={styles.checkmark} />
@@ -293,7 +293,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     type='radio'
                                     name='employeeDept'
                                     className={styles.checkmark}
-                                    checked={dept === deptInput /*userData.department*/}
+                                    checked={dept === userData.department}
                                     onChange={() => setDeptInput(dept)}
                                 />
                                 <div className={styles.checkmark} />
