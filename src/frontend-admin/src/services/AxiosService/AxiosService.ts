@@ -49,10 +49,9 @@ export class AxiosService {
             )
             .then(response => {
                 this.checkTokenExpired(url)
-                //console.log(response)
                 return response.data
             })
-            .catch(err => console.log(err))
+            .catch(err => console.error(err))
     }
 
     //wrapper method for post requests return the promise
@@ -64,7 +63,7 @@ export class AxiosService {
                 }*/
             })
             .then(response => this.checkTokenExpired(url, data))
-            .catch(err => console.log(err))
+            .catch(err => console.error(err))
     }
 
     //check if token needs refreshing

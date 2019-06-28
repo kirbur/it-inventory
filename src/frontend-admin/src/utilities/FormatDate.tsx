@@ -1,7 +1,7 @@
 export const formatDate = (date: string) => {
     const obj = new Date(date)
     const formatted = obj.getFullYear() + '/' + (obj.getMonth() + 1) + '/' + obj.getDate()
-    return formatted
+    return date ? formatted : '-'
 }
 
 export const getDays = (hireDate: string) => {
