@@ -4,8 +4,11 @@ import React, {useState, useEffect, useContext} from 'react'
 import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailEditTable} from '../../reusables/DetailEditTable/DetailEditTable'
 import {IoIosPersonAdd, IoMdAdd} from 'react-icons/io'
-import {FaUserShield, FaUser} from 'react-icons/fa'
+import {FaUserShield, FaUser, FaUserGraduate} from 'react-icons/fa'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
+import DatePicker from 'react-datepicker'
+
+import 'react-datepicker/dist/react-datepicker.css'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -59,6 +62,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const hardwareHeaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
     const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
     const licenseHeaders = ['Licenses', 'CALs']
+
+    //input feild states:
+    const [dateInput, setDateInput] = useState<Date>()
+    const [deptInput, setDeptInput] = useState<{name: string; id: number}>()
+    //TODO: add states for the rest of the inputs
 
     //TODO: remove default options
     const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([
@@ -144,6 +152,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
+    useEffect(() => {
+        var d = deptList.filter((i: any) => (i.departmentName = userData.department))
+        d[0] && setDeptInput({name: userData.department, id: d[0].departmentID})
+    }, [deptList, userData])
+
     const handleAddHardware = (id: number) => {
         //TODO: post request to assign hardware to user w/ id match.params.id
     }
@@ -159,6 +172,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const handleSubmit = () => {
         //TODO: post request
     }
+
+    console.log(deptInput)
 
     return (
         <div className={styles.columns}>
@@ -239,7 +254,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     </div>
                     <div>
                         <div className={styles.text}>Date Hired</div>
-                        <input type='text' className={styles.input} placeholder={userData.hireDate} />
+                        {/* <input type='text' className={styles.input} placeholder={userData.hireDate} /> */}
+                        <DatePicker
+                            dateFormat='yyyy/MM/dd'
+                            selected={new Date()}
+                            onChange={e => e && setDateInput(e)}
+                            className={styles.input}
+                        />
                     </div>
                 </div>
 
@@ -255,7 +276,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     type='radio'
                                     name='employeeDept'
                                     className={styles.checkmark}
-                                    checked={dept === userData.department}
+                                    checked={dept === deptInput /*userData.department*/}
+                                    onChange={() => setDeptInput(dept)}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmark} />
@@ -271,7 +293,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     type='radio'
                                     name='employeeDept'
                                     className={styles.checkmark}
-                                    checked={dept === userData.department}
+                                    checked={dept === deptInput /*userData.department*/}
+                                    onChange={() => setDeptInput(dept)}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmark} />
