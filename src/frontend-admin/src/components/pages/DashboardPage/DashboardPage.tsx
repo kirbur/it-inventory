@@ -92,8 +92,8 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
         [
             {
                 //TODO: in order for dropdown to have default this needs to be hardcoded with a dept that always exists
-                id: 8,
-                name: 'IT',
+                id: -1,
+                name: 'Select A Department',
                 tableData: [],
             },
         ]
