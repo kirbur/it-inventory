@@ -50,21 +50,9 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const licenseHeaders = ['Licenses', 'CALs']
 
     //TODO: remove default options
-    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-    const [licenseDropdown, setLicenseDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
+    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>()
+    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>()
+    const [licenseDropdown, setLicenseDropdown] = useState<any[]>()
 
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
@@ -72,6 +60,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         axios
             .get(`/detail/employee/${match.params.id}`)
             .then((data: any) => {
+                console.log(data)
                 let user: any = {
                     photo: data[0].picture,
                     name: data[0].firstName + ' ' + data[0].lastName,
@@ -123,10 +112,35 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     ])
                 )
                 setLicenseRows(l)
+
+                let uhw: any[] = []
+                data[0].unassignedHardware.map((i: any) =>
+                    uhw.push({
+                        name: i.monitorName || i.compName || i.periphName,
+                        id: i.type + '/' + i.monitorId || i.type + '/' + i.computerId || i.type + '/' + i.peripheralId,
+                    })
+                )
+                setHardwareDropdown(uhw)
+
+                let usw: any[] = []
+                data[0].unassignedSoftware.map((i: any) =>
+                    usw.push({
+                        name: i.programName,
+                        id: i.programId,
+                    })
+                )
+                setSoftwareDropdown(usw)
+
+                let ul: any[] = []
+                data[0].unassignedLicenses.map((i: any) =>
+                    ul.push({
+                        name: i.programName,
+                        id: i.programId,
+                    })
+                )
+                setLicenseDropdown(ul)
             })
             .catch((err: any) => console.error(err))
-
-        //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
     const handleArchive = () => {
@@ -201,8 +215,13 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         </div>
                     </div>
                     <DetailPageTable headers={hardwareHeaders} rows={hardwareRows} setRows={setHardwareRows} />
-                    {isAdmin && (
-                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    {isAdmin && hardwareDropdown && (
+                        <Button
+                            className={s(styles.addContainer, styles.dropdown3)}
+                            icon='add'
+                            onClick={() => {}}
+                            textInside={false}
+                        >
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
                                     triggerElement={({isOpen, toggle}) => (
@@ -213,7 +232,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                                         </button>
                                     )}
                                     choicesList={() => (
-                                        <ul className={dropdownStyles.dropdownList}>
+                                        <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
                                             {hardwareDropdown.map(i => (
                                                 <li
                                                     className={dropdownStyles.dropdownListItem}
@@ -234,8 +253,13 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     )}
 
                     <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
-                    {isAdmin && (
-                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    {isAdmin && softwareDropdown && (
+                        <Button
+                            className={s(styles.addContainer, styles.dropdown2)}
+                            icon='add'
+                            onClick={() => {}}
+                            textInside={false}
+                        >
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
                                     triggerElement={({isOpen, toggle}) => (
@@ -267,8 +291,13 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     )}
 
                     <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
-                    {isAdmin && (
-                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    {isAdmin && licenseDropdown && (
+                        <Button
+                            className={s(styles.addContainer, styles.dropdown1)}
+                            icon='add'
+                            onClick={() => {}}
+                            textInside={false}
+                        >
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
                                     triggerElement={({isOpen, toggle}) => (
