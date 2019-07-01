@@ -12,6 +12,7 @@ import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
 
 // Styles
 import styles from './DepartmentDetailPage.module.css'
+import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -37,6 +38,24 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const softwareHeaders = ['Software', '#', 'Cost']
     const licenseHeaders = ['License', 'CALs']
 
+    //TODO: remove default options
+    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([
+        {name: 'option 1', id: 1},
+        {name: 'option 2', id: 1},
+        {name: 'option 3', id: 2},
+    ])
+    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([
+        {name: 'option 1', id: 1},
+        {name: 'option 2', id: 1},
+        {name: 'option 3', id: 2},
+    ])
+    const [licenseDropdown, setLicenseDropdown] = useState<any[]>([
+        {name: 'option 1', id: 1},
+        {name: 'option 2', id: 1},
+        {name: 'option 3', id: 2},
+    ])
+
+    const [deptData, setDeptData] = useState<any>({})
     const [employeeRows, setEmployeeRows] = useState<any[]>([])
     const [softwareRows, setSoftwareRows] = useState<any[]>([])
     const [licenseRows, setLicenseRows] = useState<any[]>([])
@@ -44,6 +63,8 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const {
         loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
     } = useContext(LoginContext)
+    const isAdmin = true //TODO: remove
+
     const axios = new AxiosService(accessToken, refreshToken)
 
     useEffect(() => {
@@ -51,59 +72,69 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
             .get(`/detail/department/${match.params.id}`)
             .then((data: any) => {
                 console.log(data)
-                // let user: any = {
-                //     photo: data[0].picture,
-                //     name: data[0].firstName + ' ' + data[0].lastName,
-                //     department: data[0].department,
-                //     role: data[0].role,
-                //     hireDate: formatDate(data[0].hireDate),
-                //     hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
-                //     swCost: Math.round(data[0].totalProgramCostPerMonth * 100) / 100,
-                // }
-                // setUserData(user)
+                let dept: any = {
+                    // photo: data[0].picture,'
+                    employeeCount: data[0].countEmpsInDep,
+                    departmentName: data[0].departmentName,
+                    hardwareCost: data[0].totalCostOfActHardwareInDep,
+                    softwareCost: data[0].totalCostOfProgramsInDep,
+                }
+                setDeptData(dept)
 
                 let e: any[] = []
-                // data[0].employees.map((i: any) =>
-                //     e.push([
-                //         format(i.name),
-                //         format(i.hireDate),
-
-                //     ])
-                // )
+                data[0].listOfEmployees.map((i: any) =>
+                    e.push([format(i.id), format(i.employeeName), formatDate(i.hireDate), format(i.programCostForEmp)])
+                )
+                console.log(e)
                 setEmployeeRows(e)
 
                 // var toolTipArray = []
                 // data[0].hardware.map((i: any) => toolTipArray.push(i.tooltip.cpu ? formatToolTip(i.tooltip) : ''))
 
                 let sw: any[] = []
-                // data[0].software.map((i: any) =>
-                // sw.push([
-                //     format(i.id),
-                //     format(i.name),
-                //     format(i.licenseKey),
-                //     format(Math.round(i.costPerMonth * 100) / 100),
-                //     format(i.flatCost),
-                // ])
-                // )
+                data[0].listOfTablePrograms.map((
+                    i: any //not programs - actually software
+                ) =>
+                    sw.push([
+                        format(i.id),
+                        format(i.programName),
+                        format(i.programCount),
+                        format(Math.round(i.programCostPerYear * 100) / 100),
+                    ])
+                )
+                console.log(sw)
                 setSoftwareRows(sw)
 
                 let l: any[] = []
-                // data[0].licenses.map((i: any) =>
-                // l.push([
-                //     format(i.id),
-                //     format(i.name),
-                //     format(i.cals),
-                //     format(i.licenseKey),
-                //     format(Math.round(i.costPerMonth * 100) / 100),
-                //     format(i.flatCost),
-                // ])
-                // )
+                data[0].licensesList.map((i: any) =>
+                    l.push([format(i.id), format(i.progName), format(i.countOfThatLicense)])
+                )
+                console.log(l)
                 setLicenseRows(l)
             })
             .catch((err: any) => console.error(err))
 
         //TODO: get dropdown content for all 3 dropdowns
     }, [])
+
+    const handleArchive = () => {
+        if (window.confirm(`Are you sure you want to archive ${deptData.departmentName}?`)) {
+            //TODO: a post request to archive user w/ id match.params.id
+            history.push('/employees')
+        }
+    }
+
+    const handleAddHardware = (id: number) => {
+        //TODO: post request to assign hardware to user w/ id match.params.id
+    }
+
+    const handleAddSoftware = (id: number) => {
+        //TODO: post request to assign software to user w/ id match.params.id
+    }
+
+    const handleAddLicense = (id: number) => {
+        //TODO: post request to assign license to user w/ id match.params.id
+    }
 
     return (
         <div className={styles.detailMain}>
@@ -123,19 +154,20 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         {/* <img className={styles.img} src={URL + userData.photo} alt={''} /> */}
                     </div>
                     <div className={styles.costText}>
-                        {/* <p>Software ---------------- ${userData.swCost} /month</p> */}
-                        {/* <p>Hardware --------------- ${userData.hwCost}</p> */}
+                        <p>Software ---------------- ${deptData.softwareCost} /month</p>
+                        <p>Hardware --------------- ${deptData.hardwareCost}</p>
                     </div>
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
-                    {/* {isAdmin && (
+                    {isAdmin && (
                         <Group direction='row' justify='start' className={styles.group}>
                             <Button
                                 text='Edit'
                                 icon='edit'
                                 onClick={() => {
-                                    history.push('/editEmployee/' + match.params.id)
+                                    history.push('/editDepartment/' + match.params.id)
+                                    //TODO: wire to edit page in IIWA-155
                                 }}
                                 className={styles.editbutton}
                             />
@@ -147,10 +179,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                 className={styles.archivebutton}
                             />
                         </Group>
-                    )} */}
+                    )}
                     <div className={styles.titleText}>
-                        <div className={styles.deptName}>Department Name</div>
-                        <div className={styles.deptText}># Employees</div>
+                        <div className={styles.deptName}>{deptData.departmentName}</div>
+                        <div className={styles.deptText}>{deptData.employeeCount} employees</div>
                     </div>
                     <DetailPageTable headers={employeeHeaders} rows={employeeRows} setRows={setEmployeeRows} />
                     {/* {isAdmin && (
@@ -186,7 +218,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                     )} */}
 
                     <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
-                    {/* {isAdmin && (
+                    {isAdmin && (
                         <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
@@ -216,10 +248,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                 <div />
                             </div>
                         </Button>
-                    )} */}
+                    )}
 
                     <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
-                    {/* {isAdmin && (
+                    {isAdmin && (
                         <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
@@ -249,7 +281,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                 <div />
                             </div>
                         </Button>
-                    )} */}
+                    )}
                 </div>
             </div>
         </div>
