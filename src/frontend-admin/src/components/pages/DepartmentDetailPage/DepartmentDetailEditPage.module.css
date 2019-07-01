@@ -101,7 +101,7 @@
 .addDefaultContainer {
     padding-top: 25px;
     position: relative;
-    right: 160px;
+    right: 8px;
 }
 .addIconBorder:hover {
     background-color: #009eff;

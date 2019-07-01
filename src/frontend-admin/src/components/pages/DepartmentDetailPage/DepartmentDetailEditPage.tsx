@@ -61,7 +61,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
 
     const hardwareHeaders = ['Hardware']
     const softwareHeaders = ['Software']
-    const licenseHeaders = ['Licenses', 'CALs']
+    const licenseHeaders = ['Licenses']
 
     //input feild states:
     const [dateInput, setDateInput] = useState<Date>()

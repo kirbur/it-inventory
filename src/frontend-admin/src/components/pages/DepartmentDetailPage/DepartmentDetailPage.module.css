@@ -182,8 +182,8 @@
 }
 .addDefaultContainer {
     padding-top: 25px;
-    /* position: relative;
-    right: 160px; */
+    position: relative;
+    right: 8px;
 }
 .addContainer {
     margin: 5px 0 55px;
