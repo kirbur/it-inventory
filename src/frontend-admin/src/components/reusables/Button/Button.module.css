@@ -74,15 +74,12 @@
 .backButton {
     display: flex;
     align-items: center;
-    width: 150px;
-
     cursor: pointer;
 }
 
 .backButtonText {
     color: #979797;
     height: 27px;
-    width: 124px;
     color: #4a4a4a;
     font-size: 22px;
     font-weight: 500;
