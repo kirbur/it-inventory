@@ -14,10 +14,11 @@ import {ProgramDetailPage} from '../pages/ProgramDetailPage/ProgramDetailPage'
 import {Login} from '../reusables/Login/Login'
 import {HelloUser} from '../HelloUser/HelloUser'
 import logo from '../../content/Images/CQL-Logo-Color.png'
+import {EmployeeDetailEditPage} from '../pages/EmployeeDetailPage/EmployeeDetailEditPage'
+import {DepartmentDetailEditPage} from '../pages/DepartmentDetailPage/DepartmentDetailEditPage'
 
 // Styles
 import styles from './App.module.css'
-import {EmployeeDetailEditPage} from '../pages/EmployeeDetailPage/EmployeeDetailEditPage'
 
 //types
 export interface ILoginContext {
@@ -134,6 +135,11 @@ export const App: React.FC = () => {
                             exact
                             path={'/editEmployee/:id'}
                             render={props => <EmployeeDetailEditPage {...props} />}
+                        />
+                        <Route
+                            exact
+                            path={'/editDepartments/:id'}
+                            render={props => <DepartmentDetailEditPage {...props} />}
                         />
                     </Switch>
                 </Router>

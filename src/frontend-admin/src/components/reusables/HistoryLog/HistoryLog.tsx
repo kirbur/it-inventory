@@ -2,7 +2,7 @@ import React from 'react'
 
 import styles from './HistoryLog.module.css'
 
-type eventType = 'Assigned' | 'Unassigned' | 'Bought' | 'Broke' | 'Repaired' | 'Obsolete'
+type eventType = 'Assigned' | 'Unassigned' | 'Bought' | 'Broken' | 'Repaired' | 'Obsolete'
 
 interface IHistoryLogArray {
     date: string

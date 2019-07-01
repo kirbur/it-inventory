@@ -23,13 +23,13 @@ import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 
 // Types
-interface IEmployeeDetailEditPageProps {
+interface IDepartmentDetailEditPageProps {
     match: any
     history: any
 }
 
 // Primary Component
-export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = props => {
+export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps> = props => {
     const {history, match} = props
 
     // useEffect(() => {
