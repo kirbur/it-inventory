@@ -17,7 +17,6 @@ interface ITableProps {
     setRows: any
     onRowClick?: (datum: any) => void
     style?: string
-    toolTipRows?: any[]
 }
 
 export const DetailPageTable = (props: ITableProps) => {
@@ -85,25 +84,30 @@ export const DetailPageTable = (props: ITableProps) => {
         //nothing for now
     }
     const toolTip = (row: any[], index: number) => {
-        return (
-            <td className={styles.rowData}>
-                <a data-tip={row[row.length - 1]} className={row[row.length - 1] === '' ? '' : styles.rowTitle}>
-                    {row[index]}
-                </a>
-                <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
-            </td>
-        )
+        if (row[row.length - 1] === '' || row.length === 2) {
+            return <td className={styles.rowData}>{row[index]}</td>
+        } else {
+            return (
+                <td className={styles.rowData}>
+                    {/* {row[row.length - 1] === '' ? row[index] : styles.rowTitle} */}
+                    <a data-tip={row[row.length - 1]} className={styles.rowTitle}>
+                        {row[index]}
+                    </a>
+                    <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
+                </td>
+            )
+        }
     }
 
     var renderedRows: any[] = []
     rows.forEach(row => {
         const transformedRow: any[] = []
         for (let i = 1; i < headers.length + 1; i++) {
-            if (headers[i - 1] == 'Cost') {
+            if (headers[i - 1] === 'Cost') {
                 transformedRow[i] = <td className={styles.rowData}>${row[i]}</td>
-            } else if (headers[i - 1] == 'Hardware') {
+            } else if (headers[i - 1] === 'Hardware') {
                 transformedRow[i] = toolTip(row, i)
-            } else if (headers[i - 1] == 'Monthly Cost') {
+            } else if (headers[i - 1] === 'Monthly Cost') {
                 transformedRow[i] = <td className={styles.rowData}>${row[i]} /month</td>
             } else {
                 transformedRow[i] = <td className={styles.rowData}>{row[i]}</td>
