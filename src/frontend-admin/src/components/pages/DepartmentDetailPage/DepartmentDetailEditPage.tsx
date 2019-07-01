@@ -170,21 +170,8 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                 <div className={s(styles.title, styles.paddingBottom)}>Department Information</div>
 
                 <div className={styles.row}>
-                    <div className={styles.paddingRight}>
-                        <div className={styles.paddingBottom}>
-                            <div className={styles.text}>Department Name</div>
-                            <input type='text' className={styles.input} placeholder={deptData.departmentName} />
-                        </div>
-                    </div>
-                    <div>
-                        <div className={styles.text}>Date</div>
-                        <DatePicker
-                            dateFormat='yyyy/MM/dd'
-                            selected={new Date()}
-                            onChange={e => e && setDateInput(e)}
-                            className={styles.input}
-                        />
-                    </div>
+                    <div className={styles.text}>Department Name</div>
+                    <input type='text' className={styles.input} placeholder={deptData.departmentName} />
                 </div>
 
                 {/* Tables */}
