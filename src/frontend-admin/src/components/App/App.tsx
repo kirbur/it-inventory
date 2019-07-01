@@ -138,7 +138,7 @@ export const App: React.FC = () => {
                         />
                         <Route
                             exact
-                            path={'/editDepartments/:id'}
+                            path={'/editDepartment/:id'}
                             render={props => <DepartmentDetailEditPage {...props} />}
                         />
                     </Switch>
