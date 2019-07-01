@@ -102,21 +102,21 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                 setDeptData(dept)
 
                 let hw: any[] = []
-                data[0].jsonHardware.DefaultHardware.map((i: any) => hw.push([format(i.id), i]))
+                data[0].defaultHardware.map((i: any) => hw.push([format(i.id), i]))
                 console.log(hw)
                 setHardwareRows(hw)
 
                 let sw: any[] = []
-                data[0].jsonPrograms.DefaultPrograms.map((i: any) => sw.push([format(i.id), i]))
+                data[0].defaultSoftware.map((i: any) => sw.push([format(i.id), i]))
                 console.log(sw)
                 setSoftwareRows(sw)
 
-                // let l: any[] = []
-                // data[0].licensesList.map((i: any) =>
-                //     l.push([format(i.id), format(i.progName), format(i.countOfThatLicense)])
-                // )
-                // console.log(l)
-                // setLicenseRows(l)
+                let l: any[] = []
+                data[0].defaultLicenses.map((i: any) =>
+                    l.push([format(i.id), format(i.progName), format(i.countOfThatLicense)])
+                )
+                console.log(l)
+                setLicenseRows(l)
             })
             .catch((err: any) => console.error(err))
 

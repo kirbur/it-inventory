@@ -117,12 +117,16 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 setLicenseRows(l)
 
                 let dhw: any[] = []
-                data[0].jsonHardware.DefaultHardware.map((i: any) => dhw.push([format(i.id), i]))
+                data[0].defaultHardware.map((i: any) => dhw.push([format(i.id), i]))
                 setDefaultHardware(dhw)
 
                 let dsw: any[] = []
-                data[0].jsonHardware.DefaultPrograms.map((i: any) => dsw.push([format(i.id), i]))
+                data[0].defaultSoftware.map((i: any) => dsw.push([format(i.id), i]))
                 setDefaultHardware(dsw)
+
+                let dl: any[] = []
+                data[0].defaultLicenses.map((i: any) => dl.push([format(i.id), i]))
+                setDefaultHardware(dl)
             })
             .catch((err: any) => console.error(err))
 
