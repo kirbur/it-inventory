@@ -2,22 +2,17 @@ import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import Axios from 'axios'
 // Components
-import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
-import ReactTooltip from 'react-tooltip'
-import {IoMdAdd} from 'react-icons/io'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
-import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 
 // Utils
-import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
+import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './ProgramOverviewPage.module.css'
-import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -40,33 +35,12 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
-    const [userData, setUserData] = useState<any>({})
-    const [hardwareRows, setHardwareRows] = useState<any[]>([])
-    const [softwareRows, setSoftwareRows] = useState<any[]>([])
-    const [licenseRows, setLicenseRows] = useState<any[]>([])
+    const [programData, setProgramData] = useState<any>({})
+    const [programRows, setProgramRows] = useState<any[]>([])
+    const [pluginRows, setPluginRows] = useState<any[]>([])
 
-    const hardwareHeaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
-    const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
-    const licenseHeaders = ['Licenses', 'CALs']
-
-    //TODO: remove default options
-    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-    const [licenseDropdown, setLicenseDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-
-    const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
+    const programHeaders = [`${match.params.id}`, 'Employee', 'License Key', 'Renewal Date']
+    const pluginHeaders = ['Plugins', 'Renewal Date', 'Cost']
 
     useEffect(() => {
         fetch('https://localhost:44358/api/detail/ProgramOverview/123.Net')
@@ -91,8 +65,6 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 console.log(data)
             })
             .catch((err: any) => console.error(err))
-
-        //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
     const handleArchive = () => {
@@ -100,18 +72,6 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             //TODO: a post request to archive user w/ id match.params.id
             history.push('/programs')
         }
-    }
-
-    const handleAddHardware = (id: number) => {
-        //TODO: post request to assign hardware to user w/ id match.params.id
-    }
-
-    const handleAddSoftware = (id: number) => {
-        //TODO: post request to assign software to user w/ id match.params.id
-    }
-
-    const handleAddLicense = (id: number) => {
-        //TODO: post request to assign license to user w/ id match.params.id
     }
 
     return (
@@ -129,11 +89,11 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         textClassName={styles.backButtonText}
                     />
                     <div className={styles.imgPadding}>
-                        <img className={styles.img} src={URL + userData.photo} alt={''} />
+                        <img className={styles.img} src={URL + programData.photo} alt={''} />
                     </div>
                     <div className={styles.costText}>
-                        <p>Yearly ---------------- ${userData.swCost}</p>
-                        <p>Monthly --------------- ${userData.hwCost}</p>
+                        <p>Yearly ---------------- ${programData.yearly}</p>
+                        <p>Monthly --------------- ${programData.monthly}</p>
                     </div>
                 </div>
                 {/* column 2 */}
@@ -158,112 +118,13 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.employeeName}>{userData.name}</div>
-                        <div className={styles.employeeText}>
-                            {userData.department} | {userData.role}
-                        </div>
-                        <div className={styles.employeeText}>
-                            Hired: {userData.hireDate} | {calculateDaysEmployed(getDays(userData.hireDate))}
+                        <div className={styles.programName}>{match.params.id}</div>
+                        <div className={styles.programText}>
+                            {programData.numUsed} / {programData.numOwned} Used
                         </div>
                     </div>
-                    <DetailPageTable headers={hardwareHeaders} rows={hardwareRows} setRows={setHardwareRows} />
-                    {isAdmin && (
-                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
-                            <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                                <DropdownList
-                                    triggerElement={({isOpen, toggle}) => (
-                                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                                Assign new hardware
-                                            </div>
-                                        </button>
-                                    )}
-                                    choicesList={() => (
-                                        <ul className={dropdownStyles.dropdownList}>
-                                            {hardwareDropdown.map(i => (
-                                                <li
-                                                    className={dropdownStyles.dropdownListItem}
-                                                    key={i.name}
-                                                    onClick={() => handleAddHardware(i.id)}
-                                                >
-                                                    <button className={dropdownStyles.dropdownListItemButton}>
-                                                        <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                />
-                                <div />
-                            </div>
-                        </Button>
-                    )}
-
-                    <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
-                    {isAdmin && (
-                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
-                            <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                                <DropdownList
-                                    triggerElement={({isOpen, toggle}) => (
-                                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                                Assign new software
-                                            </div>
-                                        </button>
-                                    )}
-                                    choicesList={() => (
-                                        <ul className={dropdownStyles.dropdownList}>
-                                            {softwareDropdown.map(i => (
-                                                <li
-                                                    className={dropdownStyles.dropdownListItem}
-                                                    key={i.name}
-                                                    onClick={() => handleAddSoftware(i.id)}
-                                                >
-                                                    <button className={dropdownStyles.dropdownListItemButton}>
-                                                        <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                />
-                                <div />
-                            </div>
-                        </Button>
-                    )}
-
-                    <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
-                    {isAdmin && (
-                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
-                            <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                                <DropdownList
-                                    triggerElement={({isOpen, toggle}) => (
-                                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                                Assign new license
-                                            </div>
-                                        </button>
-                                    )}
-                                    choicesList={() => (
-                                        <ul className={dropdownStyles.dropdownList}>
-                                            {licenseDropdown.map(i => (
-                                                <li
-                                                    className={dropdownStyles.dropdownListItem}
-                                                    key={i.name}
-                                                    onClick={() => handleAddLicense(i.id)}
-                                                >
-                                                    <button className={dropdownStyles.dropdownListItemButton}>
-                                                        <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                />
-                                <div />
-                            </div>
-                        </Button>
-                    )}
+                    <DetailPageTable headers={programHeaders} rows={programRows} setRows={setProgramRows} />
+                    <DetailPageTable headers={pluginHeaders} rows={pluginRows} setRows={setPluginRows} />
                 </div>
             </div>
         </div>
