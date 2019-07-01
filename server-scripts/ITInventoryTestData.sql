@@ -14,18 +14,18 @@ DELETE FROM [Program];
 DELETE FROM [Employee];
 DELETE FROM [Department];
 
-SET IDENTITY_INSERT [dbo].[Department] ON 
+SET IDENTITY_INSERT [Department] ON 
 
-INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (8, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'IT', 0)
-INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (13, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Developer', 0)
-INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (14, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Design', 0)
-INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (15, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Project Manager', 0)
-INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (16, N'CQL', N'CQL', N'Utilities', 0)
-INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (17, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Sales', 0)
-INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (20, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'DevOps', 0)
-INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (22, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Depreciated Department', 1)
-INSERT [dbo].[Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (23, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"DefaultPrograms":["Office", "Jira", "Confluence", "Sketch"]}', N'Admin', 0)
-SET IDENTITY_INSERT [dbo].[Department] OFF
+INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (8, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"license":["Sketch","Bitbucket User", "Jira Software"],"software":["Confluence User","Parallels (Business Edition)"]}', N'IT', 0)
+INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (13, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"license":["Sketch","Bitbucket User", "Jira Software"],"software":["Confluence User","Parallels (Business Edition)"]}', N'Developer', 0)
+INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (14, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"license":["Sketch","Bitbucket User", "Jira Software"],"software":["Confluence User","Parallels (Business Edition)"]}', N'Design', 0)
+INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (15, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"license":["Sketch","Bitbucket User", "Jira Software"],"software":["Confluence User","Parallels (Business Edition)"]}', N'Project Manager', 0)
+INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (16, N'CQL', N'CQL', N'Utilities', 0)
+INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (17, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"license":["Sketch","Bitbucket User", "Jira Software"],"software":["Confluence User","Parallels (Business Edition)"]}', N'Sales', 0)
+INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (20, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"license":["Sketch","Bitbucket User", "Jira Software"],"software":["Confluence User","Parallels (Business Edition)"]}', N'DevOps', 0)
+INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (22, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"license":["Sketch","Bitbucket User", "Jira Software"],"software":["Confluence User","Parallels (Business Edition)"]}', N'Depreciated Department', 1)
+INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [DepartmentName], [IsDeleted]) VALUES (23, N'{"DefaultHardware":["Mouse", "Keyboard", "Monitor"]}', N'{"license":["Sketch","Bitbucket User", "Jira Software"],"software":["Confluence User","Parallels (Business Edition)"]}', N'Admin', 0)
+SET IDENTITY_INSERT [Department] OFF
 
 SET IDENTITY_INSERT [Employee] ON 
 
@@ -71,12 +71,12 @@ INSERT [Computer] ([ComputerID], [CPU], [RAMGB], [SSDGB], [PurchaseDate], [Renew
 SET IDENTITY_INSERT [Computer] OFF
 SET IDENTITY_INSERT [HardwareHistory] ON 
 
-INSERT [HardwareHistory] ([HardwareHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [HardwareType], [HardwareID], [EventName], [EventDescription], [EventDate]) VALUES (1, 3, CAST(N'2012-02-02' AS Date), NULL, N'Computer', 1, N'Assigning laptop', N'Gave Steve Jobs a laptop', CAST(N'1904-12-06T00:00:00.000' AS DateTime))
-INSERT [HardwareHistory] ([HardwareHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [HardwareType], [HardwareID], [EventName], [EventDescription], [EventDate]) VALUES (2, 4, CAST(N'2019-05-05' AS Date), 3, N'Computer', 2, N'Trading laptop', N'Gave John Does, Steve Job''s notebook', CAST(N'1904-08-06T00:00:00.000' AS DateTime))
-INSERT [HardwareHistory] ([HardwareHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [HardwareType], [HardwareID], [EventName], [EventDescription], [EventDate]) VALUES (3, 3, CAST(N'2019-04-04' AS Date), NULL, N'Computer', 2, N'Assigning laptop', N'Gave Steve Jobs a notebook', CAST(N'1904-09-06T00:00:00.000' AS DateTime))
-INSERT [HardwareHistory] ([HardwareHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [HardwareType], [HardwareID], [EventName], [EventDescription], [EventDate]) VALUES (4, 4, CAST(N'2019-02-02' AS Date), NULL, N'Monitor', 2, N'Assigning Monitor', N'Gave John Does a Dell monitor', CAST(N'1904-12-06T00:00:00.000' AS DateTime))
-INSERT [HardwareHistory] ([HardwareHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [HardwareType], [HardwareID], [EventName], [EventDescription], [EventDate]) VALUES (5, 2, CAST(N'2018-02-02' AS Date), NULL, N'Monitor', 3, N'Assigning Monitor', N'Gave Mike Leo a Dell 2019 monitor', CAST(N'1904-12-04T00:00:00.000' AS DateTime))
-INSERT [HardwareHistory] ([HardwareHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [HardwareType], [HardwareID], [EventName], [EventDescription], [EventDate]) VALUES (6, 2, CAST(N'2017-02-02' AS Date), NULL, N'Peripheral', 3, N'Assigning Mouse ', N'Gave Mike Leo a Logitech Mouse', CAST(N'1904-12-06T00:00:00.000' AS DateTime))
+INSERT [HardwareHistory] ([HardwareHistoryID], [EmployeeId], [HardwareType], [HardwareID], [EventType], [EventDate]) VALUES (1, 3, N'Computer', 1, N'Gave Steve Jobs a laptop', CAST(N'1904-12-06T00:00:00.000' AS DateTime))
+INSERT [HardwareHistory] ([HardwareHistoryID], [EmployeeId], [HardwareType], [HardwareID], [EventType], [EventDate]) VALUES (2, 4, N'Computer', 2, N'Gave John Does, Steve Job''s notebook', CAST(N'1904-08-06T00:00:00.000' AS DateTime))
+INSERT [HardwareHistory] ([HardwareHistoryID], [EmployeeId], [HardwareType], [HardwareID], [EventType], [EventDate]) VALUES (3, 3, N'Computer', 2, N'Gave Steve Jobs a notebook', CAST(N'1904-09-06T00:00:00.000' AS DateTime))
+INSERT [HardwareHistory] ([HardwareHistoryID], [EmployeeId], [HardwareType], [HardwareID], [EventType], [EventDate]) VALUES (4, 4, N'Monitor', 2, N'Gave John Does a Dell monitor', CAST(N'1904-12-06T00:00:00.000' AS DateTime))
+INSERT [HardwareHistory] ([HardwareHistoryID], [EmployeeId], [HardwareType], [HardwareID], [EventType], [EventDate]) VALUES (5, 2, N'Monitor', 3, N'Gave Mike Leo a Dell 2019 monitor', CAST(N'1904-12-04T00:00:00.000' AS DateTime))
+INSERT [HardwareHistory] ([HardwareHistoryID], [EmployeeId], [HardwareType], [HardwareID], [EventType], [EventDate]) VALUES (6, 2, N'Peripheral', 3, N'Gave Mike Leo a Logitech Mouse', CAST(N'1904-12-06T00:00:00.000' AS DateTime))
 SET IDENTITY_INSERT [HardwareHistory] OFF
 SET IDENTITY_INSERT [Monitor] ON 
 
@@ -221,13 +221,13 @@ INSERT [Program] ([ProgramID], [ProgramName], [ProgramCostPerYear], [ProgramFlat
 SET IDENTITY_INSERT [Program] OFF
 SET IDENTITY_INSERT [ProgramHistory] ON 
 
-INSERT [ProgramHistory] ([ProgramHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [ProgramID], [EventName], [EventDescription], [EventDate]) VALUES (1, 18, CAST(N'2019-02-02' AS Date), NULL, 38, NULL, NULL, CAST(N'1904-12-06T00:00:00.000' AS DateTime))
-INSERT [ProgramHistory] ([ProgramHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [ProgramID], [EventName], [EventDescription], [EventDate]) VALUES (2, 29, CAST(N'2019-02-02' AS Date), NULL, 39, NULL, NULL, CAST(N'1904-06-06T00:00:00.000' AS DateTime))
-INSERT [ProgramHistory] ([ProgramHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [ProgramID], [EventName], [EventDescription], [EventDate]) VALUES (3, 31, CAST(N'2019-02-02' AS Date), NULL, 66, NULL, NULL, CAST(N'1904-12-10T00:00:00.000' AS DateTime))
-INSERT [ProgramHistory] ([ProgramHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [ProgramID], [EventName], [EventDescription], [EventDate]) VALUES (5, 32, CAST(N'2020-02-02' AS Date), NULL, 67, NULL, NULL, CAST(N'1904-12-06T01:00:00.000' AS DateTime))
-INSERT [ProgramHistory] ([ProgramHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [ProgramID], [EventName], [EventDescription], [EventDate]) VALUES (6, 33, CAST(N'2020-02-02' AS Date), NULL, 68, NULL, NULL, CAST(N'1904-12-06T02:00:00.000' AS DateTime))
-INSERT [ProgramHistory] ([ProgramHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [ProgramID], [EventName], [EventDescription], [EventDate]) VALUES (8, 11, CAST(N'2019-02-02' AS Date), NULL, 92, NULL, NULL, CAST(N'1904-12-06T03:00:00.000' AS DateTime))
-INSERT [ProgramHistory] ([ProgramHistoryID], [CurrentOwnerID], [CurrentOwnerStartDate], [PreviousOwnerID], [ProgramID], [EventName], [EventDescription], [EventDate]) VALUES (9, 33, CAST(N'2019-06-06' AS Date), 11, 68, NULL, NULL, CAST(N'2019-06-06T00:00:00.000' AS DateTime))
+INSERT [ProgramHistory] ([ProgramHistoryID], [EmployeeId], [ProgramID], [EventType], [EventDate]) VALUES (1, 18, 38, NULL, CAST(N'1904-12-06T00:00:00.000' AS DateTime))
+INSERT [ProgramHistory] ([ProgramHistoryID], [EmployeeId], [ProgramID], [EventType], [EventDate]) VALUES (2, 29, 39, NULL, CAST(N'1904-06-06T00:00:00.000' AS DateTime))
+INSERT [ProgramHistory] ([ProgramHistoryID], [EmployeeId], [ProgramID], [EventType], [EventDate]) VALUES (3, 31, 66, NULL, CAST(N'1904-12-10T00:00:00.000' AS DateTime))
+INSERT [ProgramHistory] ([ProgramHistoryID], [EmployeeId], [ProgramID], [EventType], [EventDate]) VALUES (5, 32, 67, NULL, CAST(N'1904-12-06T01:00:00.000' AS DateTime))
+INSERT [ProgramHistory] ([ProgramHistoryID], [EmployeeId], [ProgramID], [EventType], [EventDate]) VALUES (6, 33, 68, NULL, CAST(N'1904-12-06T02:00:00.000' AS DateTime))
+INSERT [ProgramHistory] ([ProgramHistoryID], [EmployeeId], [ProgramID], [EventType], [EventDate]) VALUES (8, 11, 92, NULL, CAST(N'1904-12-06T03:00:00.000' AS DateTime))
+INSERT [ProgramHistory] ([ProgramHistoryID], [EmployeeId], [ProgramID], [EventType], [EventDate]) VALUES (9, 33, 68, NULL, CAST(N'2019-06-06T00:00:00.000' AS DateTime))
 SET IDENTITY_INSERT [ProgramHistory] OFF
 SET IDENTITY_INSERT [Server] ON 
 

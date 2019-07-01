@@ -462,7 +462,7 @@ namespace backend_api.Controllers
             */
             // Sorts the program history with the most recent changes.
             var programHistory = _context.ProgramHistory.ToList();
-            var sortedProgramHistory = programHistory.OrderByDescending(ph => ph.CurrentOwnerStartDate);
+            var sortedProgramHistory = programHistory.OrderByDescending(ph => ph.EventDate);
 
             // Create a list of programs that have the programs with the most recent changes first.
             List<Models.Program> sortedSoftware = new List<Models.Program>();
