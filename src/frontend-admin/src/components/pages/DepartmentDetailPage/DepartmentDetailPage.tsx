@@ -34,6 +34,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const softwareHeaders = ['Software', '#', 'Cost']
     const licenseHeaders = ['License', 'CALs']
 
+    const [deptData, setDeptData] = useState<any>({})
     const [employeeRows, setEmployeeRows] = useState<any[]>([])
     const [softwareRows, setSoftwareRows] = useState<any[]>([])
     const [licenseRows, setLicenseRows] = useState<any[]>([])
@@ -48,16 +49,16 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
             .get(`/detail/department/${match.params.id}`)
             .then((data: any) => {
                 console.log(data)
-                // let user: any = {
-                //     photo: data[0].picture,
-                //     name: data[0].firstName + ' ' + data[0].lastName,
-                //     department: data[0].department,
-                //     role: data[0].role,
-                //     hireDate: formatDate(data[0].hireDate),
-                //     hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
-                //     swCost: Math.round(data[0].totalProgramCostPerMonth * 100) / 100,
-                // }
-                // setUserData(user)
+                let dept: any = {
+                    // photo: data[0].picture,
+                    // name: data[0].firstName + ' ' + data[0].lastName,
+                    departmentName: data[0].departmentName,
+                    //     role: data[0].role,
+                    //     hireDate: formatDate(data[0].hireDate),
+                    //     hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
+                    //     swCost: Math.round(data[0].totalProgramCostPerMonth * 100) / 100,
+                }
+                setDeptData(dept)
 
                 let e: any[] = []
                 // data[0].employees.map((i: any) =>
@@ -146,7 +147,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         </Group>
                     )} */}
                     <div className={styles.titleText}>
-                        <div className={styles.deptName}>Department Name</div>
+                        <div className={styles.deptName}>{deptData.departmentName}</div>
                         <div className={styles.deptText}># Employees</div>
                     </div>
                     <DetailPageTable headers={employeeHeaders} rows={employeeRows} setRows={setEmployeeRows} />
