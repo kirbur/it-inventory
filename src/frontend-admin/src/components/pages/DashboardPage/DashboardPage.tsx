@@ -218,9 +218,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
         axios
             .get('/dashboard/departmentTable?$select=departmentName,departmentID')
-            .then((data: any) => {
-                setDeptList(data)
-            })
+            .then((data: any) => setDeptList(data))
             .catch((err: any) => console.error(err))
     }, [])
 

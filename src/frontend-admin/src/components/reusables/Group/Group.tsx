@@ -3,7 +3,7 @@ import styles from './Group.module.css'
 import {concatStyles} from '../../../utilities/mikesConcat' //allows use of more than 1 classname
 
 //Types
-type JustifyType = 'start' | 'end' | 'between' | 'around' | 'even'
+type JustifyType = 'start' | 'end' | 'between' | 'around' | 'even' | 'center'
 type DirectionType = 'row' | 'column'
 
 interface IGroupProps {

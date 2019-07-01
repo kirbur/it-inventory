@@ -240,7 +240,9 @@ namespace backend_api.Controllers
                 };
                 // returning the amalgamation of the various returnables into a nice JSON object :)
                 var ProgramOverViewPage = new { programOverview, inDivPrograms, ListOfPlugins };
-                return Ok(ProgramOverViewPage);
+                List<object> list = new List<object>();
+                list.Add(ProgramOverViewPage);
+                return Ok(list);
             }
 
         }
@@ -600,8 +602,13 @@ namespace backend_api.Controllers
                     var empLast = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.LastName).FirstOrDefault();
                     employeeName = empFirst + " " + empLast;
                 }
+                List<object> entries = new List<object>();
                 // find all the events/history of the current program
-                var ProgHistory = _context.ProgramHistory.Where(x => x.ProgramId == prog.ProgramId);
+                foreach(var entry in _context.ProgramHistory.Where(x => x.ProgramId == prog.ProgramId))
+                {
+                    var singleEntry = new { entry.EventName, entry.EventDescription, entry.EventDate };
+                    entries.Add(singleEntry);
+                }
 
                 // Returning the details of the program into a nice JSON object :)
                 var ProgramDetails = new
@@ -612,7 +619,7 @@ namespace backend_api.Controllers
                     prog.RenewalDate,
                     prog.DateBought,
                     employeeName,
-                    ProgHistory,
+                    entries,
                     ProgramLicenseKey = isAdmin() ? prog.ProgramLicenseKey : null,
                     prog.ProgramCostPerYear,
                     prog.ProgramFlatCost,
@@ -621,7 +628,9 @@ namespace backend_api.Controllers
                     prog.ProgramPurchaseLink
                 };
 
-                return Ok(ProgramDetails);
+                List<object> list = new List<object>();
+                list.Add(ProgramDetails);
+                return Ok(list);
             }
 
         }
@@ -863,7 +872,9 @@ namespace backend_api.Controllers
                     listOfTablePrograms,
                     LicensesList
                 };
-                return Ok(DepartmentDetailPage);
+                List<object> list = new List<object>();
+                list.Add(DepartmentDetailPage);
+                return Ok(list);
             }
         }
 
@@ -931,12 +942,15 @@ namespace backend_api.Controllers
                 // Server History
                 var serverHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == serverID);
 
-                return Ok(new {
+                var serverDetailPage =(new {
                     server = sv,
                     icon,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     serverHistory,
                 });
+                List<object> list = new List<object>();
+                list.Add(serverDetailPage);
+                return Ok(list);
             }
         }
 
@@ -1003,13 +1017,16 @@ namespace backend_api.Controllers
                 // Computer History
                 var compHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == ComputerID);
 
-                return Ok(new
+                var computerDetailPage = (new
                 {
                     computer = comp,
                     icon,
                     employeeAssignedName =employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     compHistory,
                 });
+                List<object> list = new List<object>();
+                list.Add(computerDetailPage);
+                return Ok(list);
             }
         }
 
@@ -1071,13 +1088,16 @@ namespace backend_api.Controllers
                 // Monitor History
                 var monitorHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == monitorID);
 
-                return Ok(new
+                var monitorDetailPage =(new
                 {
                     monitor = mn,
                     icon,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     monitorHistory,
                 });
+                List<object> list = new List<object>();
+                list.Add(monitorDetailPage);
+                return Ok(list);
             }
         }
 
@@ -1137,13 +1157,16 @@ namespace backend_api.Controllers
                 // Peripheral History
                 var peripheralHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == peripheralID);
 
-                return Ok(new
+                var peripheralDetailPage =(new
                 {
                     peripheral = pr,
                     icon,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     peripheralHistory,
                 });
+                List<object> list = new List<object>();
+                list.Add(peripheralDetailPage);
+                return Ok(list);
             }
         }
 
