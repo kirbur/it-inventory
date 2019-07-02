@@ -26,7 +26,6 @@ interface ITableProps {
     setRows: any
     // onRowClick?: (datum: any) => void
     style?: string
-    toolTipRows?: any[]
 }
 
 export const DetailPageTable = (props: ITableProps) => {
@@ -76,7 +75,7 @@ export const DetailPageTable = (props: ITableProps) => {
         let header = (
             <td
                 onClick={e => {
-                    setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                    setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                     sortStates(i)
                 }}
                 className={styles.header}
