@@ -45,8 +45,7 @@ namespace backend_api.Controllers
                     if (user != null)
                     {
                         // Return the isAdmin field from the AuthIDServer matching the Guid.
-                        string adGUID = user.Guid.ToString();
-                        return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == adGUID).First().IsAdmin;
+                        return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == user.Guid).First().IsAdmin;
                     }
                     else
                     {

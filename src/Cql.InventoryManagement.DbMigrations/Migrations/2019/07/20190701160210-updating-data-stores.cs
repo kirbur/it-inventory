@@ -67,6 +67,10 @@ namespace Cql.InventoryManagement.DbMigrations.Migrations._2019._07
                 .AlterColumn("TextField")
                 .AsString(250)
                 .Nullable();
+            Alter.Table("Employee")
+                .AlterColumn("Email")
+                .AsString(100)
+                .Nullable();
 
 
 
