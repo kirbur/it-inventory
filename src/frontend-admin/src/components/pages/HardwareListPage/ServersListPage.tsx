@@ -34,9 +34,9 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'FQDN', value: 'FQDN'})
+    const [selected, setSelected] = useState({label: 'make', value: 'make'})
 
-    const columns = ['makeModel', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag', 'model']
+    const columns = ['make', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag', 'model']
     const searchByHeaders = ['Make', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag', 'Model']
     const headerList = ['Make & Model', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
@@ -59,6 +59,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                         model: format(i.model),
                     })
                 })
+                console.log(servers)
                 setListData(servers)
             })
             .catch((err: any) => console.error(err))
@@ -185,6 +186,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     rows.forEach(row => {
         const transformedRow: any[] = []
+        console.log(row)
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
