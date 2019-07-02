@@ -36,9 +36,10 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'FQDN', value: 'FQDN'})
 
-    const columns = ['FQDN', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag']
-    const headerList = ['FQDN', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
-    const options = columns.map((c, i) => ({label: headerList[i], value: c}))
+    const columns = ['makeModel', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag', 'model']
+    const searchByHeaders = ['Make', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag', 'Model']
+    const headerList = ['Make & Model', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
+    const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
 
     useEffect(() => {
         axios
@@ -47,13 +48,14 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                 const servers: any[] = []
                 data.map((i: any) => {
                     servers.push({
-                        FQDN: format(i.fqdn),
+                        make: format(i.make),
                         id: format(i.serverId),
                         numberOfCores: format(i.numberOfCores),
                         RAM: format(i.ram),
                         renewalDate: formatDate(i.renewalDate),
                         MFGTag: format(i.mfg),
                         icon: i.icon,
+                        model: format(i.model),
                     })
                 })
                 setListData(servers)
@@ -171,7 +173,8 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             <td key={row[1]} className={styles.hardware}>
                 <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text>
+                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={styles.alignLeft}>{row[7]}</text>
                 </div>
             </td>
         )
@@ -186,13 +189,13 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[2]}</td>
                 case 3:
-                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]}</td>
                 case 4:
-                    transformedRow[4] = <td className={styles.alignLeft}>{row[4]}</td>
+                    transformedRow[3] = <td className={styles.alignLeft}>{row[4]}</td>
                 case 5:
-                    transformedRow[5] = <td className={styles.alignLeft}>{row[5]}</td>
+                    transformedRow[4] = <td className={styles.alignLeft}>{row[5]}</td>
             }
         }
 

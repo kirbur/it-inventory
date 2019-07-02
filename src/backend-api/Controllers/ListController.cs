@@ -219,7 +219,8 @@ namespace backend_api.Controllers
         /* GET: api/list/Servers 
          * Returns: [ {
          *            serverId: int,
-         *            fdqn: string,
+         *            make: string,
+         *            model: string.
          *            numberOfCores: int,
          *            ram: int,
          *            renewaldate: date

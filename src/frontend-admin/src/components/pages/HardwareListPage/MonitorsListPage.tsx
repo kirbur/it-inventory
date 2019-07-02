@@ -36,9 +36,10 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'make', value: 'make'})
 
-    const columns = ['make', 'screenSize', 'resolution', 'inputs', 'assigned']
-    const headerList = ['Make', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To']
-    const options = columns.map((c, i) => ({label: headerList[i], value: c}))
+    const columns = ['makeModel', 'screenSize', 'resolution', 'inputs', 'assigned', 'model']
+    const searchByHeaders = ['Make', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To', 'Model']
+    const headerList = ['Make & Model', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To']
+    const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
 
     useEffect(() => {
         axios
@@ -54,6 +55,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                         inputs: format(i.inputs),
                         assigned: format(i.employeeFirstName) + ' ' + i.employeeLastName,
                         icon: i.icon,
+                        model: format(i.model),
                     })
                 })
                 setListData(monitors)
@@ -166,7 +168,8 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
             <td key={row[1]} className={styles.hardware}>
                 <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text>
+                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={styles.alignLeft}>{row[7]}</text>
                 </div>
             </td>
         )
