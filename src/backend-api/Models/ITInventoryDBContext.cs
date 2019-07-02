@@ -148,17 +148,17 @@ namespace backend_api.Models
             {
                 entity.Property(e => e.HardwareHistoryId).HasColumnName("HardwareHistoryID");
 
-                entity.Property(e => e.CurrentOwnerId).HasColumnName("CurrentOwnerID");
+                //entity.Property(e => e.CurrentOwnerId).HasColumnName("CurrentOwnerID");
 
-                entity.Property(e => e.CurrentOwnerStartDate).HasColumnType("date");
+                //entity.Property(e => e.CurrentOwnerStartDate).HasColumnType("date");
 
-                entity.Property(e => e.HardwareId).HasColumnName("HardwareID");
+                //entity.Property(e => e.HardwareId).HasColumnName("HardwareID");
 
-                entity.Property(e => e.HardwareType)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                //entity.Property(e => e.HardwareType)
+                //    .IsRequired()
+                //    .HasMaxLength(50);
 
-                entity.Property(e => e.PreviousOwnerId).HasColumnName("PreviousOwnerID");
+                //entity.Property(e => e.PreviousOwnerId).HasColumnName("PreviousOwnerID");
 
                 //entity.HasOne(d => d.CurrentOwner)
                 //    .WithMany(p => p.HardwareHistoryCurrentOwner)
@@ -263,13 +263,13 @@ namespace backend_api.Models
 
             modelBuilder.Entity<ProgramHistory>(entity =>
             {
-                entity.Property(e => e.ProgramHistoryId).HasColumnName("ProgramHistoryID");
+                //entity.Property(e => e.ProgramHistoryId).HasColumnName("ProgramHistoryID");
 
-                entity.Property(e => e.CurrentOwnerId).HasColumnName("CurrentOwnerID");
+                //entity.Property(e => e.CurrentOwnerId).HasColumnName("CurrentOwnerID");
 
-                entity.Property(e => e.CurrentOwnerStartDate).HasColumnType("date");
+                //entity.Property(e => e.CurrentOwnerStartDate).HasColumnType("date");
 
-                entity.Property(e => e.PreviousOwnerId).HasColumnName("PreviousOwnerID");
+                //entity.Property(e => e.PreviousOwnerId).HasColumnName("PreviousOwnerID");
 
                 entity.Property(e => e.ProgramId).HasColumnName("ProgramID");
 

@@ -219,7 +219,8 @@ namespace backend_api.Controllers
         /* GET: api/list/Servers 
          * Returns: [ {
          *            serverId: int,
-         *            fdqn: string,
+         *            make : string,
+         *            model : string,
          *            numberOfCores: int,
          *            ram: int,
          *            renewaldate: date
@@ -257,7 +258,7 @@ namespace backend_api.Controllers
                 }
                 string icon = $"/image/server/{sv.ServerId}";
                 // Create a server object to be returned.
-                var Server = new { sv.ServerId, sv.Fqdn, sv.NumberOfCores, sv.Ram, sv.RenewalDate, sv.Mfg, employeeFirstName, employeeLastName, icon };
+                var Server = new { sv.ServerId, sv.Make, sv.Model, sv.NumberOfCores, sv.Ram, sv.RenewalDate, sv.Mfg, employeeFirstName, employeeLastName, icon };
                 listOfservers.Add(Server);
             }
             return Ok(listOfservers);
@@ -266,6 +267,8 @@ namespace backend_api.Controllers
         /* GET: api/list/Laptops
          * Returns: [ {
          *            computerId: int,
+         *            make : string,
+         *            model : string,
          *            cpu: string,
          *            ramgb: int,
          *            ssdgb: int,
@@ -315,6 +318,7 @@ namespace backend_api.Controllers
          * Returns: [ {
          *             monitorId: int,
          *             make: string,
+         *             model : string,
          *             screenSize: float,
          *             resolution: int,
          *             inputs: string,
@@ -349,7 +353,7 @@ namespace backend_api.Controllers
                 }
                 string icon = $"/image/monitor/{mn.MonitorId}";
                 // Create a Monitor object to be returned.
-                var Monitor = new { mn.MonitorId, mn.Make, mn.ScreenSize, mn.Resolution, mn.Inputs, employeeFirstName, employeeLastName, icon };
+                var Monitor = new { mn.MonitorId, mn.Make, mn.Model, mn.ScreenSize, mn.Resolution, mn.Inputs, employeeFirstName, employeeLastName, icon };
                 listOfMonitors.Add(Monitor);
             }
             return Ok(listOfMonitors);
