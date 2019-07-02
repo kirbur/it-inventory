@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from 'react'
 
 // Components
 import icon from '../../../content/Images/CQL-favicon.png'
-import {DetailEditTable} from '../../reusables/DetailEditTable/DetailEditTable'
+import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {IoIosPersonAdd, IoMdAdd} from 'react-icons/io'
 import {GoCloudUpload} from 'react-icons/go'
 import {FaUserShield, FaUser, FaUserGraduate} from 'react-icons/fa'
@@ -103,74 +103,91 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     setUserData(user)
                     setAdminInput(data[0].isAdmin)
                     setDateInput(new Date(formatDate(data[0].hireDate)))
-                    if (match.params.id !== 'new') {
-                        let hw: any[] = []
-                        data[0].hardware.map((i: any) =>
-                            hw.push([
-                                format(i.id),
-                                format(i.make + ' ' + i.model),
-                                format(i.serialNumber),
-                                format(i.mfg),
-                                formatDate(i.purchaseDate),
-                                i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
-                            ])
-                        )
-                        setHardwareRows(hw)
-                        let sw: any[] = []
-                        data[0].software.map((i: any) =>
-                            sw.push([
-                                format(i.id),
-                                format(i.name),
-                                format(i.licenseKey),
-                                format(Math.round(i.costPerMonth * 100) / 100),
-                                format(i.flatCost),
-                            ])
-                        )
-                        setSoftwareRows(sw)
 
-                        let l: any[] = []
-                        data[0].licenses.map((i: any) =>
-                            l.push([
-                                format(i.id),
-                                format(i.name),
-                                format(i.cals),
-                                format(i.licenseKey),
-                                format(Math.round(i.costPerMonth * 100) / 100),
-                                format(i.flatCost),
-                            ])
-                        )
-                        setLicenseRows(l)
+                    let hw: any[] = []
+                    data[0].hardware.map((i: any) =>
+                        hw.push([
+                            {
+                                value: format(i.make + ' ' + i.model),
+                                id: format(i.type + '/' + i.id),
+                                tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
+                                onClick: () => {},
+                                sortBy: i.make + ' ' + i.model,
+                            },
+                            {value: format(i.serialNumber), id: format(i.id), sortBy: i.serialNumber},
+                            {value: format(i.mfg), id: format(i.id), sortBy: i.mfg},
+                            {value: formatDate(i.purchaseDate), id: format(i.id), sortBy: i.purchaseDate},
+                        ])
+                    )
+                    setHardwareRows(hw)
 
-                        let uhw: any[] = []
-                        data[0].unassignedHardware.map((i: any) =>
-                            uhw.push({
-                                name: i.monitorName || i.compName || i.periphName,
-                                id:
-                                    i.type + '/' + i.monitorId ||
-                                    i.type + '/' + i.computerId ||
-                                    i.type + '/' + i.peripheralId,
-                            })
-                        )
-                        setHardwareDropdown(uhw)
+                    let sw: any[] = []
+                    data[0].software.map((i: any) =>
+                        sw.push([
+                            {
+                                value: format(i.name),
+                                id: format(i.id),
+                                sortBy: i.name,
+                                onClick: () => {},
+                            },
+                            {value: format(i.licenseKey), id: format(i.id), sortBy: i.licenseKey},
+                            {
+                                value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
+                                id: format(i.id),
+                                sortBy: i.costPerMonth,
+                            },
+                        ])
+                    )
+                    setSoftwareRows(sw)
 
-                        let usw: any[] = []
-                        data[0].unassignedSoftware.map((i: any) =>
-                            usw.push({
-                                name: i.programName,
-                                id: i.programId,
-                            })
-                        )
-                        setSoftwareDropdown(usw)
+                    let l: any[] = []
+                    data[0].licenses.map((i: any) =>
+                        l.push([
+                            {
+                                value: format(i.name),
+                                id: format(i.id),
+                                sortBy: i.name,
+                                onClick: () => {},
+                            },
+                            {value: format(i.cals), id: format(i.id), sortBy: i.cals},
+                            {
+                                value: format(Math.round(i.costPerMonth * 100) / 100),
+                                id: format(i.id),
+                                sortBy: i.costPerMonth,
+                            },
+                        ])
+                    )
+                    setLicenseRows(l)
 
-                        let ul: any[] = []
-                        data[0].unassignedLicenses.map((i: any) =>
-                            ul.push({
-                                name: i.programName,
-                                id: i.programId,
-                            })
-                        )
-                        setLicenseDropdown(ul)
-                    }
+                    let uhw: any[] = []
+                    data[0].unassignedHardware.map((i: any) =>
+                        uhw.push({
+                            name: i.monitorName || i.compName || i.periphName,
+                            id:
+                                i.type + '/' + i.monitorId ||
+                                i.type + '/' + i.computerId ||
+                                i.type + '/' + i.peripheralId,
+                        })
+                    )
+                    setHardwareDropdown(uhw)
+
+                    let usw: any[] = []
+                    data[0].unassignedSoftware.map((i: any) =>
+                        usw.push({
+                            name: i.programName,
+                            id: i.programId,
+                        })
+                    )
+                    setSoftwareDropdown(usw)
+
+                    let ul: any[] = []
+                    data[0].unassignedLicenses.map((i: any) =>
+                        ul.push({
+                            name: i.programName,
+                            id: i.programId,
+                        })
+                    )
+                    setLicenseDropdown(ul)
                 })
                 .catch((err: any) => console.error(err))
         }
@@ -204,6 +221,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
     const handleAddLicense = (id: number) => {
         //TODO: post request to assign license to user w/ id match.params.id
+    }
+
+    const handleRemove = (row: any) => {
+        //TODO: might have to make sepaerate functions for each type
     }
 
     const handleSubmit = () => {
@@ -421,11 +442,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 {/* Tables */}
                 <div className={styles.paddingTop}>
-                    <DetailEditTable
+                    <DetailPageTable
                         headers={hardwareHeaders}
                         rows={hardwareRows}
                         setRows={setHardwareRows}
                         style={styles.newRowThing}
+                        edit={true}
+                        remove={handleRemove}
                     />
                 </div>
                 {hardwareDropdown && (
@@ -461,11 +484,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 )}
 
                 <div className={styles.paddingTop}>
-                    <DetailEditTable
+                    <DetailPageTable
                         headers={softwareHeaders}
                         rows={softwareRows}
                         setRows={setSoftwareRows}
                         style={styles.newRowThing}
+                        edit={true}
+                        remove={handleRemove}
                     />
                 </div>
                 {softwareDropdown && (
@@ -501,11 +526,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 )}
 
                 <div className={styles.paddingTop}>
-                    <DetailEditTable
+                    <DetailPageTable
                         headers={licenseHeaders}
                         rows={licenseRows}
                         setRows={setLicenseRows}
                         style={styles.newRowThing}
+                        edit={true}
+                        remove={handleRemove}
                     />
                 </div>
                 {licenseDropdown && (
