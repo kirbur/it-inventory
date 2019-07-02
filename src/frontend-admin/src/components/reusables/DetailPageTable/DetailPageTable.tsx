@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 
 //components
 import ReactTooltip from 'react-tooltip'
+import {MdInfoOutline} from 'react-icons/md'
 
 //styling
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -100,6 +101,7 @@ export const DetailPageTable = (props: ITableProps) => {
                     onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
                 >
                     <a data-tip={row[i].tooltip} className={row[i].tooltip === '' ? '' : styles.rowTitle}>
+                        <MdInfoOutline size={15} />
                         {row[i].value}
                     </a>
                     <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
