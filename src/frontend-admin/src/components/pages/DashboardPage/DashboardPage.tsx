@@ -57,20 +57,12 @@ let initPieData: IPieDataProps[] = [
         ],
     },
 ]
-let initDeptList: {DepartmentName: string; DepartmentId: number}[] = []
+
 let initDeptTable: {id: number; name: string; tableData: IDashboardTableDatum[]}[] = [
     {
         id: -1,
         name: 'Select a Department',
         tableData: [],
-    },
-]
-
-let initDropdownContent: IDropdownItem[] = [
-    {
-        id: initDeptTable[0].id,
-        name: initDeptTable[0].name,
-        component: <DashboardTable data={initDeptTable[0].tableData} onRowClick={() => {}} />,
     },
 ]
 
@@ -95,11 +87,19 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const [pieData, setPieData] = useState(initPieData)
 
     //Department Tables State
-    const [deptList, setDeptList] = useState(initDeptList)
-    const [deptTableData, setDeptTableData] = useState(initDeptTable)
-    const [dropdownContent, setDropdownContent] = useState(initDropdownContent)
-
-    //TODO: get dropdown working once enpoint works
+    const [deptList, setDeptList] = useState<{DepartmentName: string; DepartmentId: number}[]>([])
+    const [deptTableData, setDeptTableData] = useState<{id: number; name: string; tableData: IDashboardTableDatum[]}[]>(
+        [
+            {
+                //TODO: in order for dropdown to have default this needs to be hardcoded with a dept that always exists
+                id: -1,
+                name: 'Select A Department',
+                tableData: [],
+            },
+        ]
+    )
+    const [dropdownContent, setDropdownContent] = useState<IDropdownItem[]>([])
+    const [selectedDeptTable, setSelectedDeptTable] = useState<IDropdownItem>({...deptTableData[0]})
 
     //Click Handling
     const onRowClick = (datum: IDashboardTableDatum) => {
@@ -139,24 +139,15 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     }
 
     const updateDropdownContent = () => {
-        initDropdownContent.length = 0
+        let x: any[] = []
 
-        deptTableData.map((i: any) =>
-            initDropdownContent.push({
+        deptTableData.map((i: any) => {
+            x.push({
                 id: i.id,
                 name: i.name,
-                component: (
-                    <div className={styles.software}>
-                        <DashboardTable data={i.tableData} onRowClick={onRowClick} />
-                        <div className={styles.softwareKey}>
-                            <div>Cost Per Year* = Projected</div>
-                        </div>
-                    </div>
-                ),
             })
-        )
-        //console.log(initDropdownContent)
-        setDropdownContent(initDropdownContent)
+        })
+        setDropdownContent(x)
     }
 
     useEffect(() => {
@@ -233,6 +224,22 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
     useEffect(getDeptTables, [deptList])
     useEffect(updateDropdownContent, [deptTableData, getDeptTables, dropdownContent])
+
+    const displayDeptTable = () => {
+        const table = deptTableData.filter(i => i.id === selectedDeptTable.id)
+
+        return table.length > 0 ? (
+            <div className={styles.software}>
+                <DashboardTable data={table[0].tableData} onRowClick={onRowClick} />
+                <div className={styles.softwareKey}>
+                    <div>Cost Per Year* = Projected</div>
+                </div>
+            </div>
+        ) : (
+            <div></div>
+        )
+    }
+
     return (
         <div className={styles.dashMain}>
             <div className={styles.dashColumn}>
@@ -281,7 +288,15 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                     />
                 </div>
                 <Card>
-                    {dropdownContent && <Dropdown content={dropdownContent} titleClassName={styles.linkedTitle} />}
+                    {dropdownContent && (
+                        <Dropdown
+                            content={dropdownContent}
+                            titleClassName={styles.linkedTitle}
+                            selected={selectedDeptTable}
+                            setSelected={setSelectedDeptTable}
+                        />
+                    )}
+                    {deptTableData[0] && displayDeptTable()}
                 </Card>
             </div>
 
