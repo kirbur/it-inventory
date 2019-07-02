@@ -51,7 +51,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
@@ -69,6 +69,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const [deptInput, setDeptInput] = useState<{DepartmentName: string; DepartmentId: number}>()
     const [adminInput, setAdminInput] = useState<boolean>()
     const [imgInput, setImgInput] = useState<File>()
+    const [roleInput, setRoleInput] = useState<string>()
 
     const [hardwareDropdown, setHardwareDropdown] = useState<any[]>()
     const [softwareDropdown, setSoftwareDropdown] = useState<any[]>()
@@ -103,6 +104,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     setUserData(user)
                     setAdminInput(data[0].isAdmin)
                     setDateInput(new Date(formatDate(data[0].hireDate)))
+                    setRoleInput(data[0].role)
+                    setSelectedEmployee({name: data[0].firstName + ' ' + data[0].lastName, id: match.params.id})
 
                     let hw: any[] = []
                     data[0].hardware.map((i: any) =>
@@ -207,8 +210,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }, [userData])
 
     useEffect(() => {
-        //TODO: get table data for department defaults
-        // & figure out how to handle unavailable defaults
+        if (match.params.id === 'new') {
+            //TODO: get table data for department defaults
+            // & figure out how to handle unavailable defaults
+        }
     }, [deptInput])
 
     const handleAddHardware = (id: number) => {
@@ -321,12 +326,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     <div className={styles.paddingRight}>
                         <div className={styles.paddingBottom}>
                             <div className={styles.text}>Employee Name</div>
-                            {/* <input type='text' className={styles.input} placeholder={userData.firstName} />
-                        </div>
-                        <div>
-                            <div className={styles.text}>Last Name</div>
-                            <input type='text' className={styles.input} placeholder={userData.lastName} /> */}
-
                             {match.params.id === 'new' ? (
                                 <Button className={s(styles.input, styles.employeeDropdownButton)}>
                                     <div
@@ -378,15 +377,30 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     </div>
                                 </Button>
                             ) : (
-                                <input type='text' className={styles.input} value={userData.name} />
+                                selectedEmployee && (
+                                    <input
+                                        type='text'
+                                        className={styles.input}
+                                        value={selectedEmployee.name}
+                                        onChange={e => setSelectedEmployee({name: e.target.value, id: match.params.id})}
+                                    />
+                                )
                             )}
+
+                            <div className={styles.text}>Role</div>
+                            <input
+                                type='text'
+                                className={styles.input}
+                                value={roleInput}
+                                onChange={e => setRoleInput(e.target.value)}
+                            />
                         </div>
                     </div>
                     <div>
                         <div className={styles.text}>Date Hired</div>
                         {/* <input type='text' className={styles.input} placeholder={userData.hireDate} /> */}
                         <DatePicker
-                            dateFormat='yyyy/MM/dd'
+                            dateFormat='MM/dd/yyyy'
                             placeholderText={userData.hireDate}
                             selected={dateInput}
                             onChange={e => e && setDateInput(e)}
