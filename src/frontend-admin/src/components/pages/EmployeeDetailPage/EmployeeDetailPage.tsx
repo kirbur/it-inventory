@@ -56,11 +56,19 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
 
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
+    //TODO: make sure these go the right place
+    const handleHardwareClick = (id: number | string) => {
+        history.push(`/hardware/${id}`)
+    }
+
+    const handleProgramClick = (id: number | string) => {
+        history.push(`/programs/overview/${id}`)
+    }
+
     useEffect(() => {
         axios
             .get(`/detail/employee/${match.params.id}`)
             .then((data: any) => {
-                console.log(data)
                 let user: any = {
                     photo: data[0].picture,
                     name: data[0].firstName + ' ' + data[0].lastName,
@@ -75,27 +83,35 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 let hw: any[] = []
                 data[0].hardware.map((i: any) =>
                     hw.push([
-                        format(i.id),
-                        format(i.make + ' ' + i.model),
-                        format(i.serialNumber),
-                        format(i.mfg),
-                        formatDate(i.purchaseDate),
-                        i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
+                        {
+                            value: format(i.make + ' ' + i.model),
+                            id: format(i.id),
+                            tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
+                            onClick: handleHardwareClick,
+                            sortBy: i.make + ' ' + i.model,
+                        },
+                        {value: format(i.serialNumber), id: format(i.id), sortBy: i.serialNumber},
+                        {value: format(i.mfg), id: format(i.id), sortBy: i.mfg},
+                        {value: formatDate(i.purchaseDate), id: format(i.id), sortBy: i.purchaseDate},
                     ])
                 )
                 setHardwareRows(hw)
 
-                // var toolTipArray = []
-                // data[0].hardware.map((i: any) => toolTipArray.push(i.tooltip.cpu ? formatToolTip(i.tooltip) : ''))
-
                 let sw: any[] = []
                 data[0].software.map((i: any) =>
                     sw.push([
-                        format(i.id),
-                        format(i.name),
-                        format(i.licenseKey),
-                        format(Math.round(i.costPerMonth * 100) / 100),
-                        format(i.flatCost),
+                        {
+                            value: format(i.name),
+                            id: format(i.id),
+                            onClick: handleProgramClick,
+                            sortBy: i.name,
+                        },
+                        {value: format(i.licenseKey), id: format(i.id), sortBy: i.licenseKey},
+                        {
+                            value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
+                            id: format(i.id),
+                            sortBy: i.costPerMonth,
+                        },
                     ])
                 )
                 setSoftwareRows(sw)
@@ -103,12 +119,18 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 let l: any[] = []
                 data[0].licenses.map((i: any) =>
                     l.push([
-                        format(i.id),
-                        format(i.name),
-                        format(i.cals),
-                        format(i.licenseKey),
-                        format(Math.round(i.costPerMonth * 100) / 100),
-                        format(i.flatCost),
+                        {
+                            value: format(i.name),
+                            id: format(i.id),
+                            onClick: handleProgramClick,
+                            sortBy: i.name,
+                        },
+                        {value: format(i.cals), id: format(i.id), sortBy: i.cals},
+                        {
+                            value: format(Math.round(i.costPerMonth * 100) / 100),
+                            id: format(i.id),
+                            sortBy: i.costPerMonth,
+                        },
                     ])
                 )
                 setLicenseRows(l)
