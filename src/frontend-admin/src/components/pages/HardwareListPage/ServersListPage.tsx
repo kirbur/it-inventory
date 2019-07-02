@@ -45,6 +45,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
         axios
             .get('/list/servers')
             .then((data: any) => {
+                console.log(data)
                 const servers: any[] = []
                 data.map((i: any) => {
                     servers.push({
