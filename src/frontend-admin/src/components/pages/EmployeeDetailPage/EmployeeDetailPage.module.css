@@ -148,9 +148,22 @@
     font-size: 20px;
 }
 
+.dropdown1 {
+    z-index: 1 !important;
+}
+
+.dropdown2 {
+    z-index: 2 !important;
+}
+
+.dropdown3 {
+    z-index: 3 !important;
+}
+
 .addContainer {
     margin: 5px 0 55px;
     align-self: flex-end;
+    z-index: 2;
 }
 .addIconBorder:hover {
     background-color: #009eff;

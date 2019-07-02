@@ -50,23 +50,20 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const licenseHeaders = ['Licenses', 'CALs']
 
     //TODO: remove default options
-    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-    const [licenseDropdown, setLicenseDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
+    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>()
+    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>()
+    const [licenseDropdown, setLicenseDropdown] = useState<any[]>()
 
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
+
+    //TODO: make sure these go the right place
+    const handleHardwareClick = (id: number | string) => {
+        history.push(`/hardware/${id}`)
+    }
+
+    const handleProgramClick = (id: number | string) => {
+        history.push(`/programs/overview/${id}`)
+    }
 
     useEffect(() => {
         axios
@@ -86,27 +83,35 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 let hw: any[] = []
                 data[0].hardware.map((i: any) =>
                     hw.push([
-                        format(i.id),
-                        format(i.make + ' ' + i.model),
-                        format(i.serialNumber),
-                        format(i.mfg),
-                        formatDate(i.purchaseDate),
-                        i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
+                        {
+                            value: format(i.make + ' ' + i.model),
+                            id: format(i.id),
+                            tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
+                            onClick: handleHardwareClick,
+                            sortBy: i.make + ' ' + i.model,
+                        },
+                        {value: format(i.serialNumber), id: format(i.id), sortBy: i.serialNumber},
+                        {value: format(i.mfg), id: format(i.id), sortBy: i.mfg},
+                        {value: formatDate(i.purchaseDate), id: format(i.id), sortBy: i.purchaseDate},
                     ])
                 )
                 setHardwareRows(hw)
 
-                // var toolTipArray = []
-                // data[0].hardware.map((i: any) => toolTipArray.push(i.tooltip.cpu ? formatToolTip(i.tooltip) : ''))
-
                 let sw: any[] = []
                 data[0].software.map((i: any) =>
                     sw.push([
-                        format(i.id),
-                        format(i.name),
-                        format(i.licenseKey),
-                        format(Math.round(i.costPerMonth * 100) / 100),
-                        format(i.flatCost),
+                        {
+                            value: format(i.name),
+                            id: format(i.id),
+                            onClick: handleProgramClick,
+                            sortBy: i.name,
+                        },
+                        {value: format(i.licenseKey), id: format(i.id), sortBy: i.licenseKey},
+                        {
+                            value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
+                            id: format(i.id),
+                            sortBy: i.costPerMonth,
+                        },
                     ])
                 )
                 setSoftwareRows(sw)
@@ -114,19 +119,50 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 let l: any[] = []
                 data[0].licenses.map((i: any) =>
                     l.push([
-                        format(i.id),
-                        format(i.name),
-                        format(i.cals),
-                        format(i.licenseKey),
-                        format(Math.round(i.costPerMonth * 100) / 100),
-                        format(i.flatCost),
+                        {
+                            value: format(i.name),
+                            id: format(i.id),
+                            onClick: handleProgramClick,
+                            sortBy: i.name,
+                        },
+                        {value: format(i.cals), id: format(i.id), sortBy: i.cals},
+                        {
+                            value: format(Math.round(i.costPerMonth * 100) / 100),
+                            id: format(i.id),
+                            sortBy: i.costPerMonth,
+                        },
                     ])
                 )
                 setLicenseRows(l)
+
+                let uhw: any[] = []
+                data[0].unassignedHardware.map((i: any) =>
+                    uhw.push({
+                        name: i.monitorName || i.compName || i.periphName,
+                        id: i.type + '/' + i.monitorId || i.type + '/' + i.computerId || i.type + '/' + i.peripheralId,
+                    })
+                )
+                setHardwareDropdown(uhw)
+
+                let usw: any[] = []
+                data[0].unassignedSoftware.map((i: any) =>
+                    usw.push({
+                        name: i.programName,
+                        id: i.programId,
+                    })
+                )
+                setSoftwareDropdown(usw)
+
+                let ul: any[] = []
+                data[0].unassignedLicenses.map((i: any) =>
+                    ul.push({
+                        name: i.programName,
+                        id: i.programId,
+                    })
+                )
+                setLicenseDropdown(ul)
             })
             .catch((err: any) => console.error(err))
-
-        //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
     const handleArchive = () => {
@@ -201,8 +237,13 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         </div>
                     </div>
                     <DetailPageTable headers={hardwareHeaders} rows={hardwareRows} setRows={setHardwareRows} />
-                    {isAdmin && (
-                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    {isAdmin && hardwareDropdown && (
+                        <Button
+                            className={s(styles.addContainer, styles.dropdown3)}
+                            icon='add'
+                            onClick={() => {}}
+                            textInside={false}
+                        >
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
                                     triggerElement={({isOpen, toggle}) => (
@@ -213,7 +254,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                                         </button>
                                     )}
                                     choicesList={() => (
-                                        <ul className={dropdownStyles.dropdownList}>
+                                        <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
                                             {hardwareDropdown.map(i => (
                                                 <li
                                                     className={dropdownStyles.dropdownListItem}
@@ -234,8 +275,13 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     )}
 
                     <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
-                    {isAdmin && (
-                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    {isAdmin && softwareDropdown && (
+                        <Button
+                            className={s(styles.addContainer, styles.dropdown2)}
+                            icon='add'
+                            onClick={() => {}}
+                            textInside={false}
+                        >
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
                                     triggerElement={({isOpen, toggle}) => (
@@ -267,8 +313,13 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     )}
 
                     <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
-                    {isAdmin && (
-                        <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    {isAdmin && licenseDropdown && (
+                        <Button
+                            className={s(styles.addContainer, styles.dropdown1)}
+                            icon='add'
+                            onClick={() => {}}
+                            textInside={false}
+                        >
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
                                     triggerElement={({isOpen, toggle}) => (

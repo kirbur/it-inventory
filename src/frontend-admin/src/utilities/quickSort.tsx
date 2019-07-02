@@ -8,10 +8,10 @@ export function quickSortAscend(low: number, high: number, datumIndex: number, r
     while (i <= j) {
         // check if number on left of pivot is > than the pivot
         // and swap it if it is
-        while (rows[i][datumIndex] < rows[pivot][datumIndex]) {
+        while (rows[i][datumIndex].sortBy < rows[pivot][datumIndex].sortBy) {
             i++
         }
-        while (rows[j][datumIndex] > rows[pivot][datumIndex]) {
+        while (rows[j][datumIndex].sortBy > rows[pivot][datumIndex].sortBy) {
             j--
         }
         if (i <= j) {
@@ -38,10 +38,10 @@ export function quickSortDescend(low: number, high: number, datumIndex: number, 
     while (i <= j) {
         // check if number on left of pivot is < than the pivot
         // and swap it if it is
-        while (rows[i][datumIndex] > rows[pivot][datumIndex]) {
+        while (rows[i][datumIndex].sortBy > rows[pivot][datumIndex].sortBy) {
             i++
         }
-        while (rows[j][datumIndex] < rows[pivot][datumIndex]) {
+        while (rows[j][datumIndex].sortBy < rows[pivot][datumIndex].sortBy) {
             j--
         }
         if (i <= j) {
