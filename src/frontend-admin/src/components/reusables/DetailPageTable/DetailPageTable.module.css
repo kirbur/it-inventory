@@ -77,3 +77,25 @@
 .clickable {
     color: #009eff;
 }
+
+/* delete icon next to row */
+.deleteRow {
+    width: 50px;
+}
+.delete {
+    background-color: red;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+}
+.delete:hover {
+    background-color: maroon;
+}
+.whiteLine {
+    width: 18px;
+    height: 2px;
+    background-color: white;
+    position: relative;
+    bottom: 16px;
+    left: 6px;
+}

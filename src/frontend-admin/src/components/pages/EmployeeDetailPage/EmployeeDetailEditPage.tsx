@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from 'react'
 
 // Components
 import icon from '../../../content/Images/CQL-favicon.png'
-import {DetailEditTable} from '../../reusables/DetailEditTable/DetailEditTable'
+import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {IoIosPersonAdd, IoMdAdd} from 'react-icons/io'
 import {GoCloudUpload} from 'react-icons/go'
 import {FaUserShield, FaUser, FaUserGraduate} from 'react-icons/fa'
@@ -51,7 +51,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
@@ -69,24 +69,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const [deptInput, setDeptInput] = useState<{DepartmentName: string; DepartmentId: number}>()
     const [adminInput, setAdminInput] = useState<boolean>()
     const [imgInput, setImgInput] = useState<File>()
-    //TODO: add states for the rest of the inputs
+    const [roleInput, setRoleInput] = useState<string>()
 
-    //TODO: remove default options
-    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-    const [licenseDropdown, setLicenseDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
+    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>()
+    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>()
+    const [licenseDropdown, setLicenseDropdown] = useState<any[]>()
 
     const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'First Last', id: 1}])
     const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>()
@@ -94,45 +81,64 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
     useEffect(() => {
-        axios //TODO: get from edit endpoint
-            .get(`/detail/employee/${match.params.id}`)
-            .then((data: any) => {
-                let user: any = {
-                    isAdmin: data[0].isAdmin,
-                    photo: data[0].picture,
-                    firstName: data[0].firstName,
-                    lastName: data[0].lastName,
-                    name: data[0].firstName + ' ' + data[0].lastName,
-                    department: data[0].department,
-                    role: data[0].role,
-                    hireDate: formatDate(data[0].hireDate),
-                    hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
-                    swCost: Math.round(data[0].totalProgramCostPerMonth * 100) / 100,
-                }
-                setUserData(user)
-                setAdminInput(data[0].isAdmin)
-                setDateInput(new Date(formatDate(data[0].hireDate)))
-                if (match.params.id !== 'new') {
+        if (match.params.id === 'new') {
+            //TODO: populate all 4 dropdowns
+            //employee dropdown with employees
+            //and available hw/progs
+        } else {
+            axios //TODO: get from edit endpoint
+                .get(`/detail/employee/${match.params.id}`)
+                .then((data: any) => {
+                    let user: any = {
+                        isAdmin: data[0].isAdmin,
+                        photo: data[0].picture,
+                        firstName: data[0].firstName,
+                        lastName: data[0].lastName,
+                        name: data[0].firstName + ' ' + data[0].lastName,
+                        department: data[0].department,
+                        role: data[0].role,
+                        hireDate: formatDate(data[0].hireDate),
+                        hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
+                        swCost: Math.round(data[0].totalProgramCostPerMonth * 100) / 100,
+                    }
+                    setUserData(user)
+                    setAdminInput(data[0].isAdmin)
+                    setDateInput(new Date(formatDate(data[0].hireDate)))
+                    setRoleInput(data[0].role)
+                    setSelectedEmployee({name: data[0].firstName + ' ' + data[0].lastName, id: match.params.id})
+
                     let hw: any[] = []
                     data[0].hardware.map((i: any) =>
                         hw.push([
-                            format(i.id),
-                            format(i.make + ' ' + i.model),
-                            format(i.serialNumber),
-                            format(i.mfg),
-                            formatDate(i.purchaseDate),
-                            i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
+                            {
+                                value: format(i.make + ' ' + i.model),
+                                id: format(i.type + '/' + i.id),
+                                tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
+                                onClick: () => {},
+                                sortBy: i.make + ' ' + i.model,
+                            },
+                            {value: format(i.serialNumber), id: format(i.id), sortBy: i.serialNumber},
+                            {value: format(i.mfg), id: format(i.id), sortBy: i.mfg},
+                            {value: formatDate(i.purchaseDate), id: format(i.id), sortBy: i.purchaseDate},
                         ])
                     )
                     setHardwareRows(hw)
+
                     let sw: any[] = []
                     data[0].software.map((i: any) =>
                         sw.push([
-                            format(i.id),
-                            format(i.name),
-                            format(i.licenseKey),
-                            format(Math.round(i.costPerMonth * 100) / 100),
-                            format(i.flatCost),
+                            {
+                                value: format(i.name),
+                                id: format(i.id),
+                                sortBy: i.name,
+                                onClick: () => {},
+                            },
+                            {value: format(i.licenseKey), id: format(i.id), sortBy: i.licenseKey},
+                            {
+                                value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
+                                id: format(i.id),
+                                sortBy: i.costPerMonth,
+                            },
                         ])
                     )
                     setSoftwareRows(sw)
@@ -140,32 +146,54 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     let l: any[] = []
                     data[0].licenses.map((i: any) =>
                         l.push([
-                            format(i.id),
-                            format(i.name),
-                            format(i.cals),
-                            format(i.licenseKey),
-                            format(Math.round(i.costPerMonth * 100) / 100),
-                            format(i.flatCost),
+                            {
+                                value: format(i.name),
+                                id: format(i.id),
+                                sortBy: i.name,
+                                onClick: () => {},
+                            },
+                            {value: format(i.cals), id: format(i.id), sortBy: i.cals},
+                            {
+                                value: format(Math.round(i.costPerMonth * 100) / 100),
+                                id: format(i.id),
+                                sortBy: i.costPerMonth,
+                            },
                         ])
                     )
                     setLicenseRows(l)
-                }
-            })
-            .catch((err: any) => console.error(err))
 
-        // axios
-        //     .get('/dashboard/departmentTable?$select=departmentName,departmentID')
-        //     .then((data: any) => {
-        //         setDeptList(data)
-        //         var d = data.filter((i: any) => (i.departmentName = userData.department))
-        //         setDeptInput({name: userData.department, id: d[0].departmentID})
-        //     })
-        //     .catch((err: any) => console.error(err))
+                    let uhw: any[] = []
+                    data[0].unassignedHardware.map((i: any) =>
+                        uhw.push({
+                            name: i.monitorName || i.compName || i.periphName,
+                            id:
+                                i.type + '/' + i.monitorId ||
+                                i.type + '/' + i.computerId ||
+                                i.type + '/' + i.peripheralId,
+                        })
+                    )
+                    setHardwareDropdown(uhw)
 
-        if (match.params.id === 'new') {
-            //TODO:
+                    let usw: any[] = []
+                    data[0].unassignedSoftware.map((i: any) =>
+                        usw.push({
+                            name: i.programName,
+                            id: i.programId,
+                        })
+                    )
+                    setSoftwareDropdown(usw)
+
+                    let ul: any[] = []
+                    data[0].unassignedLicenses.map((i: any) =>
+                        ul.push({
+                            name: i.programName,
+                            id: i.programId,
+                        })
+                    )
+                    setLicenseDropdown(ul)
+                })
+                .catch((err: any) => console.error(err))
         }
-        //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
     useEffect(() => {
@@ -181,6 +209,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             .catch((err: any) => console.error(err))
     }, [userData])
 
+    useEffect(() => {
+        if (match.params.id === 'new') {
+            //TODO: get table data for department defaults
+            // & figure out how to handle unavailable defaults
+        }
+    }, [deptInput])
+
     const handleAddHardware = (id: number) => {
         //TODO: post request to assign hardware to user w/ id match.params.id
     }
@@ -191,6 +226,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
     const handleAddLicense = (id: number) => {
         //TODO: post request to assign license to user w/ id match.params.id
+    }
+
+    const handleRemove = (row: any) => {
+        //TODO: might have to make sepaerate functions for each type
     }
 
     const handleSubmit = () => {
@@ -287,12 +326,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     <div className={styles.paddingRight}>
                         <div className={styles.paddingBottom}>
                             <div className={styles.text}>Employee Name</div>
-                            {/* <input type='text' className={styles.input} placeholder={userData.firstName} />
-                        </div>
-                        <div>
-                            <div className={styles.text}>Last Name</div>
-                            <input type='text' className={styles.input} placeholder={userData.lastName} /> */}
-
                             {match.params.id === 'new' ? (
                                 <Button className={s(styles.input, styles.employeeDropdownButton)}>
                                     <div
@@ -344,15 +377,30 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     </div>
                                 </Button>
                             ) : (
-                                <input type='text' className={styles.input} value={userData.name} />
+                                selectedEmployee && (
+                                    <input
+                                        type='text'
+                                        className={styles.input}
+                                        value={selectedEmployee.name}
+                                        onChange={e => setSelectedEmployee({name: e.target.value, id: match.params.id})}
+                                    />
+                                )
                             )}
+
+                            <div className={styles.text}>Role</div>
+                            <input
+                                type='text'
+                                className={styles.input}
+                                value={roleInput}
+                                onChange={e => setRoleInput(e.target.value)}
+                            />
                         </div>
                     </div>
                     <div>
                         <div className={styles.text}>Date Hired</div>
                         {/* <input type='text' className={styles.input} placeholder={userData.hireDate} /> */}
                         <DatePicker
-                            dateFormat='yyyy/MM/dd'
+                            dateFormat='MM/dd/yyyy'
                             placeholderText={userData.hireDate}
                             selected={dateInput}
                             onChange={e => e && setDateInput(e)}
@@ -408,118 +456,130 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 {/* Tables */}
                 <div className={styles.paddingTop}>
-                    <DetailEditTable
+                    <DetailPageTable
                         headers={hardwareHeaders}
                         rows={hardwareRows}
                         setRows={setHardwareRows}
                         style={styles.newRowThing}
+                        edit={true}
+                        remove={handleRemove}
                     />
                 </div>
-                <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
-                    <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                        <DropdownList
-                            triggerElement={({isOpen, toggle}) => (
-                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                        Assign new hardware
-                                    </div>
-                                </button>
-                            )}
-                            choicesList={() => (
-                                <ul className={dropdownStyles.dropdownList}>
-                                    {hardwareDropdown.map(i => (
-                                        <li
-                                            className={dropdownStyles.dropdownListItem}
-                                            key={i.name}
-                                            onClick={() => handleAddHardware(i.id)}
-                                        >
-                                            <button className={dropdownStyles.dropdownListItemButton}>
-                                                <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        />
-                        <div />
-                    </div>
-                </Button>
+                {hardwareDropdown && (
+                    <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                        <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                            <DropdownList
+                                triggerElement={({isOpen, toggle}) => (
+                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                        <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                            Assign new hardware
+                                        </div>
+                                    </button>
+                                )}
+                                choicesList={() => (
+                                    <ul className={dropdownStyles.dropdownList}>
+                                        {hardwareDropdown.map(i => (
+                                            <li
+                                                className={dropdownStyles.dropdownListItem}
+                                                key={i.name}
+                                                onClick={() => handleAddHardware(i.id)}
+                                            >
+                                                <button className={dropdownStyles.dropdownListItemButton}>
+                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            />
+                            <div />
+                        </div>
+                    </Button>
+                )}
 
                 <div className={styles.paddingTop}>
-                    <DetailEditTable
+                    <DetailPageTable
                         headers={softwareHeaders}
                         rows={softwareRows}
                         setRows={setSoftwareRows}
                         style={styles.newRowThing}
+                        edit={true}
+                        remove={handleRemove}
                     />
                 </div>
-                <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
-                    <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                        <DropdownList
-                            triggerElement={({isOpen, toggle}) => (
-                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                        Assign new software
-                                    </div>
-                                </button>
-                            )}
-                            choicesList={() => (
-                                <ul className={dropdownStyles.dropdownList}>
-                                    {softwareDropdown.map(i => (
-                                        <li
-                                            className={dropdownStyles.dropdownListItem}
-                                            key={i.name}
-                                            onClick={() => handleAddSoftware(i.id)}
-                                        >
-                                            <button className={dropdownStyles.dropdownListItemButton}>
-                                                <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        />
-                        <div />
-                    </div>
-                </Button>
+                {softwareDropdown && (
+                    <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                        <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                            <DropdownList
+                                triggerElement={({isOpen, toggle}) => (
+                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                        <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                            Assign new software
+                                        </div>
+                                    </button>
+                                )}
+                                choicesList={() => (
+                                    <ul className={dropdownStyles.dropdownList}>
+                                        {softwareDropdown.map(i => (
+                                            <li
+                                                className={dropdownStyles.dropdownListItem}
+                                                key={i.name}
+                                                onClick={() => handleAddSoftware(i.id)}
+                                            >
+                                                <button className={dropdownStyles.dropdownListItemButton}>
+                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            />
+                            <div />
+                        </div>
+                    </Button>
+                )}
 
                 <div className={styles.paddingTop}>
-                    <DetailEditTable
+                    <DetailPageTable
                         headers={licenseHeaders}
                         rows={licenseRows}
                         setRows={setLicenseRows}
                         style={styles.newRowThing}
+                        edit={true}
+                        remove={handleRemove}
                     />
                 </div>
-                <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
-                    <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                        <DropdownList
-                            triggerElement={({isOpen, toggle}) => (
-                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                        Assign new license
-                                    </div>
-                                </button>
-                            )}
-                            choicesList={() => (
-                                <ul className={dropdownStyles.dropdownList}>
-                                    {licenseDropdown.map(i => (
-                                        <li
-                                            className={dropdownStyles.dropdownListItem}
-                                            key={i.name}
-                                            onClick={() => handleAddLicense(i.id)}
-                                        >
-                                            <button className={dropdownStyles.dropdownListItemButton}>
-                                                <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        />
-                        <div />
-                    </div>
-                </Button>
+                {licenseDropdown && (
+                    <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                        <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                            <DropdownList
+                                triggerElement={({isOpen, toggle}) => (
+                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                        <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                            Assign new license
+                                        </div>
+                                    </button>
+                                )}
+                                choicesList={() => (
+                                    <ul className={dropdownStyles.dropdownList}>
+                                        {licenseDropdown.map(i => (
+                                            <li
+                                                className={dropdownStyles.dropdownListItem}
+                                                key={i.name}
+                                                onClick={() => handleAddLicense(i.id)}
+                                            >
+                                                <button className={dropdownStyles.dropdownListItemButton}>
+                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            />
+                            <div />
+                        </div>
+                    </Button>
+                )}
 
                 <div className={styles.submitContainer}>
                     <Button text='Submit' icon='submit' onClick={handleSubmit} className={styles.submitbutton} />

@@ -49,14 +49,12 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
     const licenseHeaders = ['Licenses', 'CALs']
 
-    //TODO: remove default options
     const [hardwareDropdown, setHardwareDropdown] = useState<any[]>()
     const [softwareDropdown, setSoftwareDropdown] = useState<any[]>()
     const [licenseDropdown, setLicenseDropdown] = useState<any[]>()
 
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
-    //TODO: make sure these go the right place
     const handleHardwareClick = (id: number | string) => {
         history.push(`/hardware/${id}`)
     }
@@ -85,7 +83,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     hw.push([
                         {
                             value: format(i.make + ' ' + i.model),
-                            id: format(i.id),
+                            id: format(i.type + '/' + i.id),
                             tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
                             onClick: handleHardwareClick,
                             sortBy: i.make + ' ' + i.model,
