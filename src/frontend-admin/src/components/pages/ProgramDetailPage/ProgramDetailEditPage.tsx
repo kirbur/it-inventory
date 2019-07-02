@@ -78,13 +78,6 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             .catch((err: any) => console.error(err))
     }, [])
 
-    const handleArchive = () => {
-        if (window.confirm(`Are you sure you want to archive this copy of ${progData.name}?`)) {
-            //TODO: a post request to archive program w/ id match.params.id
-            history.push(`/programs/overview/${progData.name}`)
-        }
-    }
-
     const handleSubmit = () => {
         //TODO: post
     }
@@ -95,10 +88,10 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
 
             <div className={styles.firstColumn}>
                 <Button
-                    text='All Programs'
+                    text={progData.name + ' ' + match.params.id}
                     icon='back'
                     onClick={() => {
-                        history.push('/programs')
+                        history.push(`/programs/details/${match.params.id}`)
                     }}
                     className={styles.backButton}
                     textClassName={styles.backButtonText}

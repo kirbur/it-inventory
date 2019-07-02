@@ -126,12 +126,23 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
                     {isAdmin && (
-                        <Button
-                            text='Archive'
-                            icon='archive'
-                            onClick={handleArchive}
-                            className={styles.archivebutton}
-                        />
+                        <Group direction='row' justify='start' className={styles.group}>
+                            <Button
+                                text='Edit'
+                                icon='edit'
+                                onClick={() => {
+                                    history.push('/editProgramOverview/' + match.params.id)
+                                }}
+                                className={styles.editbutton}
+                            />
+
+                            <Button
+                                text='Archive'
+                                icon='archive'
+                                onClick={handleArchive}
+                                className={styles.archivebutton}
+                            />
+                        </Group>
                     )}
                     <div className={styles.titleText}>
                         <div className={styles.programName}>{match.params.id}</div>
@@ -146,7 +157,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         headers={programHeaders}
                         rows={programRows}
                         setRows={setProgramRows}
-                        onRowClick={id => history.push(`/programs/detail/${id}`)}
+                        onRowClick={id => history.push(`/programs/details/${id}`)}
                     />
                     {isAdmin && (
                         <Button

@@ -79,10 +79,10 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <Button
-                        text='All Programs'
+                        text={progData.name}
                         icon='back'
                         onClick={() => {
-                            history.push('/programs')
+                            history.push(`/programs/overview/${progData.name}`)
                         }}
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
@@ -108,7 +108,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                 text='Edit'
                                 icon='edit'
                                 onClick={() => {
-                                    history.push('/editProgram/' + match.params.id)
+                                    history.push('/editProgramDetails/' + match.params.id)
                                 }}
                                 className={styles.editbutton}
                             />
