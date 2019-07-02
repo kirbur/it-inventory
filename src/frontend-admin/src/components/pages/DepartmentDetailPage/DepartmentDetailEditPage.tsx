@@ -276,11 +276,11 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                                     )}
                                     choicesList={() => (
                                         <ul className={dropdownStyles.dropdownList}>
-                                            {licenseDropdown.map(i => (
+                                            {softwareDropdown.map(i => (
                                                 <li
                                                     className={dropdownStyles.dropdownListItem}
                                                     key={i.name}
-                                                    onClick={() => handleAddLicense(i.id)}
+                                                    onClick={() => handleAddSoftware(i.id)}
                                                 >
                                                     <button className={dropdownStyles.dropdownListItemButton}>
                                                         <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>

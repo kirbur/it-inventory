@@ -99,6 +99,10 @@
     flex-direction: column;
     justify-content: left;
 }
+.left {
+    position: relative;
+    right: 5px;
+}
 .addDefaultContainer {
     padding-top: 25px;
     position: relative;
