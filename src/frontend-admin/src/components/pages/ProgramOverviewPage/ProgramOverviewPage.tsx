@@ -50,26 +50,45 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             .get(`/detail/ProgramOverview/${match.params.id}`)
             .then((data: any) => {
                 setProgramData(data[0].programOverview)
-
+                console.log(data)
                 let prog: any[] = []
                 data[0].inDivPrograms.map((i: any) =>
-                    prog.push([
-                        format(i.programId),
-                        format(i.programId),
-                        format(i.employeeName),
-                        format(i.programLicenseKey),
-                        formatDate(i.renewalDate),
-                    ])
+                    prog.push(
+                        i.employeeName
+                            ? [
+                                  {value: i.programId, id: i.programId, sortBy: i.programId, onClick: handleCopyClick},
+                                  {
+                                      value: format(i.employeeName),
+                                      id: i.employeeId,
+                                      sortBy: format(i.employeeName),
+                                      onClick: handleEmpClick,
+                                  },
+                                  {value: i.programLicenseKey, sortBy: i.programLicenseKey},
+                                  {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
+                              ]
+                            : [
+                                  {value: i.programId, id: i.programId, sortBy: i.programId, onClick: handleCopyClick},
+                                  {
+                                      value: format(i.employeeName),
+                                      id: i.employeeId,
+                                      sortBy: format(i.employeeName),
+                                  },
+                                  {value: format(i.programLicenseKey), sortBy: i.programLicenseKey},
+                                  {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
+                              ]
+                    )
                 )
                 setProgramRows(prog)
 
                 let plug: any[] = []
                 data[0].listOfPlugins.map((i: any) =>
                     plug.push([
-                        format(0),
-                        format(i.pluginName),
-                        formatDate(i.renewalDate),
-                        formatCost(i.isCostPerYear, i.pluginCostPerYear, i.pluginFlatCost),
+                        {value: format(i.pluginName), sortBy: format(i.pluginName)},
+                        {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
+                        {
+                            value: formatCost(i.isCostPerYear, i.pluginCostPerYear, i.pluginFlatCost),
+                            sortBy: i.pluginCostPerYear,
+                        },
                     ])
                 )
                 setPluginRows(plug)
@@ -83,6 +102,14 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             : perYear === 0
             ? perUse + ' paid'
             : Math.round((perYear / 12) * 100) / 100 + ' /mo'
+    }
+
+    const handleEmpClick = (id: number) => {
+        history.push(`/employees/${id}`)
+    }
+
+    const handleCopyClick = (id: number) => {
+        history.push(`/programs/details/${id}`)
     }
 
     const handleArchive = () => {
@@ -153,12 +180,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                             <div className={styles.programText}>License Key: {programData.programLicenseKey}</div>
                         )}
                     </div>
-                    <DetailPageTable
-                        headers={programHeaders}
-                        rows={programRows}
-                        setRows={setProgramRows}
-                        onRowClick={id => history.push(`/programs/details/${id}`)}
-                    />
+                    <DetailPageTable headers={programHeaders} rows={programRows} setRows={setProgramRows} />
                     {isAdmin && (
                         <Button
                             className={styles.addContainer}
