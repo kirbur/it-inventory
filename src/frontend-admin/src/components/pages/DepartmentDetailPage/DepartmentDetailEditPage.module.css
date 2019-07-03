@@ -87,17 +87,29 @@
 }
 
 /* table and add button */
-.tableRow {
+.tableColumn {
     display: flex;
     flex-direction: row;
     align-items: start;
+    justify-content: left;
+    width: 700px;
+}
+.firstTableColumn {
+    margin-top: 25px;
+    margin-right: 25px;
+    display: flex;
+    /* justify-content: flex-start; */
+    flex-direction: column;
+}
+.secondTableColumn {
+    margin-top: 25px;
+    padding-left: 25px;
+    display: flex;
+    flex-direction: column;
 }
 .table {
     width: 400px;
-    padding-top: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: left;
+    margin-top: 25px;
 }
 .left {
     position: relative;

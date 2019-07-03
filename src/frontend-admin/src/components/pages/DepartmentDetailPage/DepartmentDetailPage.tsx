@@ -122,11 +122,11 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
 
                 let dsw: any[] = []
                 data[0].defaultSoftware.map((i: any) => dsw.push([format(i.id), i]))
-                setDefaultHardware(dsw)
+                setDefaultSoftware(dsw)
 
                 let dl: any[] = []
                 data[0].defaultLicenses.map((i: any) => dl.push([format(i.id), i]))
-                setDefaultHardware(dl)
+                setDefaultLicenses(dl)
             })
             .catch((err: any) => console.error(err))
 
