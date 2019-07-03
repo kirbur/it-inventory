@@ -107,6 +107,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             history.push('/employees')
         }
     }
+    const handleSubmit = () => {}
 
     // make first section
     function renderSection(sectionHeaders: string[]) {
@@ -159,7 +160,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
             {/* column 2 */}
             <div className={styles.secondColumn}>
-                <div className={styles.header}>Hardware Information</div>
+                <div className={styles.hardwareHeader}>Hardware Information</div>
                 {/* virtualize checkbox */}
                 <div></div>
                 {/* first section */}
@@ -179,12 +180,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                 {/* comment section */}
                 <div>
-                    <table className={styles.table}>
+                    <table className={styles.commentContainer}>
                         <tr>
                             <td className={styles.header}>Text Field</td>
                         </tr>
                         <tr>
-                            <td>
+                            <td className={styles.text}>
                                 In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to
                                 demonstrate the visual form of a document without relying on meaningful content.
                                 Replacing the actual content with placeholder text allows designers to design the form
@@ -192,6 +193,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             </td>
                         </tr>
                     </table>
+                </div>
+                <div className={styles.submitContainer}>
+                    <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />
                 </div>
             </div>
         </div>

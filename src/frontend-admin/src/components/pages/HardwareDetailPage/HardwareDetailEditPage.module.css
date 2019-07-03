@@ -56,7 +56,7 @@
     padding-bottom: 100px;
     padding-top: 25px;
 }
-.header {
+.hardwareHeader {
     margin-top: 50px;
     margin-left: 15px;
     text-align: left;
@@ -100,46 +100,51 @@
 
 /* history log */
 .historyLogContainer {
-    max-width: 700px;
+    /* max-width: 700px; */
     margin-top: 50px;
 }
 
-/* idk about this stuff yet */
-.dropdownTitle {
-    margin-top: -3px;
-    font-family: cqlmedium;
-    text-transform: none;
-    color: #009eff;
+/* comment section */
+.commentContainer {
+    margin-top: 50px;
+}
+.header {
+    min-width: 100px;
+    font-size: 24px;
+    color: #a5a5a5;
+    text-align: left;
+    border-bottom: 1px solid #979797;
+}
+.text {
+    text-align: left;
+    color: #4a4a4a;
     font-size: 20px;
-}
-.addContainer {
-    margin: 5px 0 55px;
-    align-self: flex-end;
-}
-.addIconBorder:hover {
-    background-color: #009eff;
-    color: white;
-    cursor: pointer;
 }
 
-.addIconBorder:hover .addIcon {
-    color: white;
-}
-.addIconBorder {
-    border: 2px solid #009eff;
-    border-radius: 3px;
-    width: 25px;
-    height: 25px;
+/* submit button */
+.submitContainer {
+    padding-top: 50px;
     display: flex;
     justify-content: center;
+}
+.submitButton {
+    border: 2px solid #009eff;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     align-items: center;
+    width: 200px;
+    height: 35px;
 }
-.addIcon {
-    color: #009eff;
-    transform: scale(2, 2);
+.submitButton:hover {
+    background-color: #009eff;
+    cursor: pointer;
 }
-.assignText {
-    padding-left: 5px;
+.submitButton:hover .submitText {
+    color: white;
+}
+.submitText {
     color: #009eff;
-    font-size: 20px;
+    font-size: 24px;
 }
