@@ -52,6 +52,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
             setSecondTableHeaders(['MFG Tag', 'Serial #', 'SAN', 'Local HDD'])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
+            // make model purchaseDate renewalDate endOfLife virtualized
             setHeadingInfo(['the name', 'another name'])
             axios
                 .get(`/detail/hardware/${match.params.id}`)
@@ -63,9 +64,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'computer') {
-            setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
-            setSecondTableHeaders(['MFG Tag', 'Serial #', 'SAN', 'Local HDD'])
+            setFirstTableHeaders(['CPU', 'RAM', 'SSD', 'FQDN'])
+            setSecondTableHeaders(['Monitor Output', 'Screen Size', 'Serial #'])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
+            // make model purchaseDate renewalDate endOfLife
             setHeadingInfo(['the name', 'another name'])
             axios
                 .get(`/detail/hardware/${match.params.id}`)
@@ -76,9 +78,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'monitor') {
-            setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
-            setSecondTableHeaders(['MFG Tag', 'Serial #', 'SAN', 'Local HDD'])
-            setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
+            setFirstTableHeaders(['Screen Size', 'Resolution', 'Inputs', 'Serial #'])
+            setSecondTableHeaders([])
+            setThirdTableHeaders(['Employee Assigned', 'Dept Assigned'])
+            // make model
             setHeadingInfo(['the name', 'another name'])
             axios
                 .get(`/detail/hardware/${match.params.id}`)
@@ -89,9 +92,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
-            setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
-            setSecondTableHeaders(['MFG Tag', 'Serial #', 'SAN', 'Local HDD'])
-            setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
+            setFirstTableHeaders(['Employee Assigned', 'Serial #'])
+            setSecondTableHeaders([])
+            setThirdTableHeaders([])
+            // im not sure
             setHeadingInfo(['the name', 'another name'])
             axios
                 .get(`/detail/hardware/${match.params.id}`)
