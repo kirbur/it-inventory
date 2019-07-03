@@ -47,7 +47,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
 
     const hardwareHeaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
     const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
-    const licenseHeaders = ['Licenses', 'CALs']
+    const licenseHeaders = ['Licenses', 'Key/Username', 'Monthly Cost', 'CALs']
 
     const [hardwareDropdown, setHardwareDropdown] = useState<any[]>()
     const [softwareDropdown, setSoftwareDropdown] = useState<any[]>()
@@ -74,8 +74,9 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     role: data[0].role,
                     hireDate: formatDate(data[0].hireDate),
                     hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
-                    swCost: Math.round(data[0].totalProgramCostPerMonth * 100) / 100,
+                    swCost: Math.round(data[0].totalProgramCostMonthly * 100) / 100,
                 }
+                console.log(data)
                 setUserData(user)
 
                 let hw: any[] = []
@@ -83,7 +84,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     hw.push([
                         {
                             value: format(i.make + ' ' + i.model),
-                            id: format(i.type + '/' + i.id),
+                            id: format(i.type.toLowerCase() + '/' + i.id),
                             tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
                             onClick: handleHardwareClick,
                             sortBy: i.make + ' ' + i.model,
@@ -123,12 +124,16 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                             onClick: handleProgramClick,
                             sortBy: i.name,
                         },
-                        {value: format(i.cals), id: format(i.id), sortBy: i.cals},
                         {
-                            value: format(Math.round(i.costPerMonth * 100) / 100),
+                            value: format(i.licenseKey),
                             id: format(i.id),
+                            sortBy: format(i.licenseKey),
+                        },
+                        {
+                            value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
                             sortBy: i.costPerMonth,
                         },
+                        {value: format(i.cals), id: format(i.id), sortBy: i.cals},
                     ])
                 )
                 setLicenseRows(l)
@@ -136,8 +141,12 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 let uhw: any[] = []
                 data[0].unassignedHardware.map((i: any) =>
                     uhw.push({
-                        name: i.monitorName || i.compName || i.periphName,
-                        id: i.type + '/' + i.monitorId || i.type + '/' + i.computerId || i.type + '/' + i.peripheralId,
+                        name: i.monitorName ? i.monitorName : i.compName ? i.compName : i.periphName,
+                        id: i.monitorId
+                            ? i.type.toLowerCase() + '/' + i.monitorId
+                            : i.computerId
+                            ? i.type.toLowerCase() + '/' + i.computerId
+                            : i.type.toLowerCase() + '/' + i.peripheralId,
                     })
                 )
                 setHardwareDropdown(uhw)
@@ -172,6 +181,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
 
     const handleAddHardware = (id: number) => {
         //TODO: post request to assign hardware to user w/ id match.params.id
+        //then refresh the page so the changes are shown?
     }
 
     const handleAddSoftware = (id: number) => {

@@ -4,7 +4,7 @@ import React, {useState, useEffect, useContext} from 'react'
 import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {IoIosPersonAdd, IoMdAdd} from 'react-icons/io'
-import {GoCloudUpload} from 'react-icons/go'
+import {GoCloudUpload, GoDiffAdded} from 'react-icons/go'
 import {FaUserShield, FaUser, FaUserGraduate} from 'react-icons/fa'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import DatePicker from 'react-datepicker'
@@ -56,13 +56,25 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
     const axios = new AxiosService(accessToken, refreshToken)
     const [userData, setUserData] = useState<any>({})
-    const [hardwareRows, setHardwareRows] = useState<any[]>([])
-    const [softwareRows, setSoftwareRows] = useState<any[]>([])
-    const [licenseRows, setLicenseRows] = useState<any[]>([])
+    const [hardwareRows, setHardwareRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+        assigned: [],
+        added: [],
+        removed: [],
+    })
+    const [softwareRows, setSoftwareRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+        assigned: [],
+        added: [],
+        removed: [],
+    })
+    const [licenseRows, setLicenseRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+        assigned: [],
+        added: [],
+        removed: [],
+    })
 
     const hardwareHeaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
     const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
-    const licenseHeaders = ['Licenses', 'CALs']
+    const licenseHeaders = ['Licenses', 'Key/Username', 'Monthly Cost', 'CALs']
 
     //input feild states:
     const [dateInput, setDateInput] = useState<Date>(new Date())
@@ -71,14 +83,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const [imgInput, setImgInput] = useState<File>()
     const [roleInput, setRoleInput] = useState<string>()
 
-    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>()
-    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>()
-    const [licenseDropdown, setLicenseDropdown] = useState<any[]>()
+    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([])
+    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([])
+    const [licenseDropdown, setLicenseDropdown] = useState<any[]>([])
 
     const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'First Last', id: 1}])
     const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>()
-
-    const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
     useEffect(() => {
         if (match.params.id === 'new') {
@@ -112,9 +122,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         hw.push([
                             {
                                 value: format(i.make + ' ' + i.model),
-                                id: format(i.type + '/' + i.id),
-                                tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
-                                onClick: () => {},
+                                id: format(i.type.toLowerCase() + '/' + i.id),
                                 sortBy: i.make + ' ' + i.model,
                             },
                             {value: format(i.serialNumber), id: format(i.id), sortBy: i.serialNumber},
@@ -122,7 +130,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             {value: formatDate(i.purchaseDate), id: format(i.id), sortBy: i.purchaseDate},
                         ])
                     )
-                    setHardwareRows(hw)
+                    setHardwareRows({...hardwareRows, assigned: [...hw]})
 
                     let sw: any[] = []
                     data[0].software.map((i: any) =>
@@ -131,7 +139,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 value: format(i.name),
                                 id: format(i.id),
                                 sortBy: i.name,
-                                onClick: () => {},
                             },
                             {value: format(i.licenseKey), id: format(i.id), sortBy: i.licenseKey},
                             {
@@ -141,7 +148,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             },
                         ])
                     )
-                    setSoftwareRows(sw)
+                    setSoftwareRows({...softwareRows, assigned: [...sw]})
 
                     let l: any[] = []
                     data[0].licenses.map((i: any) =>
@@ -150,28 +157,33 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 value: format(i.name),
                                 id: format(i.id),
                                 sortBy: i.name,
-                                onClick: () => {},
                             },
-                            {value: format(i.cals), id: format(i.id), sortBy: i.cals},
                             {
-                                value: format(Math.round(i.costPerMonth * 100) / 100),
+                                value: format(i.licenseKey),
                                 id: format(i.id),
+                                sortBy: format(i.licenseKey),
+                            },
+                            {
+                                value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
                                 sortBy: i.costPerMonth,
                             },
+                            {value: format(i.cals), id: format(i.id), sortBy: i.cals},
                         ])
                     )
-                    setLicenseRows(l)
+                    setLicenseRows({...licenseRows, assigned: [...l]})
 
                     let uhw: any[] = []
                     data[0].unassignedHardware.map((i: any) =>
                         uhw.push({
-                            name: i.monitorName || i.compName || i.periphName,
-                            id:
-                                i.type + '/' + i.monitorId ||
-                                i.type + '/' + i.computerId ||
-                                i.type + '/' + i.peripheralId,
+                            name: i.monitorName ? i.monitorName : i.compName ? i.compName : i.periphName,
+                            id: i.monitorId
+                                ? i.type.toLowerCase() + '/' + i.monitorId
+                                : i.computerId
+                                ? i.type.toLowerCase() + '/' + i.computerId
+                                : i.type.toLowerCase() + '/' + i.peripheralId,
                         })
                     )
+
                     setHardwareDropdown(uhw)
 
                     let usw: any[] = []
@@ -216,24 +228,165 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         }
     }, [deptInput])
 
-    const handleAddHardware = (id: number) => {
-        //TODO: post request to assign hardware to user w/ id match.params.id
+    const handleAddHardware = (newRow: any) => {
+        //first add to displayed table
+        var arr = [
+            [
+                {value: newRow.name, id: newRow.id, sortBy: newRow.name},
+                {value: '', id: newRow.id, sortBy: newRow.id},
+                {value: '', id: newRow.id, sortBy: newRow.id},
+                {value: '', id: newRow.id, sortBy: newRow.id},
+            ],
+        ]
+
+        //take it out of remove if its there
+        var rem = hardwareRows.removed.filter((remove: any) => remove[0].id !== arr[0][0].id)
+        setHardwareRows({...hardwareRows, removed: [...rem]})
+
+        //dont put in added if its already assigned
+        var isAssigned = hardwareRows.assigned.filter((add: any) => add[0].id === arr[0][0].id)
+        if (isAssigned.length <= 0) {
+            setHardwareRows({...hardwareRows, added: [...hardwareRows.added, ...arr]})
+        }
+
+        //remove it from the dropdown list
+        var drop = hardwareDropdown.filter((option: any) => option !== newRow)
+        setHardwareDropdown([...drop])
     }
 
-    const handleAddSoftware = (id: number) => {
-        //TODO: post request to assign software to user w/ id match.params.id
+    const handleRemoveHardware = (row: any) => {
+        //if its in added then remove it
+        var arr = hardwareRows.added.filter((add: any) => add[0].id !== row[0].id)
+
+        //add to removed array
+        setHardwareRows({...hardwareRows, added: [...arr], removed: [...hardwareRows.removed, [...row]]})
+
+        //add it to the dropdown
+        var drop = {name: row[0].value, id: row[0].id}
+        setHardwareDropdown([...hardwareDropdown, drop])
     }
 
-    const handleAddLicense = (id: number) => {
-        //TODO: post request to assign license to user w/ id match.params.id
+    const handleAddSoftware = (newRow: any) => {
+        var arr = [
+            [
+                {value: newRow.name, id: newRow.id, sortBy: newRow.name},
+                {value: '', id: newRow.id, sortBy: newRow.id},
+                {value: '', id: newRow.id, sortBy: newRow.id},
+            ],
+        ]
+        //take it out of remove if its there
+        var rem = softwareRows.removed.filter((remove: any) => remove[0].id !== arr[0][0].id)
+        setSoftwareRows({...softwareRows, removed: [...rem]})
+
+        //dont put in added if its already assigned
+        var isAssigned = softwareRows.assigned.filter((add: any) => add[0].id === arr[0][0].id)
+        if (isAssigned.length <= 0) {
+            setSoftwareRows({...softwareRows, added: [...softwareRows.added, ...arr]})
+        }
+
+        //remove it from the dropdown list
+        var drop = softwareDropdown.filter((option: any) => option !== newRow)
+        setSoftwareDropdown([...drop])
+    }
+    const handleRemoveSoftware = (row: any) => {
+        //if its in added then remove it
+        var arr = softwareRows.added.filter((add: any) => add[0].id !== row[0].id)
+
+        //add to removed array
+        setSoftwareRows({...softwareRows, added: [...arr], removed: [...softwareRows.removed, [...row]]})
+
+        //add it to the dropdown
+        var drop = {name: row[0].value, id: row[0].id}
+        setSoftwareDropdown([...softwareDropdown, drop])
     }
 
-    const handleRemove = (row: any) => {
-        //TODO: might have to make sepaerate functions for each type
+    const handleAddLicense = (newRow: any) => {
+        var arr = [
+            [
+                {value: newRow.name, id: newRow.id, sortBy: newRow.name},
+                {value: '', id: newRow.id, sortBy: newRow.id},
+                {value: '', id: newRow.id, sortBy: newRow.id},
+                {value: '', id: newRow.id, sortBy: newRow.id},
+            ],
+        ]
+        //take it out of remove if its there
+        var rem = licenseRows.removed.filter((remove: any) => remove[0].id !== arr[0][0].id)
+        setLicenseRows({...licenseRows, removed: [...rem]})
+
+        //dont put in added if its already assigned
+        var isAssigned = licenseRows.assigned.filter((add: any) => add[0].id === arr[0][0].id)
+        if (isAssigned.length <= 0) {
+            setLicenseRows({...licenseRows, added: [...licenseRows.added, ...arr]})
+        }
+
+        //remove it from the dropdown list
+        var drop = licenseDropdown.filter((option: any) => option !== newRow)
+        setLicenseDropdown([...drop])
+    }
+
+    const handleRemoveLicence = (row: any) => {
+        //if its in added then remove it
+        var arr = licenseRows.added.filter((add: any) => add[0].id !== row[0].id)
+
+        //add to removed array
+        setLicenseRows({...licenseRows, added: [...arr], removed: [...licenseRows.removed, [...row]]})
+
+        //add it to the dropdown
+        var drop = {name: row[0].value, id: row[0].id}
+        setLicenseDropdown([...licenseDropdown, drop])
     }
 
     const handleSubmit = () => {
         //TODO: post request
+        //everything in every removed array needs to be unassigned
+        //everything in every added array needs to be assigned
+        //
+    }
+
+    const displayTable = (rows: any, type: string) => {
+        let arr: any[] = []
+
+        if (rows.removed.length === 0) {
+            arr = [...rows.assigned]
+        } else {
+            var bools: any[] = [] //bools[i] will be true if assigned[i] is not in removed
+            rows.assigned.forEach((row: any, index: number) => {
+                bools[index] = true
+                rows.removed.forEach((remove: any) => {
+                    bools[index] = bools[index] && remove[0].id !== row[0].id
+                })
+            })
+            rows.assigned.forEach((row: any, index: number) => {
+                if (bools[index]) {
+                    arr.push(row)
+                }
+            })
+        }
+
+        rows.added.map((add: any) => {
+            if (type === 'hw' || type === 'l') {
+                arr.push([
+                    {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy},
+                    {value: add[1].value, id: add[1].id, sortBy: add[1].sortBy},
+                    {value: add[2].value, id: add[2].id, sortBy: add[2].sortBy},
+                    {value: add[3].value, id: add[3].id, sortBy: add[3].sortBy},
+                ])
+            }
+            if (type === 'sw') {
+                arr.push([
+                    {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy},
+                    {value: add[1].value, id: add[1].id, sortBy: add[1].sortBy},
+                    {value: add[2].value, id: add[2].id, sortBy: add[2].sortBy},
+                ])
+            }
+            // if (type === 'l') {
+            //     arr.push([
+            //         {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy},
+            //         {value: add[1].value, id: add[1].id, sortBy: add[1].sortBy},
+            //     ])
+            // }
+        })
+        return arr
     }
 
     return (
@@ -242,16 +395,16 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
             <div className={styles.firstColumn}>
                 <Button
-                    text='All Employees'
+                    text={userData.name}
                     icon='back'
                     onClick={() => {
-                        history.push('/employees')
+                        history.push(`/employees/${match.params.id}`)
                     }}
                     className={styles.backButton}
                     textClassName={styles.backButtonText}
                 />
                 <div className={styles.imgPadding}>
-                    {/* <img className={styles.img} src={icon} /> */}
+                    {/* <ImageInput /> */}
                     <GoCloudUpload size={300} className={styles.cloudIcon} onClick={() => {}} />
                     <input
                         className={styles.imgInput}
@@ -358,7 +511,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                                     {employeeDropdown.map(i => (
                                                         <li
                                                             className={dropdownStyles.dropdownListItem}
-                                                            key={i.name}
+                                                            key={i.id}
                                                             onClick={() => {
                                                                 setSelectedEmployee(i)
                                                             }}
@@ -458,15 +611,20 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 <div className={styles.paddingTop}>
                     <DetailPageTable
                         headers={hardwareHeaders}
-                        rows={hardwareRows}
+                        rows={displayTable(hardwareRows, 'hw')}
                         setRows={setHardwareRows}
                         style={styles.newRowThing}
                         edit={true}
-                        remove={handleRemove}
+                        remove={handleRemoveHardware}
                     />
                 </div>
                 {hardwareDropdown && (
-                    <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    <Button
+                        className={s(styles.addContainer, styles.dropdown3)}
+                        icon='add'
+                        onClick={() => {}}
+                        textInside={false}
+                    >
                         <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                             <DropdownList
                                 triggerElement={({isOpen, toggle}) => (
@@ -477,12 +635,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     </button>
                                 )}
                                 choicesList={() => (
-                                    <ul className={dropdownStyles.dropdownList}>
+                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
                                         {hardwareDropdown.map(i => (
                                             <li
                                                 className={dropdownStyles.dropdownListItem}
-                                                key={i.name}
-                                                onClick={() => handleAddHardware(i.id)}
+                                                key={i.id}
+                                                onClick={() => handleAddHardware(i)}
                                             >
                                                 <button className={dropdownStyles.dropdownListItemButton}>
                                                     <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
@@ -500,15 +658,20 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 <div className={styles.paddingTop}>
                     <DetailPageTable
                         headers={softwareHeaders}
-                        rows={softwareRows}
+                        rows={displayTable(softwareRows, 'sw')}
                         setRows={setSoftwareRows}
                         style={styles.newRowThing}
                         edit={true}
-                        remove={handleRemove}
+                        remove={handleRemoveSoftware}
                     />
                 </div>
                 {softwareDropdown && (
-                    <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    <Button
+                        className={s(styles.addContainer, styles.dropdown2)}
+                        icon='add'
+                        onClick={() => {}}
+                        textInside={false}
+                    >
                         <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                             <DropdownList
                                 triggerElement={({isOpen, toggle}) => (
@@ -519,12 +682,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     </button>
                                 )}
                                 choicesList={() => (
-                                    <ul className={dropdownStyles.dropdownList}>
+                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
                                         {softwareDropdown.map(i => (
                                             <li
                                                 className={dropdownStyles.dropdownListItem}
-                                                key={i.name}
-                                                onClick={() => handleAddSoftware(i.id)}
+                                                key={i.id}
+                                                onClick={() => handleAddSoftware(i)}
                                             >
                                                 <button className={dropdownStyles.dropdownListItemButton}>
                                                     <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
@@ -542,15 +705,20 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 <div className={styles.paddingTop}>
                     <DetailPageTable
                         headers={licenseHeaders}
-                        rows={licenseRows}
+                        rows={displayTable(licenseRows, 'l')}
                         setRows={setLicenseRows}
                         style={styles.newRowThing}
                         edit={true}
-                        remove={handleRemove}
+                        remove={handleRemoveLicence}
                     />
                 </div>
                 {licenseDropdown && (
-                    <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
+                    <Button
+                        className={s(styles.addContainer, styles.dropdown1)}
+                        icon='add'
+                        onClick={() => {}}
+                        textInside={false}
+                    >
                         <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                             <DropdownList
                                 triggerElement={({isOpen, toggle}) => (
@@ -561,12 +729,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     </button>
                                 )}
                                 choicesList={() => (
-                                    <ul className={dropdownStyles.dropdownList}>
+                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
                                         {licenseDropdown.map(i => (
                                             <li
                                                 className={dropdownStyles.dropdownListItem}
-                                                key={i.name}
-                                                onClick={() => handleAddLicense(i.id)}
+                                                key={i.id}
+                                                onClick={() => handleAddLicense(i)}
                                             >
                                                 <button className={dropdownStyles.dropdownListItemButton}>
                                                     <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
