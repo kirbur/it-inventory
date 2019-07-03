@@ -43,9 +43,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     const [thirdTableHeaders, setThirdTableHeaders] = useState(['yeah something went wrong'])
     const [headingInfo, setHeadingInfo] = useState(['something aint right'])
 
-    var firstTableData: string | number[] = []
-    var secondTableData: string | number[] = []
-    var thirdTableData: string | number[] = []
+    const [firstTableData, setFirstTableData] = useState<(string | number)[]>([])
+    const [secondTableData, setSecondTableData] = useState<(string | number)[]>([])
+    const [thirdTableData, setThirdTableData] = useState<(string | number)[]>([])
+
+    const [commentText, setCommentText] = useState('')
 
     useEffect(() => {
         if (match.params.type === 'server') {
@@ -55,12 +57,24 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             // make model purchaseDate renewalDate endOfLife virtualized
             setHeadingInfo(['the name', 'another name'])
             axios
-                .get(`/detail/hardware/${match.params.id}`)
+                .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
-                    firstTableData = [data.FQDN, data.ipAddress, data.numberOfCores, data.operatingSystem, data.ram]
-                    secondTableData = []
-                    thirdTableData = []
+                    setFirstTableData([
+                        data[0].server.fqdn,
+                        data[0].server.ipAddress,
+                        data[0].server.numberOfCores,
+                        data[0].server.operatingSystem,
+                        data[0].server.ram,
+                    ])
+                    setSecondTableData([
+                        data[0].server.mfg,
+                        data[0].server.serialNumber,
+                        data[0].server.san,
+                        data[0].server.localHDD,
+                    ])
+                    setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].server.location])
+                    setCommentText(data[0].server.textField)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'laptop') {
@@ -70,11 +84,22 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             // make model purchaseDate renewalDate endOfLife
             setHeadingInfo(['the name', 'another name'])
             axios
-                .get(`/detail/hardware/${match.params.id}`)
+                .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
-                    firstTableData = []
-                    secondTableData = []
-                    thirdTableData = []
+                    console.log(data)
+                    setFirstTableData([
+                        data[0].computer.cpu,
+                        data[0].computer.ramgb,
+                        data[0].computer.ssdgb,
+                        data[0].computer.fqdn,
+                    ])
+                    setSecondTableData([
+                        data[0].computer.monitorOutput,
+                        data[0].computer.screenSize,
+                        data[0].computer.serialNumber,
+                    ])
+                    setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].computer.location])
+                    setCommentText(data[0].computer.textField)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'monitor') {
@@ -84,11 +109,18 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             // make model
             setHeadingInfo(['the name', 'another name'])
             axios
-                .get(`/detail/hardware/${match.params.id}`)
+                .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
-                    firstTableData = []
-                    secondTableData = []
-                    thirdTableData = []
+                    console.log(data)
+                    setFirstTableData([
+                        data[0].monitor.screenSize,
+                        data[0].monitor.resolution,
+                        data[0].monitor.inputs,
+                        data[0].monitor.serialNumber,
+                    ])
+                    setSecondTableData([])
+                    setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD'])
+                    setCommentText(data[0].monitor.textField)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
@@ -98,11 +130,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             // im not sure
             setHeadingInfo(['the name', 'another name'])
             axios
-                .get(`/detail/hardware/${match.params.id}`)
+                .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
-                    firstTableData = []
-                    secondTableData = []
-                    thirdTableData = []
+                    console.log(data)
+                    setFirstTableData([data[0].employeeAssignedName, data[0].peripheral.serialNumber])
+                    setSecondTableData([])
+                    setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD'])
+                    setCommentText(data[0].peripheral.textField)
                 })
                 .catch((err: any) => console.error(err))
         }
@@ -166,12 +200,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         {headingInfo.map((heading: string) => (
                             <div className={styles.hardwareText}>{heading} </div>
                         ))}
-                        {/* <div className={styles.hardwareText}>Make: </div>
-                        <div className={styles.hardwareText}>Model: </div>
-                        <div className={styles.hardwareText}>Purchased Date: </div>
-                        <div className={styles.hardwareText}>Renewal Date: </div>
-                        <div className={styles.hardwareText}>End of Life: </div>
-                        <div className={styles.hardwareText}>Virtualized: yes/no </div> */}
                     </div>
 
                     {/* tables? */}
@@ -185,7 +213,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                             </tr>
                             <tr>
                                 {firstTableData.map((datum: string | number) => (
-                                    <td className={styles.rowData}></td>
+                                    <td className={styles.rowData}>{datum}</td>
                                 ))}
                             </tr>
                         </table>
@@ -198,7 +226,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                             </tr>
                             <tr>
                                 {secondTableData.map((datum: string | number) => (
-                                    <td className={styles.rowData}></td>
+                                    <td className={styles.rowData}>{datum}</td>
                                 ))}
                             </tr>
                         </table>
@@ -211,7 +239,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                             </tr>
                             <tr>
                                 {thirdTableData.map((datum: string | number) => (
-                                    <td className={styles.rowData}></td>
+                                    <td className={styles.rowData}>{datum}</td>
                                 ))}
                             </tr>
                         </table>
@@ -229,12 +257,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                                 <td className={styles.header}>Text Field</td>
                             </tr>
                             <tr>
-                                <td className={styles.rowData}>
-                                    In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to
-                                    demonstrate the visual form of a document without relying on meaningful content.
-                                    Replacing the actual content with placeholder text allows designers to design the
-                                    form of the content before the content itself has been produced.
-                                </td>
+                                <td className={styles.rowData}>{commentText}</td>
                             </tr>
                         </table>
                     </div>
