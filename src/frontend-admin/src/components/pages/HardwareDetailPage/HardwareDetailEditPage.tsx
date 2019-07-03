@@ -92,7 +92,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     setCommentText(data[0].server.textField)
                 })
                 .catch((err: any) => console.error(err))
-        } else if (match.params.type === 'laptop') {
+        } else if (match.params.type === ('laptop' || 'computer')) {
             setFirstSectionHeaders([
                 'Make',
                 'Model',
