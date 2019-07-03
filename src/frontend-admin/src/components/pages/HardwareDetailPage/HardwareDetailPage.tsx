@@ -63,7 +63,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     thirdTableData = []
                 })
                 .catch((err: any) => console.error(err))
-        } else if (match.params.type === 'computer') {
+        } else if (match.params.type === 'laptop') {
             setFirstTableHeaders(['CPU', 'RAM', 'SSD', 'FQDN'])
             setSecondTableHeaders(['Monitor Output', 'Screen Size', 'Serial #'])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
@@ -146,7 +146,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                                 text='Edit'
                                 icon='edit'
                                 onClick={() => {
-                                    history.push('/editHardware/' + match.params.id)
+                                    history.push('/editHardware/' + match.params.type + '/' + match.params.id)
                                 }}
                                 className={styles.editbutton}
                             />
