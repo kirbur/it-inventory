@@ -24,22 +24,23 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
 
     return (
         <div className={styles.formMain}>
+            <div className={styles.line} />
             <div className={s(styles.title, styles.paddingBottom)}>Program Information</div>
 
             <Group direction={'row'}>
-                <div>
-                    <div className={styles.inputtext}>Purchase Date</div>
+                <div className={styles.inputContainer}>
+                    <div className={styles.inputText}>Purchase Date</div>
                     <DatePicker
-                        dateFormat='yyyy/MM/dd'
+                        dateFormat='MM/dd/yyyy'
                         selected={state.purchaseDate}
                         onChange={e => e && setState({...state, purchaseDate: e})}
                         className={styles.input}
                     />
                 </div>
-                <div>
-                    <div className={styles.inputtext}>Renewal Date</div>
+                <div className={styles.inputContainer}>
+                    <div className={styles.inputText}>Renewal Date</div>
                     <DatePicker
-                        dateFormat='yyyy/MM/dd'
+                        dateFormat='MM/dd/yyyy'
                         selected={state.renewalDate}
                         onChange={e => e && setState({...state, renewalDate: e})}
                         className={styles.input}
@@ -61,7 +62,7 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         <div className={styles.insideCheckmark} />
                     </div>
                     <div>
-                        <div className={styles.inputtext}>Cost per Month</div>
+                        <div className={styles.inputText}>Cost per Month</div>
                         <input
                             className={s(styles.input, styles.costInput)}
                             type='number'
@@ -84,7 +85,7 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         <div className={styles.insideCheckmark} />
                     </div>
                     <div>
-                        <div className={styles.inputtext}>Cost per Year</div>
+                        <div className={styles.inputText}>Cost per Year</div>
                         <input
                             className={s(styles.input, styles.costInput)}
                             type='number'
@@ -107,7 +108,7 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         <div className={styles.insideCheckmark} />
                     </div>
                     <div>
-                        <div className={styles.inputtext}>Cost per License</div>
+                        <div className={styles.inputText}>Cost per License</div>
                         <input
                             className={s(styles.input, styles.costInput)}
                             type='number'
@@ -117,30 +118,40 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                     </div>
                 </Group>
             </Group>
+            <div className={styles.line} />
 
             <Group direction={'row'}>
-                <div>
+                <div className={styles.inputContainer}>
                     <div className={styles.inputText}>License Key</div>
                     <input
-                        type='number'
+                        type='text'
                         className={s(styles.input, styles.pluginInput)}
                         value={state.licenseKey}
                         onChange={e => setState({...state, licenseKey: e.target.value})}
                     />
                 </div>
 
-                <div>
-                    <div className={styles.inputText}>License Key</div>
+                <div className={styles.inputContainer}>
+                    <div className={styles.inputText}>Purchase Link</div>
                     <input
-                        type='number'
+                        type='text'
                         className={s(styles.input, styles.pluginInput)}
-                        value={state.licenseKey}
-                        onChange={e => setState({...state, licenseKey: e.target.value})}
+                        value={state.link}
+                        onChange={e => setState({...state, link: e.target.value})}
                     />
                 </div>
             </Group>
+            <div className={styles.inputContainer}>
+                <div className={styles.inputText}>Description</div>
+                <textarea
+                    className={s(styles.input, styles.description)}
+                    value={state.description}
+                    onChange={e => setState({...state, description: e.target.value})}
+                />
+            </div>
 
-            <Button text='Submit Copies' onClick={submit} className={styles.submitButton} />
+            {/* <Button text='Submit Copies' onClick={submit} className={styles.submitButton} /> */}
+            <div className={styles.line} />
         </div>
     )
 }

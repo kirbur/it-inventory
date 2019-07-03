@@ -1,5 +1,4 @@
 .formMain {
-    max-width: 900px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -131,7 +130,7 @@ input:checked ~ .insideCheckmarkAdmin {
     background-color: #009eff;
 }
 
-.inputtext {
+.inputText {
     color: #a5a5a5;
     font-size: 24px;
     text-align: left;
@@ -152,4 +151,22 @@ input:checked ~ .insideCheckmarkAdmin {
 
 .costInput {
     width: 150px;
+}
+
+.inputContainer {
+    margin: 15px;
+}
+
+.description {
+    width: 100%;
+    height: 100px;
+    font-family: cqlRegularFont;
+}
+
+.line {
+    align-self: center;
+    border-bottom: 2px solid #a5a5a5;
+    width: 100%;
+    height: 10px;
+    margin-top: 50px;
 }
