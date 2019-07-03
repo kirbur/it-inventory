@@ -16,6 +16,7 @@ import {HelloUser} from '../HelloUser/HelloUser'
 import logo from '../../content/Images/CQL-Logo-Color.png'
 import {EmployeeDetailEditPage} from '../pages/EmployeeDetailPage/EmployeeDetailEditPage'
 import {DepartmentDetailEditPage} from '../pages/DepartmentDetailPage/DepartmentDetailEditPage'
+import {HardwareDetailEditPage} from '../pages/HardwareDetailPage/HardwareDetailEditPage'
 
 // Styles
 import styles from './App.module.css'
@@ -128,7 +129,7 @@ export const App: React.FC = () => {
 
                         <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
                         <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
-                        <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
+                        <Route path={'/hardware/:type/:id'} render={props => <HardwareDetailPage {...props} />} />
                         <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
 
                         <Route
@@ -140,6 +141,11 @@ export const App: React.FC = () => {
                             exact
                             path={'/editDepartment/:id'}
                             render={props => <DepartmentDetailEditPage {...props} />}
+                        />
+                        <Route
+                            exact
+                            path={'/editHardware/:type/:id'}
+                            render={props => <HardwareDetailEditPage {...props} />}
                         />
                     </Switch>
                 </Router>
