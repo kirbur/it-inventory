@@ -128,7 +128,7 @@ export const App: React.FC = () => {
 
                         <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
                         <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
-                        <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
+                        <Route path={'/hardware/:type/:id'} render={props => <HardwareDetailPage {...props} />} />
                         <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
 
                         <Route
