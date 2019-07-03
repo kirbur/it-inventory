@@ -80,7 +80,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/hardware/peripheral/new')
+        history.push('/editHardware/peripheral/new')
     }
 
     const handleRowClick = (row: any) => {

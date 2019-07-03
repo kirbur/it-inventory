@@ -86,7 +86,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }
 
     const handleClick = () => {
-        history.push(`hardware/server/new`)
+        history.push(`editHardware/server/new`)
     }
 
     const handleRowClick = (row: any) => {

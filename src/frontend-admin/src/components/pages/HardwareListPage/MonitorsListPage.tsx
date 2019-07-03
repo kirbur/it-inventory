@@ -78,7 +78,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/hardware/monitor/new')
+        history.push('/editHardware/monitor/new')
     }
 
     const handleRowClick = (row: any) => {
