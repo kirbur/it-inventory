@@ -1,11 +1,13 @@
 import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
-import Axios from 'axios'
+
 // Components
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
-
+import {Group} from '../../reusables/Group/Group'
+import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
+import {ProgramForm} from '../../reusables/ProgramForm/ProgramForm'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -35,18 +37,60 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     const [programData, setProgramData] = useState<any>({})
     const [programRows, setProgramRows] = useState<any[]>([])
     const [pluginRows, setPluginRows] = useState<any[]>([])
+    const [removedProgramRows, setRemovedProgramRows] = useState<any[]>([])
+
+    const [pluginForm, setPluginForm] = useState(false)
+    const [programForm, setProgramForm] = useState(false)
 
     const programHeaders = [`${match.params.id}`, 'Employee', 'License Key', 'Renewal Date']
     const pluginHeaders = ['Plugins', 'Renewal Date', 'Cost']
 
     // input states
     const [imgInput, setImgInput] = useState<File>()
+    const [nameInput, setNameInput] = useState<string>(match.params.id === 'new' ? '' : match.params.id)
+    const [numCopies, setNumCopies] = useState(1)
+    const [pluginInput, setPluginInput] = useState<{
+        name: string
+        programName: string
+        description: string
+        costPerMonth: number
+        flatCost: number
+        renewalDate: Date
+        monthsPerRenewal: number
+    }>({
+        name: '',
+        programName: nameInput,
+        description: '',
+        costPerMonth: 0,
+        flatCost: 0,
+        renewalDate: new Date(),
+        monthsPerRenewal: 0,
+    })
+
+    const [programInput, setProgramInput] = useState<{
+        name: string
+        programName: string
+        description: string
+        costPerMonth: number
+        flatCost: number
+        renewalDate: Date
+        monthsPerRenewal: number
+    }>({
+        name: '',
+        programName: nameInput,
+        description: '',
+        costPerMonth: 0,
+        flatCost: 0,
+        renewalDate: new Date(),
+        monthsPerRenewal: 0,
+    })
 
     useEffect(() => {
         axios
             .get(`/detail/ProgramOverview/${match.params.id}`)
             .then((data: any) => {
                 setProgramData(data[0].programOverview)
+                setNumCopies(data[0].programOverview.countProgOverall)
                 console.log(data)
                 let prog: any[] = []
                 data[0].inDivPrograms.map((i: any) =>
@@ -106,8 +150,42 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         }
     }
 
-    const handleRemove = (row: any) => {}
+    const handleRemove = (row: any) => {
+        //add to removed array
+        setRemovedProgramRows([...removedProgramRows, [...row]])
+    }
 
+    const handleSubmit = () => {
+        setPluginInput({...pluginInput, programName: nameInput})
+        //TODO: post request
+    }
+
+    const handleProgramSubmit = () => {
+        //TODO: post request
+    }
+
+    const displayCopies = () => {
+        var arr: any[] = []
+
+        if (removedProgramRows.length === 0) {
+            arr = [...programRows]
+        } else {
+            var bools: any[] = []
+            programRows.forEach((row: any, index: number) => {
+                bools[index] = true
+                removedProgramRows.forEach((remove: any) => {
+                    bools[index] = bools[index] && remove[0].id !== row[0].id
+                })
+            })
+            programRows.forEach((row: any, index: number) => {
+                if (bools[index]) {
+                    arr.push(row)
+                }
+            })
+        }
+
+        return arr
+    }
     return (
         <div className={styles.progOverviewEditMain}>
             <div className={styles.columns}>
@@ -126,32 +204,59 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
-                    <div className={styles.titleText}>
-                        <div className={styles.programName}>{match.params.id}</div>
-                        <div className={styles.programText}>
-                            {programData.countProgInUse} / {programData.countProgOverall} Used
+                    <Group className={styles.nameInput}>
+                        <div className={styles.inputContainer}>
+                            <div className={styles.inputText}>Program Name</div>
+                            <input
+                                type='text'
+                                className={styles.input}
+                                value={nameInput}
+                                onChange={e => setNameInput(e.target.value)}
+                            />
                         </div>
-                        {programData.programLicenseKey && (
-                            <div className={styles.programText}>License Key: {programData.programLicenseKey}</div>
-                        )}
-                    </div>
-                    <DetailPageTable
-                        headers={programHeaders}
-                        rows={programRows}
-                        setRows={setProgramRows}
-                        edit={true}
-                        remove={handleRemove}
-                    />
 
-                    <Button
-                        className={styles.addContainer}
-                        icon='add'
-                        onClick={() => {
-                            //TODO:what does this look like
-                        }}
-                        textInside={false}
-                        text={'Add Copy'}
-                    />
+                        <div className={styles.inputContainer}>
+                            <div className={styles.inputText}># of Copies</div>
+                            <input
+                                type='number'
+                                className={s(styles.input, styles.pluginInput)}
+                                value={numCopies}
+                                onChange={e => setNumCopies(parseInt(e.target.value))}
+                            />
+                        </div>
+                    </Group>
+
+                    {match.params.id !== 'new' ? (
+                        <Group direction={'column'}>
+                            <DetailPageTable
+                                headers={programHeaders}
+                                rows={displayCopies()}
+                                setRows={setProgramRows}
+                                edit={true}
+                                remove={handleRemove}
+                            />
+
+                            <Button
+                                className={styles.addContainer}
+                                icon='add'
+                                onClick={() => setProgramForm(!programForm)}
+                                textInside={false}
+                                text={'Add Copy'}
+                            />
+
+                            {programForm && (
+                                <ProgramForm
+                                    state={programInput}
+                                    setState={setProgramInput}
+                                    submit={handleProgramSubmit}
+                                />
+                            )}
+                        </Group>
+                    ) : (
+                        <div className={styles.programForm}>
+                            <ProgramForm state={programInput} setState={setProgramInput} submit={handleProgramSubmit} />
+                        </div>
+                    )}
 
                     <DetailPageTable
                         headers={pluginHeaders}
@@ -165,11 +270,89 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         className={styles.addContainer}
                         icon='add'
                         onClick={() => {
-                            //TODO: open up plugin form??
+                            setPluginForm(!pluginForm)
                         }}
                         textInside={false}
                         text={'Add Plugin'}
                     />
+
+                    {pluginForm && (
+                        <div className={styles.pluginForm}>
+                            <Group className={styles.pluginGroup}>
+                                <div className={styles.inputContainer}>
+                                    <div className={styles.inputText}>Plugin Name</div>
+                                    <input
+                                        type='text'
+                                        className={s(styles.input, styles.pluginInput)}
+                                        value={pluginInput.name}
+                                        onChange={e => setPluginInput({...pluginInput, name: e.target.value})}
+                                    />
+                                </div>
+
+                                <div className={styles.inputContainer}>
+                                    <div className={styles.inputText}>Description</div>
+                                    <input
+                                        type='text'
+                                        className={s(styles.input, styles.pluginInput)}
+                                        value={pluginInput.description}
+                                        onChange={e => setPluginInput({...pluginInput, description: e.target.value})}
+                                    />
+                                </div>
+
+                                <div className={styles.inputContainer}>
+                                    <div className={styles.inputText}>Renewal Date</div>
+                                    <DatePicker
+                                        dateFormat='MM/dd/yyyy'
+                                        placeholderText={new Date().toDateString()}
+                                        selected={pluginInput.renewalDate}
+                                        onChange={e => e && setPluginInput({...pluginInput, renewalDate: e})}
+                                        className={s(styles.input, styles.pluginInput)}
+                                    />
+                                </div>
+                            </Group>
+
+                            <Group className={styles.pluginGroup}>
+                                <div className={styles.inputContainer}>
+                                    <div className={styles.inputText}>Flat Cost</div>
+                                    <input
+                                        type='number'
+                                        className={s(styles.input, styles.pluginInput)}
+                                        value={pluginInput.flatCost}
+                                        onChange={e =>
+                                            setPluginInput({...pluginInput, flatCost: parseInt(e.target.value)})
+                                        }
+                                    />
+                                </div>
+
+                                <div className={styles.inputContainer}>
+                                    <div className={styles.inputText}>Monthly Cost</div>
+                                    <input
+                                        type='number'
+                                        className={s(styles.input, styles.pluginInput)}
+                                        value={pluginInput.costPerMonth}
+                                        onChange={e =>
+                                            setPluginInput({...pluginInput, costPerMonth: parseInt(e.target.value)})
+                                        }
+                                    />
+                                </div>
+
+                                <div className={styles.inputContainer}>
+                                    <div className={styles.inputText}>Months Per Renewal</div>
+                                    <input
+                                        type='number'
+                                        className={s(styles.input, styles.pluginInput)}
+                                        value={pluginInput.monthsPerRenewal}
+                                        onChange={e =>
+                                            setPluginInput({...pluginInput, monthsPerRenewal: parseInt(e.target.value)})
+                                        }
+                                    />
+                                </div>
+                            </Group>
+                        </div>
+                    )}
+                    <div className={styles.submitContainer}>
+                        <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />
+                    </div>
                 </div>
             </div>
         </div>

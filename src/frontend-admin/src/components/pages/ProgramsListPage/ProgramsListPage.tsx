@@ -88,7 +88,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/programs/overview/new')
+        history.push('/editProgramOverview/new')
     }
 
     const handleRowClick = (row: any) => {
