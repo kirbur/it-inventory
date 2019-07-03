@@ -43,6 +43,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [thirdSectionHeaders, setThirdSectionHeaders] = useState<string[]>(['yeah something went wrong'])
     const [headingInfo, setHeadingInfo] = useState<(string | number)[]>(['something aint right'])
 
+    const [firstSectionData, setFirstSectionData] = useState<(string | number)[]>([])
+    const [secondSectionData, setSecondSectionData] = useState<(string | number)[]>([])
+    const [thirdSectionData, setThirdSectionData] = useState<(string | number)[]>([])
+
+    const [commentText, setCommentText] = useState('')
+
     useEffect(() => {
         if (match.params.type === 'server') {
             setFirstSectionHeaders([
@@ -50,7 +56,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 'Model',
                 'OS',
                 'RAM',
-                'Local HDD',
+                'Local HHD',
                 '# of Cores',
                 'MFG Tag',
                 'Serial #',
@@ -61,8 +67,30 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
             setThirdSectionHeaders(['Employee Assigned', 'Department Assigned', 'Location'])
             axios
-                .get(`/detail/hardware/${match.params.id}`)
-                .then((data: any) => {})
+                .get(`/detail/server/${match.params.id}`)
+                .then((data: any) => {
+                    console.log(data)
+                    setFirstSectionData([
+                        data[0].server.make,
+                        data[0].server.model,
+                        data[0].server.operatingSystem,
+                        data[0].server.ram,
+                        data[0].server.localHHD,
+                        data[0].server.numberOfCores,
+                        data[0].server.mfg,
+                        data[0].server.serialNumber,
+                        data[0].server.ipAddress,
+                        data[0].server.san,
+                        data[0].server.fqdn,
+                    ])
+                    setSecondSectionData([
+                        data[0].server.purchaseDate,
+                        data[0].server.renewalDate,
+                        data[0].server.endOfLife,
+                    ])
+                    setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].server.location])
+                    setCommentText(data[0].server.textField)
+                })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'laptop') {
             setFirstSectionHeaders([
@@ -79,24 +107,63 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
             setThirdSectionHeaders(['Employee Assigned', 'Department Assigned', 'Location'])
             axios
-                .get(`/detail/hardware/${match.params.id}`)
-                .then((data: any) => {})
+                .get(`/detail/computer/${match.params.id}`)
+                .then((data: any) => {
+                    console.log(data)
+                    setFirstSectionData([
+                        data[0].computer.make,
+                        data[0].computer.model,
+                        data[0].computer.cpu,
+                        data[0].computer.ramgb,
+                        data[0].computer.ssdgb,
+                        data[0].computer.screenSize,
+                        data[0].computer.monitorOutput,
+                        data[0].computer.serialNumber,
+                        data[0].computer.fqdn,
+                    ])
+                    setSecondSectionData([
+                        data[0].computer.purchaseDate,
+                        data[0].computer.renewalDate,
+                        data[0].computer.endOfLife,
+                    ])
+                    setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].computer.location])
+                    setCommentText(data[0].computer.textField)
+                })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'monitor') {
             setFirstSectionHeaders(['Make', 'Model', 'Screen Size', 'Resolution', 'Inputs', 'Serial #'])
             setSecondSectionHeaders([])
             setThirdSectionHeaders(['Employee Assigned', 'Dept Assigned'])
             axios
-                .get(`/detail/hardware/${match.params.id}`)
-                .then((data: any) => {})
+                .get(`/detail/monitor/${match.params.id}`)
+                .then((data: any) => {
+                    console.log(data)
+                    setFirstSectionData([
+                        data[0].monitor.make,
+                        data[0].monitor.model,
+                        data[0].monitor.screenSize,
+                        data[0].monitor.resolution,
+                        data[0].monitor.inputs,
+                        data[0].monitor.serialNumber,
+                    ])
+                    setSecondSectionData([])
+                    setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD'])
+                    setCommentText(data[0].monitor.textField)
+                })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
             setFirstSectionHeaders(['Employee Assigned', 'Serial #'])
             setSecondSectionHeaders([])
             setThirdSectionHeaders([])
             axios
-                .get(`/detail/hardware/${match.params.id}`)
-                .then((data: any) => {})
+                .get(`/detail/peripheral/${match.params.id}`)
+                .then((data: any) => {
+                    console.log(data)
+                    setFirstSectionData([data[0].employeeAssignedName, data[0].peripheral.serialNumber])
+                    setSecondSectionData([])
+                    setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD'])
+                    setCommentText(data[0].peripheral.textField)
+                })
                 .catch((err: any) => console.error(err))
         }
     }, [])
@@ -110,7 +177,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const handleSubmit = () => {}
 
     // make first section
-    function renderSection(sectionHeaders: string[]) {
+    function renderSection(sectionHeaders: string[], sectionData: any[]) {
         var rows = []
         for (let i = 0; i < sectionHeaders.length; i += 3) {
             rows.push(
@@ -118,19 +185,19 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     {sectionHeaders[i] && (
                         <div className={styles.inputContainer}>
                             <div className={styles.inputHeader}>{sectionHeaders[i]}</div>
-                            <input type='text' className={styles.input}></input>
+                            <input type='text' className={styles.input} placeholder={sectionData[i]}></input>
                         </div>
                     )}
                     {sectionHeaders[i + 1] && (
                         <div className={styles.inputContainer}>
                             <div className={styles.inputHeader}>{sectionHeaders[i + 1]}</div>
-                            <input type='text' className={styles.input}></input>
+                            <input type='text' className={styles.input} placeholder={sectionData[i + 1]}></input>
                         </div>
                     )}
                     {sectionHeaders[i + 2] && (
                         <div className={styles.inputContainer}>
                             <div className={styles.inputHeader}>{sectionHeaders[i + 2]}</div>
-                            <input type='text' className={styles.input}></input>
+                            <input type='text' className={styles.input} placeholder={sectionData[i + 2]}></input>
                         </div>
                     )}
                 </div>
@@ -164,13 +231,13 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 {/* virtualize checkbox */}
                 <div></div>
                 {/* first section */}
-                {firstSectionHeaders.length > 0 && renderSection(firstSectionHeaders)}
+                {firstSectionHeaders.length > 0 && renderSection(firstSectionHeaders, firstSectionData)}
                 {firstSectionHeaders.length > 0 && <div className={styles.line} />}
                 {/* second section */}
-                {secondSectionHeaders.length > 0 && renderSection(secondSectionHeaders)}
+                {secondSectionHeaders.length > 0 && renderSection(secondSectionHeaders, secondSectionData)}
                 {secondSectionHeaders.length > 0 && <div className={styles.line} />}
                 {/* third section */}
-                {thirdSectionHeaders.length > 0 && renderSection(thirdSectionHeaders)}
+                {thirdSectionHeaders.length > 0 && renderSection(thirdSectionHeaders, thirdSectionData)}
                 {thirdSectionHeaders.length > 0 && <div className={styles.line} />}
 
                 {/* history log */}
