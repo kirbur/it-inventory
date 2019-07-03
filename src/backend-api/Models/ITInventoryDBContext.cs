@@ -117,7 +117,7 @@ namespace backend_api.Models
                     .HasColumnName("ADGUID")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+                entity.Property(e => e.DepartmentID).HasColumnName("DepartmentID");
 
                 entity.Property(e => e.Email)
                     .IsRequired()

@@ -69,12 +69,19 @@ namespace backend_api.Controllers
         [Route("EmployeePrep")]
         public IActionResult GetEmployeePrep()
         {
+            // list to hold CQL distribution employees
             var myDomainUsers = new List<string>();
+
+            // Finding our Active Directory.
             using (var ctx = new PrincipalContext(ContextType.Domain, "CQLCORP"))
             {
                 var userPrinciple = new UserPrincipal(ctx);
+                // Finding the CQL distribution group within AD
                 GroupPrincipal gp = GroupPrincipal.FindByIdentity(ctx, "CQL Distribution");
+
                 var ADIds = _context.AuthIdserver.Select(x => x.ActiveDirectoryId).ToList();
+                // loop to check all employees if they exist and have not yet been added to our database.
+                // if they are un added then add their name to our list of people possible to add.
                 using (var search = new PrincipalSearcher(userPrinciple))
                 {
                     foreach (var domainUser in search.FindAll())
@@ -89,23 +96,43 @@ namespace backend_api.Controllers
             }
 
             List<object> departments = new List<object>();
-            foreach (var dep in _context.Department.Where(x => x.IsDeleted == false && x.DepartmentName != "Utilities"))
+            foreach (var dep in _context.Department.Where(x => x.IsDeleted == false))
             {
-                // pull stringifyed default hardware and software out into a nice JSON object :) using JSON package.
-                JObject defaultHardware = JObject.Parse(dep.DefaultHardware);
-                JObject defaultPrograms = JObject.Parse(dep.DefaultPrograms);
-
-                string icon = $"/image/department/{dep.DepartmentId}";
-
-                departments.Add(new
+                // if the department is any department apart from utilities does not have default programs
+                if (dep.DepartmentName != "Utilities")
                 {
-                    dep.DepartmentName,
-                    dep.DepartmentId,
-                    icon,
-                    DefaultHardware = defaultHardware["DefaultHardware"],
-                    DefaultLicenses = defaultPrograms["license"],
-                    DefaultSoftware = defaultPrograms["software"],
-                });
+                    // pull stringifyed default hardware and software out into a nice JSON object :) using JSON package.
+                    JObject defaultHardware = JObject.Parse(dep.DefaultHardware);
+                    JObject defaultPrograms = JObject.Parse(dep.DefaultPrograms);
+
+                    // image for the department
+                    string icon = $"/image/department/{dep.DepartmentId}";
+
+                    // the necessary returnables
+                    departments.Add(new
+                    {
+                        dep.DepartmentName,
+                        dep.DepartmentId,
+                        icon,
+                        DefaultHardware = defaultHardware["DefaultHardware"],
+                        DefaultLicenses = defaultPrograms["license"],
+                        DefaultSoftware = defaultPrograms["software"],
+                    });
+                }
+
+                // if the department is utilities then it does not have default programs
+                else
+                {
+                    string icon = $"/image/department/{dep.DepartmentId}";
+
+                    departments.Add(new
+                    {
+                        dep.DepartmentName,
+                        dep.DepartmentId,
+                        icon
+                    });
+
+                }
             }
 
             // list that will hold the unassigned hardware
@@ -204,11 +231,74 @@ namespace backend_api.Controllers
             return Ok(new List<object> { empPrep });
         }
 
+
         [HttpPost]
         [Route("Employee")]
-        public IActionResult PostEmployee([FromBody] object empObj)
+        public IActionResult PostEmployee([FromBody] PostEmployeeInputModel input)
         {
-            return Ok(empObj);
+            // concatenating first and last name for comparison reasons
+            var userName = input.Employee.FirstName + "." + input.Employee.LastName;
+
+            // find our active directory context so we can find the guid of the employee we are adding.
+            using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
+            {
+                var user = UserPrincipal.FindByIdentity(adContext, userName);
+                // creating employee object to added to the database and then saved.
+                Employee employee = new Employee(input.Employee.HireDate, input.Employee.DepartmentID, false, "", input.Employee.FirstName, input.Employee.LastName, "", input.Employee.Role, new Guid(user.Guid.ToString()));
+                _context.Employee.Add(employee);
+                _context.SaveChanges();
+
+            }
+            // Find the employee who we are adding to the database.
+            var emp = _context.Employee.Where(x => x.FirstName == input.Employee.FirstName && x.LastName == input.Employee.LastName).FirstOrDefault();
+            
+            // if there is any hardware that is to be assigned from the front end
+            if (input.HardwareAssigned != null)
+            {
+                // loop through hardware and depending on what type the hardware is, then add the hardware to the specific table. 
+                foreach (var hardware in input.HardwareAssigned)
+                {
+                    switch (hardware.Type)
+                    {
+                        case "Monitor":
+                            var mon = _context.Monitor.Find(hardware.ID);
+                            mon.EmployeeId = emp.EmployeeId;
+                            mon.IsAssigned = true;
+                            _context.SaveChanges();
+                            return StatusCode(201);
+                        case "Peripheral":
+                            var periph = _context.Peripheral.Find(hardware.ID);
+                            periph.EmployeeId = emp.EmployeeId;
+                            periph.IsAssigned = true;
+                            return StatusCode(201);
+                        case "Computer":
+                            var comp = _context.Computer.Find(hardware.ID);
+                            comp.EmployeeId = emp.EmployeeId;
+                            comp.IsAssigned = true;
+                            return StatusCode(201);
+                        case "Server":
+                            var server = _context.Server.Find(hardware.ID);
+                            server.EmployeeId = emp.EmployeeId;
+                            server.IsAssigned = true;
+                            return StatusCode(201);
+
+                    }
+
+                }
+            }
+            // if there are any programs to be assigned from the front-end
+            if (input.ProgramAssigned != null)
+            {
+                foreach(var program in input.ProgramAssigned)
+                {
+                    var prog = _context.Program.Find(program.ID);
+                    prog.EmployeeId = emp.EmployeeId;
+                    _context.SaveChanges();
+                }
+            }
+
+                // if we get here then the various fields were created and changed and now we can return 201 created.
+                return StatusCode(201);
         }
     }
 }

@@ -5,29 +5,29 @@ namespace backend_api.Models
 {
     public partial class Employee
     {
-        public Employee()
+        public Employee(DateTime HireDate, int DepartmentID, bool IsDeleted, string UserSettings, string FirstName, string LastName, string email, string role, Guid Adguid )
         {
-            //Computer = new HashSet<Computer>();
-            //HardwareHistoryCurrentOwner = new HashSet<HardwareHistory>();
-            //HardwareHistoryPreviousOwner = new HashSet<HardwareHistory>();
-            //Monitor = new HashSet<Monitor>();
-            //Peripheral = new HashSet<Peripheral>();
-            ////Program = new HashSet<Program>();
-            ////ProgramHistoryCurrentOwner = new HashSet<ProgramHistory>();
-            ////ProgramHistoryPreviousOwner = new HashSet<ProgramHistory>();
-            //Server = new HashSet<Server>();
+            this.HireDate = HireDate;
+            this.DepartmentID = DepartmentID;
+            this.IsDeleted = IsDeleted;
+            this.UserSettings = UserSettings;
+            this.FirstName = FirstName;
+            this.LastName = LastName;
+            this.Email = email;
+            this.Role = role;
+            this.Adguid = Adguid;
         }
 
         public int EmployeeId { get; set; }
         public DateTime HireDate { get; set; }
-        public int DepartmentId { get; set; }
+        public int DepartmentID { get; set; }
         public bool IsDeleted { get; set; }
         public string UserSettings { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Role { get; set; }
-        public string Adguid { get; set; }
+        public Guid Adguid { get; set; }
 
         //public Department Department { get; set; }
         //public ICollection<Computer> Computer { get; set; }
