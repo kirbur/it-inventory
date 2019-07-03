@@ -265,22 +265,22 @@ namespace backend_api.Controllers
                             mon.EmployeeId = emp.EmployeeId;
                             mon.IsAssigned = true;
                             _context.SaveChanges();
-                            return StatusCode(201);
+                            break;
                         case "Peripheral":
                             var periph = _context.Peripheral.Find(hardware.ID);
                             periph.EmployeeId = emp.EmployeeId;
                             periph.IsAssigned = true;
-                            return StatusCode(201);
+                            break;
                         case "Computer":
                             var comp = _context.Computer.Find(hardware.ID);
                             comp.EmployeeId = emp.EmployeeId;
                             comp.IsAssigned = true;
-                            return StatusCode(201);
+                            break;
                         case "Server":
                             var server = _context.Server.Find(hardware.ID);
                             server.EmployeeId = emp.EmployeeId;
                             server.IsAssigned = true;
-                            return StatusCode(201);
+                            break;
 
                     }
 
