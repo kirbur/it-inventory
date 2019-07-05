@@ -379,12 +379,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     {value: add[2].value, id: add[2].id, sortBy: add[2].sortBy},
                 ])
             }
-            // if (type === 'l') {
-            //     arr.push([
-            //         {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy},
-            //         {value: add[1].value, id: add[1].id, sortBy: add[1].sortBy},
-            //     ])
-            // }
         })
         return arr
     }
@@ -394,15 +388,27 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             {/* column 1 */}
 
             <div className={styles.firstColumn}>
-                <Button
-                    text={userData.name}
-                    icon='back'
-                    onClick={() => {
-                        history.push(`/employees/${match.params.id}`)
-                    }}
-                    className={styles.backButton}
-                    textClassName={styles.backButtonText}
-                />
+                {match.params.id === 'new' ? (
+                    <Button
+                        text={'All Employees'}
+                        icon='back'
+                        onClick={() => {
+                            history.push(`/employees`)
+                        }}
+                        className={styles.backButton}
+                        textClassName={styles.backButtonText}
+                    />
+                ) : (
+                    <Button
+                        text={userData.name}
+                        icon='back'
+                        onClick={() => {
+                            history.push(`/employees/${match.params.id}`)
+                        }}
+                        className={styles.backButton}
+                        textClassName={styles.backButtonText}
+                    />
+                )}
                 <div className={styles.imgPadding}>
                     {/* <ImageInput /> */}
                     <GoCloudUpload size={300} className={styles.cloudIcon} onClick={() => {}} />
