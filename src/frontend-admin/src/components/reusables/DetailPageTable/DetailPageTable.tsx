@@ -28,10 +28,11 @@ interface ITableProps {
     style?: string
     edit?: boolean
     remove?: any
+    sort?: boolean
 }
 
 export const DetailPageTable = (props: ITableProps) => {
-    const {style, headers, rows, setRows, edit = false, remove} = props
+    const {style, headers, rows, setRows, edit = false, remove, sort = false} = props
 
     //initialize all the header states and styling to be not sorted
     const headerStates = []
@@ -72,7 +73,7 @@ export const DetailPageTable = (props: ITableProps) => {
     var renderedHeaders = []
     edit && renderedHeaders.push(<td className={styles.deleteRow}></td>)
     for (let i = 0; i < headers.length; i++) {
-        let header = (
+        let header = sort ? (
             <td
                 onClick={e => {
                     setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
@@ -85,7 +86,12 @@ export const DetailPageTable = (props: ITableProps) => {
                     <div className={sortState.headerStates[i]} />
                 </div>
             </td>
+        ) : (
+            <td className={styles.header}>
+                <div className={styles.headerContainer}>{headers[i]}</div>
+            </td>
         )
+
         renderedHeaders.push(header)
     }
 

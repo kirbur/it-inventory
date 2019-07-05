@@ -5,6 +5,8 @@ import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
+import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
+import DatePicker from 'react-datepicker'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -38,14 +40,22 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     const [progRows, setProgRows] = useState<any[]>([])
     const progHeaders = ['License Key', 'Purchase Link']
 
+    const [historyForm, setHistoryForm] = useState(false)
+    const [historyInput, setHistoryInput] = useState<{date: Date; event: string; user: number}>({
+        date: new Date(),
+        event: 'Broken',
+        user: -1,
+    })
+
     useEffect(() => {
         axios
             .get(`/detail/program/${match.params.id}`)
             .then((data: any) => {
+                console.log(data)
                 setProgData({
                     name: data[0].programName,
                     dateBought: formatDate(data[0].dateBought),
-                    description: format(data[0].descriptio),
+                    description: format(data[0].description),
                     employee: format(data[0].employeeName),
                     employeeId: format(data[0].employeeId),
                     icon: format(data[0].picture),
@@ -54,14 +64,19 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     flatCost: data[0].programFlatCost,
                     costPerYear: data[0].programCostPerYear,
                 })
+                setHistoryInput({...historyInput, user: data[0].employeeId})
                 setProgRows([
                     [
-                        0,
-                        format(data[0].programLicenseKey ? data[0].programLicenseKey : '-'),
-                        format(data[0].programPurchaseLink),
+                        {value: format(data[0].programLicenseKey ? data[0].programLicenseKey : '-')},
+                        {value: format(data[0].programPurchaseLink)},
                     ],
                 ])
-                setHistoryList(data[0].entries)
+
+                var hist: any[] = []
+                data[0].entries.map((i: any) => {
+                    hist.push({date: formatDate(i.eventDate), event: format(i.eventType), user: format(i.employeeName)})
+                })
+                setHistoryList(hist)
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -73,8 +88,12 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         }
     }
 
+    const handleHistorySubmit = () => {
+        //TODO: program history post request
+    }
+
     return (
-        <div className={styles.progOverviewMain}>
+        <div className={styles.progDetailMain}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
@@ -91,7 +110,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         <img className={styles.img} src={URL + progData.icon} alt={''} />
                     </div>
                     <div className={styles.costText}>
-                        {progData.flatCost !== 0 ? (
+                        {progData.flatCost ? (
                             <p>Paid ------------------ ${progData.flatCost}</p>
                         ) : progData.isCostPerYear ? (
                             <p>Yearly ---------------- ${progData.costPerYear}</p>
@@ -135,12 +154,18 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                             </div>
                         </div>
                     </div>
-                    <DetailPageTable headers={progHeaders} rows={progRows} setRows={setProgRows} />
+
+                    <DetailPageTable headers={progHeaders} rows={progRows} setRows={setProgRows} sort={false} />
+
+                    <div className={styles.spaceBetween} />
+
                     <div className={styles.descriptionContainer}>
                         <div className={styles.descriptionTitle}>Description</div>
-                        <div className={styles.descritptionBody}>{progData.description}</div>
+                        <div className={styles.descriptionBody}>{progData.description}</div>
                     </div>
-                    {/* history List*/}
+
+                    <div className={styles.spaceBetween} />
+                    <HistoryLog historyLog={historyList} />
                 </div>
             </div>
         </div>
