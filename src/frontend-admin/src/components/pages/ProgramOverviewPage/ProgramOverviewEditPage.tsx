@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
@@ -34,10 +34,13 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
-    const [programData, setProgramData] = useState<any>({})
+    //const [programData, setProgramData] = useState<any>({})
+
     const [programRows, setProgramRows] = useState<any[]>([])
-    const [pluginRows, setPluginRows] = useState<any[]>([])
     const [removedProgramRows, setRemovedProgramRows] = useState<any[]>([])
+
+    const [pluginRows, setPluginRows] = useState<any[]>([])
+    const [removedPluginRows, setRemovedPluginRows] = useState<any[]>([])
 
     const [pluginForm, setPluginForm] = useState(false)
     const [programForm, setProgramForm] = useState(false)
@@ -56,6 +59,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         costPerMonth: number
         flatCost: number
         renewalDate: Date
+        purchaseDate: Date
         monthsPerRenewal: number
     }>({
         name: '',
@@ -64,6 +68,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         costPerMonth: 0,
         flatCost: 0,
         renewalDate: new Date(),
+        purchaseDate: new Date(),
         monthsPerRenewal: 0,
     })
 
@@ -74,6 +79,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         costPerMonth: number
         flatCost: number
         renewalDate: Date
+        purchaseDate: Date
         monthsPerRenewal: number
     }>({
         name: '',
@@ -82,6 +88,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         costPerMonth: 0,
         flatCost: 0,
         renewalDate: new Date(),
+        purchaseDate: new Date(),
         monthsPerRenewal: 0,
     })
 
@@ -89,9 +96,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         axios
             .get(`/detail/ProgramOverview/${match.params.id}`)
             .then((data: any) => {
-                setProgramData(data[0].programOverview)
+                //setProgramData(data[0].programOverview)
                 setNumCopies(data[0].programOverview.countProgOverall)
-                console.log(data)
+
                 let prog: any[] = []
                 data[0].inDivPrograms.map((i: any) =>
                     prog.push([
@@ -131,37 +138,27 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             : Math.round((perYear / 12) * 100) / 100 + ' /mo'
     }
 
-    const handleEmpClick = (id: number) => {
-        history.push(`/employees/${id}`)
-    }
-
-    const handleCopyClick = (id: number) => {
-        history.push(`/programs/details/${id}`)
-    }
-
-    const handleArchive = () => {
-        if (
-            window.confirm(
-                `Are you sure you want to archive all copies of ${match.params.id}? ${programData.countProgInUse} are in use.`
-            )
-        ) {
-            //TODO: a post request to archive program w/ id match.params.id
-            history.push('/programs')
-        }
-    }
-
-    const handleRemove = (row: any) => {
+    const handleProgramRemove = (row: any) => {
         //add to removed array
         setRemovedProgramRows([...removedProgramRows, [...row]])
     }
 
-    const handleSubmit = () => {
-        setPluginInput({...pluginInput, programName: nameInput})
-        //TODO: post request
+    const handlePluginRemove = (row: any) => {
+        //add to removed array
+        setRemovedPluginRows([...removedPluginRows, [...row]])
     }
 
-    const handleProgramSubmit = () => {
-        //TODO: post request
+    const handleSubmit = () => {
+        if (programForm) {
+            //TODO: post request for x# of copies w/ programInput
+        }
+
+        if (pluginForm) {
+            setPluginInput({...pluginInput, programName: nameInput})
+            //TODO: post request for new plugin
+        }
+
+        //TODO: post request to delete removedPluginRows & removedProgramRows
     }
 
     const displayCopies = () => {
@@ -186,25 +183,63 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
         return arr
     }
+
+    const displayPlugins = () => {
+        var arr: any[] = []
+
+        if (removedPluginRows.length === 0) {
+            arr = [...pluginRows]
+        } else {
+            var bools: any[] = []
+            pluginRows.forEach((row: any, index: number) => {
+                bools[index] = true
+                removedPluginRows.forEach((remove: any) => {
+                    bools[index] = bools[index] && remove[0].id !== row[0].id
+                })
+            })
+            pluginRows.forEach((row: any, index: number) => {
+                if (bools[index]) {
+                    arr.push(row)
+                }
+            })
+        }
+
+        return arr
+    }
+
     return (
         <div className={styles.progOverviewEditMain}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
-                    <Button
-                        text='All Programs'
-                        icon='back'
-                        onClick={() => {
-                            history.push('/programs')
-                        }}
-                        className={styles.backButton}
-                        textClassName={styles.backButtonText}
-                    />
+                    {match.params.id === 'new' ? (
+                        <Button
+                            text='All Programs'
+                            icon='back'
+                            onClick={() => {
+                                history.push(`/programs`)
+                            }}
+                            className={styles.backButton}
+                            textClassName={styles.backButtonText}
+                        />
+                    ) : (
+                        <Button
+                            text={match.params.id}
+                            icon='back'
+                            onClick={() => {
+                                history.push(`/programs/overview/${match.params.id}`)
+                            }}
+                            className={styles.backButton}
+                            textClassName={styles.backButtonText}
+                        />
+                    )}
                     <PictureInput setImage={setImgInput} />
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
-                    <Group className={styles.nameInput}>
+                    <div className={styles.title}>Program Information</div>
+
+                    <Group justify={'between'} className={styles.nameInput}>
                         <div className={styles.inputContainer}>
                             <div className={styles.inputText}>Program Name</div>
                             <input
@@ -221,102 +256,112 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 type='number'
                                 className={s(styles.input, styles.pluginInput)}
                                 value={numCopies}
-                                onChange={e => setNumCopies(parseInt(e.target.value))}
+                                onChange={e =>
+                                    setNumCopies(parseInt(e.target.value) > 0 ? parseInt(e.target.value) : 0)
+                                }
                             />
                         </div>
                     </Group>
 
                     {match.params.id !== 'new' ? (
                         <Group direction={'column'}>
+                            <div className={styles.programTableContainer}>
+                                <DetailPageTable
+                                    headers={programHeaders}
+                                    rows={displayCopies()}
+                                    setRows={setProgramRows}
+                                    edit={true}
+                                    remove={handleProgramRemove}
+                                />
+                            </div>
+
+                            <Button
+                                className={styles.addContainer}
+                                icon='add'
+                                onClick={() => {
+                                    setProgramForm(!programForm)
+                                    setPluginForm(false)
+                                }}
+                                textInside={false}
+                                text={`Add ${numCopies} Copy(s)`}
+                            />
+
+                            {programForm && (
+                                <div className={styles.programForm}>
+                                    <ProgramForm state={programInput} setState={setProgramInput} />
+                                </div>
+                            )}
+                        </Group>
+                    ) : (
+                        <div className={styles.programForm}>
+                            <ProgramForm state={programInput} setState={setProgramInput} />
+                        </div>
+                    )}
+
+                    {match.params.id !== 'new' && (
+                        <div className={styles.pluginTableContainer}>
                             <DetailPageTable
-                                headers={programHeaders}
-                                rows={displayCopies()}
-                                setRows={setProgramRows}
+                                headers={pluginHeaders}
+                                rows={displayPlugins()}
+                                setRows={setPluginRows}
                                 edit={true}
-                                remove={handleRemove}
+                                remove={handlePluginRemove}
                             />
 
                             <Button
                                 className={styles.addContainer}
                                 icon='add'
-                                onClick={() => setProgramForm(!programForm)}
+                                onClick={() => {
+                                    setPluginForm(!pluginForm)
+                                    setProgramForm(false)
+                                }}
                                 textInside={false}
-                                text={'Add Copy'}
+                                text={'Add Plugin'}
                             />
-
-                            {programForm && (
-                                <ProgramForm
-                                    state={programInput}
-                                    setState={setProgramInput}
-                                    submit={handleProgramSubmit}
-                                />
-                            )}
-                        </Group>
-                    ) : (
-                        <div className={styles.programForm}>
-                            <ProgramForm state={programInput} setState={setProgramInput} submit={handleProgramSubmit} />
                         </div>
                     )}
-
-                    <DetailPageTable
-                        headers={pluginHeaders}
-                        rows={pluginRows}
-                        setRows={setPluginRows}
-                        edit={true}
-                        remove={handleRemove}
-                    />
-
-                    <Button
-                        className={styles.addContainer}
-                        icon='add'
-                        onClick={() => {
-                            setPluginForm(!pluginForm)
-                        }}
-                        textInside={false}
-                        text={'Add Plugin'}
-                    />
-
-                    {pluginForm && (
+                    {pluginForm && match.params.id !== 'new' && (
                         <div className={styles.pluginForm}>
-                            <Group className={styles.pluginGroup}>
-                                <div className={styles.inputContainer}>
+                            <Group justify={'between'} className={styles.pluginGroup}>
+                                <div className={styles.pluginInputContainerRow1}>
                                     <div className={styles.inputText}>Plugin Name</div>
                                     <input
                                         type='text'
-                                        className={s(styles.input, styles.pluginInput)}
+                                        className={s(styles.input, styles.pluginInputRow1)}
                                         value={pluginInput.name}
                                         onChange={e => setPluginInput({...pluginInput, name: e.target.value})}
                                     />
                                 </div>
 
-                                <div className={styles.inputContainer}>
-                                    <div className={styles.inputText}>Description</div>
-                                    <input
-                                        type='text'
-                                        className={s(styles.input, styles.pluginInput)}
-                                        value={pluginInput.description}
-                                        onChange={e => setPluginInput({...pluginInput, description: e.target.value})}
+                                <div className={styles.dateInputContainer}>
+                                    <div className={styles.inputText}>Purchase Date</div>
+                                    <DatePicker
+                                        dateFormat='MM/dd/yyyy'
+                                        placeholderText={new Date().toDateString()}
+                                        selected={pluginInput.purchaseDate}
+                                        onChange={e => e && setPluginInput({...pluginInput, purchaseDate: e})}
+                                        className={s(styles.input, styles.dateInput)}
                                     />
                                 </div>
 
-                                <div className={styles.inputContainer}>
+                                <div className={styles.dateInputContainer}>
                                     <div className={styles.inputText}>Renewal Date</div>
                                     <DatePicker
                                         dateFormat='MM/dd/yyyy'
                                         placeholderText={new Date().toDateString()}
                                         selected={pluginInput.renewalDate}
                                         onChange={e => e && setPluginInput({...pluginInput, renewalDate: e})}
-                                        className={s(styles.input, styles.pluginInput)}
+                                        className={s(styles.input, styles.dateInput)}
                                     />
                                 </div>
                             </Group>
 
-                            <Group className={styles.pluginGroup}>
-                                <div className={styles.inputContainer}>
+                            <Group justify={'between'} className={styles.pluginGroup}>
+                                <div className={styles.pluginInputContainerRow2}>
                                     <div className={styles.inputText}>Flat Cost</div>
                                     <input
                                         type='number'
-                                        className={s(styles.input, styles.pluginInput)}
+                                        className={s(styles.input, styles.pluginInputRow2)}
                                         value={pluginInput.flatCost}
                                         onChange={e =>
                                             setPluginInput({...pluginInput, flatCost: parseInt(e.target.value)})
@@ -324,11 +369,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                     />
                                 </div>
 
-                                <div className={styles.inputContainer}>
+                                <div className={styles.pluginInputContainerRow2}>
                                     <div className={styles.inputText}>Monthly Cost</div>
                                     <input
                                         type='number'
-                                        className={s(styles.input, styles.pluginInput)}
+                                        className={s(styles.input, styles.pluginInputRow2)}
                                         value={pluginInput.costPerMonth}
                                         onChange={e =>
                                             setPluginInput({...pluginInput, costPerMonth: parseInt(e.target.value)})
@@ -336,11 +381,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                     />
                                 </div>
 
-                                <div className={styles.inputContainer}>
+                                <div className={styles.pluginInputContainerRow2}>
                                     <div className={styles.inputText}>Months Per Renewal</div>
                                     <input
                                         type='number'
-                                        className={s(styles.input, styles.pluginInput)}
+                                        className={s(styles.input, styles.pluginInputRow2)}
                                         value={pluginInput.monthsPerRenewal}
                                         onChange={e =>
                                             setPluginInput({...pluginInput, monthsPerRenewal: parseInt(e.target.value)})
@@ -348,6 +393,14 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                     />
                                 </div>
                             </Group>
+                            <div className={styles.pluginGroup}>
+                                <div className={styles.inputText}>Description</div>
+                                <textarea
+                                    className={s(styles.input, styles.description)}
+                                    value={pluginInput.description}
+                                    onChange={e => setPluginInput({...pluginInput, description: e.target.value})}
+                                />
+                            </div>
                         </div>
                     )}
                     <div className={styles.submitContainer}>

@@ -8,6 +8,7 @@ import {Group} from '../../reusables/Group/Group'
 import {GoCloudUpload} from 'react-icons/go'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import DatePicker from 'react-datepicker'
+import {ProgramForm} from '../../reusables/ProgramForm/ProgramForm'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -44,6 +45,25 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     const progHeaders = ['License Key', 'Purchase Link']
 
     //input feild states:
+    const [formState, setFormState] = useState<{
+        name: string
+        programName: string
+        description: string
+        costPerMonth: number
+        flatCost: number
+        renewalDate: Date
+        monthsPerRenewal: number
+        purchaseDate: Date
+    }>({
+        name: '',
+        programName: '',
+        description: '',
+        costPerMonth: 0,
+        flatCost: 0,
+        renewalDate: new Date(),
+        monthsPerRenewal: 0,
+        purchaseDate: new Date(),
+    })
     const [imgInput, setImgInput] = useState<File>()
     const [purchaseInput, setPurchaseInput] = useState<Date>(new Date())
     const [renewalInput, setRenewalInput] = useState<Date>(new Date())
@@ -57,14 +77,24 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                 setProgData({
                     name: data[0].programName,
                     dateBought: formatDate(data[0].dateBought),
-                    description: format(data[0].descriptio),
+                    description: format(data[0].description),
                     employee: format(data[0].employeeName),
                     employeeId: format(data[0].employeeId),
                     icon: format(data[0].picture),
                     renewalDate: formatDate(data[0].renewalDate),
                     isCostPerYear: data[0].isCostPerYear,
                     flatCost: data[0].programFlatCost,
-                    costPerYear: data[0].programCostPerYear,
+                    costPerYear: data[0].programFlatCost,
+                })
+
+                setFormState({
+                    name: data[0].programName,
+                    programName: data[0].programName,
+                    description: data[0].description,
+                    renewalDate: new Date(data[0].renewalDate),
+                    monthsPerRenewal: 0,
+                    purchaseDate: new Date(data[0].dateBought),
+                    ...formState,
                 })
                 setProgRows([
                     [
@@ -103,7 +133,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                 {/* name and date */}
                 <div className={s(styles.title, styles.paddingBottom)}>Program Information</div>
 
-                <Group direction={'row'}>
+                {/* <Group direction={'row'}>
                     <div>
                         <div className={styles.inputtext}>Purchase Date</div>
                         <DatePicker
@@ -190,9 +220,11 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                             />
                         </div>
                     </Group>
-                </Group>
+                </Group> */}
 
-                <div className={styles.line} />
+                <div className={styles.formContainer}>
+                    <ProgramForm state={formState} setState={setFormState} />
+                </div>
 
                 <div className={styles.submitContainer}>
                     <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />

@@ -1,21 +1,17 @@
 import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
-import Axios from 'axios'
+
 // Components
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 
-import {DropdownList} from '../../reusables/Dropdown/DropdownList'
-
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
-import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './ProgramOverviewPage.module.css'
-import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -181,30 +177,8 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         )}
                     </div>
                     <DetailPageTable headers={programHeaders} rows={programRows} setRows={setProgramRows} />
-                    {isAdmin && (
-                        <Button
-                            className={styles.addContainer}
-                            icon='add'
-                            onClick={() => {
-                                //TODO:what does this look like
-                            }}
-                            textInside={false}
-                            text={'Add Copy'}
-                        />
-                    )}
-
+                    <div className={styles.spaceBetweenTables} />
                     <DetailPageTable headers={pluginHeaders} rows={pluginRows} setRows={setPluginRows} />
-                    {isAdmin && (
-                        <Button
-                            className={styles.addContainer}
-                            icon='add'
-                            onClick={() => {
-                                //TODO: open up plugin form??
-                            }}
-                            textInside={false}
-                            text={'Add Plugin'}
-                        />
-                    )}
                 </div>
             </div>
         </div>

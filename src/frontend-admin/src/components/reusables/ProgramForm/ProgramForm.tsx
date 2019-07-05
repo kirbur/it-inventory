@@ -4,7 +4,6 @@ import React from 'react'
 import DatePicker from 'react-datepicker'
 
 // Components
-import {Button} from '../Button/Button'
 import {Group} from '../Group/Group'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
@@ -15,20 +14,16 @@ import styles from './ProgramForm.module.css'
 interface IProgramFormProps {
     state: any
     setState: any
-    submit: any
 }
 
 // Primary Component
 export const ProgramForm: React.SFC<IProgramFormProps> = props => {
-    const {state, setState, submit} = props
+    const {state, setState} = props
 
     return (
         <div className={styles.formMain}>
-            <div className={styles.line} />
-            <div className={s(styles.title, styles.paddingBottom)}>Program Information</div>
-
-            <Group direction={'row'}>
-                <div className={styles.inputContainer}>
+            <Group direction={'row'} justify={'between'}>
+                <div className={styles.dateInputContainer}>
                     <div className={styles.inputText}>Purchase Date</div>
                     <DatePicker
                         dateFormat='MM/dd/yyyy'
@@ -37,7 +32,7 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         className={styles.input}
                     />
                 </div>
-                <div className={styles.inputContainer}>
+                <div className={styles.dateInputContainer}>
                     <div className={styles.inputText}>Renewal Date</div>
                     <DatePicker
                         dateFormat='MM/dd/yyyy'
@@ -120,7 +115,7 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
             </Group>
             <div className={styles.line} />
 
-            <Group direction={'row'}>
+            <Group direction={'row'} justify={'between'}>
                 <div className={styles.inputContainer}>
                     <div className={styles.inputText}>License Key</div>
                     <input
@@ -141,7 +136,7 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                     />
                 </div>
             </Group>
-            <div className={styles.inputContainer}>
+            <div className={s(styles.inputContainer, styles.descriptionContainer)}>
                 <div className={styles.inputText}>Description</div>
                 <textarea
                     className={s(styles.input, styles.description)}
@@ -150,7 +145,6 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                 />
             </div>
 
-            {/* <Button text='Submit Copies' onClick={submit} className={styles.submitButton} /> */}
             <div className={styles.line} />
         </div>
     )
