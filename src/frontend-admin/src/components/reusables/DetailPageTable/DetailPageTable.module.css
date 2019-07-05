@@ -78,6 +78,10 @@
     color: #009eff;
 }
 
+.clickable:hover {
+    text-decoration: underline;
+}
+
 /* delete icon next to row */
 .deleteRow {
     width: 50px;

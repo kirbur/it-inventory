@@ -133,14 +133,14 @@ export const DetailPageTable = (props: ITableProps) => {
         renderedRows.push(transformedRow)
     })
     return (
-        <table className={s(styles.table, /*isClickable &&*/ styles.clickable)}>
+        <table className={styles.table}>
             <thead>
                 <tr className={styles.header}>{renderedHeaders.map(header => header)}</tr>
             </thead>
 
             <tbody>
                 {renderedRows.map((row, i) => (
-                    <tr className={s(style, styles.tr, /* isClickable &&*/ styles.clickable)}>{row}</tr>
+                    <tr className={s(style, styles.tr)}>{row}</tr>
                 ))}
             </tbody>
         </table>
