@@ -80,7 +80,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push(`${match.url}/new`)
+        history.push(`/editDepartment/new`)
     }
 
     const handleRowClick = (row: any) => {
