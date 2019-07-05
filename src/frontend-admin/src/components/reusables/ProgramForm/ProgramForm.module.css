@@ -68,6 +68,7 @@ input:checked ~ .insideCheckmarkAdmin {
     color: #a5a5a5;
     font-size: 24px;
     text-align: left;
+    white-space: nowrap;
 }
 
 .input {
@@ -108,6 +109,7 @@ input:checked ~ .insideCheckmarkAdmin {
     margin-top: 50px;
 }
 
-.dateInputContainer {
-    width: 45%;
+.row1Input {
+    width: 30%;
+    margin-bottom: 20px;
 }

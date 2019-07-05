@@ -8,7 +8,7 @@ import {Group} from '../../reusables/Group/Group'
 import {GoCloudUpload} from 'react-icons/go'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import DatePicker from 'react-datepicker'
-import {ProgramForm} from '../../reusables/ProgramForm/ProgramForm'
+import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -45,46 +45,16 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     const progHeaders = ['License Key', 'Purchase Link']
 
     //input feild states:
-    const [formState, setFormState] = useState<{
-        name: string
-        programName: string
-        description: string
-        costPerMonth: number
-        flatCost: number
-        renewalDate: Date
-        monthsPerRenewal: number
-        purchaseDate: Date
-    }>({
-        name: '',
-        programName: '',
-        description: '',
-        costPerMonth: 0,
-        flatCost: 0,
-        renewalDate: new Date(),
-        monthsPerRenewal: 0,
-        purchaseDate: new Date(),
-    })
+    const [formState, setFormState] = useState<IProgramFormInputs>()
     const [imgInput, setImgInput] = useState<File>()
-    const [purchaseInput, setPurchaseInput] = useState<Date>(new Date())
-    const [renewalInput, setRenewalInput] = useState<Date>(new Date())
-    const [costInput, setCostInput] = useState<number>(0)
-    const [costTypeInput, setCostTypeInput] = useState<'per month' | 'per year' | 'per use'>('per month')
 
     useEffect(() => {
         axios
             .get(`/detail/program/${match.params.id}`)
             .then((data: any) => {
+                console.log(data)
                 setProgData({
                     name: data[0].programName,
-                    dateBought: formatDate(data[0].dateBought),
-                    description: format(data[0].description),
-                    employee: format(data[0].employeeName),
-                    employeeId: format(data[0].employeeId),
-                    icon: format(data[0].picture),
-                    renewalDate: formatDate(data[0].renewalDate),
-                    isCostPerYear: data[0].isCostPerYear,
-                    flatCost: data[0].programFlatCost,
-                    costPerYear: data[0].programFlatCost,
                 })
 
                 setFormState({
@@ -92,10 +62,18 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     programName: data[0].programName,
                     description: data[0].description,
                     renewalDate: new Date(data[0].renewalDate),
-                    monthsPerRenewal: 0,
                     purchaseDate: new Date(data[0].dateBought),
-                    ...formState,
+                    purchaseLink: data[0].programPurchaseLink,
+                    licenseKey: data[0].programLicenseKey,
+
+                    costPerMonth:
+                        !data[0].isCostPerYear && data[0].programCostPerYear ? data[0].programCostPerYear / 12 : 0,
+                    costPerYear: data[0].isCostPerYear ? data[0].programCostPerYear : 0,
+                    flatCost: data[0].programFlatCost ? data[0].programFlatCost : 0,
+                    costType: data[0].isCostPerYear ? 'per year' : data[0].programCostPerYear ? 'per month' : 'per use',
+                    monthsPerRenewal: 0,
                 })
+
                 setProgRows([
                     [
                         0,
@@ -130,104 +108,12 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             </div>
             {/* column 2 */}
             <div className={styles.secondColumn}>
-                {/* name and date */}
                 <div className={s(styles.title, styles.paddingBottom)}>Program Information</div>
 
-                {/* <Group direction={'row'}>
-                    <div>
-                        <div className={styles.inputtext}>Purchase Date</div>
-                        <DatePicker
-                            dateFormat='yyyy/MM/dd'
-                            selected={purchaseInput}
-                            onChange={e => e && setPurchaseInput(e)}
-                            className={styles.input}
-                        />
-                    </div>
-                    <div>
-                        <div className={styles.inputtext}>Renewal Date</div>
-                        <DatePicker
-                            dateFormat='yyyy/MM/dd'
-                            selected={renewalInput}
-                            onChange={e => e && setRenewalInput(e)}
-                            className={styles.input}
-                        />
-                    </div>
-                </Group>
-
-                <Group direction={'row'} justify={'between'}>
-                    <Group direction={'row'} className={styles.costGroup}>
-                        <div className={styles.container}>
-                            <input
-                                type='radio'
-                                name='cost'
-                                className={styles.checkmark}
-                                checked={costTypeInput === 'per month'}
-                                onChange={() => setCostTypeInput('per month')}
-                            />
-                            <div className={styles.checkmark} />
-                            <div className={styles.insideCheckmark} />
-                        </div>
-                        <div>
-                            <div className={styles.inputtext}>Cost per Month</div>
-                            <input
-                                className={s(styles.input, styles.costInput)}
-                                type='number'
-                                onChange={cost => setCostInput(parseInt(cost.target.value))}
-                            />
-                        </div>
-                    </Group>
-
-                    <Group direction={'row'} className={styles.costGroup}>
-                        <div className={styles.container}>
-                            <input
-                                type='radio'
-                                name='cost'
-                                className={styles.checkmark}
-                                checked={costTypeInput === 'per year'}
-                                onChange={() => setCostTypeInput('per year')}
-                            />
-                            <div className={styles.checkmark} />
-                            <div className={styles.insideCheckmark} />
-                        </div>
-                        <div>
-                            <div className={styles.inputtext}>Cost per Year</div>
-                            <input
-                                className={s(styles.input, styles.costInput)}
-                                type='number'
-                                onChange={cost => setCostInput(parseInt(cost.target.value))}
-                            />
-                        </div>
-                    </Group>
-
-                    <Group direction={'row'} className={styles.costGroup}>
-                        <div className={styles.container}>
-                            <input
-                                type='radio'
-                                name='cost'
-                                className={styles.checkmark}
-                                checked={costTypeInput === 'per use'}
-                                onChange={() => setCostTypeInput('per use')}
-                            />
-                            <div className={styles.checkmark} />
-                            <div className={styles.insideCheckmark} />
-                        </div>
-                        <div>
-                            <div className={styles.inputtext}>Cost per License</div>
-                            <input
-                                className={s(styles.input, styles.costInput)}
-                                type='number'
-                                onChange={cost => setCostInput(parseInt(cost.target.value))}
-                            />
-                        </div>
-                    </Group>
-                </Group> */}
-
-                <div className={styles.formContainer}>
-                    <ProgramForm state={formState} setState={setFormState} />
-                </div>
+                {formState && <ProgramForm state={formState} setState={setFormState} />}
 
                 <div className={styles.submitContainer}>
-                    <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />
+                    <Button text='Submit' onClick={handleSubmit} />
                 </div>
             </div>
         </div>

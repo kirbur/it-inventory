@@ -11,8 +11,23 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import styles from './ProgramForm.module.css'
 
 // Types
+export interface IProgramFormInputs {
+    name: string
+    programName: string
+    description: string
+    costType: 'per month' | 'per year' | 'per use'
+    costPerMonth: number
+    costPerYear: number
+    flatCost: number
+    renewalDate: Date
+    monthsPerRenewal: number
+    purchaseDate: Date
+    purchaseLink: string
+    licenseKey: string
+}
+
 interface IProgramFormProps {
-    state: any
+    state: IProgramFormInputs
     setState: any
 }
 
@@ -23,7 +38,7 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
     return (
         <div className={styles.formMain}>
             <Group direction={'row'} justify={'between'}>
-                <div className={styles.dateInputContainer}>
+                <div className={styles.row1Input}>
                     <div className={styles.inputText}>Purchase Date</div>
                     <DatePicker
                         dateFormat='MM/dd/yyyy'
@@ -32,13 +47,23 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         className={styles.input}
                     />
                 </div>
-                <div className={styles.dateInputContainer}>
+                <div className={styles.row1Input}>
                     <div className={styles.inputText}>Renewal Date</div>
                     <DatePicker
                         dateFormat='MM/dd/yyyy'
                         selected={state.renewalDate}
                         onChange={e => e && setState({...state, renewalDate: e})}
                         className={styles.input}
+                    />
+                </div>
+
+                <div className={styles.row1Input}>
+                    <div className={styles.inputText}># of Months per Renewal</div>
+                    <input
+                        type='number'
+                        className={s(styles.input, styles.pluginInput)}
+                        value={state.monthsPerRenewal}
+                        onChange={e => setState({...state, monthsPerRenewal: e.target.value})}
                     />
                 </div>
             </Group>
@@ -61,8 +86,9 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         <input
                             className={s(styles.input, styles.costInput)}
                             type='number'
-                            value={state.cost}
-                            onChange={cost => setState({...state, cost: parseInt(cost.target.value)})}
+                            step='0.01'
+                            value={state.costPerMonth}
+                            onChange={cost => setState({...state, costPerMonth: parseFloat(cost.target.value)})}
                         />
                     </div>
                 </Group>
@@ -84,8 +110,9 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         <input
                             className={s(styles.input, styles.costInput)}
                             type='number'
-                            value={state.cost}
-                            onChange={cost => setState({...state, cost: parseInt(cost.target.value)})}
+                            step='0.01'
+                            value={state.costPerYear}
+                            onChange={cost => setState({...state, costPerYear: parseFloat(cost.target.value)})}
                         />
                     </div>
                 </Group>
@@ -107,8 +134,9 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         <input
                             className={s(styles.input, styles.costInput)}
                             type='number'
-                            value={state.cost}
-                            onChange={cost => setState({...state, cost: parseInt(cost.target.value)})}
+                            step='0.01'
+                            value={state.flatCost}
+                            onChange={cost => setState({...state, flatCost: parseFloat(cost.target.value)})}
                         />
                     </div>
                 </Group>
@@ -131,8 +159,8 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                     <input
                         type='text'
                         className={s(styles.input, styles.pluginInput)}
-                        value={state.link}
-                        onChange={e => setState({...state, link: e.target.value})}
+                        value={state.purchaseLink}
+                        onChange={e => setState({...state, purchaseLink: e.target.value})}
                     />
                 </div>
             </Group>

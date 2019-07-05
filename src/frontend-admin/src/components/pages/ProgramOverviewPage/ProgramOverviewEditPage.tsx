@@ -7,7 +7,7 @@ import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
-import {ProgramForm} from '../../reusables/ProgramForm/ProgramForm'
+import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -72,23 +72,18 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         monthsPerRenewal: 0,
     })
 
-    const [programInput, setProgramInput] = useState<{
-        name: string
-        programName: string
-        description: string
-        costPerMonth: number
-        flatCost: number
-        renewalDate: Date
-        purchaseDate: Date
-        monthsPerRenewal: number
-    }>({
+    const [programInput, setProgramInput] = useState<IProgramFormInputs>({
         name: '',
         programName: nameInput,
         description: '',
-        costPerMonth: 0,
-        flatCost: 0,
         renewalDate: new Date(),
         purchaseDate: new Date(),
+        purchaseLink: '',
+        licenseKey: '',
+        costPerMonth: 0,
+        costPerYear: 0,
+        flatCost: 0,
+        costType: 'per month',
         monthsPerRenewal: 0,
     })
 
@@ -361,6 +356,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                     <div className={styles.inputText}>Flat Cost</div>
                                     <input
                                         type='number'
+                                        step='0.01'
                                         className={s(styles.input, styles.pluginInputRow2)}
                                         value={pluginInput.flatCost}
                                         onChange={e =>
@@ -373,6 +369,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                     <div className={styles.inputText}>Monthly Cost</div>
                                     <input
                                         type='number'
+                                        step='0.01'
                                         className={s(styles.input, styles.pluginInputRow2)}
                                         value={pluginInput.costPerMonth}
                                         onChange={e =>
@@ -385,6 +382,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                     <div className={styles.inputText}>Months Per Renewal</div>
                                     <input
                                         type='number'
+                                        step='0.01'
                                         className={s(styles.input, styles.pluginInputRow2)}
                                         value={pluginInput.monthsPerRenewal}
                                         onChange={e =>
