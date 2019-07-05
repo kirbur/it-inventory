@@ -52,7 +52,6 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
         axios
             .get(`/detail/program/${match.params.id}`)
             .then((data: any) => {
-                console.log(data)
                 setProgData({
                     name: data[0].programName,
                 })

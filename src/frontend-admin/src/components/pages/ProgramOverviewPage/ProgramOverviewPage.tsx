@@ -9,6 +9,7 @@ import {Group} from '../../reusables/Group/Group'
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {formatCost} from '../../../utilities/FormatCost'
 
 // Styles
 import styles from './ProgramOverviewPage.module.css'
@@ -46,7 +47,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             .get(`/detail/ProgramOverview/${match.params.id}`)
             .then((data: any) => {
                 setProgramData(data[0].programOverview)
-                console.log(data)
+
                 let prog: any[] = []
                 data[0].inDivPrograms.map((i: any) =>
                     prog.push(
@@ -91,14 +92,6 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             })
             .catch((err: any) => console.error(err))
     }, [])
-
-    const formatCost = (isPerYear: boolean, perYear: number, perUse: number) => {
-        return isPerYear
-            ? perYear + ' /yr'
-            : perYear === 0
-            ? perUse + ' paid'
-            : Math.round((perYear / 12) * 100) / 100 + ' /mo'
-    }
 
     const handleEmpClick = (id: number) => {
         history.push(`/employees/${id}`)

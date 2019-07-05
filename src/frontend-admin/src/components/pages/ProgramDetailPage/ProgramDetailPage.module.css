@@ -1,6 +1,7 @@
 .progDetailMain {
     margin: 0 50px;
 }
+
 .columns {
     display: flex;
     flex-direction: row;

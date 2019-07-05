@@ -51,7 +51,6 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         axios
             .get(`/detail/program/${match.params.id}`)
             .then((data: any) => {
-                console.log(data)
                 setProgData({
                     name: data[0].programName,
                     dateBought: formatDate(data[0].dateBought),

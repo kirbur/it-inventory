@@ -13,6 +13,7 @@ import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/Progr
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {formatCost} from '../../../utilities/FormatCost'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -124,14 +125,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             })
             .catch((err: any) => console.error(err))
     }, [])
-
-    const formatCost = (isPerYear: boolean, perYear: number, perUse: number) => {
-        return isPerYear
-            ? perYear + ' /yr'
-            : perYear === 0
-            ? perUse + ' paid'
-            : Math.round((perYear / 12) * 100) / 100 + ' /mo'
-    }
 
     const handleProgramRemove = (row: any) => {
         //add to removed array
