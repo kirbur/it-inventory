@@ -24,6 +24,15 @@ import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 
 // Types
+interface IDepartment {
+    departmentName: string
+    departmentId: number
+    icon: string
+    defaultHardware: string[]
+    defaultSoftware: string[]
+    defaultLicenses: string[]
+}
+
 interface IEmployeeDetailEditPageProps {
     match: any
     history: any
@@ -32,23 +41,6 @@ interface IEmployeeDetailEditPageProps {
 // Primary Component
 export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = props => {
     const {history, match} = props
-
-    // useEffect(() => {
-    //     axios.post()
-    // })
-
-    //TODO: get the dept names for the employee dept radio buttons
-    const [deptList, setDeptList] = useState<any>([])
-    var deptsRowOne: any[] = []
-    var deptsRowTwo: any[] = []
-    //push them into alternating rows so that rows are equal
-    for (let i = 0; i < deptList.length; i++) {
-        if (i % 2 == 0) {
-            deptsRowOne.push(deptList[i] /*.DepartmentName*/)
-        } else {
-            deptsRowTwo.push(deptList[i] /*.DepartmentName*/)
-        }
-    }
 
     const {
         loginContextVariables: {accessToken, refreshToken},
@@ -76,9 +68,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
     const licenseHeaders = ['Licenses', 'Key/Username', 'Monthly Cost', 'CALs']
 
+    const [deptList, setDeptList] = useState<IDepartment[]>([])
+
     //input feild states:
     const [dateInput, setDateInput] = useState<Date>(new Date())
-    const [deptInput, setDeptInput] = useState<{DepartmentName: string; DepartmentId: number}>()
+    const [deptInput, setDeptInput] = useState<IDepartment>()
     const [adminInput, setAdminInput] = useState<boolean>()
     const [imgInput, setImgInput] = useState<File>()
     const [roleInput, setRoleInput] = useState<string>()
@@ -87,14 +81,62 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([])
     const [licenseDropdown, setLicenseDropdown] = useState<any[]>([])
 
-    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'First Last', id: 1}])
-    const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>()
+    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'Select An Employee', id: -1}])
+    const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>(employeeDropdown[0])
 
     useEffect(() => {
         if (match.params.id === 'new') {
             //TODO: populate all 4 dropdowns
             //employee dropdown with employees
             //and available hw/progs
+
+            axios //TODO: get from edit endpoint
+                .get(`/add/employeePrep/`)
+                .then((data: any) => {
+                    console.log(data)
+
+                    var availableEmp: any[] = []
+                    data[0].myDomainUsers
+                        .sort()
+                        .map((emp: any, index: number) => availableEmp.push({name: emp, id: index}))
+
+                    setEmployeeDropdown(availableEmp)
+
+                    setDeptList(data[0].departments)
+
+                    let uhw: any[] = []
+                    data[0].unassignedHardware.map((i: any) =>
+                        uhw.push({
+                            name: i.monitorName ? i.monitorName : i.compName ? i.compName : i.periphName,
+                            id: i.monitorId
+                                ? i.type.toLowerCase() + '/' + i.monitorId
+                                : i.computerId
+                                ? i.type.toLowerCase() + '/' + i.computerId
+                                : i.type.toLowerCase() + '/' + i.peripheralId,
+                        })
+                    )
+
+                    setHardwareDropdown(uhw)
+
+                    let usw: any[] = []
+                    data[0].unassignedSoftware.map((i: any) =>
+                        usw.push({
+                            name: i.programName,
+                            id: i.programId,
+                        })
+                    )
+                    setSoftwareDropdown(usw)
+
+                    let ul: any[] = []
+                    data[0].unassignedLicenses.map((i: any) =>
+                        ul.push({
+                            name: i.programName,
+                            id: i.programId,
+                        })
+                    )
+                    setLicenseDropdown(ul)
+                })
+                .catch((err: any) => console.error(err))
         } else {
             axios //TODO: get from edit endpoint
                 .get(`/detail/employee/${match.params.id}`)
@@ -209,22 +251,20 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }, [])
 
     useEffect(() => {
-        axios
-            .get('/dashboard/departmentTable?$select=departmentName,departmentID')
-            .then((data: any) => {
-                setDeptList(data)
-                var d = data.filter((i: any) => i.DepartmentName === userData.department)
-                d[0]
-                    ? setDeptInput({DepartmentName: userData.department, DepartmentId: d[0].DepartmentId})
-                    : setDeptInput({DepartmentName: data[0].departmentName, DepartmentId: data[0].DepartmentId})
-            })
-            .catch((err: any) => console.error(err))
-    }, [userData])
+        var d = deptList.filter((i: any) => i.DepartmentName === userData.department)
+        d[0] ? setDeptInput({...d[0]}) : setDeptInput({...deptList[0]})
+    }, [deptList])
 
     useEffect(() => {
-        if (match.params.id === 'new') {
-            //TODO: get table data for department defaults
-            // & figure out how to handle unavailable defaults
+        if (match.params.id === 'new' && deptInput) {
+            //Add defaults to [type].added
+            //deptInput.defaultHardware.map(hw => handleAddHardware({name: hw, id: }))
+            hardwareDropdown.map(available => {
+                // deptInput.defaultHardware.map( (default: string) => {
+                //     // if() {
+                //     // }
+                // })
+            })
         }
     }, [deptInput])
 
@@ -397,6 +437,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 ])
             }
         })
+
         return arr
     }
 
@@ -519,7 +560,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                                             styles.employeeDropdownTitle
                                                         )}
                                                     >
-                                                        <div>Select an employee</div>
+                                                        <div>{selectedEmployee.name}</div>
                                                         <div
                                                             className={s(
                                                                 dropdownStyles.dropdownArrow,
@@ -530,7 +571,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                                 </button>
                                             )}
                                             choicesList={() => (
-                                                <ul className={dropdownStyles.dropdownList}>
+                                                <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
                                                     {employeeDropdown.map(i => (
                                                         <li
                                                             className={dropdownStyles.dropdownListItem}
@@ -589,42 +630,23 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 {/* Employee Dept radio buttons */}
                 <div className={s(styles.title, styles.paddingTop, styles.paddingBottom)}>Employee Department</div>
-                {deptInput && (
+                {deptInput && deptList && (
                     <div className={styles.employeeDepartment}>
-                        <div>
-                            {deptsRowOne.map(dept => (
-                                <div className={styles.container}>
-                                    <input
-                                        type='radio'
-                                        name='employeeDept'
-                                        className={styles.checkmark}
-                                        checked={dept.DepartmentId === deptInput.DepartmentId /*userData.department*/}
-                                        onChange={() => setDeptInput(dept)}
-                                    />
-                                    <div className={styles.checkmark} />
-                                    <div className={styles.insideCheckmark} />
-                                    <img src={icon} className={styles.deptIcon} />
-                                    <div className={styles.deptName}>{dept.DepartmentName}</div>
-                                </div>
-                            ))}
-                        </div>
-                        <div>
-                            {deptsRowTwo.map(dept => (
-                                <div className={styles.container}>
-                                    <input
-                                        type='radio'
-                                        name='employeeDept'
-                                        className={styles.checkmark}
-                                        checked={dept.DepartmentId === deptInput.DepartmentId /*userData.department*/}
-                                        onChange={() => setDeptInput(dept)}
-                                    />
-                                    <div className={styles.checkmark} />
-                                    <div className={styles.insideCheckmark} />
-                                    <img src={icon} className={styles.deptIcon} />
-                                    <div className={styles.deptName}>{dept.DepartmentName}</div>
-                                </div>
-                            ))}
-                        </div>
+                        {deptList.map((dept: any) => (
+                            <div className={styles.container}>
+                                <input
+                                    type='radio'
+                                    name='employeeDept'
+                                    className={styles.checkmark}
+                                    checked={dept.departmentId === deptInput.departmentId}
+                                    onChange={() => setDeptInput(dept)}
+                                />
+                                <div className={styles.checkmark} />
+                                <div className={styles.insideCheckmark} />
+                                <img src={dept.icon} className={styles.deptIcon} />
+                                <div className={styles.deptName}>{dept.departmentName}</div>
+                            </div>
+                        ))}
                     </div>
                 )}
 

@@ -180,7 +180,7 @@ input:checked ~ .insideCheckmarkAdmin {
 
 .employeeDepartment {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
 }
 .deptIcon {
     width: 75px;
