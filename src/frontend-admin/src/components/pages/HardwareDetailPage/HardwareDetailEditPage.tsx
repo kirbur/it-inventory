@@ -66,6 +66,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             ])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
             setThirdSectionHeaders(['Employee Assigned', 'Department Assigned', 'Location'])
+            // setFourthSectionHeaders(['Fixed Cost', 'Cost per year'])
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
@@ -227,7 +228,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
             {/* column 2 */}
             <div className={styles.secondColumn}>
-                <div className={styles.hardwareHeader}>Hardware Information</div>
+                <div className={styles.hardwareHeader}>{match.params.type} Information</div>
                 {/* virtualize checkbox */}
                 <div></div>
                 {/* first section */}
@@ -239,6 +240,78 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 {/* third section */}
                 {thirdSectionHeaders.length > 0 && renderSection(thirdSectionHeaders, thirdSectionData)}
                 {thirdSectionHeaders.length > 0 && <div className={styles.line} />}
+                {/* cost section */}
+                <div className={styles.radioSection}>
+                    <div className={styles.radioContainer}>
+                        <div className={styles.radio}>
+                            <input
+                                type='radio'
+                                name='cost'
+                                className={styles.checkmark}
+                                // checked={state.costType === 'per month'}
+                                // onChange={() => setState({...state, costType: 'per month'})}
+                            />
+                            <div className={styles.checkmark} />
+                            <div className={styles.insideCheckmark} />
+                        </div>
+                        <div>
+                            <div className={styles.inputHeader}>Cost per Month</div>
+                            <input
+                                className={s(styles.radioInput, styles.costInput)}
+                                type='number'
+                                step='0.01'
+                                // value={state.costPerMonth}
+                                // onChange={cost => setState({...state, costPerMonth: parseFloat(cost.target.value)})}
+                            />
+                        </div>
+                    </div>
+                    <div className={styles.radioContainer}>
+                        <div className={styles.radio}>
+                            <input
+                                type='radio'
+                                name='cost'
+                                className={styles.checkmark}
+                                // checked={state.costType === 'per year'}
+                                // onChange={() => setState({...state, costType: 'per year'})}
+                            />
+                            <div className={styles.checkmark} />
+                            <div className={styles.insideCheckmark} />
+                        </div>
+                        <div>
+                            <div className={styles.inputHeader}>Cost per Year</div>
+                            <input
+                                className={s(styles.radioInput, styles.costInput)}
+                                type='number'
+                                step='0.01'
+                                // value={state.costPerYear}
+                                // onChange={cost => setState({...state, costPerYear: parseFloat(cost.target.value)})}
+                            />
+                        </div>
+                    </div>
+                    <div className={styles.radioContainer}>
+                        <div className={styles.radio}>
+                            <input
+                                type='radio'
+                                name='cost'
+                                className={styles.checkmark}
+                                // checked={state.costType === 'per use'}
+                                // onChange={() => setState({...state, costType: 'per use'})}
+                            />
+                            <div className={styles.checkmark} />
+                            <div className={styles.insideCheckmark} />
+                        </div>
+                        <div>
+                            <div className={styles.inputHeader}>Cost per License</div>
+                            <input
+                                className={s(styles.radioInput, styles.costInput)}
+                                type='number'
+                                step='0.01'
+                                // value={state.flatCost}
+                                // onChange={cost => setState({...state, flatCost: parseFloat(cost.target.value)})}
+                            />
+                        </div>
+                    </div>
+                </div>
 
                 {/* history log */}
                 <div className={styles.historyLogContainer}>

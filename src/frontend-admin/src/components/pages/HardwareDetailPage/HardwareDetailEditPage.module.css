@@ -62,6 +62,7 @@
     text-align: left;
     font-size: 24px;
     color: #000000;
+    text-transform: capitalize;
 }
 .hardwareText {
     margin: 6px;
@@ -98,13 +99,79 @@
     padding-left: 12px;
 }
 
+/* cost radio inputs */
+.radioSection {
+    display: flex;
+    flex-direction: row;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+.radioContainer {
+    display: flex;
+    flex-direction: row;
+}
+.radio input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+.radio {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    margin-left: 15px;
+    /* width: 450px; */
+}
+.radioInput {
+    width: 220px;
+    height: 45px;
+    border: 1.5px solid #a5a5a5;
+    border-radius: 3px;
+    font-size: 18px;
+    padding-left: 12px;
+}
+.checkmark {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    border: 2px solid #979797;
+}
+.insideCheckmark {
+    z-index: 1;
+    position: relative;
+    right: 25px;
+    border-radius: 50%;
+    height: 21px;
+    width: 21px;
+    background-color: white;
+}
+.insideCheckmarkAdmin {
+    z-index: 1;
+    position: relative;
+    bottom: 25px;
+    left: 4px;
+    border-radius: 50%;
+    height: 21px;
+    width: 21px;
+    background-color: white;
+}
+input:checked ~ .checkmark {
+    border-color: #009eff;
+}
+input:checked ~ .insideCheckmark {
+    background-color: #009eff;
+}
+input:checked ~ .insideCheckmarkAdmin {
+    background-color: #009eff;
+}
+
 /* history log */
 .historyLogContainer {
-    /* max-width: 700px; */
     margin-top: 50px;
 }
 
-/* comment section */
+/* Comment section */
 .commentContainer {
     margin-top: 50px;
 }
