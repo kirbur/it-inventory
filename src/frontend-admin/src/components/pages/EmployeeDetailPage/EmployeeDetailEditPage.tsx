@@ -292,6 +292,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmarkAdmin} />
+
                                 <div className={styles.title}>Admin User</div>
                                 <div className={styles.adminText}>
                                     This user will be able to edit any detail pages and be able to add new hardware,

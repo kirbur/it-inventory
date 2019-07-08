@@ -353,7 +353,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                         className={s(styles.input, styles.pluginInputRow2)}
                                         value={pluginInput.flatCost}
                                         onChange={e =>
-                                            setPluginInput({...pluginInput, flatCost: parseInt(e.target.value)})
+                                            setPluginInput({...pluginInput, flatCost: parseFloat(e.target.value)})
                                         }
                                     />
                                 </div>
@@ -366,7 +366,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                         className={s(styles.input, styles.pluginInputRow2)}
                                         value={pluginInput.costPerMonth}
                                         onChange={e =>
-                                            setPluginInput({...pluginInput, costPerMonth: parseInt(e.target.value)})
+                                            setPluginInput({...pluginInput, costPerMonth: parseFloat(e.target.value)})
                                         }
                                     />
                                 </div>
@@ -375,11 +375,13 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                     <div className={styles.inputText}>Months Per Renewal</div>
                                     <input
                                         type='number'
-                                        step='0.01'
                                         className={s(styles.input, styles.pluginInputRow2)}
                                         value={pluginInput.monthsPerRenewal}
                                         onChange={e =>
-                                            setPluginInput({...pluginInput, monthsPerRenewal: parseInt(e.target.value)})
+                                            setPluginInput({
+                                                ...pluginInput,
+                                                monthsPerRenewal: parseFloat(e.target.value),
+                                            })
                                         }
                                     />
                                 </div>

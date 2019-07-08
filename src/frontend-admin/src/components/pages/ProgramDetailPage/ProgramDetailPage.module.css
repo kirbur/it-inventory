@@ -81,6 +81,10 @@
     cursor: pointer;
 }
 
+.empName:hover {
+    text-decoration: underline;
+}
+
 .descriptionContainer {
     width: 100%;
     text-align: left;
