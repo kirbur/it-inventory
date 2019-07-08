@@ -45,8 +45,7 @@ namespace backend_api.Controllers
                     if (user != null)
                     {
                         // Return the isAdmin field from the AuthIDServer matching the Guid.
-                        string adGUID = user.Guid.ToString();
-                        return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == adGUID).First().IsAdmin;
+                        return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == user.Guid.Value).First().IsAdmin;
                     }
                     else
                     {
@@ -291,6 +290,7 @@ namespace backend_api.Controllers
          *          licenseKey: string, //TODO
          *          costPerMonth: decimal,
          *          flatCost: decimal,
+         *          LicensesCount : int
          *      } ,.. ],
          *  } ]           
          */
@@ -425,7 +425,8 @@ namespace backend_api.Controllers
                             name = prog.ProgramName,
                             licensesKey = isAdmin ? prog.ProgramLicenseKey : null,
                             costPerMonth,
-                            flatCost = prog.ProgramFlatCost
+                            flatCost = prog.ProgramFlatCost,
+                            licensesCount = 1
                         };
                         licenses.Add(license);
                     }
@@ -448,7 +449,7 @@ namespace backend_api.Controllers
                 string picture = $"/image/employee/{id}";
 
                 // Get the department name
-                var department = _context.Department.Where(dep => dep.DepartmentId == emp.DepartmentId && !dep.IsDeleted).FirstOrDefault().DepartmentName;
+                var department = _context.Department.Where(dep => dep.DepartmentId == emp.DepartmentID && !dep.IsDeleted).FirstOrDefault().DepartmentName;
 
                 // list that will hold the unassigned hardware
                 List<object> UnassignedHardware = new List<object>();
@@ -547,6 +548,7 @@ namespace backend_api.Controllers
                     department,
                     emp.Role,
                     emp.HireDate,
+                    // TODO: This is just a temp fix until we sort when to create authIdserver entries
                     Admin = false,
                     hardware,
                     software,
@@ -717,7 +719,7 @@ namespace backend_api.Controllers
                 decimal? TotalCostOfActHardwareInDep = 0;
 
                 // lambda to collect all the employees in the current department into a list
-                var empsInDep = _context.Employee.Where(x => x.DepartmentId == DepId && x.IsDeleted == false);
+                var empsInDep = _context.Employee.Where(x => x.DepartmentID == DepId && x.IsDeleted == false);
 
                 // lambda to get the ids of the all the employees in the current department
                 var empsIDsInDep = empsInDep.Select(x => x.EmployeeId).ToList();
@@ -925,6 +927,8 @@ namespace backend_api.Controllers
                     "location": string,
                     "serialNumber": string,
                 },
+                "departmentName : string,
+                "departmentID : int,
                 "icon": partial URL (as string),
                 "serverClicked" : string,
                 "employeeAssignedName": string,
@@ -958,9 +962,23 @@ namespace backend_api.Controllers
                 // Employee the server is assigned to.
                 var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == sv.EmployeeId).FirstOrDefault();
 
+                // int to hold the department Id for click-ability. -1 is the default if hardware is not assigned. 
+                int departmentID = -1;
+                // string to hold department name. empty string if hardware is unassigned. 
+                string departmentName = "";
+
+                // if an employee is assigned to this hardware then find their department
+                if (employeeAssigned != null)
+                {
+                    var dep = _context.Department.Where(x => x.DepartmentId == employeeAssigned.DepartmentID).FirstOrDefault();
+                    departmentID = dep.DepartmentId;
+                    departmentName = dep.DepartmentName;
+                }
+
                 // Server History
                 List<object> SeverHistory = new List<object>();
 
+                // Formatting the data returned of this piece of hardware's history and adding it to a list.
                 foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == serverID))
                 {
                     var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
@@ -973,8 +991,11 @@ namespace backend_api.Controllers
 
                 var serverClicked = nameof(Server) + "/" + sv.ServerId;
 
-                var serverDetailPage =(new {
+                var serverDetailPage =(new
+                {
                     server = sv,
+                    departmentName,
+                    departmentID,
                     icon,
                     serverClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
@@ -1013,6 +1034,8 @@ namespace backend_api.Controllers
                         "location": string,
                         "serialNumber": string
                     },
+                    "departmentName : string,
+                    "departmentID : int,
                     "icon": partial URL (as string),
                     "computerClicked" : string,
                     "employeeAssignedName": string,
@@ -1045,9 +1068,23 @@ namespace backend_api.Controllers
                 // Employee the computer is assigned to.
                 var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == comp.EmployeeId).FirstOrDefault();
 
+                // int to hold the department Id for click-ability. -1 is the default if hardware is not assigned. 
+                int departmentID = -1;
+                // string to hold department name. empty string if hardware is unassigned. 
+                string departmentName = "";
+
+                // if an employee is assigned to this hardware then find their department
+                if (employeeAssigned != null)
+                {
+                    var dep = _context.Department.Where(x => x.DepartmentId == employeeAssigned.DepartmentID).FirstOrDefault();
+                    departmentID = dep.DepartmentId;
+                    departmentName = dep.DepartmentName;
+                }
+
                 // Computer History
                 List<object> ComputerHistory = new List<object>();
 
+                // Formatting the data returned of this piece of hardware's history and adding it to a list.
                 foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == ComputerID))
                 {
                     var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
@@ -1062,6 +1099,8 @@ namespace backend_api.Controllers
                 var computerDetailPage = (new
                 {
                     computer = comp,
+                    departmentName,
+                    departmentID,
                     icon,
                     computerClicked,
                     employeeAssignedName =employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
@@ -1096,6 +1135,8 @@ namespace backend_api.Controllers
                     "location": string,
                     "serialNumber": string,
                 },
+                "departmentName : string,
+                "departmentID : int,
                 "icon": partial URL (as string),
                 "monitorClicked" : string,
                 "employeeAssignedName": string,
@@ -1129,9 +1170,24 @@ namespace backend_api.Controllers
                 // Employee the monitor is assigned to.
                 var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == mn.EmployeeId).FirstOrDefault();
 
+                // int to hold the department Id for click-ability. -1 is the default if hardware is not assigned. 
+                int departmentID = -1;
+                // string to hold department name. empty string if hardware is unassigned. 
+                string departmentName = "";
+
+                // if an employee is assigned to this hardware then find their department
+                if (employeeAssigned != null)
+                {
+                    var dep = _context.Department.Where(x => x.DepartmentId == employeeAssigned.DepartmentID).FirstOrDefault();
+                    departmentID = dep.DepartmentId;
+                    departmentName = dep.DepartmentName;
+                }
+
+
                 // Monitor History
                 List<object> MonitorHistory = new List<object>();
 
+                // Formatting the data returned of this piece of hardware's history and adding it to a list.
                 foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == monitorID))
                 {
                     var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
@@ -1147,6 +1203,8 @@ namespace backend_api.Controllers
                 var monitorDetailPage =(new
                 {
                     monitor = mn,
+                    departmentName,
+                    departmentID,
                     icon,
                     monitorClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
@@ -1176,6 +1234,8 @@ namespace backend_api.Controllers
                     "renewalDate": date (as string),
                     "serialNumber": string,
                 },
+                "departmentName : string,
+                "departmentID : int,
                 "icon": partial URL (as string),
                 "peripheralClicked" : string,
                 "employeeAssignedName": string,
@@ -1209,11 +1269,25 @@ namespace backend_api.Controllers
 
                 // Employee the peripheral is assigned to.
                 var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == pr.EmployeeId).FirstOrDefault();
+                
+                // int to hold the department Id for click-ability. -1 is the default if hardware is not assigned. 
+                int departmentID = -1;
+                // string to hold department name. empty string if hardware is unassigned. 
+                string departmentName = "";
+
+                // if an employee is assigned to this hardware then find their department
+                if (employeeAssigned != null)
+                {
+                    var dep = _context.Department.Where(x => x.DepartmentId == employeeAssigned.DepartmentID).FirstOrDefault();
+                    departmentID = dep.DepartmentId;
+                    departmentName = dep.DepartmentName;
+                }
 
                 // Peripheral History
 
                 List<object> peripheralHistory = new List<object>();
 
+                // Formatting the data returned of this piece of hardware's history and adding it to a list.
                 foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == peripheralID))
                 {
                     var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
@@ -1228,6 +1302,8 @@ namespace backend_api.Controllers
                 var peripheralDetailPage =(new
                 {
                     peripheral = pr,
+                    departmentName,
+                    departmentID,
                     icon,
                     peripheralClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
