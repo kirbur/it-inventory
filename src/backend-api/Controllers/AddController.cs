@@ -311,22 +311,21 @@ namespace backend_api.Controllers
         }
 
         // Return the list of history, licenses, and software.
+        // TODO: add a better comment.
         [HttpGet]
         [Route("DepartmentPrep")]
         public IActionResult GetDepartmentPrep()
         {
+            // List of generic types that can be assigned as defaults.
+            List<string> hardware = new List<string> { "Server", "Laptop", "Monitor" };
+
+            // Get the type of peripherals. Types are generic but more specific than "Peripheral"
+            List<string> peripherals = _context.Peripheral.Where(pr => !pr.IsDeleted).GroupBy(pr => pr.PeripheralType).Select(pr => pr.FirstOrDefault()).Select(pr => pr.PeripheralType).ToList();
+            hardware.AddRange(peripherals);
+
             // Get the names of licenses and software that are not deleted
             IQueryable<string> licenses = _context.Program.Where(prog => prog.IsLicense && !prog.IsDeleted).GroupBy(prog => prog.ProgramName).Select(prog => prog.FirstOrDefault()).Select(prog => prog.ProgramName);
             IQueryable<string> software = _context.Program.Where(prog => !prog.IsLicense && !prog.IsDeleted).GroupBy(prog => prog.ProgramName).Select(prog => prog.FirstOrDefault()).Select(prog => prog.ProgramName);
-
-            // Get the names (make + model) of all the hardware that are not deleted.
-            IQueryable<string> servers = _context.Server.Where(sv => !sv.IsDeleted).GroupBy(sv => sv.Make + " " + sv.Model).Select(sv => sv.FirstOrDefault()).Select(sv => sv.Make + " " + sv.Model);
-            IQueryable<string> computers = _context.Computer.Where(cp => !cp.IsDeleted).GroupBy(cp => cp.Make + " " + cp.Model).Select(cp => cp.FirstOrDefault()).Select(cp => cp.Make + " " + cp.Model);
-            IQueryable<string> monitors = _context.Monitor.Where(mn => !mn.IsDeleted).GroupBy(mn => mn.Make + " " + mn.Model).Select(mn => mn.FirstOrDefault()).Select(mn => mn.Make + " " + mn.Model);
-            IQueryable<string> peripherals = _context.Peripheral.Where(pr => !pr.IsDeleted).GroupBy(pr => pr.PeripheralName + " " + pr.PeripheralType).Select(pr => pr.FirstOrDefault()).Select(pr => pr.PeripheralName + " " + pr.PeripheralType);
-
-            // Add all the hardware to one list.
-            IQueryable<string> hardware = servers.Union(computers).Union(monitors).Union(peripherals);
 
             // Return JSON in a list :)
             return Ok(new[] { new
@@ -338,12 +337,17 @@ namespace backend_api.Controllers
             });
         }
 
-        //[HttpPost]
-        //[Route("Department")]
-        //public IActionResult PostDepartment([FromBody] PostDepartmentInputModel input)
-        //{
-        //    return Ok();
-        //}
+        [HttpPost]
+        [Route("Department")]
+        public IActionResult PostDepartment([FromBody] Department input)
+        {
+            
+            _context.Department.Add(input);
+            _context.SaveChanges();
+
+            // if we get here then the various fields were created and changed and now we can return 201 created.
+            return StatusCode(201);
+        }
 
     }
 }
