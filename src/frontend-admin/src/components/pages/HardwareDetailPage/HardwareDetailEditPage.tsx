@@ -49,7 +49,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [secondSectionData, setSecondSectionData] = useState<(string | number)[]>([])
     const [thirdSectionData, setThirdSectionData] = useState<(string | number)[]>([])
 
-    const [commentText, setCommentText] = useState('')
+    const [commentText, setCommentText] = useState(
+        'In publishing and graphic design, Lorem ipsum is a placeholder text commonly used todemonstrate the visual form of a document without relying on meaningful content.Replacing the actual content with placeholder text allows designers to design the formof the content before the content itself has been produced.'
+    )
 
     const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([
         {date: 'some day', event: 'Assigned', user: 'Jo'},
@@ -228,6 +230,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             date: formatDate(dateInput.toString()),
         })
         setHistoryLogEntries(tempHistoryLog)
+        // TODO: post the entry to the db - wil post one at a time
     }
 
     return (
@@ -399,19 +402,13 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                 {/* comment section */}
                 <div>
-                    <table className={styles.commentContainer}>
-                        <tr>
-                            <td className={styles.header}>Text Field</td>
-                        </tr>
-                        <tr>
-                            <td className={styles.text}>
-                                In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to
-                                demonstrate the visual form of a document without relying on meaningful content.
-                                Replacing the actual content with placeholder text allows designers to design the form
-                                of the content before the content itself has been produced.
-                            </td>
-                        </tr>
-                    </table>
+                    <div className={styles.header}>Text Field</div>
+
+                    <textarea
+                        className={styles.description}
+                        value={commentText}
+                        onChange={e => setCommentText(e.target.value)}
+                    ></textarea>
                 </div>
                 <div className={styles.submitContainer}>
                     <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />
