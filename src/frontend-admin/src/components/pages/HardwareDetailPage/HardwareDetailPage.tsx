@@ -47,6 +47,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     const [secondTableData, setSecondTableData] = useState<(string | number)[]>([])
     const [thirdTableData, setThirdTableData] = useState<(string | number)[]>([])
 
+    const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([])
     const [commentText, setCommentText] = useState('')
 
     useEffect(() => {
@@ -75,6 +76,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     ])
                     setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].server.location])
                     setCommentText(data[0].server.textField)
+                    setHistoryLogEntries(data[0].serverHistory)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'laptop') {
@@ -100,6 +102,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     ])
                     setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].computer.location])
                     setCommentText(data[0].computer.textField)
+                    setHistoryLogEntries(data[0].computerHistory)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'monitor') {
@@ -121,6 +124,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setSecondTableData([])
                     setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD'])
                     setCommentText(data[0].monitor.textField)
+                    setHistoryLogEntries(data[0].monitorHistory)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
@@ -137,6 +141,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setSecondTableData([])
                     setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD'])
                     setCommentText(data[0].peripheral.textField)
+                    setHistoryLogEntries(data[0].peripheralHistory)
                 })
                 .catch((err: any) => console.error(err))
         }

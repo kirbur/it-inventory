@@ -53,9 +53,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         'In publishing and graphic design, Lorem ipsum is a placeholder text commonly used todemonstrate the visual form of a document without relying on meaningful content.Replacing the actual content with placeholder text allows designers to design the formof the content before the content itself has been produced.'
     )
 
-    const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([
-        {date: 'some day', event: 'Assigned', user: 'Jo'},
-    ])
+    const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([])
     const [eventInput, setEventInput] = useState('')
     const [historyLogBool, setHistoryLogBool] = useState(false)
     const [dateInput, setDateInput] = useState<Date>(new Date())
