@@ -7,6 +7,7 @@ import {IoMdAdd} from 'react-icons/io'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
+import DatePicker from 'react-datepicker'
 
 // Utils
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
@@ -18,6 +19,7 @@ import styles from './HardwareDetailEditPage.module.css'
 
 // Context
 import {LoginContext} from '../../App/App'
+import {cloneDeep} from 'lodash'
 
 // Types
 interface IHardwareDetailEditPageProps {
@@ -48,6 +50,13 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [thirdSectionData, setThirdSectionData] = useState<(string | number)[]>([])
 
     const [commentText, setCommentText] = useState('')
+
+    const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([
+        {date: 'some day', event: 'Assigned', user: 'Jo'},
+    ])
+    const [eventInput, setEventInput] = useState('')
+    const [historyLogBool, setHistoryLogBool] = useState(false)
+    const [dateInput, setDateInput] = useState<Date>(new Date())
 
     useEffect(() => {
         if (match.params.type === 'server') {
@@ -207,6 +216,20 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         return <div className={styles.section}>{rows}</div>
     }
 
+    const toggleHistoryLogForm = () => {
+        setHistoryLogBool(!historyLogBool)
+    }
+    const submitHistoryLog = () => {
+        setHistoryLogBool(!historyLogBool)
+        let tempHistoryLog = cloneDeep(historyLogEntries)
+        tempHistoryLog.push({
+            user: thirdSectionData[0],
+            event: eventInput,
+            date: formatDate(dateInput.toString()),
+        })
+        setHistoryLogEntries(tempHistoryLog)
+    }
+
     return (
         <div className={styles.columns}>
             {/* column 1 */}
@@ -301,7 +324,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             <div className={styles.insideCheckmark} />
                         </div>
                         <div>
-                            <div className={styles.inputHeader}>Cost per License</div>
+                            <div className={styles.inputHeader}>Fixed Cost</div>
                             <input
                                 className={s(styles.radioInput, styles.costInput)}
                                 type='number'
@@ -313,9 +336,65 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     </div>
                 </div>
 
-                {/* history log */}
+                {/* history log - will post separately from the rest of the hardware*/}
                 <div className={styles.historyLogContainer}>
-                    <HistoryLog historyLog={[{date: 'some day', event: 'Assigned', user: 'Jo'}]} />
+                    <HistoryLog historyLog={historyLogEntries} />
+                    {historyLogBool && (
+                        <div className={styles.row}>
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>Date</div>
+                                <DatePicker
+                                    dateFormat='yyyy/MM/dd'
+                                    selected={dateInput}
+                                    onChange={e => e && setDateInput(e)}
+                                    className={styles.input}
+                                />
+                            </div>
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>Event Type</div>
+                                <div className={styles.radioContainer}>
+                                    <div className={styles.radio}>
+                                        <input
+                                            type='radio'
+                                            name='event'
+                                            className={styles.checkmark}
+                                            checked={eventInput === 'Broken'}
+                                            onChange={() => setEventInput('Broken')}
+                                        />
+                                        <div className={styles.checkmark} />
+                                        <div className={styles.insideCheckmark} />
+                                    </div>
+                                    <div className={styles.inputHeader}>Broken</div>
+                                </div>
+                                <div className={styles.radioContainer}>
+                                    <div className={styles.radio}>
+                                        <input
+                                            type='radio'
+                                            name='event'
+                                            className={styles.checkmark}
+                                            checked={eventInput === 'Repaired'}
+                                            onChange={() => setEventInput('Repaired')}
+                                        />
+                                        <div className={styles.checkmark} />
+                                        <div className={styles.insideCheckmark} />
+                                        <div className={styles.inputHeader}>Repaired</div>
+                                    </div>
+                                </div>
+                                {/* the rest of the logs are done on the backend - obsolete when archived */}
+                            </div>
+                            {/* should send back the employee of this page */}
+                            <div className={styles.historyLogSubmit}>
+                                <Button icon='add' onClick={submitHistoryLog} className={styles.historyLogButton} />
+                                Submit Log
+                            </div>
+                        </div>
+                    )}
+                    {!historyLogBool && (
+                        <div className={styles.historyLogAdd}>
+                            <Button icon='add' onClick={toggleHistoryLogForm} className={styles.historyLogButton} />
+                            add log
+                        </div>
+                    )}
                 </div>
 
                 {/* comment section */}

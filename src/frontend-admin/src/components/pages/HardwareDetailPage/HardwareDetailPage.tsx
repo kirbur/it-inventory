@@ -167,8 +167,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         {/* <img className={styles.img} src={URL + userData.photo} alt={''} /> */}
                     </div>
                     <div className={styles.costText}>
-                        {/* <p>Software ---------------- ${userData.swCost} /month</p>
-                        <p>Hardware --------------- ${userData.hwCost}</p> */}
+                        <p>Cost ---------------------- $ 5000 /month</p>
                     </div>
                 </div>
 
