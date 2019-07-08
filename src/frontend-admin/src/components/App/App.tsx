@@ -14,6 +14,8 @@ import {ProgramDetailPage} from '../pages/ProgramDetailPage/ProgramDetailPage'
 import {Login} from '../reusables/Login/Login'
 import {HelloUser} from '../HelloUser/HelloUser'
 import logo from '../../content/Images/CQL-Logo-Color.png'
+import {EmployeeDetailEditPage} from '../pages/EmployeeDetailPage/EmployeeDetailEditPage'
+import {DepartmentDetailEditPage} from '../pages/DepartmentDetailPage/DepartmentDetailEditPage'
 
 // Styles
 import styles from './App.module.css'
@@ -128,6 +130,17 @@ export const App: React.FC = () => {
                         <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
                         <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
                         <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
+
+                        <Route
+                            exact
+                            path={'/editEmployee/:id'}
+                            render={props => <EmployeeDetailEditPage {...props} />}
+                        />
+                        <Route
+                            exact
+                            path={'/editDepartment/:id'}
+                            render={props => <DepartmentDetailEditPage {...props} />}
+                        />
                     </Switch>
                 </Router>
 

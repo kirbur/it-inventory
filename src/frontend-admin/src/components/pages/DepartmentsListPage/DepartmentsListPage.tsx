@@ -10,7 +10,6 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
 
 // Styles
 import styles from './DepartmentsListPage.module.css'
@@ -81,7 +80,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push(`${match.url}/new`)
+        history.push(`/editDepartment/new`)
     }
 
     const handleRowClick = (row: any) => {
@@ -104,7 +103,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
+        headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
     //var initHeaderStates = cloneDeep(headerStates)
@@ -151,7 +150,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
             let header = (
                 <td
                     onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                        setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                         sortStates(i)
                     }}
                 >
@@ -167,9 +166,9 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         return headers
     }
 
-    function concatenatedDept(row: any[], id: number) {
+    function concatenatedDept(row: any[]) {
         return (
-            <td key={id} className={styles.departments}>
+            <td key={row[1]} className={styles.departments}>
                 <img className={styles.icon} src={URL + row[4]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.departmentName}>{row[0]}</text>
@@ -185,9 +184,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
-                    transformedRow[0] = concatenatedDept(row, row[1])
-                // case 1:
-                //     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
+                    transformedRow[0] = concatenatedDept(row)
                 case 2:
                     transformedRow[2] = (
                         <td className={styles.alignLeft}>

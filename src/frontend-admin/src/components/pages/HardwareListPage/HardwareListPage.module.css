@@ -37,10 +37,6 @@
     width: 150px;
 }
 
-.dropdownContainer {
-    margin: auto;
-}
-
 .dropdownButton:hover .dropdownTitle {
     color: white;
 }
@@ -50,11 +46,15 @@
     border-top: 2px solid white;
 }
 
-.dropdownTitle {
+.dropdownTitleContainer {
     font-family: cqlmedium;
-    margin: auto;
     line-height: 40px;
     color: #009eff;
+    width: 150px;
+    height: 50px;
+
+    display: flex;
+    justify-content: center;
 }
 
 .dropdownArrow {
@@ -93,6 +93,7 @@
     flex-direction: row;
     align-items: center;
 }
+
 .hardwareName {
     color: #009eff;
 }
