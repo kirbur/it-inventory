@@ -368,7 +368,7 @@ namespace backend_api.Controllers
             }
 
             //getting the Admin's entity
-            var AdminEmployee = _context.Employee.FirstOrDefault(x => x.Adguid.ToString() == "811cbf54-2913-4ffc-8f33-6418ddb4e06d");
+            var AdminEmployee = _context.Employee.FirstOrDefault(x => ActiveDirectoryUtil.IsFirstAdmin(x.Adguid));
             //parsing their user settings from the database into a Json Object
             JObject json = JObject.Parse(AdminEmployee.UserSettings);
             //Getting their licenses from their user settings because that contains both their licenses and software preferences

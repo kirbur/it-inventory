@@ -244,61 +244,70 @@ namespace backend_api.Controllers
             {
                 var user = UserPrincipal.FindByIdentity(adContext, userName);
                 // creating employee object to added to the database and then saved.
-                Employee employee = new Employee(input.Employee.HireDate, input.Employee.DepartmentID, false, "", input.Employee.FirstName, input.Employee.LastName, "", input.Employee.Role, new Guid(user.Guid.ToString()));
-                _context.Employee.Add(employee);
+                var emp =new Employee()
+                {
+                    HireDate = input.Employee.HireDate,
+                    DepartmentID= input.Employee.DepartmentID,
+                    IsDeleted = false,
+                    UserSettings = "",
+                    FirstName = input.Employee.FirstName,
+                    LastName = input.Employee.LastName,
+                    Email = "",
+                    Role = input.Employee.Role,
+                    Adguid = user.Guid.Value
+                };
+                _context.Employee.Add(emp);
                 _context.SaveChanges();
 
-            }
-            // Find the employee who we are adding to the database.
-            var emp = _context.Employee.Where(x => x.FirstName == input.Employee.FirstName && x.LastName == input.Employee.LastName).FirstOrDefault();
-            
-            // if there is any hardware that is to be assigned from the front end
-            if (input.HardwareAssigned != null)
-            {
-                // loop through hardware and depending on what type the hardware is, then add the hardware to the specific table. 
-                foreach (var hardware in input.HardwareAssigned)
+
+                // if there is any hardware that is to be assigned from the front end
+                if (input.HardwareAssigned != null)
                 {
-                    switch (hardware.Type)
+                    // loop through hardware and depending on what type the hardware is, then add the hardware to the specific table. 
+                    foreach (var hardware in input.HardwareAssigned)
                     {
-                        case "Monitor":
-                            var mon = _context.Monitor.Find(hardware.ID);
-                            mon.EmployeeId = emp.EmployeeId;
-                            mon.IsAssigned = true;
-                            _context.SaveChanges();
-                            break;
-                        case "Peripheral":
-                            var periph = _context.Peripheral.Find(hardware.ID);
-                            periph.EmployeeId = emp.EmployeeId;
-                            periph.IsAssigned = true;
-                            break;
-                        case "Computer":
-                            var comp = _context.Computer.Find(hardware.ID);
-                            comp.EmployeeId = emp.EmployeeId;
-                            comp.IsAssigned = true;
-                            break;
-                        case "Server":
-                            var server = _context.Server.Find(hardware.ID);
-                            server.EmployeeId = emp.EmployeeId;
-                            server.IsAssigned = true;
-                            break;
+                        switch (hardware.Type)
+                        {
+                            case "Monitor":
+                                var mon = _context.Monitor.Find(hardware.ID);
+                                mon.EmployeeId = emp.EmployeeId;
+                                mon.IsAssigned = true;
+                                _context.SaveChanges();
+                                break;
+                            case "Peripheral":
+                                var periph = _context.Peripheral.Find(hardware.ID);
+                                periph.EmployeeId = emp.EmployeeId;
+                                periph.IsAssigned = true;
+                                break;
+                            case "Computer":
+                                var comp = _context.Computer.Find(hardware.ID);
+                                comp.EmployeeId = emp.EmployeeId;
+                                comp.IsAssigned = true;
+                                break;
+                            case "Server":
+                                var server = _context.Server.Find(hardware.ID);
+                                server.EmployeeId = emp.EmployeeId;
+                                server.IsAssigned = true;
+                                break;
+
+                        }
 
                     }
-
                 }
-            }
-            // if there are any programs to be assigned from the front-end
-            if (input.ProgramAssigned != null)
-            {
-                foreach(var program in input.ProgramAssigned)
+                // if there are any programs to be assigned from the front-end
+                if (input.ProgramAssigned != null)
                 {
-                    var prog = _context.Program.Find(program.ID);
-                    prog.EmployeeId = emp.EmployeeId;
-                    _context.SaveChanges();
+                    foreach (var program in input.ProgramAssigned)
+                    {
+                        var prog = _context.Program.Find(program.ID);
+                        prog.EmployeeId = emp.EmployeeId;
+                        _context.SaveChanges();
+                    }
                 }
-            }
 
                 // if we get here then the various fields were created and changed and now we can return 201 created.
                 return StatusCode(201);
+            }
         }
     }
 }

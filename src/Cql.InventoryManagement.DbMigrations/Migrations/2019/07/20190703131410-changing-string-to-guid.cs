@@ -13,8 +13,8 @@ namespace Cql.InventoryManagement.DbMigrations.Migrations._2019._07
             Alter.Table("Employee")
                 .AlterColumn("ADGUID")
                 .AsGuid()
-                .WithDefaultValue("783c44bd-2639-4f34-b034-c83fbf457363");
-
+                .NotNullable();
+               
 
 
         }

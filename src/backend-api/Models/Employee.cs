@@ -5,6 +5,8 @@ namespace backend_api.Models
 {
     public partial class Employee
     {
+
+        public Employee() { }
         public Employee(DateTime HireDate, int DepartmentID, bool IsDeleted, string UserSettings, string FirstName, string LastName, string email, string role, Guid Adguid )
         {
             this.HireDate = HireDate;

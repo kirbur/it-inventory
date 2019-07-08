@@ -45,7 +45,7 @@ namespace backend_api.Controllers
                     if (user != null)
                     {
                         // Return the isAdmin field from the AuthIDServer matching the Guid.
-                        return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == user.Guid).First().IsAdmin;
+                        return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == user.Guid.Value).First().IsAdmin;
                     }
                     else
                     {
@@ -548,6 +548,7 @@ namespace backend_api.Controllers
                     department,
                     emp.Role,
                     emp.HireDate,
+                    // TODO: This is just a temp fix until we sort when to create authIdserver entries
                     Admin = false,
                     hardware,
                     software,
