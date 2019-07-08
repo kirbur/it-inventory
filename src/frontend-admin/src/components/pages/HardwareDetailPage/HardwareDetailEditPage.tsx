@@ -49,9 +49,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [secondSectionData, setSecondSectionData] = useState<(string | number)[]>([])
     const [thirdSectionData, setThirdSectionData] = useState<(string | number)[]>([])
 
-    const [commentText, setCommentText] = useState(
-        'In publishing and graphic design, Lorem ipsum is a placeholder text commonly used todemonstrate the visual form of a document without relying on meaningful content.Replacing the actual content with placeholder text allows designers to design the formof the content before the content itself has been produced.'
-    )
+    const [commentText, setCommentText] = useState('')
 
     const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([])
     const [eventInput, setEventInput] = useState('')
@@ -269,8 +267,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     <div className={styles.radioContainer}>
                         <div className={styles.radio}>
                             <input
-                                type='radio'
-                                name='cost'
+                                type='checkbox'
                                 className={styles.checkmark}
                                 // checked={state.costType === 'per month'}
                                 // onChange={() => setState({...state, costType: 'per month'})}
@@ -279,7 +276,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             <div className={styles.insideCheckmark} />
                         </div>
                         <div>
-                            <div className={styles.inputHeader}>Cost per Month</div>
+                            <div className={styles.inputHeader}>Initial Cost</div>
                             <input
                                 className={s(styles.radioInput, styles.costInput)}
                                 type='number'
@@ -292,8 +289,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     <div className={styles.radioContainer}>
                         <div className={styles.radio}>
                             <input
-                                type='radio'
-                                name='cost'
+                                type='checkbox'
                                 className={styles.checkmark}
                                 // checked={state.costType === 'per year'}
                                 // onChange={() => setState({...state, costType: 'per year'})}
@@ -309,29 +305,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 step='0.01'
                                 // value={state.costPerYear}
                                 // onChange={cost => setState({...state, costPerYear: parseFloat(cost.target.value)})}
-                            />
-                        </div>
-                    </div>
-                    <div className={styles.radioContainer}>
-                        <div className={styles.radio}>
-                            <input
-                                type='radio'
-                                name='cost'
-                                className={styles.checkmark}
-                                // checked={state.costType === 'per use'}
-                                // onChange={() => setState({...state, costType: 'per use'})}
-                            />
-                            <div className={styles.checkmark} />
-                            <div className={styles.insideCheckmark} />
-                        </div>
-                        <div>
-                            <div className={styles.inputHeader}>Fixed Cost</div>
-                            <input
-                                className={s(styles.radioInput, styles.costInput)}
-                                type='number'
-                                step='0.01'
-                                // value={state.flatCost}
-                                // onChange={cost => setState({...state, flatCost: parseFloat(cost.target.value)})}
                             />
                         </div>
                     </div>

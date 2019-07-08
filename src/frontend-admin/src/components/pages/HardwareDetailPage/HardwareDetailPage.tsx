@@ -61,6 +61,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
+                    setHeadingInfo([
+                        data[0].server.make,
+                        data[0].server.model,
+                        data[0].server.purchaseDate,
+                        data[0].server.renewalDate,
+                        data[0].server.endOfLife,
+                    ])
                     setFirstTableData([
                         data[0].server.fqdn,
                         data[0].server.ipAddress,
@@ -84,11 +91,18 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             setSecondTableHeaders(['Monitor Output', 'Screen Size', 'Serial #'])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
             // make model purchaseDate renewalDate endOfLife
-            setHeadingInfo(['the name', 'another name'])
+            setHeadingInfo(['name', 'the make', 'model name'])
             axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
+                    setHeadingInfo([
+                        data[0].computer.make,
+                        data[0].computer.model,
+                        data[0].computer.purchaseDate,
+                        data[0].computer.renewalDate,
+                        data[0].computer.endOfLife,
+                    ])
                     setFirstTableData([
                         data[0].computer.cpu,
                         data[0].computer.ramgb,
@@ -115,6 +129,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
+                    setHeadingInfo([
+                        data[0].monitor.make,
+                        data[0].monitor.model,
+                        data[0].monitor.purchaseDate,
+                        data[0].monitor.renewalDate,
+                        data[0].monitor.endOfLife,
+                    ])
                     setFirstTableData([
                         data[0].monitor.screenSize,
                         data[0].monitor.resolution,
@@ -137,6 +158,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
+                    setHeadingInfo([data[0].peripheral.make, data[0].peripheral.model])
                     setFirstTableData([data[0].employeeAssignedName, data[0].peripheral.serialNumber])
                     setSecondTableData([])
                     setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD'])
@@ -200,7 +222,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
                     {/* title/makeModel/dates/virtualized */}
                     <div className={styles.titleText}>
-                        <div className={styles.hardwareName}>Server Name</div>
+                        <div className={styles.hardwareName}>{match.params.type}</div>
                         {headingInfo.map((heading: string) => (
                             <div className={styles.hardwareText}>{heading} </div>
                         ))}
@@ -251,7 +273,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
                     {/* history log */}
                     <div className={styles.historyLogContainer}>
-                        <HistoryLog historyLog={[{date: 'some day', event: 'Assigned', user: 'Jo'}]} />
+                        <HistoryLog historyLog={historyLogEntries} />
                     </div>
 
                     {/* comment section */}

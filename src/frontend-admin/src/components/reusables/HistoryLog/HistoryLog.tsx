@@ -21,7 +21,6 @@ export const HistoryLog = (props: IHistoryLogProps) => {
     //todo: post data automatically when assigning something to an employee
 
     var rows: any[] = []
-
     for (let i = 0; i < historyLog.length; i++) {
         let tempElement = <div />
 
