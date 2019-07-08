@@ -37,3 +37,46 @@
     display: flex;
     justify-content: center;
 }
+
+/*Employee Dropdown*/
+.input {
+    width: 380px;
+    height: 45px;
+    border: 1.5px solid #a5a5a5;
+    border-radius: 3px;
+    font-size: 18px;
+    padding-left: 12px;
+    font-family: cqlRegularFont;
+}
+
+.text {
+    color: #a5a5a5;
+    font-size: 24px;
+    text-align: left;
+}
+
+.employeeDropdownButton {
+    background: white;
+}
+
+.employeeDropdownButton:hover {
+    background: white;
+}
+
+.employeeDropdownTitle {
+    line-height: 40px;
+    width: 380px;
+    height: 45px;
+    font-size: 18px;
+    font-family: cqlRegularFont;
+}
+
+.employeeDropdownArrow {
+    top: 14px;
+}
+
+.empText {
+    color: #a5a5a5;
+    font-size: 24px;
+    text-align: left;
+}

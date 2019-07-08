@@ -2,16 +2,13 @@ import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 
 // Components
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
-import {Group} from '../../reusables/Group/Group'
-import {GoCloudUpload} from 'react-icons/go'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
-import DatePicker from 'react-datepicker'
 import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
+import {DropdownList} from '../../reusables/Dropdown/DropdownList'
+import {Group} from '../../reusables/Group/Group'
 
 // Utils
-import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
@@ -20,6 +17,7 @@ import {LoginContext} from '../../App/App'
 
 // Styles
 import styles from './ProgramDetailEditPage.module.css'
+import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Types
 interface IProgramDetailEditPageProps {
@@ -44,6 +42,9 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     const [progRows, setProgRows] = useState<any[]>([])
     const progHeaders = ['License Key', 'Purchase Link']
 
+    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'First Last', id: 1}])
+    const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>()
+
     //input feild states:
     const [formState, setFormState] = useState<IProgramFormInputs>()
     const [imgInput, setImgInput] = useState<File>()
@@ -54,6 +55,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             .then((data: any) => {
                 setProgData({
                     name: data[0].programName,
+                    employee: data[0].employeeName,
                 })
 
                 setFormState({
@@ -81,6 +83,8 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     ],
                 ])
                 setHistoryList(data[0].entries)
+
+                //TODO: populate employee dropdown
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -110,6 +114,45 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                 <div className={s(styles.title, styles.paddingBottom)}>Program Information</div>
 
                 {formState && <ProgramForm state={formState} setState={setFormState} />}
+
+                <div className={styles.empText}>
+                    Currently {progData.employee ? ' Assigned to ' + progData.employee : ' Unassigned'}
+                </div>
+
+                <Button className={s(styles.input, styles.employeeDropdownButton)}>
+                    <div className={s(dropdownStyles.dropdownContainer, styles.employeeDropdownContainer)}>
+                        <DropdownList
+                            triggerElement={({isOpen, toggle}) => (
+                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                    <div className={s(dropdownStyles.dropdownTitle, styles.employeeDropdownTitle)}>
+                                        <div>Assign To Employee</div>
+                                        <div
+                                            className={s(dropdownStyles.dropdownArrow, styles.employeeDropdownArrow)}
+                                        />
+                                    </div>
+                                </button>
+                            )}
+                            choicesList={() => (
+                                <ul className={dropdownStyles.dropdownList}>
+                                    {employeeDropdown.map(i => (
+                                        <li
+                                            className={dropdownStyles.dropdownListItem}
+                                            key={i.name}
+                                            onClick={() => {
+                                                setSelectedEmployee(i)
+                                            }}
+                                        >
+                                            <button className={dropdownStyles.dropdownListItemButton}>
+                                                <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        />
+                        <div />
+                    </div>
+                </Button>
 
                 <div className={styles.submitContainer}>
                     <Button text='Submit' onClick={handleSubmit} />
