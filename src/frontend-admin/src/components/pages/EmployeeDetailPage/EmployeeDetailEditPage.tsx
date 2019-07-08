@@ -340,7 +340,24 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         //TODO: post request
         //everything in every removed array needs to be unassigned
         //everything in every added array needs to be assigned
-        //
+
+        //post image
+
+        if (imgInput) {
+            var formData = new FormData()
+            formData.append('file', imgInput)
+
+            axios
+                .put(userData.photo, formData, {
+                    headers: {'Content-Type': 'multipart/form-data'},
+                })
+                .then(data => console.log(data))
+                .catch(err => console.error(err))
+        }
+
+        if (window.confirm('Finished Editing?')) {
+            history.push(`/employees/${match.params.id}`)
+        }
     }
 
     const displayTable = (rows: any, type: string) => {
