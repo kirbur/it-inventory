@@ -69,7 +69,7 @@ namespace backend_api.Controllers
         [Route("EmployeePrep")]
         public IActionResult GetEmployeePrep()
         {
-            // list to hold CQL distribution employees
+            // list to hold CQL distribution employees that are not currently added to the application
             var myDomainUsers = new List<string>();
 
             // Finding our Active Directory.
@@ -79,14 +79,14 @@ namespace backend_api.Controllers
                 // Finding the CQL distribution group within AD
                 GroupPrincipal gp = GroupPrincipal.FindByIdentity(ctx, "CQL Distribution");
 
-                var ADIds = _context.AuthIdserver.Select(x => x.ActiveDirectoryId).ToList();
+                var ADIds = _context.Employee.Select(x => x.Adguid).ToList();
                 // loop to check all employees if they exist and have not yet been added to our database.
-                // if they are un added then add their name to our list of people possible to add.
+                // if they are not added then add their name to our list of people possible to add.
                 using (var search = new PrincipalSearcher(userPrinciple))
                 {
                     foreach (var domainUser in search.FindAll())
                     {
-                        if (domainUser.DisplayName != null && domainUser.Guid != null && domainUser.IsMemberOf(gp) && !ADIds.Contains(new Guid(domainUser.Guid.ToString())))
+                        if (domainUser.DisplayName != null && domainUser.Guid != null && domainUser.IsMemberOf(gp) && !ADIds.Contains(domainUser.Guid.Value))
                         {
                             myDomainUsers.Add(domainUser.DisplayName);
                         }
