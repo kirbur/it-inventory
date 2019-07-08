@@ -86,6 +86,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         flatCost: 0,
         costType: 'per month',
         monthsPerRenewal: 0,
+        isLicense: false,
     })
 
     useEffect(() => {

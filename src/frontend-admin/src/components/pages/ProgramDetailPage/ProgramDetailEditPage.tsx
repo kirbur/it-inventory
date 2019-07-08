@@ -18,6 +18,7 @@ import {LoginContext} from '../../App/App'
 // Styles
 import styles from './ProgramDetailEditPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
+import {FaLessThanEqual} from 'react-icons/fa'
 
 // Types
 interface IProgramDetailEditPageProps {
@@ -66,6 +67,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     purchaseDate: new Date(data[0].dateBought),
                     purchaseLink: data[0].programPurchaseLink,
                     licenseKey: data[0].programLicenseKey,
+                    isLicense: false,
 
                     costPerMonth:
                         !data[0].isCostPerYear && data[0].programCostPerYear ? data[0].programCostPerYear / 12 : 0,
@@ -115,44 +117,49 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
 
                 {formState && <ProgramForm state={formState} setState={setFormState} />}
 
-                <div className={styles.empText}>
-                    Currently {progData.employee ? ' Assigned to ' + progData.employee : ' Unassigned'}
-                </div>
-
-                <Button className={s(styles.input, styles.employeeDropdownButton)}>
-                    <div className={s(dropdownStyles.dropdownContainer, styles.employeeDropdownContainer)}>
-                        <DropdownList
-                            triggerElement={({isOpen, toggle}) => (
-                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                    <div className={s(dropdownStyles.dropdownTitle, styles.employeeDropdownTitle)}>
-                                        <div>Assign To Employee</div>
-                                        <div
-                                            className={s(dropdownStyles.dropdownArrow, styles.employeeDropdownArrow)}
-                                        />
-                                    </div>
-                                </button>
-                            )}
-                            choicesList={() => (
-                                <ul className={dropdownStyles.dropdownList}>
-                                    {employeeDropdown.map(i => (
-                                        <li
-                                            className={dropdownStyles.dropdownListItem}
-                                            key={i.name}
-                                            onClick={() => {
-                                                setSelectedEmployee(i)
-                                            }}
-                                        >
-                                            <button className={dropdownStyles.dropdownListItemButton}>
-                                                <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        />
-                        <div />
+                <div className={styles.assignContainer}>
+                    <div className={styles.empText}>
+                        Currently {progData.employee ? ' Assigned to ' + progData.employee : ' Unassigned'}
                     </div>
-                </Button>
+
+                    <Button className={s(styles.input, styles.employeeDropdownButton)}>
+                        <div className={s(dropdownStyles.dropdownContainer, styles.employeeDropdownContainer)}>
+                            <DropdownList
+                                triggerElement={({isOpen, toggle}) => (
+                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                        <div className={s(dropdownStyles.dropdownTitle, styles.employeeDropdownTitle)}>
+                                            <div>Assign To Employee</div>
+                                            <div
+                                                className={s(
+                                                    dropdownStyles.dropdownArrow,
+                                                    styles.employeeDropdownArrow
+                                                )}
+                                            />
+                                        </div>
+                                    </button>
+                                )}
+                                choicesList={() => (
+                                    <ul className={dropdownStyles.dropdownList}>
+                                        {employeeDropdown.map(i => (
+                                            <li
+                                                className={dropdownStyles.dropdownListItem}
+                                                key={i.name}
+                                                onClick={() => {
+                                                    setSelectedEmployee(i)
+                                                }}
+                                            >
+                                                <button className={dropdownStyles.dropdownListItemButton}>
+                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            />
+                            <div />
+                        </div>
+                    </Button>
+                </div>
 
                 <div className={styles.submitContainer}>
                     <Button text='Submit' onClick={handleSubmit} />

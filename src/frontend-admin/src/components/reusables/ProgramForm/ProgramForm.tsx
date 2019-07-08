@@ -24,6 +24,7 @@ export interface IProgramFormInputs {
     purchaseDate: Date
     purchaseLink: string
     licenseKey: string
+    isLicense: boolean
 }
 
 interface IProgramFormProps {
@@ -61,7 +62,7 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                     <div className={styles.inputText}># of Months per Renewal</div>
                     <input
                         type='number'
-                        className={s(styles.input, styles.pluginInput)}
+                        className={styles.input}
                         value={state.monthsPerRenewal}
                         onChange={e => setState({...state, monthsPerRenewal: e.target.value})}
                     />
@@ -144,11 +145,19 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
             <div className={styles.line} />
 
             <Group direction={'row'} justify={'between'}>
+                <div className={styles.checkBoxContainer}>
+                    <div className={styles.inputText}>License</div>
+                    <div className={styles.checkbox} onClick={() => setState({...state, isLicense: !state.isLicense})}>
+                        <div className={styles.check} />
+                        {state.isLicense && <div className={styles.insideCheck} />}
+                    </div>
+                </div>
+
                 <div className={styles.inputContainer}>
                     <div className={styles.inputText}>License Key</div>
                     <input
                         type='text'
-                        className={s(styles.input, styles.pluginInput)}
+                        className={styles.input}
                         value={state.licenseKey}
                         onChange={e => setState({...state, licenseKey: e.target.value})}
                     />
@@ -158,7 +167,7 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                     <div className={styles.inputText}>Purchase Link</div>
                     <input
                         type='text'
-                        className={s(styles.input, styles.pluginInput)}
+                        className={styles.input}
                         value={state.purchaseLink}
                         onChange={e => setState({...state, purchaseLink: e.target.value})}
                     />
