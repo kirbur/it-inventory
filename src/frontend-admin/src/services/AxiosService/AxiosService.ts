@@ -64,7 +64,7 @@ export class AxiosService {
             })
             .then(response => {
                 this.checkTokenExpired(url)
-                return response.data
+                return response
             })
             .catch(err => console.error(err))
     }

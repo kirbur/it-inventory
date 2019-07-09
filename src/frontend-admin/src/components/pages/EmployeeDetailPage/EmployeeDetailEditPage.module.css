@@ -179,6 +179,7 @@ input:checked ~ .insideCheckmarkAdmin {
 }
 
 .employeeDepartment {
+    max-width: 900px;
     display: flex;
     flex-wrap: wrap;
 }
