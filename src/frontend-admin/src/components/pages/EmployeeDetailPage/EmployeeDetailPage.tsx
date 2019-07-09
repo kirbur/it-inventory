@@ -2,10 +2,7 @@ import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 
 // Components
-import icon from '../../../content/Images/CQL-favicon.png'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
-import ReactTooltip from 'react-tooltip'
-import {IoMdAdd} from 'react-icons/io'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
