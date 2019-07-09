@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.DirectoryServices.AccountManagement;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
 namespace backend_api.Controllers
@@ -45,12 +40,11 @@ namespace backend_api.Controllers
         public IActionResult PutDepartment([FromBody] DepartmentInput input)
         {
             // Get department by ID.
-            var dep = _context.Department.FirstOrDefault(d => d.DepartmentId == input.ID);
+            var dep = _context.Department.Find(input.ID);
 
             if (dep != null)
             {
                 // Try to update department row
-                // TODO: make a helper class
                 try
                 {
                     dep.DefaultHardware = JsonConvert.SerializeObject(input.DefaultHardware);
