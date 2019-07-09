@@ -276,6 +276,17 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             />
                         </div>
 
+                        <div className={styles.checkBoxContainer}>
+                            <div className={styles.inputText}>License</div>
+                            <div
+                                className={styles.checkbox}
+                                onClick={() => setProgramInput({...programInput, isLicense: !programInput.isLicense})}
+                            >
+                                <div className={styles.check} />
+                                {programInput.isLicense && <div className={styles.insideCheck} />}
+                            </div>
+                        </div>
+
                         <div className={styles.inputContainer}>
                             <div className={styles.inputText}># of Copies</div>
                             <input

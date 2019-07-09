@@ -92,14 +92,6 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
             <div className={styles.line} />
 
             <Group direction={'row'} justify={'between'}>
-                <div className={styles.checkBoxContainer}>
-                    <div className={styles.inputText}>License</div>
-                    <div className={styles.checkbox} onClick={() => setState({...state, isLicense: !state.isLicense})}>
-                        <div className={styles.check} />
-                        {state.isLicense && <div className={styles.insideCheck} />}
-                    </div>
-                </div>
-
                 <div className={styles.inputContainer}>
                     <div className={styles.inputText}>License Key</div>
                     <input

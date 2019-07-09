@@ -58,41 +58,6 @@ input:checked ~ .insideCheckmarkAdmin {
     background-color: #009eff;
 }
 
-/*input boxes & titles*/
-.inputContainer {
-    margin: 15px;
-    width: 35%;
-}
-
-.checkBoxContainer {
-    margin: 15px;
-    width: 10%;
-}
-
-.check {
-    border-radius: 3px;
-    height: 45px;
-    width: 45px;
-    border: 2px solid #979797;
-}
-.insideCheck {
-    margin: -48px 0 0 13px;
-    height: 30px;
-    width: 15px;
-    border-left: 7px solid #009eff;
-    border-top: 7px solid #009eff;
-    transform: rotate(225deg);
-}
-
-/* changes checkmark after input clicked */
-.checkbox:checked ~ .check {
-    border-color: #009eff;
-}
-.checkbox:checked ~ .insideCheck {
-    border-left: 7px solid #009eff;
-    border-top: 7px solid #009eff;
-}
-
 .inputText {
     color: #a5a5a5;
     font-size: 24px;
@@ -118,13 +83,20 @@ input:checked ~ .insideCheckmarkAdmin {
 .costInput {
     width: 100%;
 }
+.inputContainer {
+    margin: 15px;
+    width: 45%;
+}
 
 .descriptionContainer {
     width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .description {
-    width: 98%;
+    justify-self: flex-start;
+    width: 97%;
     height: 100px;
     font-family: cqlRegularFont;
     resize: none;
