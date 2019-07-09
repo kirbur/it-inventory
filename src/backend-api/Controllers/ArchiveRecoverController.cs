@@ -50,7 +50,7 @@ namespace backend_api.Controllers
                 case "department":
                     return ArchiveRecoverDepartment(isDeleted, id);
                 case "server":
-                    return BadRequest("Not Archived");
+                    return DeleteServer(isDeleted, id);
                 case "computer":
                     return BadRequest("Not Archived");
                 case "monitor":
@@ -127,6 +127,82 @@ namespace backend_api.Controllers
                 {
                     return BadRequest("Department does not exist or failed to supply ID");
                 }
+            }
+        }
+        
+        private IActionResult DeleteServer(bool isDeleted, int id)
+        {
+            // TODO: Cannot delete if already deleted??
+
+            // TODO: Add something to the history table it was deleted?
+            Server sv = _context.Server.Find(id);
+
+            if (sv != null)
+            {
+                try
+                {
+                    if (!isDeleted && sv.EmployeeId != null)
+                    {
+                        sv.IsAssigned = true;
+                    }
+                    else
+                    {
+                        // Not assigned if isDeleted == ture or if sv.EmployeeId == null
+                        sv.IsAssigned = false;
+                    }
+                    sv.IsDeleted = isDeleted;
+                    
+
+                    // Update the history
+                    // Unassign
+                    if (sv.IsAssigned && isDeleted)
+                    {
+                        _context.HardwareHistory.Add(new HardwareHistory
+                        {
+                            HardwareId = sv.ServerId,
+                            EmployeeId = sv.EmployeeId,
+                            HardwareType = "Server",
+                            EventType = $"Unassigned",
+                            EventDate = DateTime.Now,
+                        });
+                    }
+
+                    // Delete or recover
+                    _context.HardwareHistory.Add(new HardwareHistory
+                    {
+                        HardwareId = sv.ServerId,
+                        EmployeeId = null,
+                        HardwareType = "Server",
+                        EventType = $"{(isDeleted ? "Deleted" : "Recovered")}",
+                        EventDate = DateTime.Now,
+                    });
+
+                    // Assign if there is an emp ID.
+                    if (sv.EmployeeId != null && !isDeleted)
+                    {
+                        _context.HardwareHistory.Add(new HardwareHistory
+                        {
+                            HardwareId = sv.ServerId,
+                            EmployeeId = sv.EmployeeId,
+                            HardwareType = "Server",
+                            EventType = $"Unassigned",
+                            EventDate = DateTime.Now,
+                        });
+                    }
+
+                    _context.Server.Update(sv);
+                    _context.SaveChanges();
+
+                    return Ok($"{(isDeleted ? "delete" : "recover")} completed");
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(error: e.Message);
+                }
+            }
+            else
+            {
+                return BadRequest("Server does not exist or failed to supply ID");
             }
         }
     }
