@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.DirectoryServices.AccountManagement;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace backend_api.Controllers
 {
@@ -310,8 +311,16 @@ namespace backend_api.Controllers
             }
         }
 
-        // Return the list of history, licenses, and software.
-        // TODO: add a better comment.
+        /* GET: api/add/departmentprep
+         * Returns the list of hardware, licenses, and software to be used
+         *      during the creation of a new department.
+         * Returns: [ {
+                        "hardware": string[],
+                        "licenses": string[],
+                        "software": string[],
+                    } ]
+         * 
+         */
         [HttpGet]
         [Route("DepartmentPrep")]
         public IActionResult GetDepartmentPrep()
@@ -337,16 +346,46 @@ namespace backend_api.Controllers
             });
         }
 
+        /* POST: api/add/department
+         * Will add a row to the department table
+         * Param input format:
+                {
+                    "DefaultHardware": {
+                        "DefaultHardware": string[],
+                    },
+                    "DefaultPrograms": {
+                        "license": string[],
+                        "software": string[],
+                    },
+                    "Name": "NewDept",
+                }
+         * Return: 201 if created. Else, 400 bad request. 
+         */
         [HttpPost]
         [Route("Department")]
-        public IActionResult PostDepartment([FromBody] Department input)
+        public IActionResult PostDepartment([FromBody] PostDepartmentInput input)
         {
-            
-            _context.Department.Add(input);
-            _context.SaveChanges();
+            // Try to add a department entity.
+            try
+            {
+                Department dep = new Department()
+                {
+                    // Convert the objects to strings to store in the db.
+                    DefaultHardware = JsonConvert.SerializeObject(input.DefaultHardware),
+                    DefaultPrograms = JsonConvert.SerializeObject(input.DefaultPrograms),
+                    DepartmentName = input.Name,
+                    IsDeleted = false,
+                };
+                _context.Department.Add(dep);
+                _context.SaveChanges();
 
-            // if we get here then the various fields were created and changed and now we can return 201 created.
-            return StatusCode(201);
+                // if we get here then the various fields were created and changed and now we can return 201 created.
+                return StatusCode(201);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(error: e.Message);
+            }
         }
 
     }
