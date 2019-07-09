@@ -16,6 +16,7 @@ namespace backend_api.Models
         public DateTime HireDate { get; set; }
         public string Role { get; set; }
         public int DepartmentID { get; set; }
+        public bool IsAdmin { get; set; }
        
 
     }

@@ -284,6 +284,14 @@ namespace backend_api.Controllers
                     Adguid = user.Guid.Value
                 };
                 _context.Employee.Add(emp);
+
+                var AuthEmp = new AuthIdserver()
+                {
+                    ActiveDirectoryId = user.Guid.Value,
+                    RefreshToken = "",
+                    IsAdmin = input.Employee.IsAdmin
+                };
+                _context.AuthIdserver.Add(AuthEmp);
                 _context.SaveChanges();
 
 
@@ -331,6 +339,7 @@ namespace backend_api.Controllers
                         _context.SaveChanges();
                     }
                 }
+
 
                 // if we get here then the various fields were created and changed and now we can return 201 created.
                 return StatusCode(201);
