@@ -63,8 +63,8 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                         <DropdownList
                             triggerElement={({isOpen, toggle}) => (
                                 <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                        <div>{selectedHW.name}</div>
+                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitleContainer)}>
+                                        <div className={styles.dropdownTitle}>{selectedHW.name}</div>
                                         <div className={s(dropdownStyles.dropdownArrow, styles.dropdownArrow)} />
                                     </div>
                                 </button>

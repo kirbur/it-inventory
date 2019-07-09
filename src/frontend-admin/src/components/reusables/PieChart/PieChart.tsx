@@ -85,7 +85,7 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                                     onClick={
                                         onSliceClick
                                             ? () => {
-                                                  onSliceClick(entry.name)
+                                                  onSliceClick(entry.id)
                                               }
                                             : undefined
                                     }
@@ -105,7 +105,7 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                         onClick={
                             onSliceClick
                                 ? () => {
-                                      onSliceClick(datum.name)
+                                      onSliceClick(datum.id)
                                   }
                                 : undefined
                         }

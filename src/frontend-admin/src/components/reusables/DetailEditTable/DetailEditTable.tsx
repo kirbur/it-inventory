@@ -68,7 +68,7 @@ export const DetailEditTable = (props: ITableProps) => {
         let header = (
             <td
                 onClick={e => {
-                    setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                    setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                     sortStates(i)
                 }}
                 className={styles.header}
@@ -87,14 +87,19 @@ export const DetailEditTable = (props: ITableProps) => {
     }
 
     const toolTip = (row: any[], index: number) => {
-        return (
-            <td className={styles.rowData}>
-                <a data-tip={row[row.length - 1]} className={row[row.length - 1] === '' ? '' : styles.rowTitle}>
-                    {row[index]}
-                </a>
-                <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
-            </td>
-        )
+        if (row[row.length - 1] === '' || row.length === 2) {
+            return <td className={styles.rowData}>{row[index]}</td>
+        } else {
+            return (
+                <td className={styles.rowData}>
+                    {/* {row[row.length - 1] === '' ? row[index] : styles.rowTitle} */}
+                    <a data-tip={row[row.length - 1]} className={styles.rowTitle}>
+                        {row[index]}
+                    </a>
+                    <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
+                </td>
+            )
+        }
     }
 
     var renderedRows: any[] = []
