@@ -61,6 +61,22 @@ namespace backend_api.Controllers
 
         }
 
+        private List<object> listOfEmployees()
+        {
+            List<object> ListOfEmployees = new List<object>();
+            foreach (var emp in _context.Employee.Where(x => x.IsDeleted == false).ToList())
+            {
+                var employeeName = emp.FirstName + " " + emp.LastName;
+                var employee = new
+                {
+                    employeeName,
+                    emp.EmployeeId
+                };
+                ListOfEmployees.Add(employee);
+            }
+            return ListOfEmployees;
+        }
+
         // TODO: Abstract this reused code from this and the image controller.
         /* Change the front end to match the back end verbatim. 
          * Return: "computer" if "laptop" is matched.
@@ -555,7 +571,7 @@ namespace backend_api.Controllers
                     licenses,
                     UnassignedHardware,
                     UnassignedSoftware,
-                    UnassignedLicenses
+                    UnassignedLicenses,
                 };
                 return Ok(new List<object> { employeeDetail });
             }
@@ -585,7 +601,8 @@ namespace backend_api.Controllers
         *    "programFlatCost": int,
         *    "isCostPerYear": bool,
         *    "description": string,
-        *    "programPurchaseLink": string
+        *    "programPurchaseLink": string,
+        *    "List of employees" : [
         *   }
         * 
         * 
@@ -608,7 +625,7 @@ namespace backend_api.Controllers
 
                 // holds the employee name for concatenation purposes 
                 var employeeName = "";
-                int employeeId = 0;
+                int employeeId = -1;
                 // Concatenating employees first and last name of the employee who owns the program if the program is assigned
                 // and if the program is not deleted
                 if (prog.EmployeeId != null && prog.IsDeleted == false)
@@ -620,7 +637,7 @@ namespace backend_api.Controllers
                 }
                 List<object> entries = new List<object>();
                 // find all the events/history of the current program
-                foreach(var entry in _context.ProgramHistory.Where(x => x.ProgramId == prog.ProgramId))
+                foreach (var entry in _context.ProgramHistory.Where(x => x.ProgramId == prog.ProgramId))
                 {
                     var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
                     var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
@@ -646,10 +663,11 @@ namespace backend_api.Controllers
                     prog.ProgramFlatCost,
                     prog.IsCostPerYear,
                     prog.Description,
-                    prog.ProgramPurchaseLink
+                    prog.ProgramPurchaseLink,
+                    listOfEmployees = listOfEmployees()
                 };
 
-                return Ok(new List<object> { ProgramDetails});
+                return Ok(new List<object> { ProgramDetails });
             }
 
         }
@@ -991,7 +1009,9 @@ namespace backend_api.Controllers
 
                 var serverClicked = nameof(Server) + "/" + sv.ServerId;
 
-                var serverDetailPage =(new
+                // list to hold the list of employees that are not deleted so the front end can assign programs to individuals 
+
+                var serverDetailPage = (new
                 {
                     server = sv,
                     departmentName,
@@ -1000,6 +1020,7 @@ namespace backend_api.Controllers
                     serverClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     SeverHistory,
+                    listOfEmployees = listOfEmployees()
                 });
                 return Ok(new List<object> { serverDetailPage });
             }
@@ -1103,8 +1124,9 @@ namespace backend_api.Controllers
                     departmentID,
                     icon,
                     computerClicked,
-                    employeeAssignedName =employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     ComputerHistory,
+                    listOfEmployees = listOfEmployees()
                 });
                 List<object> list = new List<object>();
                 list.Add(computerDetailPage);
@@ -1200,7 +1222,7 @@ namespace backend_api.Controllers
 
                 var monitorClicked = nameof(Monitor) + "/" + mn.MonitorId;
 
-                var monitorDetailPage =(new
+                var monitorDetailPage = (new
                 {
                     monitor = mn,
                     departmentName,
@@ -1209,8 +1231,9 @@ namespace backend_api.Controllers
                     monitorClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     MonitorHistory,
+                    listOfEmployees = listOfEmployees()
                 });
-                return Ok(new List<object> { monitorDetailPage});
+                return Ok(new List<object> { monitorDetailPage });
             }
         }
 
@@ -1269,7 +1292,7 @@ namespace backend_api.Controllers
 
                 // Employee the peripheral is assigned to.
                 var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == pr.EmployeeId).FirstOrDefault();
-                
+
                 // int to hold the department Id for click-ability. -1 is the default if hardware is not assigned. 
                 int departmentID = -1;
                 // string to hold department name. empty string if hardware is unassigned. 
@@ -1299,7 +1322,7 @@ namespace backend_api.Controllers
                 }
 
                 var peripheralClicked = nameof(Peripheral) + "/" + pr.PeripheralId;
-                var peripheralDetailPage =(new
+                var peripheralDetailPage = (new
                 {
                     peripheral = pr,
                     departmentName,
@@ -1308,8 +1331,9 @@ namespace backend_api.Controllers
                     peripheralClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     peripheralHistory,
+                    listOfEmployees = listOfEmployees()
                 });
-                return Ok(new List<object> { peripheralDetailPage});
+                return Ok(new List<object> { peripheralDetailPage });
             }
         }
 
