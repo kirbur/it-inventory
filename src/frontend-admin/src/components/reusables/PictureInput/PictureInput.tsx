@@ -15,7 +15,7 @@ interface IPictureInputProps {
 
 // Primary Component
 export const PictureInput: React.SFC<IPictureInputProps> = props => {
-    const {setImage, className} = props
+    const {setImage} = props
 
     return (
         <div className={styles.pictureInputMain}>

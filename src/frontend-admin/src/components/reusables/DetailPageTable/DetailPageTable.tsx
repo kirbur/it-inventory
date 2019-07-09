@@ -51,7 +51,7 @@ export const DetailPageTable = (props: ITableProps) => {
     const [sortState, setSortState] = useState(initHardwareState)
 
     function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
+        if (sortState.headerStateCounts[index] === 0) {
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({
@@ -59,7 +59,7 @@ export const DetailPageTable = (props: ITableProps) => {
                 headerStateCounts: tempHeaderStateCounts,
             })
             tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
+        } else if (sortState.headerStateCounts[index] === 1) {
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({
@@ -75,6 +75,7 @@ export const DetailPageTable = (props: ITableProps) => {
     for (let i = 0; i < headers.length; i++) {
         let header = sort ? (
             <td
+                key={headers[i]}
                 onClick={e => {
                     setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                     sortStates(i)
@@ -87,7 +88,7 @@ export const DetailPageTable = (props: ITableProps) => {
                 </div>
             </td>
         ) : (
-            <td className={styles.header}>
+            <td key={headers[i]} className={styles.header}>
                 <div className={styles.headerContainer}>{headers[i]}</div>
             </td>
         )

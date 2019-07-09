@@ -23,12 +23,11 @@ import styles from './ProgramsListPage.module.css'
 // Types
 interface IProgramsListPageProps {
     history: any
-    match: any
 }
 
 // Primary Component
 export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
-    const {history, match} = props
+    const {history} = props
     const {
         loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
@@ -116,12 +115,12 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const [sortState, setSortState] = useState(initState)
 
     function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
+        if (sortState.headerStateCounts[index] === 0) {
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
             tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
+        } else if (sortState.headerStateCounts[index] === 1) {
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
@@ -134,6 +133,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
 
         var firstHeader = (
             <td
+                key={0}
                 onClick={e => {
                     setRows(sortTable(rows, 0, sortState.headerStateCounts[0]))
                     sortStates(0)
@@ -151,6 +151,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             let header =
                 i === 3 ? (
                     <td
+                        key={headerList[i]}
                         onClick={e => {
                             setRows(sortTable(rows, 4, sortState.headerStateCounts[i]))
                             sortStates(i)
@@ -163,6 +164,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                     </td>
                 ) : (
                     <td
+                        key={headerList[i]}
                         onClick={e => {
                             setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
                             sortStates(i)
@@ -199,14 +201,28 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedDept(row)
+                    break
                 case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
+                    transformedRow[1] = (
+                        <td key={i + row[1]} className={styles.alignLeft}>
+                            {row[1]}
+                        </td>
+                    )
+                    break
                 case 2:
                     transformedRow[2] = (
-                        <td className={styles.alignLeft}>{row[2] === 1 ? row[2] + ' user' : row[2] + ' users'}</td>
+                        <td key={i + row[2]} className={styles.alignLeft}>
+                            {row[2] === 1 ? row[2] + ' user' : row[2] + ' users'}
+                        </td>
                     )
+                    break
                 case 3:
-                    transformedRow[3] = <td className={styles.alignLeft}>{formatCost(row[5], row[3], row[4])}</td>
+                    transformedRow[3] = (
+                        <td key={i + row[3]} className={styles.alignLeft}>
+                            {formatCost(row[5], row[3], row[4])}
+                        </td>
+                    )
+                    break
             }
         }
 

@@ -64,7 +64,7 @@ export const Login: React.FunctionComponent<ILoginProps> = props => {
     return (
         <form className={styles.body}>
             <div className={styles.center}>
-                <img className={styles.logo} src={logo} />
+                <img className={styles.logo} src={logo} alt={''} />
             </div>
             <div className={styles.center}>
                 <input

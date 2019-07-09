@@ -159,7 +159,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
             axios
                 .post('/add/program', postProgram)
-                .then((response: any) => console.log(response))
+                .then((response: any) => {
+                    //TODO: check response and give msg
+                    return
+                })
                 .catch((err: any) => console.error(err))
         } else {
             if (programForm) {

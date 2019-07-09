@@ -147,12 +147,12 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const updateDropdownContent = () => {
         let x: any[] = []
 
-        deptTableData.map((i: any) => {
+        deptTableData.map((i: any) =>
             x.push({
                 id: i.id,
                 name: i.name,
             })
-        })
+        )
         setDropdownContent(x)
     }
 

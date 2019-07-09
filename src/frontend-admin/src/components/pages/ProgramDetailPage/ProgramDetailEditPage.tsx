@@ -1,15 +1,13 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
 import {Button} from '../../reusables/Button/Button'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
-import {Group} from '../../reusables/Group/Group'
 
 // Utils
-import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Context
@@ -18,7 +16,6 @@ import {LoginContext} from '../../App/App'
 // Styles
 import styles from './ProgramDetailEditPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
-import {FaLessThanEqual} from 'react-icons/fa'
 
 // Types
 interface IProgramDetailEditPageProps {
@@ -33,15 +30,11 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
-    const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
     const [progData, setProgData] = useState<any>({})
-    const [historyList, setHistoryList] = useState<any[]>([])
-    const [progRows, setProgRows] = useState<any[]>([])
-    const progHeaders = ['License Key', 'Purchase Link']
 
     const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'First Last', id: 1}])
     const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>({
@@ -75,15 +68,6 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     flatCost: data[0].programFlatCost ? data[0].programFlatCost : 0,
                     monthsPerRenewal: 0,
                 })
-
-                setProgRows([
-                    [
-                        0,
-                        format(data[0].programLicenseKey ? data[0].programLicenseKey : '-'),
-                        format(data[0].programPurchaseLink),
-                    ],
-                ])
-                setHistoryList(data[0].entries)
             })
             .catch((err: any) => console.error(err))
 
@@ -92,12 +76,12 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             .get('/list/employees')
             .then((data: any) => {
                 const employees: any[] = []
-                data.map((i: any) => {
+                data.map((i: any) =>
                     employees.push({
                         name: i.employeeName,
                         id: i.employeeId,
                     })
-                })
+                )
                 setEmployeeDropdown(employees)
             })
             .catch((err: any) => console.error(err))
