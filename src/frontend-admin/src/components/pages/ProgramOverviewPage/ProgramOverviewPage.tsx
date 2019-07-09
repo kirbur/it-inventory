@@ -1,8 +1,10 @@
 import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {History} from 'history'
+import {match} from 'react-router-dom'
 
 // Components
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
@@ -20,11 +22,36 @@ import {LoginContext} from '../../App/App'
 
 // Types
 interface IProgramOverviewPageProps {
-    history: any
-    match: any
+    history: History
+    match: match<{id: string}>
 }
 
-// Helpers
+interface ExpectedProgramOverview {
+    countProgInUse: number
+    countProgOverall: number
+    icon: string
+    isCostPerYear: boolean
+    progCostPerYear: number
+    progFlatCost: number
+    program: string
+    programlicenseKey: string
+}
+
+export interface ExpectedProgramType {
+    employeeId: number
+    employeeName: string
+    programId: number
+    programlicenseKey: string
+    renewalDate: string
+}
+
+export interface ExpectedPluginType {
+    isCostPerYear: boolean
+    pluginCostPerYear: number
+    pluginFlatCost: number
+    pluginName: string
+    renewalDate: string
+}
 
 // Primary Component
 export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props => {
@@ -37,9 +64,18 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
 
     const axios = new AxiosService(accessToken, refreshToken)
     const [img, setImg] = useState('')
-    const [programData, setProgramData] = useState<any>({})
-    const [programRows, setProgramRows] = useState<any[]>([])
-    const [pluginRows, setPluginRows] = useState<any[]>([])
+    const [programData, setProgramData] = useState<ExpectedProgramOverview>({
+        countProgInUse: 0,
+        countProgOverall: 0,
+        icon: '',
+        isCostPerYear: false,
+        progCostPerYear: 0,
+        progFlatCost: 0,
+        program: '',
+        programlicenseKey: '',
+    })
+    const [programRows, setProgramRows] = useState<ITableItem[][]>([])
+    const [pluginRows, setPluginRows] = useState<ITableItem[][]>([])
 
     const programHeaders = [`${match.params.id}`, 'Employee', 'License Key', 'Renewal Date']
     const pluginHeaders = ['Plugins', 'Renewal Date', 'Cost']
@@ -48,10 +84,11 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
         axios
             .get(`/detail/ProgramOverview/${match.params.id}`)
             .then((data: any) => {
+                console.log(data)
                 setProgramData(data[0].programOverview)
 
-                let prog: any[] = []
-                data[0].inDivPrograms.map((i: any) =>
+                let prog: ITableItem[][] = []
+                data[0].inDivPrograms.map((i: ExpectedProgramType) =>
                     prog.push(
                         i.employeeName
                             ? [
@@ -62,7 +99,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                                       sortBy: format(i.employeeName),
                                       onClick: handleEmpClick,
                                   },
-                                  {value: i.programLicenseKey, sortBy: i.programLicenseKey},
+                                  {value: i.programlicenseKey, sortBy: i.programlicenseKey},
                                   {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
                               ]
                             : [
@@ -72,15 +109,15 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                                       id: i.employeeId,
                                       sortBy: format(i.employeeName),
                                   },
-                                  {value: format(i.programLicenseKey), sortBy: i.programLicenseKey},
+                                  {value: format(i.programlicenseKey), sortBy: i.programlicenseKey},
                                   {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
                               ]
                     )
                 )
                 setProgramRows(prog)
 
-                let plug: any[] = []
-                data[0].listOfPlugins.map((i: any) =>
+                let plug: ITableItem[][] = []
+                data[0].listOfPlugins.map((i: ExpectedPluginType) =>
                     plug.push([
                         {value: format(i.pluginName), sortBy: format(i.pluginName)},
                         {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
@@ -180,8 +217,8 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         <div className={styles.programText}>
                             {programData.countProgInUse} / {programData.countProgOverall} Used
                         </div>
-                        {programData.programLicenseKey && (
-                            <div className={styles.programText}>License Key: {programData.programLicenseKey}</div>
+                        {programData.programlicenseKey && (
+                            <div className={styles.programText}>License Key: {programData.programlicenseKey}</div>
                         )}
                     </div>
                     <DetailPageTable headers={programHeaders} rows={programRows} setRows={setProgramRows} />

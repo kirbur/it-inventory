@@ -12,8 +12,8 @@ import styles from './DetailPageTable.module.css'
 import {cloneDeep} from 'lodash'
 import {sortTable} from '../../../utilities/quickSort'
 
-interface ITableItem {
-    value: string
+export interface ITableItem {
+    value: string | number
     id?: string | number
     sortBy: string | number
     onClick?: any
@@ -113,6 +113,7 @@ export const DetailPageTable = (props: ITableProps) => {
             var click = row[i].onClick ? styles.clickable : ''
             transformedRow[i + start] = row[i].tooltip ? (
                 <td
+                    key={JSON.stringify(row[i])}
                     className={s(styles.rowData, click)}
                     onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
                 >
@@ -124,6 +125,7 @@ export const DetailPageTable = (props: ITableProps) => {
                 </td>
             ) : (
                 <td
+                    key={JSON.stringify(row[i])}
                     className={s(styles.rowData, click)}
                     onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
                 >

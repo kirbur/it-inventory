@@ -1,8 +1,10 @@
 import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {History} from 'history'
+import {match} from 'react-router-dom'
 
 // Components
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import DatePicker from 'react-datepicker'
@@ -22,9 +24,10 @@ import {LoginContext} from '../../App/App'
 import styles from './ProgramOverviewEditPage.module.css'
 
 // Types
+import {ExpectedPluginType, ExpectedProgramType} from './ProgramOverviewPage'
 interface IProgramOverviewEditPageProps {
-    history: any
-    match: any
+    history: History
+    match: match<{id: string}>
 }
 
 // Primary Component
@@ -35,13 +38,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
-    //const [programData, setProgramData] = useState<any>({})
 
-    const [programRows, setProgramRows] = useState<any[]>([])
-    const [removedProgramRows, setRemovedProgramRows] = useState<any[]>([])
+    const [programRows, setProgramRows] = useState<ITableItem[][]>([])
+    const [removedProgramRows, setRemovedProgramRows] = useState<ITableItem[][]>([])
 
-    const [pluginRows, setPluginRows] = useState<any[]>([])
-    const [removedPluginRows, setRemovedPluginRows] = useState<any[]>([])
+    const [pluginRows, setPluginRows] = useState<ITableItem[][]>([])
+    const [removedPluginRows, setRemovedPluginRows] = useState<ITableItem[][]>([])
 
     const [pluginForm, setPluginForm] = useState(false)
     const [programForm, setProgramForm] = useState(false)
@@ -96,8 +98,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     setImgLocation(data[0].programOverview.icon)
                     setNumCopies(data[0].programOverview.countProgOverall)
 
-                    let prog: any[] = []
-                    data[0].inDivPrograms.map((i: any) =>
+                    let prog: ITableItem[][] = []
+                    data[0].inDivPrograms.map((i: ExpectedProgramType) =>
                         prog.push([
                             {value: i.programId, id: i.programId, sortBy: i.programId},
                             {
@@ -105,14 +107,14 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 id: i.employeeId,
                                 sortBy: format(i.employeeName),
                             },
-                            {value: format(i.programLicenseKey), sortBy: i.programLicenseKey},
+                            {value: format(i.programlicenseKey), sortBy: i.programlicenseKey},
                             {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
                         ])
                     )
                     setProgramRows(prog)
 
-                    let plug: any[] = []
-                    data[0].listOfPlugins.map((i: any) =>
+                    let plug: ITableItem[][] = []
+                    data[0].listOfPlugins.map((i: ExpectedPluginType) =>
                         plug.push([
                             {value: format(i.pluginName), sortBy: format(i.pluginName)},
                             {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
@@ -128,12 +130,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         }
     }, [])
 
-    const handleProgramRemove = (row: any) => {
+    const handleProgramRemove = (row: ITableItem[]) => {
         //add to removed array
         setRemovedProgramRows([...removedProgramRows, [...row]])
     }
 
-    const handlePluginRemove = (row: any) => {
+    const handlePluginRemove = (row: ITableItem[]) => {
         //add to removed array
         setRemovedPluginRows([...removedPluginRows, [...row]])
     }
@@ -191,19 +193,19 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     }
 
     const displayCopies = () => {
-        var arr: any[] = []
+        var arr: ITableItem[][] = []
 
         if (removedProgramRows.length === 0) {
             arr = [...programRows]
         } else {
-            var bools: any[] = []
-            programRows.forEach((row: any, index: number) => {
+            var bools: boolean[] = []
+            programRows.forEach((row: ITableItem[], index: number) => {
                 bools[index] = true
-                removedProgramRows.forEach((remove: any) => {
+                removedProgramRows.forEach((remove: ITableItem[]) => {
                     bools[index] = bools[index] && remove[0].id !== row[0].id
                 })
             })
-            programRows.forEach((row: any, index: number) => {
+            programRows.forEach((row: ITableItem[], index: number) => {
                 if (bools[index]) {
                     arr.push(row)
                 }
@@ -214,19 +216,19 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     }
 
     const displayPlugins = () => {
-        var arr: any[] = []
+        var arr: ITableItem[][] = []
 
         if (removedPluginRows.length === 0) {
             arr = [...pluginRows]
         } else {
-            var bools: any[] = []
-            pluginRows.forEach((row: any, index: number) => {
+            var bools: boolean[] = []
+            pluginRows.forEach((row: ITableItem[], index: number) => {
                 bools[index] = true
-                removedPluginRows.forEach((remove: any) => {
+                removedPluginRows.forEach((remove: ITableItem[]) => {
                     bools[index] = bools[index] && remove[0].id !== row[0].id
                 })
             })
-            pluginRows.forEach((row: any, index: number) => {
+            pluginRows.forEach((row: ITableItem[], index: number) => {
                 if (bools[index]) {
                     arr.push(row)
                 }
