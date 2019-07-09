@@ -8,10 +8,26 @@ using Newtonsoft.Json;
 
 namespace backend_api.Controllers
 {
+    public interface IHardwareInterface
+    {
+        int? EmployeeId { get; set; }
+        bool IsDeleted { get; set; }
+        bool IsAssigned { get; set; }
+    }
+
+    public class Hardware : IHardwareInterface
+    {
+        public Hardware() { }
+        public int? EmployeeId { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool IsAssigned { get; set; }
+    }
     // [Authorize]
     [ApiController]
     public class ArchiveRecoverController : ContextController
     {
+
+
         public ArchiveRecoverController(ITInventoryDBContext context) : base(context) { }
 
         /* PUT: api/{operation}/{model}/{id}
@@ -50,9 +66,17 @@ namespace backend_api.Controllers
                 case "department":
                     return ArchiveRecoverDepartment(isDeleted, id);
                 case "server":
-                    return ArchiveRecoverServer(isDeleted, id);
+                    //return ArchiveRecoverServer(isDeleted, id);
                 case "computer":
-                    return BadRequest("Not Archived");
+                    Computer cp = _context.Computer.Find(id);
+                    Hardware comp = new Hardware()
+                    {
+                        EmployeeId = cp.EmployeeId,
+                        IsDeleted = cp.IsDeleted,
+                        IsAssigned = cp.IsAssigned,
+                    };
+                    return ArchiveRecoverHardware<Hardware>(comp, isDeleted, id);
+                    //return ArchiveRecoverComputer(isDeleted, id);
                 case "monitor":
                     return BadRequest("Not Archived");
                 case "peripheral":
@@ -132,52 +156,180 @@ namespace backend_api.Controllers
             }
         }
 
-        /* PUT: api/{operation}/server/{id}
-         * Will change the IsDeleted field for the Server of the id corresponding to the operation.
-         *      Will also add an entry to the Hardware History for the Server
-         * {operation} is a string. Either "archive" or "recover"
-         * {id} is a number that is the ID for any of the models.
-         * Return: 200 if updated. Else, 400 bad request. 
-         */
-        private IActionResult ArchiveRecoverServer(bool isDeleted, int id)
+        ///* PUT: api/{operation}/server/{id}
+        // * Will change the IsDeleted field for the Server of the id corresponding to the operation.
+        // *      Will also add an entry to the Hardware History for the Server
+        // * {operation} is a string. Either "archive" or "recover"
+        // * {id} is a number that is the ID for any of the models.
+        // * Return: 200 if updated. Else, 400 bad request. 
+        // */
+        //private IActionResult ArchiveRecoverServer(bool isDeleted, int id)
+        //{
+
+        //    // Find server by ID.
+        //    Server sv = _context.Server.Find(id);
+
+        //    // Make sure server is not null
+        //    if (sv != null)
+        //    {
+        //        // If trying to archive when already archived, or recover when already recovered, 
+        //        //      give a BadRequest.
+        //        if (sv.IsDeleted == isDeleted)
+        //        {
+        //            return BadRequest($"Server cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
+        //        }
+
+        //        // Else, try updating the server fields.
+        //        else
+        //        {
+        //            try
+        //            {
+        //                // If the server is assigned to an employee when recovered, make IsAssigned be true.
+        //                if (!isDeleted && sv.EmployeeId != null)
+        //                {
+        //                    sv.IsAssigned = true;
+        //                }
+        //                // Not assigned if isDeleted == true or if sv.EmployeeId == null
+        //                else
+        //                {
+        //                    sv.IsAssigned = false;
+        //                }
+        //                sv.IsDeleted = isDeleted;
+
+        //                // Update the history: Archive or Recover
+        //                _context.HardwareHistory.Add(new HardwareHistory
+        //                {
+        //                    HardwareId = sv.ServerId,
+        //                    EmployeeId = sv.EmployeeId,
+        //                    HardwareType = "Server",
+        //                    EventType = $"{(isDeleted ? "Archived" : "Recovered")}",
+        //                    EventDate = DateTime.Now,
+        //                });
+
+        //                _context.SaveChanges();
+
+        //                return Ok($"{(isDeleted ? "archive" : "recover")} completed");
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                return BadRequest(error: e.Message);
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Server does not exist or failed to supply ID");
+        //    }
+        //}
+
+
+
+        ///* PUT: api/{operation}/laptop/{id}
+        // * Will change the IsDeleted field for the Computer of the id corresponding to the operation.
+        // *      Will also add an entry to the Hardware History for the Computer.
+        // *      Will change laptop to match the back-end verbatim of "computer"
+        // * {operation} is a string. Either "archive" or "recover"
+        // * {id} is a number that is the ID for any of the models.
+        // * Return: 200 if updated. Else, 400 bad request. 
+        // */
+
+
+        //// TODO: This is the same function as above with very minor changes....
+        //private IActionResult ArchiveRecoverComputer(bool isDeleted, int id)
+        //{
+        //    // Find computer by ID.
+        //    Computer cp = _context.Computer.Find(id);
+
+        //    // Make sure computer is not null
+        //    if (cp != null)
+        //    {
+        //        // If trying to archive when already archived, or recover when already recovered, 
+        //        //      give a BadRequest.
+        //        if (cp.IsDeleted == isDeleted)
+        //        {
+        //            return BadRequest($"Computer cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
+        //        }
+
+        //        // Else, try updating the computer fields.
+        //        else
+        //        {
+        //            try
+        //            {
+        //                // If the computer is assigned to an employee when recovered, make IsAssigned be true.
+        //                if (!isDeleted && cp.EmployeeId != null)
+        //                {
+        //                    cp.IsAssigned = true;
+        //                }
+        //                // Not assigned if isDeleted == true or if cp.EmployeeId == null
+        //                else
+        //                {
+        //                    cp.IsAssigned = false;
+        //                }
+        //                cp.IsDeleted = isDeleted;
+
+        //                // Update the history: Archive or Recover
+        //                _context.HardwareHistory.Add(new HardwareHistory
+        //                {
+        //                    HardwareId = cp.ComputerId,
+        //                    EmployeeId = cp.EmployeeId,
+        //                    HardwareType = "Computer",
+        //                    EventType = $"{(isDeleted ? "Archived" : "Recovered")}",
+        //                    EventDate = DateTime.Now,
+        //                });
+
+        //                _context.SaveChanges();
+
+        //                return Ok($"{(isDeleted ? "archive" : "recover")} completed");
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                return BadRequest(error: e.Message);
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Computer does not exist or failed to supply ID");
+        //    }
+        //}
+
+        private IActionResult ArchiveRecoverHardware<T>(T hdwr, bool isDeleted, int id)
+            where T : IHardwareInterface
         {
 
-            // Find server by ID.
-            Server sv = _context.Server.Find(id);
-
-            // Make sure server is not null
-            if (sv != null)
+            // Make sure computer is not null
+            if (hdwr != null)
             {
-                // If trying to archive when already archiveed, or recover when already recovered, 
+                // If trying to archive when already archived, or recover when already recovered, 
                 //      give a BadRequest.
-                if (sv.IsDeleted == isDeleted)
+                if (hdwr.IsDeleted == isDeleted)
                 {
-                    return BadRequest($"Server cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
+                    return BadRequest($"Computer cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
                 }
 
-                // Else, try updating the server fields.
+                // Else, try updating the computer fields.
                 else
                 {
                     try
                     {
-                        // If the server is assigned to an employee when recovered, make IsAssigned be true.
-                        if (!isDeleted && sv.EmployeeId != null)
+                        // If the computer is assigned to an employee when recovered, make IsAssigned be true.
+                        if (!isDeleted && hdwr.EmployeeId != null)
                         {
-                            sv.IsAssigned = true;
+                            hdwr.IsAssigned = true;
                         }
-                        // Not assigned if isDeleted == ture or if sv.EmployeeId == null
+                        // Not assigned if isDeleted == true or if cp.EmployeeId == null
                         else
                         {
-                            sv.IsAssigned = false;
+                            hdwr.IsAssigned = false;
                         }
-                        sv.IsDeleted = isDeleted;
+                        hdwr.IsDeleted = isDeleted;
 
                         // Update the history: Archive or Recover
                         _context.HardwareHistory.Add(new HardwareHistory
                         {
-                            HardwareId = sv.ServerId,
-                            EmployeeId = sv.EmployeeId,
-                            HardwareType = "Server",
+                            HardwareId = id,
+                            EmployeeId = hdwr.EmployeeId,
+                            HardwareType = "Computer",
                             EventType = $"{(isDeleted ? "Archived" : "Recovered")}",
                             EventDate = DateTime.Now,
                         });
@@ -194,7 +346,7 @@ namespace backend_api.Controllers
             }
             else
             {
-                return BadRequest("Server does not exist or failed to supply ID");
+                return BadRequest("Computer does not exist or failed to supply ID");
             }
         }
     }
