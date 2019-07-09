@@ -603,6 +603,9 @@ namespace backend_api.Controllers
         *    "description": string,
         *    "programPurchaseLink": string,
         *    "List of employees" : [
+        *       "EmployeeName : string,
+        *       "EmployeeID : int
+        *    ]
         *   }
         * 
         * 

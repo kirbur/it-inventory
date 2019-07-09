@@ -372,7 +372,7 @@ namespace backend_api.Controllers
                     ProgramPurchaseLink = input.Program.ProgramPurchaseLink,
                     HasPlugIn = false,
                     IsDeleted = false,
-                    IsCostPerYear = input.Program.MonthsPerRenewal == null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false,
+                    IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false,
                     DateBought = input.Program.DateBought,
                     RenewalDate = input.Program.RenewalDate,
                     MonthsPerRenewal = input.Program.MonthsPerRenewal
