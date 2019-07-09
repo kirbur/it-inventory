@@ -455,8 +455,14 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         //everything in every added array needs to be assigned
 
         //If this is a new employee
-        var name = selectedEmployee.name.split(' ')
-        if (match.params.id === 'new' && deptInput) {
+        //make sure no inputs are null/undefined/empty
+        if (
+            match.params.id === 'new' &&
+            deptInput &&
+            selectedEmployee.name !== 'Select An Employee' &&
+            roleInput !== ''
+        ) {
+            var name = selectedEmployee.name.split(' ')
             var postEmployee = {
                 Employee: {
                     FirstName: name[0],
@@ -464,7 +470,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     HireDate: dateInput.toISOString(),
                     Role: roleInput,
                     DepartmentID: deptInput.departmentId,
-                    isAdmin: adminInput,
+                    IsAdmin: adminInput,
                 },
                 HardwareAssigned: [
                     ...hardwareRows.added.map(i => {
@@ -481,13 +487,25 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     }),
                 ],
             }
-            console.log(postEmployee)
 
             axios
                 .post('/add/Employee', postEmployee)
-                .then((response: any) => console.log(response))
-                .catch((err: any) => console.error(err))
-            history.push('/employees')
+                .then((response: any) => {
+                    if (response && response.status === 201) {
+                        window.alert(`${selectedEmployee.name} was successfully added!`)
+                    }
+                })
+                .catch((err: any) => {
+                    window.alert(`Something went wrong`)
+                    console.error(err)
+                })
+        } else if (match.params.id === 'new') {
+            //one or maore of the inputs was null/undefined/empty
+            var msg = 'Failed because:\n'
+            msg += selectedEmployee.name === 'Select An Employee' ? 'No employee was selected,\n' : ''
+            msg += roleInput === '' ? 'No role was given,' : ''
+
+            window.alert(msg)
         }
 
         //post image
