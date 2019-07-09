@@ -99,7 +99,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                                       sortBy: format(i.employeeName),
                                       onClick: handleEmpClick,
                                   },
-                                  {value: i.programlicenseKey, sortBy: i.programlicenseKey},
+                                  {value: format(i.programlicenseKey), sortBy: i.programlicenseKey},
                                   {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
                               ]
                             : [

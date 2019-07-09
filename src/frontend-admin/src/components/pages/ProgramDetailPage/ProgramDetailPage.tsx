@@ -153,7 +153,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         <div className={styles.programName}>{progData.name}</div>
                         <div className={styles.programText}>Renewal Date: {progData.renewalDate}</div>
                         <div className={styles.programText}>Purchase Date: {progData.dateBought}</div>
-                        {progData.employeeId !== '-' && (
+                        {progData.employee !== '-' && (
                             <div className={s(styles.programText, styles.assignedTo)}>
                                 Assigned to{' '}
                                 <div
