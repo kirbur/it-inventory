@@ -42,7 +42,7 @@ namespace backend_api.Controllers
                 case "program":
                     return BadRequest("Not Deleted");
                 case "department":
-                    return DeleteServer(isDeleted, id);
+                    return DeleteDepartment(isDeleted, id);
                 case "server":
                     return BadRequest("Not Deleted");
                 case "computer":
@@ -84,7 +84,7 @@ namespace backend_api.Controllers
          *      Will not delete the department if employees are still assigned to the department.
          * Return: 200 if updated. Else, 400 bad request. 
          */
-        private IActionResult DeleteServer(bool isDeleted, int id)
+        private IActionResult DeleteDepartment(bool isDeleted, int id)
         {
             // Find if any employees are still assigned to the department.
             int count = _context.Employee.Where(emp => emp.DepartmentID == id).ToList().Count();
