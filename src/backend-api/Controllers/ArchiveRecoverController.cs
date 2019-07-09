@@ -17,7 +17,7 @@ namespace backend_api.Controllers
         /* PUT: api/{operation}/{model}/{id}
          * Will change the IsDeleted field for the id of the model corresponding to the operation.
          * {operation} is a string. Either "archive" or "recover"
-         * {model} is a string that is a name of one of our models.
+         * {model} is a string that is a name of one of the models.
          *      Employee, Department, Program, Plugin, Server, Laptop, Monitor, Peripheral
          * {id} is a number that is the ID for any of the models.
          * Return: 200 if updated. Else, 400 bad request. 
@@ -29,7 +29,8 @@ namespace backend_api.Controllers
             // Make the model all lower and change "laptop" to "computer".
             model = VerbatimMatch(model);
 
-            // Try to change the operation to a boolean.
+            // Checks the validity of the operation, and assigns isDeleted to a 
+            //      boolean according to the operation provided.
             bool isDeleted;
             try
             {
@@ -63,11 +64,11 @@ namespace backend_api.Controllers
             }
         }
 
-        /* isDeleted(operation) converts the route path string
+        /* OperationCheck(operation) converts the route path string
          *      to a boolean value or throws an error if the string
-         *      is not "archive" or "recover"
+         *      is not "archive" or "recover".
          * Params: string operation
-         * Returns: True if "archive" and False if "recover".
+         * Returns: true if "archive" and false if "recover".
          */
         private bool OperationCheck(string operation)
         {
