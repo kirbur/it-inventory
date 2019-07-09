@@ -10,25 +10,30 @@ namespace backend_api.Controllers
 {
     // [Authorize]
     [ApiController]
-    public class DeleteController : ContextController
+    public class ArchiveRecoverController : ContextController
     {
-        public DeleteController(ITInventoryDBContext context) : base(context) { }
+        public ArchiveRecoverController(ITInventoryDBContext context) : base(context) { }
 
         /* PUT: api/{operation}/{model}/{id}
          * Will change the IsDeleted field for the id of the model corresponding to the operation.
+         * {operation} is a string. Either "archive" or "recover"
+         * {model} is a string that is a name of one of our models.
+         *      Employee, Department, Program, Plugin, Server, Laptop, Monitor, Peripheral
+         * {id} is a number that is the ID for any of the models.
          * Return: 200 if updated. Else, 400 bad request. 
          */
         [HttpPut]
         [Route("{operation}/{model}/{id}")]
-        public IActionResult PutDepartment([FromRoute] string operation, string model, int id)
+        public IActionResult ArchiveRecoverSwitch([FromRoute] string operation, string model, int id)
         {
+            // Make the model all lower and change "laptop" to "computer".
             model = VerbatimMatch(model);
 
             // Try to change the operation to a boolean.
             bool isDeleted;
             try
             {
-                isDeleted = this.isDeleted(operation);
+                isDeleted = OperationCheck(operation);
             }
             catch (Exception)
             {
@@ -38,19 +43,21 @@ namespace backend_api.Controllers
             switch (model)
             {
                 case "employee":
-                    return BadRequest("Not Deleted");
+                    return BadRequest("Not Archived");
                 case "program":
-                    return BadRequest("Not Deleted");
+                    return BadRequest("Not Archived");
                 case "department":
-                    return DeleteDepartment(isDeleted, id);
+                    return ArchiveRecoverDepartment(isDeleted, id);
                 case "server":
-                    return BadRequest("Not Deleted");
+                    return BadRequest("Not Archived");
                 case "computer":
-                    return BadRequest("Not Deleted");
+                    return BadRequest("Not Archived");
                 case "monitor":
-                    return BadRequest("Not Deleted");
+                    return BadRequest("Not Archived");
                 case "peripheral":
-                    return BadRequest("Not Deleted");
+                    return BadRequest("Not Archived");
+                case "plugin":
+                    return BadRequest("Not Archived");
                 default:
                     return BadRequest("Invalid Model");
             }
@@ -58,14 +65,14 @@ namespace backend_api.Controllers
 
         /* isDeleted(operation) converts the route path string
          *      to a boolean value or throws an error if the string
-         *      is not "delete" or "recover"
+         *      is not "archive" or "recover"
          * Params: string operation
-         * Returns: boolean.
+         * Returns: True if "archive" and False if "recover".
          */
-        private bool isDeleted(string operation)
+        private bool OperationCheck(string operation)
         {
             operation = operation.ToLower();
-            if (operation == "delete")
+            if (operation == "archive")
             {
                 return true;
             }
@@ -81,18 +88,18 @@ namespace backend_api.Controllers
 
         /* PUT: api/{operation}/department/{id}
          * Will change the IsDeleted field for the department of the id corresponding to the operation.
-         *      Will not delete the department if employees are still assigned to the department.
+         *      Will not archive the department if employees are still assigned to the department.
          * Return: 200 if updated. Else, 400 bad request. 
          */
-        private IActionResult DeleteDepartment(bool isDeleted, int id)
+        private IActionResult ArchiveRecoverDepartment(bool isDeleted, int id)
         {
             // Find if any employees are still assigned to the department.
             int count = _context.Employee.Where(emp => emp.DepartmentID == id).ToList().Count();
 
-            // Cannot delete if there are still employees assigned to the department.
+            // Cannot archive if there are still employees assigned to the department.
             if (count > 0 && isDeleted)
             {
-                return BadRequest($"Cannot delete department. {count} employee{(count > 1 ? "s" : "")} assigned to department");
+                return BadRequest($"Cannot archive department. {count} employee{(count > 1 ? "s" : "")} assigned to department");
             }
             else
             {
@@ -108,7 +115,7 @@ namespace backend_api.Controllers
                         _context.Department.Update(dep);
                         _context.SaveChanges();
 
-                        return Ok($"{(isDeleted ? "delete" : "recover")} completed");
+                        return Ok($"{(isDeleted ? "archive" : "recover")} completed");
                     }
                     catch (Exception e)
                     {
