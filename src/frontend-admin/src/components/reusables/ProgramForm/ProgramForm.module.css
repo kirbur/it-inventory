@@ -139,6 +139,10 @@ input:checked ~ .insideCheckmarkAdmin {
 }
 
 .row1Input {
+    width: 50%;
+    margin-bottom: 20px;
+}
+.row2Input {
     width: 30%;
     margin-bottom: 20px;
 }

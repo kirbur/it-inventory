@@ -75,6 +75,15 @@
     top: 14px;
 }
 
+.dropdownList {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
+.dropdownContent {
+    width: 250px;
+}
+
 .empText {
     color: #a5a5a5;
     font-size: 24px;

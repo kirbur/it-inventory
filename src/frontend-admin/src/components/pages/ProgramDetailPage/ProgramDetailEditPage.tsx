@@ -44,7 +44,10 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     const progHeaders = ['License Key', 'Purchase Link']
 
     const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'First Last', id: 1}])
-    const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>()
+    const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>({
+        name: 'Select An Employee',
+        id: -1,
+    })
 
     //input feild states:
     const [formState, setFormState] = useState<IProgramFormInputs>()
@@ -68,12 +71,8 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     purchaseLink: data[0].programPurchaseLink,
                     licenseKey: data[0].programLicenseKey,
                     isLicense: false,
-
-                    costPerMonth:
-                        !data[0].isCostPerYear && data[0].programCostPerYear ? data[0].programCostPerYear / 12 : 0,
-                    costPerYear: data[0].isCostPerYear ? data[0].programCostPerYear : 0,
+                    cost: data[0].isCostPerYear ? data[0].programCostPerYear : data[0].programCostPerYear / 12,
                     flatCost: data[0].programFlatCost ? data[0].programFlatCost : 0,
-                    costType: data[0].isCostPerYear ? 'per year' : data[0].programCostPerYear ? 'per month' : 'per use',
                     monthsPerRenewal: 0,
                 })
 
@@ -85,14 +84,39 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     ],
                 ])
                 setHistoryList(data[0].entries)
+            })
+            .catch((err: any) => console.error(err))
 
-                //TODO: populate employee dropdown
+        //populate employee dropdown
+        axios
+            .get('/list/employees')
+            .then((data: any) => {
+                const employees: any[] = []
+                data.map((i: any) => {
+                    employees.push({
+                        name: i.employeeName,
+                        id: i.employeeId,
+                    })
+                })
+                setEmployeeDropdown(employees)
             })
             .catch((err: any) => console.error(err))
     }, [])
 
     const handleSubmit = () => {
         //TODO: post
+
+        if (imgInput) {
+            var formData = new FormData()
+            formData.append('file', imgInput)
+
+            axios
+                .put(`/image/program/${match.params.id}`, formData, {
+                    headers: {'Content-Type': 'multipart/form-data'},
+                })
+                .then(data => console.log(data))
+                .catch(err => console.error(err))
+        }
     }
 
     return (
@@ -128,7 +152,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                                 triggerElement={({isOpen, toggle}) => (
                                     <button onClick={toggle} className={dropdownStyles.dropdownButton}>
                                         <div className={s(dropdownStyles.dropdownTitle, styles.employeeDropdownTitle)}>
-                                            <div>Assign To Employee</div>
+                                            <div>{selectedEmployee.name}</div>
                                             <div
                                                 className={s(
                                                     dropdownStyles.dropdownArrow,
@@ -139,7 +163,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                                     </button>
                                 )}
                                 choicesList={() => (
-                                    <ul className={dropdownStyles.dropdownList}>
+                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
                                         {employeeDropdown.map(i => (
                                             <li
                                                 className={dropdownStyles.dropdownListItem}
@@ -155,6 +179,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                                         ))}
                                     </ul>
                                 )}
+                                listWidthClass={styles.dropdownContent}
                             />
                             <div />
                         </div>

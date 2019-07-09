@@ -15,9 +15,7 @@ export interface IProgramFormInputs {
     name: string
     programName: string
     description: string
-    costType: 'per month' | 'per year' | 'per use'
-    costPerMonth: number
-    costPerYear: number
+    cost: number
     flatCost: number
     renewalDate: Date
     monthsPerRenewal: number
@@ -57,8 +55,31 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         className={styles.input}
                     />
                 </div>
+            </Group>
 
-                <div className={styles.row1Input}>
+            <Group direction={'row'} justify={'between'}>
+                {/* Cost Group */}
+                <div className={styles.row2Input}>
+                    <div className={styles.inputText}>Flat Cost</div>
+                    <input
+                        className={s(styles.input, styles.costInput)}
+                        type='number'
+                        step='0.01'
+                        value={state.flatCost}
+                        onChange={cost => setState({...state, flatCost: parseFloat(cost.target.value)})}
+                    />
+                </div>
+                <div className={styles.row2Input}>
+                    <div className={styles.inputText}>Recurring Cost</div>
+                    <input
+                        className={s(styles.input, styles.costInput)}
+                        type='number'
+                        step='0.01'
+                        value={state.cost}
+                        onChange={cost => setState({...state, cost: parseFloat(cost.target.value)})}
+                    />
+                </div>
+                <div className={styles.row2Input}>
                     <div className={styles.inputText}># of Months per Renewal</div>
                     <input
                         type='number'
@@ -67,80 +88,6 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         onChange={e => setState({...state, monthsPerRenewal: e.target.value})}
                     />
                 </div>
-            </Group>
-
-            <Group direction={'row'} justify={'between'}>
-                <Group direction={'row'} className={styles.costGroup}>
-                    <div className={styles.container}>
-                        <input
-                            type='radio'
-                            name='cost'
-                            className={styles.checkmark}
-                            checked={state.costType === 'per month'}
-                            onChange={() => setState({...state, costType: 'per month'})}
-                        />
-                        <div className={styles.checkmark} />
-                        <div className={styles.insideCheckmark} />
-                    </div>
-                    <div>
-                        <div className={styles.inputText}>Cost per Month</div>
-                        <input
-                            className={s(styles.input, styles.costInput)}
-                            type='number'
-                            step='0.01'
-                            value={state.costPerMonth}
-                            onChange={cost => setState({...state, costPerMonth: parseFloat(cost.target.value)})}
-                        />
-                    </div>
-                </Group>
-
-                <Group direction={'row'} className={styles.costGroup}>
-                    <div className={styles.container}>
-                        <input
-                            type='radio'
-                            name='cost'
-                            className={styles.checkmark}
-                            checked={state.costType === 'per year'}
-                            onChange={() => setState({...state, costType: 'per year'})}
-                        />
-                        <div className={styles.checkmark} />
-                        <div className={styles.insideCheckmark} />
-                    </div>
-                    <div>
-                        <div className={styles.inputText}>Cost per Year</div>
-                        <input
-                            className={s(styles.input, styles.costInput)}
-                            type='number'
-                            step='0.01'
-                            value={state.costPerYear}
-                            onChange={cost => setState({...state, costPerYear: parseFloat(cost.target.value)})}
-                        />
-                    </div>
-                </Group>
-
-                <Group direction={'row'} className={styles.costGroup}>
-                    <div className={styles.container}>
-                        <input
-                            type='radio'
-                            name='cost'
-                            className={styles.checkmark}
-                            checked={state.costType === 'per use'}
-                            onChange={() => setState({...state, costType: 'per use'})}
-                        />
-                        <div className={styles.checkmark} />
-                        <div className={styles.insideCheckmark} />
-                    </div>
-                    <div>
-                        <div className={styles.inputText}>Cost per License</div>
-                        <input
-                            className={s(styles.input, styles.costInput)}
-                            type='number'
-                            step='0.01'
-                            value={state.flatCost}
-                            onChange={cost => setState({...state, flatCost: parseFloat(cost.target.value)})}
-                        />
-                    </div>
-                </Group>
             </Group>
             <div className={styles.line} />
 

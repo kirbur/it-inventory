@@ -5,6 +5,7 @@ import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
+import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -35,6 +36,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
+    const [img, setImg] = useState('')
     const [programData, setProgramData] = useState<any>({})
     const [programRows, setProgramRows] = useState<any[]>([])
     const [pluginRows, setPluginRows] = useState<any[]>([])
@@ -93,6 +95,19 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             .catch((err: any) => console.error(err))
     }, [])
 
+    useEffect(() => {
+        axios
+            .get(programData.icon)
+            .then((data: any) => {
+                if (data !== '') {
+                    setImg(URL + programData.icon)
+                } else {
+                    setImg(placeholder)
+                }
+            })
+            .catch((err: any) => console.error(err))
+    }, [programData.icon])
+
     const handleEmpClick = (id: number) => {
         history.push(`/employees/${id}`)
     }
@@ -127,7 +142,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         textClassName={styles.backButtonText}
                     />
                     <div className={styles.imgPadding}>
-                        <img className={styles.img} src={URL + programData.icon} alt={''} />
+                        <img className={styles.img} src={img} alt={''} />
                     </div>
                     <div className={styles.costText}>
                         {programData.progFlatCost !== 0 ? (
@@ -135,7 +150,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         ) : programData.isCostPerYear ? (
                             <p>Yearly ---------------- ${programData.progCostPerYear}</p>
                         ) : (
-                            <p>Monthly --------------- ${Math.round((programData.progCostPerYear / 12) * 100) / 100}</p>
+                            <p>Monthly --------------- ${programData.progCostPerYear}</p>
                         )}
                     </div>
                 </div>

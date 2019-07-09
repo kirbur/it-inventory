@@ -51,6 +51,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
     // input states
     const [imgInput, setImgInput] = useState<File>()
+    const [imgLocation, setImgLocation] = useState<string>()
     const [nameInput, setNameInput] = useState<string>(match.params.id === 'new' ? '' : match.params.id)
     const [numCopies, setNumCopies] = useState(1)
     const [pluginInput, setPluginInput] = useState<{
@@ -81,50 +82,50 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         purchaseDate: new Date(),
         purchaseLink: '',
         licenseKey: '',
-        costPerMonth: 0,
-        costPerYear: 0,
+        cost: 0,
         flatCost: 0,
-        costType: 'per month',
         monthsPerRenewal: 0,
         isLicense: false,
     })
 
     useEffect(() => {
-        axios
-            .get(`/detail/ProgramOverview/${match.params.id}`)
-            .then((data: any) => {
-                //setProgramData(data[0].programOverview)
-                setNumCopies(data[0].programOverview.countProgOverall)
+        if (match.params.id !== 'new') {
+            axios
+                .get(`/detail/ProgramOverview/${match.params.id}`)
+                .then((data: any) => {
+                    setImgLocation(data[0].programOverview.icon)
+                    setNumCopies(data[0].programOverview.countProgOverall)
 
-                let prog: any[] = []
-                data[0].inDivPrograms.map((i: any) =>
-                    prog.push([
-                        {value: i.programId, id: i.programId, sortBy: i.programId},
-                        {
-                            value: format(i.employeeName),
-                            id: i.employeeId,
-                            sortBy: format(i.employeeName),
-                        },
-                        {value: format(i.programLicenseKey), sortBy: i.programLicenseKey},
-                        {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
-                    ])
-                )
-                setProgramRows(prog)
+                    let prog: any[] = []
+                    data[0].inDivPrograms.map((i: any) =>
+                        prog.push([
+                            {value: i.programId, id: i.programId, sortBy: i.programId},
+                            {
+                                value: format(i.employeeName),
+                                id: i.employeeId,
+                                sortBy: format(i.employeeName),
+                            },
+                            {value: format(i.programLicenseKey), sortBy: i.programLicenseKey},
+                            {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
+                        ])
+                    )
+                    setProgramRows(prog)
 
-                let plug: any[] = []
-                data[0].listOfPlugins.map((i: any) =>
-                    plug.push([
-                        {value: format(i.pluginName), sortBy: format(i.pluginName)},
-                        {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
-                        {
-                            value: formatCost(i.isCostPerYear, i.pluginCostPerYear, i.pluginFlatCost),
-                            sortBy: i.pluginCostPerYear,
-                        },
-                    ])
-                )
-                setPluginRows(plug)
-            })
-            .catch((err: any) => console.error(err))
+                    let plug: any[] = []
+                    data[0].listOfPlugins.map((i: any) =>
+                        plug.push([
+                            {value: format(i.pluginName), sortBy: format(i.pluginName)},
+                            {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
+                            {
+                                value: formatCost(i.isCostPerYear, i.pluginCostPerYear, i.pluginFlatCost),
+                                sortBy: i.pluginCostPerYear,
+                            },
+                        ])
+                    )
+                    setPluginRows(plug)
+                })
+                .catch((err: any) => console.error(err))
+        }
     }, [])
 
     const handleProgramRemove = (row: any) => {
@@ -138,16 +139,52 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     }
 
     const handleSubmit = () => {
-        if (programForm) {
-            //TODO: post request for x# of copies w/ programInput
+        if (match.params.id === 'new') {
+            //TODO: depending on selected cost type, make sure a number isnt 0
+            var postProgram = {
+                Program: {
+                    numberOfPrograms: numCopies,
+                    ProgramName: nameInput,
+                    ProgramCostPerYear: programInput.cost,
+                    ProgramFlatCost: programInput.flatCost,
+                    ProgramLicenseKey: programInput.licenseKey,
+                    IsLicense: programInput.isLicense,
+                    ProgramDescription: programInput.description,
+                    ProgramPurchaseLink: programInput.purchaseLink,
+                    DateBought: programInput.purchaseDate.toISOString(),
+                    RenewalDate: programInput.monthsPerRenewal === 0 ? null : programInput.renewalDate.toISOString(),
+                    MonthsPerRenewal: programInput.monthsPerRenewal === 0 ? null : programInput.monthsPerRenewal,
+                },
+            }
+
+            axios
+                .post('/add/program', postProgram)
+                .then((response: any) => console.log(response))
+                .catch((err: any) => console.error(err))
+        } else {
+            if (programForm) {
+                //TODO: post request for x# of copies w/ programInput
+            }
+
+            if (pluginForm) {
+                setPluginInput({...pluginInput, programName: nameInput})
+                //TODO: post request for new plugin
+            }
+
+            //TODO: post request to delete removedPluginRows & removedProgramRows
         }
 
-        if (pluginForm) {
-            setPluginInput({...pluginInput, programName: nameInput})
-            //TODO: post request for new plugin
-        }
+        if (imgInput && imgLocation) {
+            var formData = new FormData()
+            formData.append('file', imgInput)
 
-        //TODO: post request to delete removedPluginRows & removedProgramRows
+            axios
+                .put(imgLocation, formData, {
+                    headers: {'Content-Type': 'multipart/form-data'},
+                })
+                .then(data => console.log(data))
+                .catch(err => console.error(err))
+        }
     }
 
     const displayCopies = () => {
