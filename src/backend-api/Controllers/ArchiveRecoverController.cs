@@ -50,7 +50,7 @@ namespace backend_api.Controllers
                 case "department":
                     return ArchiveRecoverDepartment(isDeleted, id);
                 case "server":
-                    return DeleteServer(isDeleted, id);
+                    return ArchiveRecoverServer(isDeleted, id);
                 case "computer":
                     return BadRequest("Not Archived");
                 case "monitor":
@@ -88,8 +88,10 @@ namespace backend_api.Controllers
         }
 
         /* PUT: api/{operation}/department/{id}
-         * Will change the IsDeleted field for the department of the id corresponding to the operation.
-         *      Will not archive the department if employees are still assigned to the department.
+         * Will change the IsDeleted field for the Department of the id corresponding to the operation.
+         *      Will not archive the Department if employees are still assigned to the Department.
+         * {operation} is a string. Either "archive" or "recover"
+         * {id} is a number that is the ID for any of the models.
          * Return: 200 if updated. Else, 400 bad request. 
          */
         private IActionResult ArchiveRecoverDepartment(bool isDeleted, int id)
@@ -129,75 +131,65 @@ namespace backend_api.Controllers
                 }
             }
         }
-        
-        private IActionResult DeleteServer(bool isDeleted, int id)
-        {
-            // TODO: Cannot delete if already deleted??
 
-            // TODO: Add something to the history table it was deleted?
+        /* PUT: api/{operation}/server/{id}
+         * Will change the IsDeleted field for the Server of the id corresponding to the operation.
+         *      Will also add an entry to the Hardware History for the Server
+         * {operation} is a string. Either "archive" or "recover"
+         * {id} is a number that is the ID for any of the models.
+         * Return: 200 if updated. Else, 400 bad request. 
+         */
+        private IActionResult ArchiveRecoverServer(bool isDeleted, int id)
+        {
+
+            // Find server by ID.
             Server sv = _context.Server.Find(id);
 
+            // Make sure server is not null
             if (sv != null)
             {
-                try
+                // If trying to archive when already archiveed, or recover when already recovered, 
+                //      give a BadRequest.
+                if (sv.IsDeleted == isDeleted)
                 {
-                    if (!isDeleted && sv.EmployeeId != null)
-                    {
-                        sv.IsAssigned = true;
-                    }
-                    else
-                    {
-                        // Not assigned if isDeleted == ture or if sv.EmployeeId == null
-                        sv.IsAssigned = false;
-                    }
-                    sv.IsDeleted = isDeleted;
-                    
-
-                    // Update the history
-                    // Unassign
-                    if (sv.IsAssigned && isDeleted)
-                    {
-                        _context.HardwareHistory.Add(new HardwareHistory
-                        {
-                            HardwareId = sv.ServerId,
-                            EmployeeId = sv.EmployeeId,
-                            HardwareType = "Server",
-                            EventType = $"Unassigned",
-                            EventDate = DateTime.Now,
-                        });
-                    }
-
-                    // Delete or recover
-                    _context.HardwareHistory.Add(new HardwareHistory
-                    {
-                        HardwareId = sv.ServerId,
-                        EmployeeId = null,
-                        HardwareType = "Server",
-                        EventType = $"{(isDeleted ? "Deleted" : "Recovered")}",
-                        EventDate = DateTime.Now,
-                    });
-
-                    // Assign if there is an emp ID.
-                    if (sv.EmployeeId != null && !isDeleted)
-                    {
-                        _context.HardwareHistory.Add(new HardwareHistory
-                        {
-                            HardwareId = sv.ServerId,
-                            EmployeeId = sv.EmployeeId,
-                            HardwareType = "Server",
-                            EventType = $"Unassigned",
-                            EventDate = DateTime.Now,
-                        });
-                    }
-
-                    _context.Server.Update(sv);
-                    _context.SaveChanges();
-
-                    return Ok($"{(isDeleted ? "delete" : "recover")} completed");
+                    return BadRequest($"Server cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
                 }
-                catch (Exception e)
+
+                // Else, try updating the server fields.
+                else
                 {
-                    return BadRequest(error: e.Message);
+                    try
+                    {
+                        // If the server is assigned to an employee when recovered, make IsAssigned be true.
+                        if (!isDeleted && sv.EmployeeId != null)
+                        {
+                            sv.IsAssigned = true;
+                        }
+                        // Not assigned if isDeleted == ture or if sv.EmployeeId == null
+                        else
+                        {
+                            sv.IsAssigned = false;
+                        }
+                        sv.IsDeleted = isDeleted;
+
+                        // Update the history: Archive or Recover
+                        _context.HardwareHistory.Add(new HardwareHistory
+                        {
+                            HardwareId = sv.ServerId,
+                            EmployeeId = sv.EmployeeId,
+                            HardwareType = "Server",
+                            EventType = $"{(isDeleted ? "Archived" : "Recovered")}",
+                            EventDate = DateTime.Now,
+                        });
+
+                        _context.SaveChanges();
+
+                        return Ok($"{(isDeleted ? "archive" : "recover")} completed");
+                    }
+                    catch (Exception e)
+                    {
+                        return BadRequest(error: e.Message);
+                    }
                 }
             }
             else
