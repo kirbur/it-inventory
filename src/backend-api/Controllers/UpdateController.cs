@@ -40,7 +40,7 @@ namespace backend_api.Controllers
         public IActionResult PutDepartment([FromBody] DepartmentInput input)
         {
             // Get department by ID.
-            var dep = _context.Department.Find(input.ID);
+            Department dep = _context.Department.Find(input.ID);
 
             if (dep != null)
             {
