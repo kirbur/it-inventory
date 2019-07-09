@@ -231,6 +231,33 @@ namespace backend_api.Controllers
             return Ok(new List<object> { empPrep });
         }
 
+        /* POST: api/add/employee
+         * Takes in as input:
+         * {
+         *           "Employee": {
+         *           "FirstName": String,
+         *           "LastName": String,
+         *           "HireDate": String,
+         *           "Role": String,
+         *           "DepartmentID": int
+         *       },
+         *       "HardwareAssigned": [
+         *           {
+         *               "Type": String,
+         *               "ID": int
+         *           }
+         *       ],
+         *       "ProgramAssigned": [
+         *           {
+         *               "ID": int
+         *           },
+         *           {	
+         *	            "ID": int
+         *           }
+         *       ]
+         *   }
+         * 
+         */
 
         [HttpPost]
         [Route("Employee")]
@@ -244,10 +271,10 @@ namespace backend_api.Controllers
             {
                 var user = UserPrincipal.FindByIdentity(adContext, userName);
                 // creating employee object to added to the database and then saved.
-                var emp =new Employee()
+                var emp = new Employee()
                 {
                     HireDate = input.Employee.HireDate,
-                    DepartmentID= input.Employee.DepartmentID,
+                    DepartmentID = input.Employee.DepartmentID,
                     IsDeleted = false,
                     UserSettings = "",
                     FirstName = input.Employee.FirstName,
@@ -309,5 +336,56 @@ namespace backend_api.Controllers
                 return StatusCode(201);
             }
         }
+
+        /* POST: api/add/Program
+         * Takes in as input:
+         * {   "Program" : {
+         *          "numberOfPrograms" : int,
+         *          "ProgramName" : string,
+         *          "ProgramCostPerYear" : Decimal,
+         *          "ProgramFlatCost" : Decimal,
+         *          "ProgramLicenseKey" : string,
+         *          "IsLicense" : bool,
+         *          "ProgramDescription" : string,
+         *          "ProgramPurchaseLink" : string,
+         *          "DateBought" : DateTime,
+         *          "RenewalDate" : DateTime,
+         *          "MonthsPerRenewal" : int
+         *     }
+         * }
+         */
+        [HttpPost]
+        [Route("Program")]
+        public IActionResult PostProgram([FromBody] PostProgramInputModel input)
+        {
+            for(int i=0; i < input.Program.NumberOfPrograms; i++)
+            {
+                var Prog = new Models.Program()
+                {
+                    ProgramName = input.Program.ProgramName,
+                    ProgramCostPerYear = input.Program.ProgramCostPerYear,
+                    ProgramFlatCost = input.Program.ProgramFlatCost,
+                    ProgramLicenseKey = input.Program.ProgramLicenseKey,
+                    IsLicense = input.Program.IsLicense,
+                    EmployeeId = null,
+                    Description = input.Program.ProgramDescription,
+                    ProgramPurchaseLink = input.Program.ProgramPurchaseLink,
+                    HasPlugIn = false,
+                    IsDeleted = false,
+                    IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false,
+                    DateBought = input.Program.DateBought,
+                    RenewalDate = input.Program.RenewalDate,
+                    MonthsPerRenewal = input.Program.MonthsPerRenewal
+                };
+                _context.Add(Prog);
+                _context.SaveChanges();
+
+
+            }
+            // if we get here then the various fields were created and changed and now we can return 201 created.
+            return StatusCode(201);
+        }
     }
 }
+ 
+ 

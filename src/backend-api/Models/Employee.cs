@@ -7,18 +7,7 @@ namespace backend_api.Models
     {
 
         public Employee() { }
-        public Employee(DateTime HireDate, int DepartmentID, bool IsDeleted, string UserSettings, string FirstName, string LastName, string email, string role, Guid Adguid )
-        {
-            this.HireDate = HireDate;
-            this.DepartmentID = DepartmentID;
-            this.IsDeleted = IsDeleted;
-            this.UserSettings = UserSettings;
-            this.FirstName = FirstName;
-            this.LastName = LastName;
-            this.Email = email;
-            this.Role = role;
-            this.Adguid = Adguid;
-        }
+    
 
         public int EmployeeId { get; set; }
         public DateTime HireDate { get; set; }
