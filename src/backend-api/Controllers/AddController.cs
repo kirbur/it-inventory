@@ -293,25 +293,25 @@ namespace backend_api.Controllers
                     // loop through hardware and depending on what type the hardware is, then add the hardware to the specific table. 
                     foreach (var hardware in input.HardwareAssigned)
                     {
-                        switch (hardware.Type)
+                        switch (hardware.Type.ToLower())
                         {
-                            case "Monitor":
+                            case "monitor":
                                 var mon = _context.Monitor.Find(hardware.ID);
                                 mon.EmployeeId = emp.EmployeeId;
                                 mon.IsAssigned = true;
                                 _context.SaveChanges();
                                 break;
-                            case "Peripheral":
+                            case "peripheral":
                                 var periph = _context.Peripheral.Find(hardware.ID);
                                 periph.EmployeeId = emp.EmployeeId;
                                 periph.IsAssigned = true;
                                 break;
-                            case "Computer":
+                            case "computer":
                                 var comp = _context.Computer.Find(hardware.ID);
                                 comp.EmployeeId = emp.EmployeeId;
                                 comp.IsAssigned = true;
                                 break;
-                            case "Server":
+                            case "server":
                                 var server = _context.Server.Find(hardware.ID);
                                 server.EmployeeId = emp.EmployeeId;
                                 server.IsAssigned = true;
@@ -358,7 +358,11 @@ namespace backend_api.Controllers
         [Route("Program")]
         public IActionResult PostProgram([FromBody] PostProgramInputModel input)
         {
-            for(int i=0; i < input.Program.NumberOfPrograms; i++)
+            // list to hold the congruent programs that will be added.
+            List<Models.Program> Programs = new List<Models.Program>();
+
+            // adding the correct number of programs that was specified 
+            for (int i = 0; i < input.Program.NumberOfPrograms; i++)
             {
                 var Prog = new Models.Program()
                 {
@@ -377,15 +381,19 @@ namespace backend_api.Controllers
                     RenewalDate = input.Program.RenewalDate,
                     MonthsPerRenewal = input.Program.MonthsPerRenewal
                 };
-                _context.Add(Prog);
-                _context.SaveChanges();
-
+                // add the individual program to our list to hold the congruent program
+                Programs.Add(Prog);
 
             }
+            // Save multiple entities at once.
+            _context.AddRange(Programs);
+            _context.SaveChanges();
+
+
+
             // if we get here then the various fields were created and changed and now we can return 201 created.
             return StatusCode(201);
         }
     }
 }
- 
- 
+
