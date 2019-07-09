@@ -393,13 +393,13 @@ namespace backend_api.Controllers
                         "license": string[],
                         "software": string[],
                     },
-                    "Name": "NewDept",
+                    "Name": string,
                 }
          * Return: 201 if created. Else, 400 bad request. 
          */
         [HttpPost]
         [Route("Department")]
-        public IActionResult PostDepartment([FromBody] PostDepartmentInput input)
+        public IActionResult PostDepartment([FromBody] DepartmentInput input)
         {
             // Try to add a department entity.
             try
@@ -423,7 +423,7 @@ namespace backend_api.Controllers
                 return BadRequest(error: e.Message);
             }
         }
-
+        
         /* POST: api/add/Program
          * Takes in as input:
          * {   "Program" : {
