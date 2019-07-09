@@ -1,6 +1,6 @@
 ﻿namespace backend_api.Models
 {
-    public class PostDepartmentInput
+    public class DepartmentInput
     {
         public struct ProgramsObject
         {
@@ -13,7 +13,7 @@
         }
         public string Name { get; set; }
         public HardwareObject DefaultHardware { get; set; }
-        public ProgramsObject DefaultPrograms { get; set; }
-
+        public ProgramsObject DefaultPrograms { get; set;  }
+        public int? ID { get; set;  }
     }
 }
