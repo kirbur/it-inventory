@@ -232,6 +232,33 @@ namespace backend_api.Controllers
             return Ok(new List<object> { empPrep });
         }
 
+        /* POST: api/add/employee
+         * Takes in as input:
+         * {
+         *           "Employee": {
+         *           "FirstName": String,
+         *           "LastName": String,
+         *           "HireDate": String,
+         *           "Role": String,
+         *           "DepartmentID": int
+         *       },
+         *       "HardwareAssigned": [
+         *           {
+         *               "Type": String,
+         *               "ID": int
+         *           }
+         *       ],
+         *       "ProgramAssigned": [
+         *           {
+         *               "ID": int
+         *           },
+         *           {	
+         *	            "ID": int
+         *           }
+         *       ]
+         *   }
+         * 
+         */
 
         [HttpPost]
         [Route("Employee")]
@@ -258,6 +285,14 @@ namespace backend_api.Controllers
                     Adguid = user.Guid.Value
                 };
                 _context.Employee.Add(emp);
+
+                var AuthEmp = new AuthIdserver()
+                {
+                    ActiveDirectoryId = user.Guid.Value,
+                    RefreshToken = "",
+                    IsAdmin = input.Employee.IsAdmin
+                };
+                _context.AuthIdserver.Add(AuthEmp);
                 _context.SaveChanges();
 
 
@@ -267,25 +302,25 @@ namespace backend_api.Controllers
                     // loop through hardware and depending on what type the hardware is, then add the hardware to the specific table. 
                     foreach (var hardware in input.HardwareAssigned)
                     {
-                        switch (hardware.Type)
+                        switch (hardware.Type.ToLower())
                         {
-                            case "Monitor":
+                            case "monitor":
                                 var mon = _context.Monitor.Find(hardware.ID);
                                 mon.EmployeeId = emp.EmployeeId;
                                 mon.IsAssigned = true;
                                 _context.SaveChanges();
                                 break;
-                            case "Peripheral":
+                            case "peripheral":
                                 var periph = _context.Peripheral.Find(hardware.ID);
                                 periph.EmployeeId = emp.EmployeeId;
                                 periph.IsAssigned = true;
                                 break;
-                            case "Computer":
+                            case "computer":
                                 var comp = _context.Computer.Find(hardware.ID);
                                 comp.EmployeeId = emp.EmployeeId;
                                 comp.IsAssigned = true;
                                 break;
-                            case "Server":
+                            case "server":
                                 var server = _context.Server.Find(hardware.ID);
                                 server.EmployeeId = emp.EmployeeId;
                                 server.IsAssigned = true;
@@ -305,6 +340,7 @@ namespace backend_api.Controllers
                         _context.SaveChanges();
                     }
                 }
+
 
                 // if we get here then the various fields were created and changed and now we can return 201 created.
                 return StatusCode(201);
@@ -387,5 +423,64 @@ namespace backend_api.Controllers
                 return BadRequest(error: e.Message);
             }
         }
+        
+        /* POST: api/add/Program
+         * Takes in as input:
+         * {   "Program" : {
+         *          "numberOfPrograms" : int,
+         *          "ProgramName" : string,
+         *          "ProgramCostPerYear" : Decimal,
+         *          "ProgramFlatCost" : Decimal,
+         *          "ProgramLicenseKey" : string,
+         *          "IsLicense" : bool,
+         *          "ProgramDescription" : string,
+         *          "ProgramPurchaseLink" : string,
+         *          "DateBought" : DateTime,
+         *          "RenewalDate" : DateTime,
+         *          "MonthsPerRenewal" : int
+         *     }
+         * }
+         */
+        [HttpPost]
+        [Route("Program")]
+        public IActionResult PostProgram([FromBody] PostProgramInputModel input)
+        {
+            // list to hold the congruent programs that will be added.
+            List<Models.Program> Programs = new List<Models.Program>();
+
+            // adding the correct number of programs that was specified 
+            for (int i = 0; i < input.Program.NumberOfPrograms; i++)
+            {
+                var Prog = new Models.Program()
+                {
+                    ProgramName = input.Program.ProgramName,
+                    ProgramCostPerYear = input.Program.ProgramCostPerYear,
+                    ProgramFlatCost = input.Program.ProgramFlatCost,
+                    ProgramLicenseKey = input.Program.ProgramLicenseKey,
+                    IsLicense = input.Program.IsLicense,
+                    EmployeeId = null,
+                    Description = input.Program.ProgramDescription,
+                    ProgramPurchaseLink = input.Program.ProgramPurchaseLink,
+                    HasPlugIn = false,
+                    IsDeleted = false,
+                    IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false,
+                    DateBought = input.Program.DateBought,
+                    RenewalDate = input.Program.RenewalDate,
+                    MonthsPerRenewal = input.Program.MonthsPerRenewal
+                };
+                // add the individual program to our list to hold the congruent program
+                Programs.Add(Prog);
+
+            }
+            // Save multiple entities at once.
+            _context.AddRange(Programs);
+            _context.SaveChanges();
+
+
+
+            // if we get here then the various fields were created and changed and now we can return 201 created.
+            return StatusCode(201);
+        }
     }
 }
+
