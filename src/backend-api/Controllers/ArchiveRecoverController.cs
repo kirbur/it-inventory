@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using backend_api.Models;
 using backend_api.Helpers;
 
@@ -17,12 +15,16 @@ namespace backend_api.Controllers
         public ArchiveRecoverController(ITInventoryDBContext context) : base(context) { }
 
         /* PUT: api/{operation}/{model}/{id}
-         * Will change the IsDeleted field for the id of the model corresponding to the operation.
-         * {operation} is a string. Either "archive" or "recover"
-         * {model} is a string that is a name of one of the models.
-         *      Employee, Department, Program, Plugin, Server, Laptop, Monitor, Peripheral
-         * {id} is a number that is the ID for any of the models.
-         * Return: 200 if updated. Else, 400 bad request. 
+         * Route Params:
+         *   {operation} is a string. Either "archive" or "recover"
+         *   {model} is a string that is a name of one of the models.
+         *        Employee, Department, Program, Plugin, Server, Laptop, Monitor, Peripheral
+         *   {id} is a number that is the ID for any of the models.
+         * ArchiveRecoverSwitch(operation, model, id) is the generic controller for all archiving/recovering
+         *   of the models. The method will validate the model and operation and then call the appropriate
+         *   methods and will change the IsDeleted field for the id of the model corresponding to the operation.
+         * Method Params are from the route which are specified above.
+         * Return: IActionResult 200 if updated. Else, 400 bad request. 
          */
         [HttpPut]
         [Route("{operation}/{model}/{id}")]
@@ -31,8 +33,8 @@ namespace backend_api.Controllers
             // Make the model all lower and change "laptop" to "computer".
             model = VerbatimMatch(model);
 
-            // Checks the validity of the operation, and assigns isDeleted to a 
-            //      boolean according to the operation provided.
+            // Checks the validity of the operation (archive or recover), and assigns 
+            //      isDeleted to a boolean according to the operation provided.
             bool isDeleted;
             try
             {
@@ -49,19 +51,17 @@ namespace backend_api.Controllers
                     return BadRequest("Not Archived");
                 case "program":
                     return BadRequest("Not Archived");
+                case "plugin":
+                    return BadRequest("Not Archived");
                 case "department":
                     return ArchiveRecoverDepartment(isDeleted, id);
                 case "server":
                     return ArchiveRecoverHardware(_context.Server, isDeleted, id);
-                    //return ArchiveRecoverServer(isDeleted, id);
                 case "computer":
                     return ArchiveRecoverHardware(_context.Computer, isDeleted, id);
-                    //return ArchiveRecoverComputer(isDeleted, id);
                 case "monitor":
                     return BadRequest("Not Archived");
                 case "peripheral":
-                    return BadRequest("Not Archived");
-                case "plugin":
                     return BadRequest("Not Archived");
                 default:
                     return BadRequest("Invalid Model");
@@ -92,11 +92,16 @@ namespace backend_api.Controllers
         }
 
         /* PUT: api/{operation}/department/{id}
-         * Will change the IsDeleted field for the Department of the id corresponding to the operation.
-         *      Will not archive the Department if employees are still assigned to the Department.
-         * {operation} is a string. Either "archive" or "recover"
-         * {id} is a number that is the ID for any of the models.
-         * Return: 200 if updated. Else, 400 bad request. 
+         * Route params:
+         *   {operation} is a string. Either "archive" or "recover"
+         *   {id} is a number that is the ID for any of the models.
+         * ArchiveRecoverDepartment(isDeleted, id) is a department method for archiving and recovering 
+         *   a department. The method will change the IsDeleted field for the Department of the id corresponding
+         *   to the operation. And will not archive the Department if employees are still assigned to the Department.
+         * Method Params:
+         *   bool isDeleted, is if the department is going to be archived or recovered
+         *   int id, the ID of the specified department
+         * Return: IActionResult 200 if updated. Else, 400 bad request. 
          */
         private IActionResult ArchiveRecoverDepartment(bool isDeleted, int id)
         {
@@ -115,19 +120,7 @@ namespace backend_api.Controllers
 
                 if (dep != null)
                 {
-                    // Try to update department row
-                    try
-                    {
-                        dep.IsDeleted = isDeleted;
-                        _context.Department.Update(dep);
-                        _context.SaveChanges();
-
-                        return Ok($"{(isDeleted ? "archive" : "recover")} completed");
-                    }
-                    catch (Exception e)
-                    {
-                        return BadRequest(error: e.Message);
-                    }
+                    return TryUpdateDetartment(isDeleted, dep);
                 }
                 else
                 {
@@ -136,145 +129,44 @@ namespace backend_api.Controllers
             }
         }
 
-        ///* PUT: api/{operation}/server/{id}
-        // * Will change the IsDeleted field for the Server of the id corresponding to the operation.
-        // *      Will also add an entry to the Hardware History for the Server
-        // * {operation} is a string. Either "archive" or "recover"
-        // * {id} is a number that is the ID for any of the models.
-        // * Return: 200 if updated. Else, 400 bad request. 
-        // */
-        //private IActionResult ArchiveRecoverServer(bool isDeleted, int id)
-        //{
+        /* TryUpdateDepartment(isDeleted, dep) will try to update the IsDeleted field on the 
+         *   department row.
+         * Result IActionResult. 200 if successful. 400 if not.
+         */
+        private IActionResult TryUpdateDetartment(bool isDeleted, Department dep)
+        {
+            try
+            {
+                dep.IsDeleted = isDeleted;
+                _context.Department.Update(dep);
+                _context.SaveChanges();
 
-        //    // Find server by ID.
-        //    Server sv = _context.Server.Find(id);
+                return Ok($"{(isDeleted ? "archive" : "recover")} completed");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(error: e.Message);
+            }
+        }
 
-        //    // Make sure server is not null
-        //    if (sv != null)
-        //    {
-        //        // If trying to archive when already archived, or recover when already recovered, 
-        //        //      give a BadRequest.
-        //        if (sv.IsDeleted == isDeleted)
-        //        {
-        //            return BadRequest($"Server cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
-        //        }
-
-        //        // Else, try updating the server fields.
-        //        else
-        //        {
-        //            try
-        //            {
-        //                // If the server is assigned to an employee when recovered, make IsAssigned be true.
-        //                if (!isDeleted && sv.EmployeeId != null)
-        //                {
-        //                    sv.IsAssigned = true;
-        //                }
-        //                // Not assigned if isDeleted == true or if sv.EmployeeId == null
-        //                else
-        //                {
-        //                    sv.IsAssigned = false;
-        //                }
-        //                sv.IsDeleted = isDeleted;
-
-        //                // Update the history: Archive or Recover
-        //                _context.HardwareHistory.Add(new HardwareHistory
-        //                {
-        //                    HardwareId = sv.ServerId,
-        //                    EmployeeId = sv.EmployeeId,
-        //                    HardwareType = "Server",
-        //                    EventType = $"{(isDeleted ? "Archived" : "Recovered")}",
-        //                    EventDate = DateTime.Now,
-        //                });
-
-        //                _context.SaveChanges();
-
-        //                return Ok($"{(isDeleted ? "archive" : "recover")} completed");
-        //            }
-        //            catch (Exception e)
-        //            {
-        //                return BadRequest(error: e.Message);
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return BadRequest("Server does not exist or failed to supply ID");
-        //    }
-        //}
-
-
-
-        ///* PUT: api/{operation}/laptop/{id}
-        // * Will change the IsDeleted field for the Computer of the id corresponding to the operation.
-        // *      Will also add an entry to the Hardware History for the Computer.
-        // *      Will change laptop to match the back-end verbatim of "computer"
-        // * {operation} is a string. Either "archive" or "recover"
-        // * {id} is a number that is the ID for any of the models.
-        // * Return: 200 if updated. Else, 400 bad request. 
-        // */
-
-
-        //// TODO: This is the same function as above with very minor changes....
-        //private IActionResult ArchiveRecoverComputer(bool isDeleted, int id)
-        //{
-        //    // Find computer by ID.
-        //    Computer cp = _context.Computer.Find(id);
-
-        //    // Make sure computer is not null
-        //    if (cp != null)
-        //    {
-        //        // If trying to archive when already archived, or recover when already recovered, 
-        //        //      give a BadRequest.
-        //        if (cp.IsDeleted == isDeleted)
-        //        {
-        //            return BadRequest($"Computer cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
-        //        }
-
-        //        // Else, try updating the computer fields.
-        //        else
-        //        {
-        //            try
-        //            {
-        //                //// If the computer is assigned to an employee when recovered, make IsAssigned be true.
-        //                //if (!isDeleted && cp.EmployeeId != null)
-        //                //{
-        //                //    cp.IsAssigned = true;
-        //                //}
-        //                //// Not assigned if isDeleted == true or if cp.EmployeeId == null
-        //                //else
-        //                //{
-        //                //    cp.IsAssigned = false;
-        //                //}
-        //                //cp.IsDeleted = isDeleted;
-
-        //                SoftDelete(cp, isDeleted, id);
-
-        //                // Update the history: Archive or Recover
-        //                _context.HardwareHistory.Add(new HardwareHistory
-        //                {
-        //                    HardwareId = cp.ComputerId,
-        //                    EmployeeId = cp.EmployeeId,
-        //                    HardwareType = "Computer",
-        //                    EventType = $"{(isDeleted ? "Archived" : "Recovered")}",
-        //                    EventDate = DateTime.Now,
-        //                });
-
-        //                _context.SaveChanges();
-
-        //                return Ok($"{(isDeleted ? "archive" : "recover")} completed");
-        //            }
-        //            catch (Exception e)
-        //            {
-        //                return BadRequest(error: e.Message);
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return BadRequest("Computer does not exist or failed to supply ID");
-        //    }
-        //}
-
+        /* PUT: api/{operation}/{model}/{id}
+         * Route Params:
+         *   {operation} is a string. Either "archive" or "recover"
+         *   {model} is a string that is a name of one of the Hardware models.
+         *       Server, Laptop, Monitor, Peripheral
+         *   {id} is a number that is the ID for any of the models.
+         * ArchiveRecoverhardware<T>(dbSet, isDeleted, id) is a generic method for archive/recovering
+         *   and assigning hardware entities.
+         *   The method will also:
+         *    - change the IsDeleted field for the Hardware of the id corresponding to the operation.
+         *    - add an entry to the Hardware History for the Hardware.
+         *    - change laptop to match the back-end verbatim of "computer"
+         * Method Params:
+         *   DbSet<T> dbSet is the _context.<HardwareType> for the entity
+         *   bool isDeleted, true if the entity is going to be archived
+         *   int id, is the entity id on the table.
+         * Return: IActionResult 200 if updated. Else, 400 bad request. 
+         */
         private IActionResult ArchiveRecoverHardware<T>(DbSet<T> dbSet, bool isDeleted, int id)
             where T : class, ISoftDeletable, IAssignable
         {
@@ -287,39 +179,7 @@ namespace backend_api.Controllers
             // Make sure hardware is not null
             if (hardware != null)
             {
-                // If trying to archive when already archived, or recover when already recovered, 
-                //      give a BadRequest.
-                if (hardware.IsDeleted == isDeleted)
-                {
-                    return BadRequest($"{type} cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
-                }
-
-                // Else, try updating the hardware fields.
-                else
-                {
-                    try
-                    {
-                        SoftDelete(hardware, isDeleted, id);
-
-                        // Update the history: Archive or Recover
-                        _context.HardwareHistory.Add(new HardwareHistory
-                        {
-                            HardwareId = id,
-                            EmployeeId = hardware.EmployeeId,
-                            HardwareType = type,
-                            EventType = $"{(isDeleted ? "Archived" : "Recovered")}",
-                            EventDate = DateTime.Now,
-                        });
-
-                        _context.SaveChanges();
-
-                        return Ok($"{(isDeleted ? "archive" : "recover")} completed");
-                    }
-                    catch (Exception e)
-                    {
-                        return BadRequest(error: e.Message);
-                    }
-                }
+                return CheckEntityDeletedState(hardware, isDeleted, id, type);
             }
             else
             {
@@ -327,8 +187,49 @@ namespace backend_api.Controllers
             }
         }
 
-        // TODO: 
-        private void SoftDelete<T>(T hardware, bool isDeleted, int id)
+        /* CheckEntityDeletedState<T>(hardware, isDeleted, id, type) will check the current IsDeleted state
+         *   of the hardware with the database IsDeleted state. 
+         * Return IActionResult 400 if the IsDeleted states are the same.
+         */
+        private IActionResult CheckEntityDeletedState<T>(T hardware, bool isDeleted, int id, string type)
+            where T : class, ISoftDeletable, IAssignable
+        {
+            if (hardware.IsDeleted == isDeleted)
+            {
+                return BadRequest($"{type} cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
+            }
+            else
+            {
+                return TryUpdatingHardware(hardware, isDeleted, id, type);
+            }
+        }
+        
+        /* TryUpdatingHardware<T>(hardware, isDeleted, id, type) will attempt to update the hardware entity fields
+         *   and also create an entity on the hardware history recording the change.
+         * Return IActionResult 200 if the updating works and 400 if there is an error.
+         */
+        private IActionResult TryUpdatingHardware<T>(T hardware, bool isDeleted, int id, string type)
+            where T : class, ISoftDeletable, IAssignable
+        {
+            try
+            {
+                UpdateHardwareEntity(hardware, isDeleted);
+                UpdateHardwareHistory(hardware, isDeleted, id, type);
+                _context.SaveChanges();
+
+                return Ok($"{(isDeleted ? "archive" : "recover")} completed");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(error: e.Message);
+            }
+        }
+
+        /* UpdateHardwareEntity<T>(hardware, isDeleted) will update the assigment of the hardware
+         *   if the EmployeeId is not null and will also update the IsDeleted field according to the
+         *   parameter passed.
+         */
+        private void UpdateHardwareEntity<T>(T hardware, bool isDeleted)
             where T : class, ISoftDeletable, IAssignable
         {
             if (!isDeleted && hardware.EmployeeId != null)
@@ -341,6 +242,23 @@ namespace backend_api.Controllers
                 hardware.IsAssigned = false;
             }
             hardware.IsDeleted = isDeleted;
+        }
+
+        /* UpdateHardwareHistory<T>(hardware, isDeleted, id, type) will add a row to the hardware history
+         *   table recording the change to the hardware entity.
+         */
+        private void UpdateHardwareHistory<T>(T hardware, bool isDeleted, int id, string type)
+            where T : class, ISoftDeletable, IAssignable
+        {
+            // Update the history: Archive or Recover
+            _context.HardwareHistory.Add(new HardwareHistory
+            {
+                HardwareId = id,
+                EmployeeId = hardware.EmployeeId,
+                HardwareType = type,
+                EventType = $"{(isDeleted ? "Archived" : "Recovered")}",
+                EventDate = DateTime.Now,
+            });
         }
     }
 }
