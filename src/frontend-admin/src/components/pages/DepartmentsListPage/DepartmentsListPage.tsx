@@ -45,6 +45,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         axios
             .get('/list/departments')
             .then((data: any) => {
+                console.log(data)
                 var depts: any[] = []
                 data.map((i: any) =>
                     depts.push({
