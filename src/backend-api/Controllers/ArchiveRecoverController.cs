@@ -1,33 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using backend_api.Models;
+using backend_api.Helpers;
 
 namespace backend_api.Controllers
 {
-    public interface IHardwareInterface
-    {
-        int? EmployeeId { get; set; }
-        bool IsDeleted { get; set; }
-        bool IsAssigned { get; set; }
-    }
-
-    public class Hardware : IHardwareInterface
-    {
-        public Hardware() { }
-        public int? EmployeeId { get; set; }
-        public bool IsDeleted { get; set; }
-        public bool IsAssigned { get; set; }
-    }
     // [Authorize]
     [ApiController]
     public class ArchiveRecoverController : ContextController
     {
-
-
         public ArchiveRecoverController(ITInventoryDBContext context) : base(context) { }
 
         /* PUT: api/{operation}/{model}/{id}
@@ -66,16 +52,10 @@ namespace backend_api.Controllers
                 case "department":
                     return ArchiveRecoverDepartment(isDeleted, id);
                 case "server":
+                    return ArchiveRecoverHardware(_context.Server, isDeleted, id);
                     //return ArchiveRecoverServer(isDeleted, id);
                 case "computer":
-                    Computer cp = _context.Computer.Find(id);
-                    Hardware comp = new Hardware()
-                    {
-                        EmployeeId = cp.EmployeeId,
-                        IsDeleted = cp.IsDeleted,
-                        IsAssigned = cp.IsAssigned,
-                    };
-                    return ArchiveRecoverHardware<Hardware>(comp, isDeleted, id);
+                    return ArchiveRecoverHardware(_context.Computer, isDeleted, id);
                     //return ArchiveRecoverComputer(isDeleted, id);
                 case "monitor":
                     return BadRequest("Not Archived");
@@ -255,17 +235,19 @@ namespace backend_api.Controllers
         //        {
         //            try
         //            {
-        //                // If the computer is assigned to an employee when recovered, make IsAssigned be true.
-        //                if (!isDeleted && cp.EmployeeId != null)
-        //                {
-        //                    cp.IsAssigned = true;
-        //                }
-        //                // Not assigned if isDeleted == true or if cp.EmployeeId == null
-        //                else
-        //                {
-        //                    cp.IsAssigned = false;
-        //                }
-        //                cp.IsDeleted = isDeleted;
+        //                //// If the computer is assigned to an employee when recovered, make IsAssigned be true.
+        //                //if (!isDeleted && cp.EmployeeId != null)
+        //                //{
+        //                //    cp.IsAssigned = true;
+        //                //}
+        //                //// Not assigned if isDeleted == true or if cp.EmployeeId == null
+        //                //else
+        //                //{
+        //                //    cp.IsAssigned = false;
+        //                //}
+        //                //cp.IsDeleted = isDeleted;
+
+        //                SoftDelete(cp, isDeleted, id);
 
         //                // Update the history: Archive or Recover
         //                _context.HardwareHistory.Add(new HardwareHistory
@@ -293,43 +275,38 @@ namespace backend_api.Controllers
         //    }
         //}
 
-        private IActionResult ArchiveRecoverHardware<T>(T hdwr, bool isDeleted, int id)
-            where T : IHardwareInterface
+        private IActionResult ArchiveRecoverHardware<T>(DbSet<T> dbSet, bool isDeleted, int id)
+            where T : class, ISoftDeletable, IAssignable
         {
+            // Find hardware entity by ID.
+            var hardware = dbSet.Find(id);
 
-            // Make sure computer is not null
-            if (hdwr != null)
+            // Find type name at runtime
+            string type = hardware.GetType().Name;
+
+            // Make sure hardware is not null
+            if (hardware != null)
             {
                 // If trying to archive when already archived, or recover when already recovered, 
                 //      give a BadRequest.
-                if (hdwr.IsDeleted == isDeleted)
+                if (hardware.IsDeleted == isDeleted)
                 {
-                    return BadRequest($"Computer cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
+                    return BadRequest($"{type} cannot be {(isDeleted ? "archived if already archived" : "recovered if already recovered")}");
                 }
 
-                // Else, try updating the computer fields.
+                // Else, try updating the hardware fields.
                 else
                 {
                     try
                     {
-                        // If the computer is assigned to an employee when recovered, make IsAssigned be true.
-                        if (!isDeleted && hdwr.EmployeeId != null)
-                        {
-                            hdwr.IsAssigned = true;
-                        }
-                        // Not assigned if isDeleted == true or if cp.EmployeeId == null
-                        else
-                        {
-                            hdwr.IsAssigned = false;
-                        }
-                        hdwr.IsDeleted = isDeleted;
+                        SoftDelete(hardware, isDeleted, id);
 
                         // Update the history: Archive or Recover
                         _context.HardwareHistory.Add(new HardwareHistory
                         {
                             HardwareId = id,
-                            EmployeeId = hdwr.EmployeeId,
-                            HardwareType = "Computer",
+                            EmployeeId = hardware.EmployeeId,
+                            HardwareType = type,
                             EventType = $"{(isDeleted ? "Archived" : "Recovered")}",
                             EventDate = DateTime.Now,
                         });
@@ -346,8 +323,24 @@ namespace backend_api.Controllers
             }
             else
             {
-                return BadRequest("Computer does not exist or failed to supply ID");
+                return BadRequest($"{type} does not exist or failed to supply ID");
             }
+        }
+
+        // TODO: 
+        private void SoftDelete<T>(T hardware, bool isDeleted, int id)
+            where T : class, ISoftDeletable, IAssignable
+        {
+            if (!isDeleted && hardware.EmployeeId != null)
+            {
+                hardware.IsAssigned = true;
+            }
+            // Not assigned if isDeleted == true or if entity.EmployeeId == null
+            else
+            {
+                hardware.IsAssigned = false;
+            }
+            hardware.IsDeleted = isDeleted;
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public partial class Server
+    public partial class Server : IAssignable, ISoftDeletable
     {
         public int ServerId { get; set; }
         public string Fqdn { get; set; }
