@@ -68,15 +68,9 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     flatCost: data[0].programFlatCost ? data[0].programFlatCost : 0,
                     monthsPerRenewal: 0,
                 })
-            })
-            .catch((err: any) => console.error(err))
 
-        //populate employee dropdown
-        axios
-            .get('/list/employees')
-            .then((data: any) => {
                 const employees: any[] = []
-                data.map((i: any) =>
+                data[0].listOfEmployees.map((i: any) =>
                     employees.push({
                         name: i.employeeName,
                         id: i.employeeId,
