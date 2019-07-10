@@ -62,7 +62,7 @@ namespace backend_api.Controllers
                 case "monitor":
                     return ArchiveRecoverHardware(_context.Monitor, isDeleted, id);
                 case "peripheral":
-                    return BadRequest("Not Archived");
+                    return ArchiveRecoverHardware(_context.Peripheral, isDeleted, id);
                 default:
                     return BadRequest("Invalid Model");
             }
