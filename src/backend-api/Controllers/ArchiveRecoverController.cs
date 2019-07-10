@@ -148,7 +148,7 @@ namespace backend_api.Controllers
             // Make sure server is not null
             if (sv != null)
             {
-                // If trying to archive when already archiveed, or recover when already recovered, 
+                // If trying to archive when already archived, or recover when already recovered, 
                 //      give a BadRequest.
                 if (sv.IsDeleted == isDeleted)
                 {
@@ -165,7 +165,7 @@ namespace backend_api.Controllers
                         {
                             sv.IsAssigned = true;
                         }
-                        // Not assigned if isDeleted == ture or if sv.EmployeeId == null
+                        // Not assigned if isDeleted == true or if sv.EmployeeId == null
                         else
                         {
                             sv.IsAssigned = false;
