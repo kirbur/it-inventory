@@ -77,7 +77,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             ])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
             setThirdSectionHeaders(['Employee Assigned', 'Department Assigned', 'Location'])
-            // setFourthSectionHeaders(['Fixed Cost', 'Cost per year'])
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
@@ -95,11 +94,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].server.san,
                         data[0].server.fqdn,
                     ])
-                    setSecondSectionData([
-                        // data[0].server.purchaseDate,
-                        // data[0].server.renewalDate,
-                        // data[0].server.endOfLife,
-                    ])
+                    setSecondSectionData([])
                     setPurchaseDateInput(data[0].server.purchaseDate)
                     setRenewalDateInput(data[0].server.renewalDate)
                     setEndOfLifeInput(data[0].server.endOfLife)
@@ -137,11 +132,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].computer.serialNumber,
                         data[0].computer.fqdn,
                     ])
-                    setSecondSectionData([
-                        // formatDate(data[0].computer.purchaseDate),
-                        // formatDate(data[0].computer.renewalDate),
-                        // formatDate(data[0].computer.endOfLife),
-                    ])
+                    setSecondSectionData([])
                     setPurchaseDateInput(data[0].computer.purchaseDate)
                     setRenewalDateInput(data[0].computer.renewalDate)
                     setEndOfLifeInput(data[0].computer.endOfLife)
@@ -166,11 +157,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].monitor.inputs,
                         data[0].monitor.serialNumber,
                     ])
-                    setSecondSectionData([
-                        // formatDate(data[0].monitor.purchaseDate),
-                        // formatDate(data[0].monitor.renewalDate),
-                        // formatDate(data[0].monitor.endOfLife),
-                    ])
+                    setSecondSectionData([])
                     setPurchaseDateInput(data[0].monitor.purchaseDate)
                     setRenewalDateInput(data[0].monitor.renewalDate)
 
@@ -186,11 +173,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
-                    setFirstSectionData([
-                        data[0].employeeAssignedName,
-                        data[0].peripheral.serialNumber,
-                        // formatDate(data[0].peripheral.purchaseDate),
-                    ])
+                    setFirstSectionData([data[0].employeeAssignedName, data[0].peripheral.serialNumber])
                     setPurchaseDateInput(data[0].peripheral.purchaseDate)
 
                     setSecondSectionData([])
@@ -386,7 +369,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             <div className={styles.inputContainer}>
                                 <div className={styles.inputHeader}>Date</div>
                                 <DatePicker
-                                    dateFormat='yyyy/MM/dd'
+                                    dateFormat='MM/dd/yyyy'
                                     selected={dateInput}
                                     onChange={e => e && setDateInput(e)}
                                     className={styles.input}

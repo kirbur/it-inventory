@@ -254,7 +254,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     </div>
                     <div>
                         <div className={styles.text}>Date Hired</div>
-                        {/* <input type='text' className={styles.input} placeholder={userData.hireDate} /> */}
                         <DatePicker
                             dateFormat='yyyy/MM/dd'
                             selected={new Date()}
