@@ -66,7 +66,12 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         type='number'
                         step='0.01'
                         value={state.flatCost}
-                        onChange={cost => setState({...state, flatCost: parseFloat(cost.target.value)})}
+                        onChange={cost =>
+                            setState({
+                                ...state,
+                                flatCost: parseFloat(cost.target.value),
+                            })
+                        }
                     />
                 </div>
                 <div className={styles.row2Input}>
@@ -76,7 +81,12 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         type='number'
                         step='0.01'
                         value={state.cost}
-                        onChange={cost => setState({...state, cost: parseFloat(cost.target.value)})}
+                        onChange={cost =>
+                            setState({
+                                ...state,
+                                cost: parseFloat(cost.target.value),
+                            })
+                        }
                     />
                 </div>
                 <div className={styles.row2Input}>
@@ -85,7 +95,12 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         type='number'
                         className={styles.input}
                         value={state.monthsPerRenewal}
-                        onChange={e => setState({...state, monthsPerRenewal: e.target.value})}
+                        onChange={e =>
+                            setState({
+                                ...state,
+                                monthsPerRenewal: parseInt(e.target.value),
+                            })
+                        }
                     />
                 </div>
             </Group>

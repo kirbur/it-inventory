@@ -146,27 +146,53 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             //TODO: depending on selected cost type, make sure a number isnt 0
             var postProgram = {
                 Program: {
-                    numberOfPrograms: numCopies,
+                    numberOfPrograms: Number.isNaN(numCopies) ? 0 : numCopies,
                     ProgramName: nameInput,
-                    ProgramCostPerYear: programInput.cost,
-                    ProgramFlatCost: programInput.flatCost,
+                    ProgramCostPerYear: Number.isNaN(programInput.cost) ? 0 : programInput.cost,
+                    ProgramFlatCost: Number.isNaN(programInput.flatCost) ? 0 : programInput.flatCost,
                     ProgramLicenseKey: programInput.licenseKey,
                     IsLicense: programInput.isLicense,
                     ProgramDescription: programInput.description,
                     ProgramPurchaseLink: programInput.purchaseLink,
                     DateBought: programInput.purchaseDate.toISOString(),
                     RenewalDate: programInput.monthsPerRenewal === 0 ? null : programInput.renewalDate.toISOString(),
-                    MonthsPerRenewal: programInput.monthsPerRenewal === 0 ? null : programInput.monthsPerRenewal,
+                    MonthsPerRenewal: programInput.cost
+                        ? Number.isNaN(programInput.monthsPerRenewal) || programInput.monthsPerRenewal === 0
+                            ? 1 //default is monthly
+                            : programInput.monthsPerRenewal
+                        : null,
                 },
             }
+            console.log(postProgram.Program)
 
-            axios
-                .post('/add/program', postProgram)
-                .then((response: any) => {
-                    //TODO: check response and give msg
-                    return
-                })
-                .catch((err: any) => console.error(err))
+            var msg: string = ''
+            if (
+                postProgram.Program.numberOfPrograms >= 1 &&
+                postProgram.Program.ProgramName &&
+                (postProgram.Program.ProgramCostPerYear > 0 || postProgram.Program.ProgramFlatCost > 0) &&
+                postProgram.Program.DateBought
+            ) {
+                axios
+                    .post('/add/program', postProgram)
+                    .then((response: any) => {
+                        console.log(response)
+                        if (response.status === 201) {
+                            msg = numCopies + ' copies of ' + nameInput + ' were added to inventory!'
+                            window.alert(msg)
+                        }
+                        return
+                    })
+                    .catch((err: any) => console.error(err))
+            } else {
+                msg = 'Failed because: \n'
+                msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
+                msg += postProgram.Program.ProgramName === '' ? 'No name entered,\n' : ''
+                msg +=
+                    postProgram.Program.ProgramCostPerYear <= 0 && postProgram.Program.ProgramFlatCost <= 0
+                        ? 'No cost entered,\n'
+                        : ''
+                window.alert(msg)
+            }
         } else {
             if (programForm) {
                 //TODO: post request for x# of copies w/ programInput
@@ -299,9 +325,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 type='number'
                                 className={s(styles.input, styles.pluginInput)}
                                 value={numCopies}
-                                onChange={e =>
-                                    setNumCopies(parseInt(e.target.value) > 0 ? parseInt(e.target.value) : 0)
-                                }
+                                onChange={e => setNumCopies(parseInt(e.target.value))}
                             />
                         </div>
                     </Group>
