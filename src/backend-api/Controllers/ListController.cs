@@ -122,7 +122,7 @@ namespace backend_api.Controllers
                     var ProgForEmp = _context.Program.Where(x => x.EmployeeId == emp.EmployeeId && x.IsDeleted == false).Select(x => x.ProgramName);
 
                     // lambda to select the department of this employee which is not deleted
-                    var EmpDep = _context.Department.Where(x => x.DepartmentId == emp.DepartmentId && x.IsDeleted == false).Select(x => x.DepartmentName).FirstOrDefault().ToString();
+                    var EmpDep = _context.Department.Where(x => x.DepartmentId == emp.DepartmentID && x.IsDeleted == false).Select(x => x.DepartmentName).FirstOrDefault().ToString();
 
                     // photo path.
                     string photo = $"/image/employee/{emp.EmployeeId}";
@@ -163,10 +163,10 @@ namespace backend_api.Controllers
                     decimal? CostOfPrograms = 0;
 
                     // finds number of employees in the current department
-                    var numOfEmp = _context.Employee.Where(x => x.DepartmentId == dep.DepartmentId && x.IsDeleted == false).Count();
+                    var numOfEmp = _context.Employee.Where(x => x.DepartmentID == dep.DepartmentId && x.IsDeleted == false).Count();
 
                     //creates a list of the employees in the current department
-                    var listOfEmpInDep = _context.Employee.Where(x => x.DepartmentId == dep.DepartmentId && x.IsDeleted == false).ToList();
+                    var listOfEmpInDep = _context.Employee.Where(x => x.DepartmentID == dep.DepartmentId && x.IsDeleted == false).ToList();
 
                     //list to store programs that are being used by the current department
                     var ProgUsedByDep = new List<Models.Program>();
