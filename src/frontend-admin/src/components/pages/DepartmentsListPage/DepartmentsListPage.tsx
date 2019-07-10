@@ -10,6 +10,7 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import {History} from 'history'
 
 // Styles
 import styles from './DepartmentsListPage.module.css'
@@ -19,7 +20,7 @@ import {LoginContext} from '../../App/App'
 
 // Types
 interface IDepartmentsListPageProps {
-    history: any
+    history: History
     match: any
 }
 
@@ -32,8 +33,8 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const axios = new AxiosService(accessToken, refreshToken)
 
     // state
-    const [listData, setListData] = useState<any[]>([])
-    const [filteredData, setFilteredData] = useState<any[]>([])
+    const [listData, setListData] = useState<Element[]>([])
+    const [filteredData, setFilteredData] = useState<Element[]>([])
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Departments', value: 'name'})
 

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useState, useEffect, useContext, ReactText, SetStateAction} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -10,6 +10,7 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import {History} from 'history'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -19,7 +20,7 @@ import styles from './EmployeesListPage.module.css'
 
 // Types
 interface IEmployeesListPageProps {
-    history: any
+    history: History
     match: any
 }
 
@@ -32,8 +33,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const axios = new AxiosService(accessToken, refreshToken)
 
     // state
-    const [listData, setListData] = useState<any[]>([])
-    const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
+    const [listData, setListData] = useState<Element[]>([])
+    const [filteredData, setFilteredData] = useState<Element[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Employees', value: 'name'})
 
@@ -45,7 +46,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         axios
             .get('/list/employees')
             .then((data: any) => {
-                const employees: any[] = []
+                let employees: any = []
                 data.map((i: any) => {
                     employees.push({
                         name: format(i.employeeName),
@@ -121,7 +122,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         history.push(`/editEmployee/new`)
     }
 
-    const handleRowClick = (row: any) => {
+    const handleRowClick = (row: any[]) => {
         history.push(`${match.url}/${row[0].key}`)
     }
 

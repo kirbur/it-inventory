@@ -10,6 +10,7 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import {History} from 'history'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -19,7 +20,7 @@ import styles from './HardwareListPage.module.css'
 
 // Types
 interface ILaptopsListPageProps {
-    history: any
+    history: History
 }
 
 // Primary Component
