@@ -609,17 +609,17 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             }
 
             //TODO: verify this endpoint is right, and that updateEmployee is formatted correctly
-            axios
-                .put(`/update/Employee/${match.params.id}`, updateEmployee)
-                .then((response: any) => {
-                    if (response && response.status === 201) {
-                        window.alert(`${selectedEmployee.name} was successfully updated!`)
-                    }
-                })
-                .catch((err: any) => {
-                    window.alert(`Something went wrong`)
-                    console.error(err)
-                })
+            // axios
+            //     .put(`/update/Employee/${match.params.id}`, updateEmployee)
+            //     .then((response: any) => {
+            //         if (response && response.status === 201) {
+            //             window.alert(`${selectedEmployee.name} was successfully updated!`)
+            //         }
+            //     })
+            //     .catch((err: any) => {
+            //         window.alert(`Something went wrong`)
+            //         console.error(err)
+            //     })
         } else {
             //one or maore of the inputs was null/undefined/empty
             var msg = 'Failed because:\n'
