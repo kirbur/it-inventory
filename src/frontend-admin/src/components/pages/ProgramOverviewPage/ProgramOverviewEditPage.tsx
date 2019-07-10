@@ -97,7 +97,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 .then((data: any) => {
                     setImgLocation(data[0].programOverview.icon)
                     setNumCopies(data[0].programOverview.countProgOverall)
-                    console.log(data)
 
                     let prog: ITableItem[][] = []
                     data[0].inDivPrograms.map((i: ExpectedProgramType) =>
@@ -142,29 +141,27 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     }
 
     const handleSubmit = () => {
-        if (match.params.id === 'new') {
-            //TODO: depending on selected cost type, make sure a number isnt 0
-            var postProgram = {
-                Program: {
-                    numberOfPrograms: Number.isNaN(numCopies) ? 0 : numCopies,
-                    ProgramName: nameInput,
-                    ProgramCostPerYear: Number.isNaN(programInput.cost) ? 0 : programInput.cost,
-                    ProgramFlatCost: Number.isNaN(programInput.flatCost) ? 0 : programInput.flatCost,
-                    ProgramLicenseKey: programInput.licenseKey,
-                    IsLicense: programInput.isLicense,
-                    ProgramDescription: programInput.description,
-                    ProgramPurchaseLink: programInput.purchaseLink,
-                    DateBought: programInput.purchaseDate.toISOString(),
-                    RenewalDate: programInput.monthsPerRenewal === 0 ? null : programInput.renewalDate.toISOString(),
-                    MonthsPerRenewal: programInput.cost
-                        ? Number.isNaN(programInput.monthsPerRenewal) || programInput.monthsPerRenewal === 0
-                            ? 1 //default is monthly
-                            : programInput.monthsPerRenewal
-                        : null,
-                },
-            }
-            console.log(postProgram.Program)
+        var postProgram = {
+            Program: {
+                numberOfPrograms: Number.isNaN(numCopies) ? 0 : numCopies,
+                ProgramName: nameInput,
+                ProgramCostPerYear: Number.isNaN(programInput.cost) ? 0 : programInput.cost,
+                ProgramFlatCost: Number.isNaN(programInput.flatCost) ? 0 : programInput.flatCost,
+                ProgramLicenseKey: programInput.licenseKey,
+                IsLicense: programInput.isLicense,
+                ProgramDescription: programInput.description,
+                ProgramPurchaseLink: programInput.purchaseLink,
+                DateBought: programInput.purchaseDate.toISOString(),
+                RenewalDate: programInput.monthsPerRenewal === 0 ? null : programInput.renewalDate.toISOString(),
+                MonthsPerRenewal: programInput.cost
+                    ? Number.isNaN(programInput.monthsPerRenewal) || programInput.monthsPerRenewal === 0
+                        ? 1 //default is monthly
+                        : programInput.monthsPerRenewal
+                    : null,
+            },
+        }
 
+        if (match.params.id === 'new') {
             var msg: string = ''
             if (
                 postProgram.Program.numberOfPrograms >= 1 &&
@@ -196,6 +193,34 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         } else {
             if (programForm) {
                 //TODO: post request for x# of copies w/ programInput
+
+                postProgram.Program.ProgramName = match.params.id
+                if (
+                    postProgram.Program.numberOfPrograms >= 1 &&
+                    (postProgram.Program.ProgramCostPerYear > 0 || postProgram.Program.ProgramFlatCost > 0) &&
+                    postProgram.Program.DateBought
+                ) {
+                    axios
+                        .post('/add/program', postProgram)
+                        .then((response: any) => {
+                            console.log(response)
+                            if (response.status === 201) {
+                                msg = numCopies + ' copies of ' + nameInput + ' were added to inventory!'
+                                window.alert(msg)
+                            }
+                            return
+                        })
+                        .catch((err: any) => console.error(err))
+                } else {
+                    msg = 'Failed because: \n'
+                    msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
+                    msg += postProgram.Program.ProgramName === '' ? 'No name entered,\n' : ''
+                    msg +=
+                        postProgram.Program.ProgramCostPerYear <= 0 && postProgram.Program.ProgramFlatCost <= 0
+                            ? 'No cost entered,\n'
+                            : ''
+                    window.alert(msg)
+                }
             }
 
             if (pluginForm) {
