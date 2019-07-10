@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.DirectoryServices.AccountManagement;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace backend_api.Controllers
 {
@@ -346,6 +347,83 @@ namespace backend_api.Controllers
             }
         }
 
+        /* GET: api/add/departmentprep
+         * Returns the list of hardware, licenses, and software to be used
+         *      during the creation of a new department.
+         * Returns: [ {
+                        "hardware": string[],
+                        "licenses": string[],
+                        "software": string[],
+                    } ]
+         * 
+         */
+        [HttpGet]
+        [Route("DepartmentPrep")]
+        public IActionResult GetDepartmentPrep()
+        {
+            // List of generic types that can be assigned as defaults.
+            List<string> hardware = new List<string> { "Server", "Laptop", "Monitor" };
+
+            // Get the type of peripherals. Types are generic but more specific than "Peripheral"
+            List<string> peripherals = _context.Peripheral.Where(pr => !pr.IsDeleted).GroupBy(pr => pr.PeripheralType).Select(pr => pr.FirstOrDefault()).Select(pr => pr.PeripheralType).ToList();
+            hardware.AddRange(peripherals);
+
+            // Get the names of licenses and software that are not deleted
+            IQueryable<string> licenses = _context.Program.Where(prog => prog.IsLicense && !prog.IsDeleted).GroupBy(prog => prog.ProgramName).Select(prog => prog.FirstOrDefault()).Select(prog => prog.ProgramName);
+            IQueryable<string> software = _context.Program.Where(prog => !prog.IsLicense && !prog.IsDeleted).GroupBy(prog => prog.ProgramName).Select(prog => prog.FirstOrDefault()).Select(prog => prog.ProgramName);
+
+            // Return JSON in a list :)
+            return Ok(new[] { new
+                {
+                    hardware,
+                    licenses,
+                    software,
+                }
+            });
+        }
+
+        /* POST: api/add/department
+         * Will add a row to the department table
+         * Param input format:
+                {
+                    "DefaultHardware": {
+                        "DefaultHardware": string[],
+                    },
+                    "DefaultPrograms": {
+                        "license": string[],
+                        "software": string[],
+                    },
+                    "Name": string,
+                }
+         * Return: 201 if created. Else, 400 bad request. 
+         */
+        [HttpPost]
+        [Route("Department")]
+        public IActionResult PostDepartment([FromBody] DepartmentInput input)
+        {
+            // Try to add a department entity.
+            try
+            {
+                Department dep = new Department()
+                {
+                    // Convert the objects to strings to store in the db.
+                    DefaultHardware = JsonConvert.SerializeObject(input.DefaultHardware),
+                    DefaultPrograms = JsonConvert.SerializeObject(input.DefaultPrograms),
+                    DepartmentName = input.Name,
+                    IsDeleted = false,
+                };
+                _context.Department.Add(dep);
+                _context.SaveChanges();
+
+                // if we get here then the various fields were created and changed and now we can return 201 created.
+                return StatusCode(201);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(error: e.Message);
+            }
+        }
+        
         /* POST: api/add/Program
          * Takes in as input:
          * {   "Program" : {
