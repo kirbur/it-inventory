@@ -126,6 +126,7 @@ namespace backend_api.Controllers
          *              CountOfProgramsInUse: int,
          *              CountOfProgramsOverall: int
          *              Program(name) : string,
+         *              IsLicense : bool,
          *              ProgramCostFlatCost : int or null,
          *              ProgramCostPerYear : int or null,
          *              isCostPerYear : bool,
@@ -227,6 +228,8 @@ namespace backend_api.Controllers
                         prog.RenewalDate
                     });
                 }
+                // lambda to check if all the indiv programs under this name are a license
+                bool isLicense = UsefulProgramsList.All(x => x.IsLicense == true) ? true : false;
                 // creating a list of plug-ins that will be returned
                 List<object> ListOfPlugins = new List<object>();
 
@@ -255,6 +258,7 @@ namespace backend_api.Controllers
                     CountProgInUse,
                     CountProgOverall,
                     program,
+                    isLicense,
                     ProgFlatCost,
                     ProgCostPerYear,
                     UsefulProgramsList.FirstOrDefault().IsCostPerYear,
@@ -658,6 +662,7 @@ namespace backend_api.Controllers
                     picture,
                     prog.RenewalDate,
                     prog.DateBought,
+                    prog.MonthsPerRenewal,
                     employeeName,
                     employeeId = employeeName != "" ? employeeId : -1,
                     entries,
