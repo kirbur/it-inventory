@@ -120,7 +120,7 @@ namespace backend_api.Controllers
 
                 if (dep != null)
                 {
-                    return TryUpdateDetartment(isDeleted, dep);
+                    return TryUpdateDepartment(isDeleted, dep);
                 }
                 else
                 {
@@ -133,7 +133,7 @@ namespace backend_api.Controllers
          *   department row.
          * Result IActionResult. 200 if successful. 400 if not.
          */
-        private IActionResult TryUpdateDetartment(bool isDeleted, Department dep)
+        private IActionResult TryUpdateDepartment(bool isDeleted, Department dep)
         {
             try
             {
