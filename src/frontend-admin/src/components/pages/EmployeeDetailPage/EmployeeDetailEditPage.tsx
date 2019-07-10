@@ -1,4 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react'
+import {History} from 'history'
+import {match} from 'react-router-dom'
 
 // Components
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
@@ -32,8 +34,21 @@ interface IDepartment {
 }
 
 interface IEmployeeDetailEditPageProps {
-    match: any
+    match: match<{id: string}>
     history: any
+}
+
+interface IEmployee {
+    isAdmin: boolean
+    photo: string
+    firstName: string
+    lastName: string
+    name: string
+    department: string
+    role: string
+    hireDate: string
+    hwCost: number
+    swCost: number
 }
 
 // Primary Component
@@ -45,7 +60,18 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
-    const [userData, setUserData] = useState<any>({})
+    const [userData, setUserData] = useState<IEmployee>({
+        isAdmin: false,
+        photo: '',
+        firstName: '',
+        lastName: '',
+        name: '',
+        department: '',
+        role: '',
+        hireDate: '',
+        hwCost: 0,
+        swCost: 0,
+    })
     const [hardwareRows, setHardwareRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
         assigned: [],
         added: [],
@@ -135,8 +161,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             axios //TODO: get from edit endpoint
                 .get(`/detail/employee/${match.params.id}`)
                 .then((data: any) => {
-                    let user: any = {
-                        isAdmin: data[0].isAdmin,
+                    setUserData({
+                        isAdmin: data[0].admin,
                         photo: data[0].picture,
                         firstName: data[0].firstName,
                         lastName: data[0].lastName,
@@ -146,12 +172,15 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         hireDate: formatDate(data[0].hireDate),
                         hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
                         swCost: Math.round(data[0].totalProgramCostPerMonth * 100) / 100,
-                    }
-                    setUserData(user)
-                    setAdminInput(data[0].isAdmin)
+                    })
+
+                    setAdminInput(data[0].admin)
                     setDateInput(new Date(formatDate(data[0].hireDate)))
                     setRoleInput(data[0].role)
-                    setSelectedEmployee({name: data[0].firstName + ' ' + data[0].lastName, id: match.params.id})
+                    setSelectedEmployee({
+                        name: data[0].firstName + ' ' + data[0].lastName,
+                        id: parseInt(match.params.id),
+                    })
 
                     let hw: any[] = []
                     data[0].hardware.map((i: any) =>
@@ -241,102 +270,124 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     setLicenseDropdown(ul)
                 })
                 .catch((err: any) => console.error(err))
+
+            axios
+                .get(`/add/employeePrep/`)
+                .then((data: any) => setDeptList(data[0].departments))
+                .catch((err: any) => console.error(err))
         }
-        console.log('use')
     }, [])
 
     //Check the current employees department, if they don't have one yet check the first
     useEffect(() => {
-        var d = deptList.filter((i: any) => i.DepartmentName === userData.department)
+        var d = deptList.filter((i: any) => i.departmentName === userData.department)
         d[0] ? setDeptInput({...d[0]}) : setDeptInput({...deptList[0]})
     }, [deptList, userData.department])
 
     //If the employee is new add the default hardware and programs to their tables to be assigned to them
     const applyDefaults = () => {
-        if (match.params.id === 'new' && deptInput && deptInput.defaultHardware) {
+        if (match.params.id === 'new' && deptInput) {
             /*APPLY HARDWARE DEFAULTS */
-            //clear out added
-            setHardwareRows({...hardwareRows, added: []})
+            if (deptInput.defaultHardware) {
+                //clear out added
+                setHardwareRows({...hardwareRows, added: []})
 
-            var toBeAdded: any[] = []
-            hardwareDropdown.map(available =>
+                var toBeAdded: any[] = []
+
                 deptInput.defaultHardware.forEach(need => {
-                    if (available.name.search(need) >= 0 || available.id.search(need.toLowerCase()) >= 0) {
-                        var arr = [
-                            {value: available.name, id: available.id, sortBy: available.name},
-                            {value: '', id: available.id, sortBy: available.id},
-                            {value: '', id: available.id, sortBy: available.id},
-                            {value: '', id: available.id, sortBy: available.id},
-                        ]
+                    var needFulfilled = false
+                    hardwareDropdown.map(available => {
+                        if (
+                            !needFulfilled &&
+                            (available.name.search(need) >= 0 || available.id.search(need.toLowerCase()) >= 0)
+                        ) {
+                            var arr = [
+                                {value: available.name, id: available.id, sortBy: available.name},
+                                {value: '', id: available.id, sortBy: available.id},
+                                {value: '', id: available.id, sortBy: available.id},
+                                {value: '', id: available.id, sortBy: available.id},
+                            ]
 
-                        toBeAdded.push(arr)
-                        return
-                    }
+                            toBeAdded.push(arr)
+                            needFulfilled = true
+                            return
+                        }
+                    })
                 })
-            )
 
-            //add the hardware defaults
-            setHardwareRows({...hardwareRows, added: [...toBeAdded]})
+                //add the hardware defaults
+                setHardwareRows({...hardwareRows, added: [...toBeAdded]})
 
-            //remove the defaults from the dropdown
-            toBeAdded.map(added =>
-                setHardwareDropdown([...hardwareDropdown.filter((option: any) => option.name === added[0].value)])
-            )
+                //remove the defaults from the dropdown
+                toBeAdded.map(added =>
+                    setHardwareDropdown([...hardwareDropdown.filter((option: any) => option.name === added[0].value)])
+                )
+            }
 
-            /*APPLY SOFTWARE DEFAULTS */
-            //clear out added
-            setSoftwareRows({...softwareRows, added: []})
-            toBeAdded = []
-            softwareDropdown.map(available =>
+            if (deptInput.defaultSoftware) {
+                /*APPLY SOFTWARE DEFAULTS */
+                //clear out added
+                setSoftwareRows({...softwareRows, added: []})
+                toBeAdded = []
+
                 deptInput.defaultSoftware.forEach(need => {
-                    if (available.name.search(need) >= 0 || available.name === need) {
-                        var arr = [
-                            {value: available.name, id: available.id, sortBy: available.name},
-                            {value: '', id: available.id, sortBy: available.id},
-                            {value: '', id: available.id, sortBy: available.id},
-                        ]
+                    var needFulfilled = false
+                    softwareDropdown.map(available => {
+                        if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
+                            var arr = [
+                                {value: available.name, id: available.id, sortBy: available.name},
+                                {value: '', id: available.id, sortBy: available.id},
+                                {value: '', id: available.id, sortBy: available.id},
+                            ]
 
-                        toBeAdded.push(arr)
-                        return
-                    }
+                            toBeAdded.push(arr)
+                            needFulfilled = true
+                            return
+                        }
+                    })
                 })
-            )
 
-            //add the software defaults
-            setSoftwareRows({...softwareRows, added: [...toBeAdded]})
+                //add the software defaults
+                setSoftwareRows({...softwareRows, added: [...toBeAdded]})
 
-            //remove the defaults from the dropdown
-            toBeAdded.map(added =>
-                setSoftwareDropdown([...softwareDropdown.filter((option: any) => option.name === added[0].value)])
-            )
+                //remove the defaults from the dropdown
+                toBeAdded.map(added =>
+                    setSoftwareDropdown([...softwareDropdown.filter((option: any) => option.name === added[0].value)])
+                )
+            }
 
-            /*APPLY LICENSE DEFAULTS */
-            //clear out added
-            setLicenseRows({...licenseRows, added: []})
-            toBeAdded = []
-            licenseDropdown.map(available =>
+            if (deptInput.defaultLicenses) {
+                /*APPLY LICENSE DEFAULTS */
+                //clear out added
+                setLicenseRows({...licenseRows, added: []})
+                toBeAdded = []
+
                 deptInput.defaultLicenses.forEach(need => {
-                    if (available.name.search(need) >= 0 || available.name === need) {
-                        var arr = [
-                            {value: available.name, id: available.id, sortBy: available.name},
-                            {value: '', id: available.id, sortBy: available.id},
-                            {value: '', id: available.id, sortBy: available.id},
-                            {value: '', id: available.id, sortBy: available.id},
-                        ]
+                    var needFulfilled = false
+                    licenseDropdown.map(available => {
+                        if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
+                            var arr = [
+                                {value: available.name, id: available.id, sortBy: available.name},
+                                {value: '', id: available.id, sortBy: available.id},
+                                {value: '', id: available.id, sortBy: available.id},
+                                {value: '', id: available.id, sortBy: available.id},
+                            ]
 
-                        toBeAdded.push(arr)
-                        return
-                    }
+                            toBeAdded.push(arr)
+                            needFulfilled = true
+                            return
+                        }
+                    })
                 })
-            )
 
-            //add the license defaults
-            setLicenseRows({...licenseRows, added: [...toBeAdded]})
+                //add the license defaults
+                setLicenseRows({...licenseRows, added: [...toBeAdded]})
 
-            //remove the defaults from the dropdown
-            toBeAdded.map(added =>
-                setLicenseDropdown([...licenseDropdown.filter((option: any) => option.name === added[0].value)])
-            )
+                //remove the defaults from the dropdown
+                toBeAdded.map(added =>
+                    setLicenseDropdown([...licenseDropdown.filter((option: any) => option.name === added[0].value)])
+                )
+            }
         }
     }
 
@@ -612,14 +663,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 {/* name and date */}
-                <div className={s(styles.title, styles.paddingBottom)}>Employee Information</div>
+                <div className={styles.title}>Employee Information</div>
 
                 {/* Admin/nonadmin radio cards */}
-
-                {/* TODO:
-                pull in bool from backend to set default on admin radio cards
-                */}
-
                 <div className={styles.adminCardContainer}>
                     {/* admin card */}
                     <div className={styles.paddingRight}>
@@ -724,7 +770,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                         type='text'
                                         className={styles.input}
                                         value={selectedEmployee.name}
-                                        onChange={e => setSelectedEmployee({name: e.target.value, id: match.params.id})}
+                                        onChange={e =>
+                                            setSelectedEmployee({name: e.target.value, id: parseInt(match.params.id)})
+                                        }
                                     />
                                 )
                             )}
@@ -785,10 +833,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     <DetailPageTable
                         headers={hardwareHeaders}
                         rows={displayTable(hardwareRows, 'hw')}
-                        setRows={setHardwareRows}
+                        setRows={() => {}}
                         style={styles.newRowThing}
                         edit={true}
                         remove={handleRemoveHardware}
+                        // sorting={false}
                     />
                 </div>
                 {hardwareDropdown && (
@@ -832,10 +881,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     <DetailPageTable
                         headers={softwareHeaders}
                         rows={displayTable(softwareRows, 'sw')}
-                        setRows={setSoftwareRows}
+                        setRows={() => {}}
                         style={styles.newRowThing}
                         edit={true}
                         remove={handleRemoveSoftware}
+                        // sorting={false}
                     />
                 </div>
                 {softwareDropdown && (
@@ -879,10 +929,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     <DetailPageTable
                         headers={licenseHeaders}
                         rows={displayTable(licenseRows, 'l')}
-                        setRows={setLicenseRows}
+                        setRows={() => {}}
                         style={styles.newRowThing}
                         edit={true}
                         remove={handleRemoveLicence}
+                        // sorting={false}
                     />
                 </div>
                 {licenseDropdown && (

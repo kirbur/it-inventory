@@ -28,10 +28,11 @@ interface ITableProps {
     style?: string
     edit?: boolean
     remove?: any
+    className?: string
 }
 
 export const DetailPageTable = (props: ITableProps) => {
-    const {style, headers, rows, setRows, edit = false, remove} = props
+    const {style, headers, rows, setRows, edit = false, remove, className = ''} = props
 
     //initialize all the header states and styling to be not sorted
     const headerStates = []
@@ -127,7 +128,7 @@ export const DetailPageTable = (props: ITableProps) => {
         renderedRows.push(transformedRow)
     })
     return (
-        <table className={s(styles.table, /*isClickable &&*/ styles.clickable)}>
+        <table className={s(styles.table, /*isClickable &&*/ styles.clickable, className)}>
             <thead>
                 <tr className={styles.header}>{renderedHeaders.map(header => header)}</tr>
             </thead>

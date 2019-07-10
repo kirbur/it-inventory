@@ -1,10 +1,5 @@
 .empDetailMain {
-    margin: 50px 85px;
-}
-
-.archivebutton {
-    margin-left: 18px;
-    padding: 0 5px;
+    margin: 0 50px;
 }
 
 .columns {
@@ -15,23 +10,17 @@
 }
 
 .firstColumn {
-    min-width: 300px;
-    padding: 25px;
-    flex-grow: 1;
-}
-
-.backButton {
-    margin-bottom: 30px;
+    padding: 50px;
 }
 
 .secondColumn {
-    min-width: 700px;
-    padding: 25px;
-    flex-grow: 2;
+    padding: 50px;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
+/*First Column*/
 .imgPadding {
     padding: 25px;
     background-color: #f4f4f4;
@@ -42,14 +31,10 @@
 }
 
 .img {
-    max-width: 300px;
+    width: 300px;
     max-height: 300px;
-    min-width: 250px;
     min-height: 250px;
     margin: auto;
-    /* position: relative; */
-
-    /* transform: scale(1.5, 1.5); */
 }
 
 .costText {
@@ -58,10 +43,19 @@
     font-size: 18px;
 }
 
+/*Second Column*/
+.archivebutton {
+    margin-left: 18px;
+    padding: 0 5px;
+}
+
+.backButton {
+    margin-bottom: 30px;
+}
+
 .titleText {
     text-align: left;
-    padding-bottom: 100px;
-    padding-top: 25px;
+    padding: 100px 0;
 }
 
 .employeeName {
@@ -76,119 +70,6 @@
     color: #a5a5a5;
 }
 
-.headerContainer {
-    color: #a5a5a5;
-    font-size: 24px;
-    padding-bottom: 16px;
-    padding-top: 16px;
-    display: flex;
-    cursor: pointer;
-}
-
-.header {
-    text-align: left;
-    border-bottom: 1px solid #979797;
-}
-
-.rowData {
-    text-align: left;
-    color: #4a4a4a;
-}
-
-.notSorted {
-    border-left: 8px solid #636363;
-    border-right: 8px solid #636363;
-    border-top: 2px solid #636363;
-    border-bottom: none;
-    height: 2px;
-    position: relative;
-    top: 15px;
-    left: 5px;
-}
-
-.ascending {
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid #636363;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    position: relative;
-    bottom: 10px;
-    left: 5px;
-}
-
-.descending {
-    border-top: 8px solid #636363;
-    border-bottom: 8px solid transparent;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    position: relative;
-    top: 15px;
-    left: 5px;
-}
-
-.rowTitle {
-    color: #009eff;
-}
-
-.tooltip {
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: -0.52px;
-    line-height: 30px;
-    color: black !important;
-    box-shadow: 1px 1px 6px 0 rgba(114, 114, 114, 0.2) !important;
-    border-radius: 15px;
-}
-
-.dropdownTitle {
-    margin-top: -3px;
-    font-family: cqlmedium;
-    text-transform: none;
-    color: #009eff;
-    font-size: 20px;
-}
-
-.dropdown1 {
-    z-index: 1 !important;
-}
-
-.dropdown2 {
-    z-index: 2 !important;
-}
-
-.dropdown3 {
-    z-index: 3 !important;
-}
-
-.addContainer {
-    margin: 5px 0 55px;
-    align-self: flex-end;
-    z-index: 2;
-}
-.addIconBorder:hover {
-    background-color: #009eff;
-    color: white;
-    cursor: pointer;
-}
-
-.addIconBorder:hover .addIcon {
-    color: white;
-}
-.addIconBorder {
-    border: 2px solid #009eff;
-    border-radius: 3px;
-    width: 25px;
-    height: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.addIcon {
-    color: #009eff;
-    transform: scale(2, 2);
-}
-.assignText {
-    padding-left: 5px;
-    color: #009eff;
-    font-size: 20px;
+.table {
+    margin-bottom: 50px;
 }
