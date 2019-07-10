@@ -141,6 +141,12 @@ namespace backend_api.Controllers
             // Get program by ID.
             var prog = _context.Program.Find(id);
 
+            // list to hold the history entries that will be added.
+            List<ProgramHistory> programHistories = new List<ProgramHistory>();
+
+            // temp value to hold the old employee's id(could be null)
+            int? progEmpId = prog.EmployeeId != null ? prog.EmployeeId : null;
+
             if (prog != null)
                 try
                 {
@@ -154,6 +160,60 @@ namespace backend_api.Controllers
                     prog.RenewalDate = input.Program.RenewalDate;
                     prog.MonthsPerRenewal = input.Program.MonthsPerRenewal;
                     prog.EmployeeId = input.Program.EmployeeId;
+
+                    // Case 1: When an unassigned program becomes assigned
+                    if (input.Program.EmployeeId != null && progEmpId == null)
+                    {
+                        var History = (new ProgramHistory
+                        {
+                            EmployeeId = input.Program.EmployeeId,
+                            ProgramId = prog.ProgramId,
+                            EventType = "Assigned",
+                            EventDate = DateTime.Now
+
+                        });
+                        programHistories.Add(History);
+                    }
+                    // Case 2: When an already assigned program becomes assigned to someone else
+                    // This requires 2 entries; one for the unassigning and one for the assigning.
+                    else if (input.Program.EmployeeId != null && progEmpId != null)
+                    {
+                        // unassigning
+                        var History = (new ProgramHistory
+                        {
+                            EmployeeId = progEmpId,
+                            ProgramId = prog.ProgramId,
+                            EventType = "Unassigned",
+                            EventDate = DateTime.Now
+
+                        });
+                        // assigning
+                        programHistories.Add(History);
+
+                        var HistorySecond = (new ProgramHistory
+                        {
+                            EmployeeId = input.Program.EmployeeId,
+                            ProgramId = prog.ProgramId,
+                            EventType = "Assigned",
+                            EventDate = DateTime.Now
+                        });
+                        programHistories.Add(HistorySecond);
+
+                    }
+                    // Case 3: When an assigned program becomes unassigned
+                    else if (input.Program.EmployeeId == null && progEmpId != null)
+                    {
+                        var History = (new ProgramHistory
+                        {
+                            EmployeeId = progEmpId,
+                            ProgramId = prog.ProgramId,
+                            EventType = "Unassigned",
+                            EventDate = DateTime.Now
+
+                        });
+                        programHistories.Add(History);
+                    }
+                    _context.ProgramHistory.AddRange(programHistories);
 
                     _context.SaveChanges();
                     return StatusCode(202);

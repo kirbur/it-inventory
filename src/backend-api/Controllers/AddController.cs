@@ -423,7 +423,7 @@ namespace backend_api.Controllers
                 return BadRequest(error: e.Message);
             }
         }
-        
+
         /* POST: api/add/Program
          * Takes in as input:
          * {   "Program" : {
@@ -445,41 +445,74 @@ namespace backend_api.Controllers
         [Route("Program")]
         public IActionResult PostProgram([FromBody] PostProgramInputModel input)
         {
+            // checking that the number of programs to be created is valid.
+            if (input.Program.NumberOfPrograms <= 0)
+            {
+                return BadRequest("Invalid number of programs to be created");
+            }
             // list to hold the congruent programs that will be added.
             List<Models.Program> Programs = new List<Models.Program>();
 
-            // adding the correct number of programs that was specified 
-            for (int i = 0; i < input.Program.NumberOfPrograms; i++)
+            // list to hold the congruent histories of programs that will be added
+            List<ProgramHistory> programHistories = new List<ProgramHistory>();
+            try
             {
-                var Prog = new Models.Program()
+                // adding the correct number of programs that was specified 
+                for (int i = 0; i < input.Program.NumberOfPrograms; i++)
                 {
-                    ProgramName = input.Program.ProgramName,
-                    ProgramCostPerYear = input.Program.ProgramCostPerYear,
-                    ProgramFlatCost = input.Program.ProgramFlatCost,
-                    ProgramLicenseKey = input.Program.ProgramLicenseKey,
-                    IsLicense = input.Program.IsLicense,
-                    EmployeeId = null,
-                    Description = input.Program.ProgramDescription,
-                    ProgramPurchaseLink = input.Program.ProgramPurchaseLink,
-                    HasPlugIn = false,
-                    IsDeleted = false,
-                    IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false,
-                    DateBought = input.Program.DateBought,
-                    RenewalDate = input.Program.RenewalDate,
-                    MonthsPerRenewal = input.Program.MonthsPerRenewal
-                };
-                // add the individual program to our list to hold the congruent program
-                Programs.Add(Prog);
+                    var Prog = new Models.Program()
+                    {
+                        ProgramName = input.Program.ProgramName,
+                        ProgramCostPerYear = input.Program.ProgramCostPerYear,
+                        ProgramFlatCost = input.Program.ProgramFlatCost,
+                        ProgramLicenseKey = input.Program.ProgramLicenseKey,
+                        IsLicense = input.Program.IsLicense,
+                        EmployeeId = null,
+                        Description = input.Program.ProgramDescription,
+                        ProgramPurchaseLink = input.Program.ProgramPurchaseLink,
+                        HasPlugIn = false,
+                        IsDeleted = false,
+                        IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false,
+                        DateBought = input.Program.DateBought,
+                        RenewalDate = input.Program.RenewalDate,
+                        MonthsPerRenewal = input.Program.MonthsPerRenewal
 
+                    };
+
+                    // add the individual program to our list to hold the congruent program
+                    Programs.Add(Prog);
+
+                }
+                // Save multiple entities at once.
+                _context.Program.AddRange(Programs);
+                _context.SaveChanges();
+
+                // now that the programs have been added to the database, now we can generate the program history entries
+                // for the programs we just added
+                foreach (var prog in _context.Program.Where(x => x.ProgramName == input.Program.ProgramName))
+                {
+                    var History = (new ProgramHistory
+                    {
+                        EmployeeId = null,
+                        ProgramId = prog.ProgramId,
+                        EventType = "Bought",
+                        EventDate = prog.DateBought.Value
+
+                    });
+                    programHistories.Add(History);
+                }
+                // Save multiple entries at once
+                _context.ProgramHistory.AddRange(programHistories);
+                _context.SaveChanges();
+
+
+                // if we get here then the various fields were created and changed and now we can return 201 created.
+                return StatusCode(201);
             }
-            // Save multiple entities at once.
-            _context.AddRange(Programs);
-            _context.SaveChanges();
-
-
-
-            // if we get here then the various fields were created and changed and now we can return 201 created.
-            return StatusCode(201);
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }
