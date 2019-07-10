@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public partial class Computer
+    public partial class Computer : ISoftDeletable, IAssignable
     {
         public int ComputerId { get; set; }
         public string Cpu { get; set; }
