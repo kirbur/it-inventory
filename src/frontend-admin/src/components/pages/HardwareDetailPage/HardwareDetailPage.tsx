@@ -50,6 +50,9 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([])
     const [commentText, setCommentText] = useState('')
 
+    const [costPerYear, setCostPerYear] = useState(0)
+    const [flatCost, setFlatCost] = useState(0)
+
     useEffect(() => {
         if (match.params.type === 'server') {
             setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
@@ -62,11 +65,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .then((data: any) => {
                     console.log(data)
                     setHeadingInfo([
-                        data[0].server.make,
-                        data[0].server.model,
-                        data[0].server.purchaseDate,
-                        data[0].server.renewalDate,
-                        data[0].server.endOfLife,
+                        'Make: ' + data[0].server.make,
+                        'Model: ' + data[0].server.model,
+                        'Purchase Date: ' + formatDate(data[0].server.purchaseDate),
+                        'Renewal Date: ' + formatDate(data[0].server.renewalDate),
+                        'End of Life: ' + formatDate(data[0].server.endOfLife),
                     ])
                     setFirstTableData([
                         data[0].server.fqdn,
@@ -81,6 +84,9 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         data[0].server.san,
                         data[0].server.localHDD,
                     ])
+                    setCostPerYear(data[0].server.costPerYear)
+                    setFlatCost(data[0].server.flatCost)
+
                     setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].server.location])
                     setCommentText(data[0].server.textField)
                     setHistoryLogEntries(data[0].serverHistory)
@@ -97,11 +103,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .then((data: any) => {
                     console.log(data)
                     setHeadingInfo([
-                        data[0].computer.make,
-                        data[0].computer.model,
-                        data[0].computer.purchaseDate,
-                        data[0].computer.renewalDate,
-                        data[0].computer.endOfLife,
+                        'Make: ' + data[0].computer.make,
+                        'Model: ' + data[0].computer.model,
+                        'Purchase Date: ' + formatDate(data[0].computer.purchaseDate),
+                        'Renewal Date: ' + formatDate(data[0].computer.renewalDate),
+                        'End of Life: ' + formatDate(data[0].computer.endOfLife),
                     ])
                     setFirstTableData([
                         data[0].computer.cpu,
@@ -114,6 +120,9 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         data[0].computer.screenSize,
                         data[0].computer.serialNumber,
                     ])
+                    setCostPerYear(data[0].computer.costPerYear)
+                    setFlatCost(data[0].computer.flatCost)
+
                     setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].computer.location])
                     setCommentText(data[0].computer.textField)
                     setHistoryLogEntries(data[0].computerHistory)
@@ -130,11 +139,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .then((data: any) => {
                     console.log(data)
                     setHeadingInfo([
-                        data[0].monitor.make,
-                        data[0].monitor.model,
-                        data[0].monitor.purchaseDate,
-                        data[0].monitor.renewalDate,
-                        data[0].monitor.endOfLife,
+                        'Make: ' + data[0].monitor.make,
+                        'Model: ' + data[0].monitor.model,
+                        'Purchase Date: ' + formatDate(data[0].monitor.purchaseDate),
+                        'Renewal Date: ' + formatDate(data[0].monitor.renewalDate),
+                        'End of Life: ' + formatDate(data[0].monitor.endOfLife),
                     ])
                     setFirstTableData([
                         data[0].monitor.screenSize,
@@ -144,6 +153,8 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     ])
                     setSecondTableData([])
                     setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD'])
+                    setCostPerYear(data[0].monitor.costPerYear)
+                    setFlatCost(data[0].monitor.flatCost)
                     setCommentText(data[0].monitor.textField)
                     setHistoryLogEntries(data[0].monitorHistory)
                 })
@@ -158,10 +169,16 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
-                    setHeadingInfo([data[0].peripheral.make, data[0].peripheral.model])
+                    setHeadingInfo([
+                        'Make: ' + data[0].peripheral.peripheralName,
+                        'Model: ' + data[0].peripheral.peripheralType,
+                        'Purchase Date: ' + formatDate(data[0].peripheral.purchaseDate),
+                    ])
                     setFirstTableData([data[0].employeeAssignedName, data[0].peripheral.serialNumber])
                     setSecondTableData([])
                     setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD'])
+                    setCostPerYear(data[0].peripheral.costPerYear)
+                    setFlatCost(data[0].peripheral.flatCost)
                     setCommentText(data[0].peripheral.textField)
                     setHistoryLogEntries(data[0].peripheralHistory)
                 })
@@ -175,6 +192,17 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             history.push('/employees')
         }
     }
+
+    // function renderFlatCost() {
+    //     if (flatCost !== undefined || null || 0) {
+    //         return <p>Flat Cost ---------------------- ${flatCost}</p>
+    //     }
+    // }
+    // function renderCostPerYear() {
+    //     if (costPerYear !== undefined || null || 0) {
+    //         return <p>Cost Per Year ------------------ ${costPerYear}</p>
+    //     }
+    // }
 
     return (
         <div className={styles.detailMain}>
@@ -194,7 +222,8 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         {/* <img className={styles.img} src={URL + userData.photo} alt={''} /> */}
                     </div>
                     <div className={styles.costText}>
-                        <p>Cost ---------------------- $ 5000 /month</p>
+                        <p>Flat Cost ---------------------- ${flatCost}</p>
+                        <p>Cost Per Year ---------------- ${costPerYear}</p>
                     </div>
                 </div>
 

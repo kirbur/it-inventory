@@ -49,6 +49,10 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [secondSectionData, setSecondSectionData] = useState<(string | number)[]>([])
     const [thirdSectionData, setThirdSectionData] = useState<(string | number)[]>([])
 
+    const [purchaseDateInput, setPurchaseDateInput] = useState<Date>(new Date())
+    const [renewalDateInput, setRenewalDateInput] = useState<Date>(new Date())
+    const [endOfLifeInput, setEndOfLifeInput] = useState<Date>(new Date())
+
     const [commentText, setCommentText] = useState('')
 
     const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([])
@@ -73,7 +77,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             ])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
             setThirdSectionHeaders(['Employee Assigned', 'Department Assigned', 'Location'])
-            // setFourthSectionHeaders(['Fixed Cost', 'Cost per year'])
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
@@ -91,11 +94,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].server.san,
                         data[0].server.fqdn,
                     ])
-                    setSecondSectionData([
-                        data[0].server.purchaseDate,
-                        data[0].server.renewalDate,
-                        data[0].server.endOfLife,
-                    ])
+                    setSecondSectionData([])
+                    setPurchaseDateInput(data[0].server.purchaseDate)
+                    setRenewalDateInput(data[0].server.renewalDate)
+                    setEndOfLifeInput(data[0].server.endOfLife)
+
                     setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].server.location])
                     setCommentText(data[0].server.textField)
                 })
@@ -129,18 +132,18 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].computer.serialNumber,
                         data[0].computer.fqdn,
                     ])
-                    setSecondSectionData([
-                        data[0].computer.purchaseDate,
-                        data[0].computer.renewalDate,
-                        data[0].computer.endOfLife,
-                    ])
+                    setSecondSectionData([])
+                    setPurchaseDateInput(data[0].computer.purchaseDate)
+                    setRenewalDateInput(data[0].computer.renewalDate)
+                    setEndOfLifeInput(data[0].computer.endOfLife)
+
                     setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].computer.location])
                     setCommentText(data[0].computer.textField)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'monitor') {
             setFirstSectionHeaders(['Make', 'Model', 'Screen Size', 'Resolution', 'Inputs', 'Serial #'])
-            setSecondSectionHeaders([])
+            setSecondSectionHeaders(['Purchase Date', 'Renewal Date'])
             setThirdSectionHeaders(['Employee Assigned', 'Dept Assigned'])
             axios
                 .get(`/detail/monitor/${match.params.id}`)
@@ -155,19 +158,24 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].monitor.serialNumber,
                     ])
                     setSecondSectionData([])
+                    setPurchaseDateInput(data[0].monitor.purchaseDate)
+                    setRenewalDateInput(data[0].monitor.renewalDate)
+
                     setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD'])
                     setCommentText(data[0].monitor.textField)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
             setFirstSectionHeaders(['Employee Assigned', 'Serial #'])
-            setSecondSectionHeaders([])
+            setSecondSectionHeaders(['Purchase Date'])
             setThirdSectionHeaders([])
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
                     setFirstSectionData([data[0].employeeAssignedName, data[0].peripheral.serialNumber])
+                    setPurchaseDateInput(data[0].peripheral.purchaseDate)
+
                     setSecondSectionData([])
                     setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD'])
                     setCommentText(data[0].peripheral.textField)
@@ -187,30 +195,73 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     // make first section
     function renderSection(sectionHeaders: string[], sectionData: any[]) {
         var rows = []
-        for (let i = 0; i < sectionHeaders.length; i += 3) {
-            rows.push(
-                <div className={styles.row}>
-                    {sectionHeaders[i] && (
-                        <div className={styles.inputContainer}>
-                            <div className={styles.inputHeader}>{sectionHeaders[i]}</div>
-                            <input type='text' className={styles.input} placeholder={sectionData[i]}></input>
-                        </div>
-                    )}
-                    {sectionHeaders[i + 1] && (
-                        <div className={styles.inputContainer}>
-                            <div className={styles.inputHeader}>{sectionHeaders[i + 1]}</div>
-                            <input type='text' className={styles.input} placeholder={sectionData[i + 1]}></input>
-                        </div>
-                    )}
-                    {sectionHeaders[i + 2] && (
-                        <div className={styles.inputContainer}>
-                            <div className={styles.inputHeader}>{sectionHeaders[i + 2]}</div>
-                            <input type='text' className={styles.input} placeholder={sectionData[i + 2]}></input>
-                        </div>
-                    )}
-                </div>
-            )
+        if (sectionData == secondSectionData) {
+            for (let i = 0; i < sectionHeaders.length; i += 3) {
+                rows.push(
+                    <div className={styles.row}>
+                        {sectionHeaders[i] && (
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>{sectionHeaders[i]}</div>
+                                <DatePicker
+                                    dateFormat='MM/dd/yyyy'
+                                    selected={new Date(purchaseDateInput)}
+                                    onChange={e => e && setPurchaseDateInput(e)}
+                                    className={styles.input}
+                                />
+                            </div>
+                        )}
+                        {sectionHeaders[i + 1] && (
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>{sectionHeaders[i + 1]}</div>
+                                <DatePicker
+                                    dateFormat='MM/dd/yyyy'
+                                    selected={new Date(renewalDateInput)}
+                                    onChange={e => e && setRenewalDateInput(e)}
+                                    className={styles.input}
+                                />
+                            </div>
+                        )}
+                        {sectionHeaders[i + 2] && (
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>{sectionHeaders[i + 2]}</div>
+                                <DatePicker
+                                    dateFormat='MM/dd/yyyy'
+                                    selected={new Date(endOfLifeInput)}
+                                    onChange={e => e && setEndOfLifeInput(e)}
+                                    className={styles.input}
+                                />
+                            </div>
+                        )}
+                    </div>
+                )
+            }
+        } else {
+            for (let i = 0; i < sectionHeaders.length; i += 3) {
+                rows.push(
+                    <div className={styles.row}>
+                        {sectionHeaders[i] && (
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>{sectionHeaders[i]}</div>
+                                <input type='text' className={styles.input} placeholder={sectionData[i]}></input>
+                            </div>
+                        )}
+                        {sectionHeaders[i + 1] && (
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>{sectionHeaders[i + 1]}</div>
+                                <input type='text' className={styles.input} placeholder={sectionData[i + 1]}></input>
+                            </div>
+                        )}
+                        {sectionHeaders[i + 2] && (
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>{sectionHeaders[i + 2]}</div>
+                                <input type='text' className={styles.input} placeholder={sectionData[i + 2]}></input>
+                            </div>
+                        )}
+                    </div>
+                )
+            }
         }
+
         return <div className={styles.section}>{rows}</div>
     }
 
@@ -318,7 +369,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             <div className={styles.inputContainer}>
                                 <div className={styles.inputHeader}>Date</div>
                                 <DatePicker
-                                    dateFormat='yyyy/MM/dd'
+                                    dateFormat='MM/dd/yyyy'
                                     selected={dateInput}
                                     onChange={e => e && setDateInput(e)}
                                     className={styles.input}
