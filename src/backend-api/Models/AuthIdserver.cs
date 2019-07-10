@@ -7,7 +7,7 @@ namespace backend_api.Models
     public partial class AuthIdserver
     {
         // constuctor 
-        public AuthIdserver( string pActiveDirectoryId, string pRefreshToken, bool pIsAdmin)
+        public AuthIdserver( Guid pActiveDirectoryId, string pRefreshToken, bool pIsAdmin)
         {
             ActiveDirectoryId = pActiveDirectoryId;
             RefreshToken = pRefreshToken;
@@ -17,7 +17,7 @@ namespace backend_api.Models
 
         [Key]
         public int AuthorizationSimpleId { get; set; }
-        public string ActiveDirectoryId { get; set; }
+        public Guid ActiveDirectoryId { get; set; }
         public string RefreshToken { get; set; }
         public bool IsAdmin { get; set; }
     }
