@@ -36,7 +36,7 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
 
     return (
         <div className={styles.formMain}>
-            <Group direction={'row'} justify={'between'}>
+            <Group direction={'row'}>
                 <div className={styles.row1Input}>
                     <div className={styles.inputText}>Purchase Date</div>
                     <DatePicker

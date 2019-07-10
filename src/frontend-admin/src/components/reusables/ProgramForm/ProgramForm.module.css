@@ -74,17 +74,9 @@ input:checked ~ .insideCheckmarkAdmin {
     width: 100%;
 }
 
-.costGroup {
-    flex-wrap: nowrap;
-    width: 30%;
-    padding: 10px 0;
-}
-
-.costInput {
-    width: 100%;
-}
 .inputContainer {
     margin: 15px;
+    margin-left: 0;
     width: 45%;
 }
 
@@ -96,7 +88,7 @@ input:checked ~ .insideCheckmarkAdmin {
 
 .description {
     justify-self: flex-start;
-    width: 97%;
+    width: 98%;
     height: 100px;
     font-family: cqlRegularFont;
     resize: none;
@@ -111,10 +103,10 @@ input:checked ~ .insideCheckmarkAdmin {
 }
 
 .row1Input {
-    width: 50%;
-    margin-bottom: 20px;
+    margin: 15px 40px 15px 0;
 }
 .row2Input {
+    margin: 15px;
+    margin-left: 0;
     width: 30%;
-    margin-bottom: 20px;
 }

@@ -97,6 +97,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 .then((data: any) => {
                     setImgLocation(data[0].programOverview.icon)
                     setNumCopies(data[0].programOverview.countProgOverall)
+                    console.log(data)
 
                     let prog: ITableItem[][] = []
                     data[0].inDivPrograms.map((i: ExpectedProgramType) =>

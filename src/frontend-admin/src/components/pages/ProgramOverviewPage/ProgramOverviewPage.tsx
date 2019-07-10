@@ -84,7 +84,6 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
         axios
             .get(`/detail/ProgramOverview/${match.params.id}`)
             .then((data: any) => {
-                console.log(data)
                 setProgramData(data[0].programOverview)
 
                 let prog: ITableItem[][] = []
