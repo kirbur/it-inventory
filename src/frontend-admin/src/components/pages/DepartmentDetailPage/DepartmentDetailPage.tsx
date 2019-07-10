@@ -208,7 +208,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                     <div className={styles.title}>Department Breakdown</div>
 
                     <DetailPageTable headers={employeeHeaders} rows={employeeRows} setRows={setEmployeeRows} />
-                    {isAdmin && (
+                    {/* {isAdmin && (
                         <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
@@ -238,10 +238,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                 <div />
                             </div>
                         </Button>
-                    )}
+                    )} */}
 
                     <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
-                    {isAdmin && (
+                    {/* {isAdmin && (
                         <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
@@ -271,10 +271,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                 <div />
                             </div>
                         </Button>
-                    )}
+                    )} */}
 
                     <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
-                    {isAdmin && (
+                    {/* {isAdmin && (
                         <Button className={styles.addContainer} icon='add' onClick={() => {}} textInside={false}>
                             <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
                                 <DropdownList
@@ -304,7 +304,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                 <div />
                             </div>
                         </Button>
-                    )}
+                    )} */}
 
                     <div className={styles.line} />
                     <div className={styles.title}>Department Defaults</div>
@@ -318,7 +318,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                 setRows={setDefaultHardware}
                             />
 
-                            <Button
+                            {/* <Button
                                 className={styles.addDefaultContainer}
                                 icon='add'
                                 onClick={() => {}}
@@ -353,7 +353,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                     />
                                     <div />
                                 </div>
-                            </Button>
+                            </Button> */}
                         </div>
                         {/* default software */}
                         <div className={styles.table}>
@@ -362,7 +362,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                 rows={defaultSoftware}
                                 setRows={setDefaultSoftware}
                             />
-                            <Button
+                            {/* <Button
                                 className={styles.addDefaultContainer}
                                 icon='add'
                                 onClick={() => {}}
@@ -397,7 +397,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                     />
                                     <div />
                                 </div>
-                            </Button>
+                            </Button> */}
                         </div>
                     </div>
                     {/* default licenses */}
@@ -409,7 +409,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                 setRows={setDefaultLicenses}
                             />
 
-                            <Button
+                            {/* <Button
                                 className={styles.addDefaultContainer}
                                 icon='add'
                                 onClick={() => {}}
@@ -444,12 +444,13 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                     />
                                     <div />
                                 </div>
-                            </Button>
+                            </Button> */}
                         </div>
                     </div>
-                    <div className={styles.submitContainer}>
+                    {/* <div className={styles.submitContainer}>
                         <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />
                     </div>
+                </div> */}
                 </div>
             </div>
         </div>

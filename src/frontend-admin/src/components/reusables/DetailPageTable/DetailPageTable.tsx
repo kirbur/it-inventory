@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 
 //components
 import ReactTooltip from 'react-tooltip'
+import {MdInfoOutline} from 'react-icons/md'
 
 //styling
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -11,19 +12,27 @@ import styles from './DetailPageTable.module.css'
 import {cloneDeep} from 'lodash'
 import {sortTable} from '../../../utilities/quickSort'
 
+interface ITableItem {
+    value: string
+    id?: string | number
+    sortBy: string | number
+    onClick?: any
+    tooltip?: string
+}
+
 interface ITableProps {
     headers: string[]
-    rows: any[][]
+    rows: ITableItem[][]
     setRows: any
-    onRowClick?: (datum: any) => void
+    // onRowClick?: (datum: any) => void
     style?: string
+    edit?: boolean
+    remove?: any
+    className?: string
 }
 
 export const DetailPageTable = (props: ITableProps) => {
-    const {style, headers, rows, setRows, onRowClick} = props
-    const isClickable = Boolean(onRowClick)
-
-    // const [rows, setRows] = useState(rows)
+    const {style, headers, rows, setRows, edit = false, remove, className = ''} = props
 
     //initialize all the header states and styling to be not sorted
     const headerStates = []
@@ -42,7 +51,7 @@ export const DetailPageTable = (props: ITableProps) => {
     const [sortState, setSortState] = useState(initHardwareState)
 
     function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
+        if (sortState.headerStateCounts[index] === 0) {
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({
@@ -50,7 +59,7 @@ export const DetailPageTable = (props: ITableProps) => {
                 headerStateCounts: tempHeaderStateCounts,
             })
             tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
+        } else if (sortState.headerStateCounts[index] === 1) {
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({
@@ -62,6 +71,7 @@ export const DetailPageTable = (props: ITableProps) => {
     }
 
     var renderedHeaders = []
+    edit && renderedHeaders.push(<td className={styles.deleteRow}></td>)
     for (let i = 0; i < headers.length; i++) {
         let header = (
             <td
@@ -80,61 +90,52 @@ export const DetailPageTable = (props: ITableProps) => {
         renderedHeaders.push(header)
     }
 
-    function deleteSummin(value: any) {
-        //nothing for now
-    }
-    const toolTip = (row: any[], index: number) => {
-        if (row[row.length - 1] === '' || row.length === 2) {
-            return <td className={styles.rowData}>{row[index]}</td>
-        } else {
-            return (
-                <td className={styles.rowData}>
-                    {/* {row[row.length - 1] === '' ? row[index] : styles.rowTitle} */}
-                    <a data-tip={row[row.length - 1]} className={styles.rowTitle}>
-                        {row[index]}
-                    </a>
-                    <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
-                </td>
-            )
-        }
-    }
-
     var renderedRows: any[] = []
     rows.forEach(row => {
         const transformedRow: any[] = []
-        for (let i = 1; i < headers.length + 1; i++) {
-            if (headers[i - 1] === 'Cost') {
-                transformedRow[i] = <td className={styles.rowData}>${row[i]}</td>
-            } else if (headers[i - 1] === 'Hardware') {
-                transformedRow[i] = toolTip(row, i)
-            } else if (headers[i - 1] === 'Monthly Cost') {
-                transformedRow[i] = <td className={styles.rowData}>${row[i]} /month</td>
-            } else {
-                transformedRow[i] = <td className={styles.rowData}>{row[i]}</td>
-            }
+        var start = 0
+        if (edit) {
+            start = 1
+            transformedRow[0] = (
+                <td onClick={e => remove(row)} className={styles.deleteRow}>
+                    <div className={styles.delete} />
+                    <div className={styles.whiteLine} />
+                </td>
+            )
+        }
+        for (let i = 0; i < headers.length; i++) {
+            var click = row[i].onClick ? styles.clickable : ''
+            transformedRow[i + start] = row[i].tooltip ? (
+                <td
+                    className={s(styles.rowData, click)}
+                    onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
+                >
+                    <a data-tip={row[i].tooltip} className={row[i].tooltip === '' ? '' : styles.rowTitle}>
+                        {row[i].value}
+                        <MdInfoOutline size={15} />
+                    </a>
+                    <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
+                </td>
+            ) : (
+                <td
+                    className={s(styles.rowData, click)}
+                    onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
+                >
+                    {rows[0] && row[i].value}
+                </td>
+            )
         }
         renderedRows.push(transformedRow)
     })
     return (
-        <table className={s(styles.table, isClickable && styles.clickable)}>
+        <table className={s(styles.table, /*isClickable &&*/ styles.clickable, className)}>
             <thead>
                 <tr className={styles.header}>{renderedHeaders.map(header => header)}</tr>
             </thead>
 
             <tbody>
                 {renderedRows.map((row, i) => (
-                    <tr
-                        className={s(style, styles.tr, isClickable && styles.clickable)}
-                        onClick={
-                            onRowClick
-                                ? e => {
-                                      onRowClick(rows[i][0])
-                                  }
-                                : undefined
-                        }
-                    >
-                        {row}
-                    </tr>
+                    <tr className={s(style, styles.tr, /* isClickable &&*/ styles.clickable)}>{row}</tr>
                 ))}
             </tbody>
         </table>
