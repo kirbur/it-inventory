@@ -1,29 +1,23 @@
 .columns {
+    margin: 0 50px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
 }
+
 .firstColumn {
-    min-width: 300px;
-    padding: 25px;
-    padding-right: 75px;
+    padding: 50px;
 }
+
 .secondColumn {
-    min-width: 700px;
-    padding: 25px;
-    padding-top: 100px;
+    padding: 50px;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
-.row {
-    display: flex;
-    flex-direction: row;
-}
 
-.backButton {
-    margin-bottom: 50px;
-}
+/*First Column*/
 .imgPadding {
     padding: 25px;
     background-color: #f4f4f4;
@@ -49,19 +43,27 @@
     top: 50px;
     transform: scale(1.5, 1.5);
 }
+
+/*Second Column*/
 .title {
     text-align: left;
     font-size: 24px;
+    padding-bottom: 25px;
 }
+
 .paddingTop {
     padding-top: 50px;
 }
-.paddingBottom {
-    padding-bottom: 25px;
-}
+
 .paddingRight {
     padding-right: 50px;
 }
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
 .line {
     border-bottom: 2px solid #a5a5a5;
     width: 100%;
@@ -179,8 +181,9 @@ input:checked ~ .insideCheckmarkAdmin {
 }
 
 .employeeDepartment {
+    max-width: 900px;
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
 }
 .deptIcon {
     width: 75px;
@@ -245,30 +248,6 @@ input:checked ~ .insideCheckmarkAdmin {
     width: 200px;
     height: 35px;
 }
-.submitButton:hover {
-    background-color: #009eff;
-    cursor: pointer;
-}
-.submitButton:hover .personIcon {
-    color: white;
-}
-.submitButton:hover .submitText {
-    color: white;
-}
-.submitText {
-    color: #009eff;
-    font-size: 24px;
-}
-.personIcon {
-    color: #009eff;
-    transform: scale(1.5, 1.5);
-    position: relative;
-    left: 10px;
-}
-
-.submitbutton {
-    width: 200px;
-}
 
 /*dropdown styles*/
 .dropdownTitle {
@@ -282,6 +261,11 @@ input:checked ~ .insideCheckmarkAdmin {
 .addContainer {
     margin: 5px 0 15px;
     align-self: flex-end;
+}
+
+.dropdownList {
+    max-height: 200px;
+    overflow-y: scroll;
 }
 
 /*Employee Dropdown Style*/
@@ -303,4 +287,16 @@ input:checked ~ .insideCheckmarkAdmin {
 
 .employeeDropdownArrow {
     top: 14px;
+}
+
+.dropdown1 {
+    z-index: 1;
+}
+
+.dropdown2 {
+    z-index: 2;
+}
+
+.dropdown3 {
+    z-index: 3;
 }

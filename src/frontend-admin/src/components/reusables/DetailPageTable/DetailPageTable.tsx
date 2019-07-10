@@ -26,13 +26,13 @@ interface ITableProps {
     setRows: any
     // onRowClick?: (datum: any) => void
     style?: string
+    edit?: boolean
+    remove?: any
+    className?: string
 }
 
 export const DetailPageTable = (props: ITableProps) => {
-    const {style, headers, rows, setRows} = props
-    // const isClickable = Boolean(onRowClick)
-
-    // const [rows, setRows] = useState(rows)
+    const {style, headers, rows, setRows, edit = false, remove, className = ''} = props
 
     //initialize all the header states and styling to be not sorted
     const headerStates = []
@@ -51,7 +51,7 @@ export const DetailPageTable = (props: ITableProps) => {
     const [sortState, setSortState] = useState(initHardwareState)
 
     function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
+        if (sortState.headerStateCounts[index] === 0) {
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({
@@ -59,7 +59,7 @@ export const DetailPageTable = (props: ITableProps) => {
                 headerStateCounts: tempHeaderStateCounts,
             })
             tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
+        } else if (sortState.headerStateCounts[index] === 1) {
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({
@@ -71,6 +71,7 @@ export const DetailPageTable = (props: ITableProps) => {
     }
 
     var renderedHeaders = []
+    edit && renderedHeaders.push(<td className={styles.deleteRow}></td>)
     for (let i = 0; i < headers.length; i++) {
         let header = (
             <td
@@ -92,16 +93,26 @@ export const DetailPageTable = (props: ITableProps) => {
     var renderedRows: any[] = []
     rows.forEach(row => {
         const transformedRow: any[] = []
+        var start = 0
+        if (edit) {
+            start = 1
+            transformedRow[0] = (
+                <td onClick={e => remove(row)} className={styles.deleteRow}>
+                    <div className={styles.delete} />
+                    <div className={styles.whiteLine} />
+                </td>
+            )
+        }
         for (let i = 0; i < headers.length; i++) {
             var click = row[i].onClick ? styles.clickable : ''
-            transformedRow[i] = row[i].tooltip ? (
+            transformedRow[i + start] = row[i].tooltip ? (
                 <td
                     className={s(styles.rowData, click)}
                     onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
                 >
                     <a data-tip={row[i].tooltip} className={row[i].tooltip === '' ? '' : styles.rowTitle}>
-                        <MdInfoOutline size={15} />
                         {row[i].value}
+                        <MdInfoOutline size={15} />
                     </a>
                     <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
                 </td>
@@ -117,7 +128,7 @@ export const DetailPageTable = (props: ITableProps) => {
         renderedRows.push(transformedRow)
     })
     return (
-        <table className={s(styles.table, /*isClickable &&*/ styles.clickable)}>
+        <table className={s(styles.table, /*isClickable &&*/ styles.clickable, className)}>
             <thead>
                 <tr className={styles.header}>{renderedHeaders.map(header => header)}</tr>
             </thead>
