@@ -18,12 +18,11 @@ import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 interface IHardwareListPageProps {
     history: History
-    match: any
 }
 
 // Primary Component
 export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
-    const {history, match} = props
+    const {history} = props
 
     // state
     const currentList = localStorage.getItem('selectedHW')

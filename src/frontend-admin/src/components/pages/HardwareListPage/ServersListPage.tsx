@@ -22,6 +22,26 @@ import styles from './HardwareListPage.module.css'
 interface IServersListPageProps {
     history: History
 }
+interface IServerData {
+    make: string
+    id: number
+    numberOfCores: number
+    RAM: number
+    renewalDate: string
+    MFGTag: string
+    icon: string
+    model: string
+}
+interface IPulledData {
+    make: string
+    serverId: number
+    numberOfCores: number
+    ram: number
+    renewalDate: string
+    mfg: string
+    icon: string
+    model: string
+}
 
 // Primary Component
 export const ServersListPage: React.SFC<IServersListPageProps> = props => {
@@ -45,15 +65,15 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     useEffect(() => {
         axios
             .get('/list/servers')
-            .then((data: any) => {
+            .then((data: IPulledData[]) => {
                 console.log(data)
-                const servers: any[] = []
-                data.map((i: any) => {
+                const servers: IServerData[] = []
+                data.map((i: IPulledData) => {
                     servers.push({
                         make: format(i.make),
-                        id: format(i.serverId),
-                        numberOfCores: format(i.numberOfCores),
-                        RAM: format(i.ram),
+                        id: i.serverId,
+                        numberOfCores: i.numberOfCores,
+                        RAM: i.ram,
                         renewalDate: formatDate(i.renewalDate),
                         MFGTag: format(i.mfg),
                         icon: i.icon,

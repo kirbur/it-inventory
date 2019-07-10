@@ -22,6 +22,30 @@ import styles from './HardwareListPage.module.css'
 interface ILaptopsListPageProps {
     history: History
 }
+interface ILaptopData {
+    make: string
+    id: number
+    cpu: number
+    ram: number
+    ssd: number
+    assigned: string
+    mfgtag: string
+    icon: string
+    model: string
+}
+interface IPulledData {
+    make: string
+    computerId: number
+    cpu: number
+    ramgb: number
+    ssdgb: number
+    isAssigned: boolean
+    employeeFirstName: string
+    employeeLastName: string
+    mfg: string
+    icon: string
+    model: string
+}
 
 // Primary Component
 export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
@@ -45,18 +69,18 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     useEffect(() => {
         axios
             .get('/list/laptops')
-            .then((data: any) => {
-                const laptops: any[] = []
-                data.map((i: any) => {
+            .then((data: IPulledData[]) => {
+                const laptops: ILaptopData[] = []
+                data.map((i: IPulledData) => {
                     laptops.push({
                         make: format(i.make),
-                        id: format(i.computerId),
-                        cpu: format(i.cpu),
-                        ram: format(i.ramgb),
-                        ssd: format(i.ssdgb),
+                        id: i.computerId,
+                        cpu: i.cpu,
+                        ram: i.ramgb,
+                        ssd: i.ssdgb,
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
                         mfgtag: format(i.mfg),
-                        icon: i.icon,
+                        icon: format(i.icon),
                         model: format(i.model),
                     })
                 })

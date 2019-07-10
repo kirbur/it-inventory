@@ -123,7 +123,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         format(i.id),
                         format(i.name),
                         format(i.licenseKey),
-                        format(Math.round(i.costPerMonth * 100) / 100),
+                        Math.round(i.costPerMonth * 100) / 100,
                         format(i.flatCost),
                     ])
                 )
@@ -136,7 +136,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         format(i.name),
                         format(i.cals),
                         format(i.licenseKey),
-                        format(Math.round(i.costPerMonth * 100) / 100),
+                        Math.round(i.costPerMonth * 100) / 100,
                         format(i.flatCost),
                     ])
                 )

@@ -62,6 +62,7 @@ export function quickSortDescend(low: number, high: number, datumIndex: number, 
 
 //sortTable takes in the data as a matrix as the first parameter and the
 //row index of the value you are comparing as the secodn parameter
+//sort value is the sort state, it tells whether it needs to be sorted as ascending or descending
 export function sortTable(rows: any[][], dataIndex: number, sortValue: number) {
     var tempData = cloneDeep(rows)
 

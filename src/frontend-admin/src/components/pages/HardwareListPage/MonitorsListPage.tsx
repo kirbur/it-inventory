@@ -22,6 +22,27 @@ import styles from './HardwareListPage.module.css'
 interface IMonitorsListPageProps {
     history: History
 }
+interface IMonitorData {
+    make: string
+    id: number
+    screenSize: number
+    resolution: number
+    assigned: string
+    inputs: string
+    icon: string
+    model: string
+}
+interface IPulledData {
+    make: string
+    monitorId: number
+    screenSize: number
+    resolution: number
+    employeeFirstName: string
+    employeeLastName: string
+    inputs: string
+    icon: string
+    model: string
+}
 
 // Primary Component
 export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
@@ -45,14 +66,14 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     useEffect(() => {
         axios
             .get('/list/monitors')
-            .then((data: any) => {
-                const monitors: any[] = []
-                data.map((i: any) => {
+            .then((data: IPulledData[]) => {
+                const monitors: IMonitorData[] = []
+                data.map((i: IPulledData) => {
                     monitors.push({
                         make: format(i.make),
-                        id: format(i.monitorId),
-                        screenSize: format(i.screenSize),
-                        resolution: format(i.resolution),
+                        id: i.monitorId,
+                        screenSize: i.screenSize,
+                        resolution: i.resolution,
                         inputs: format(i.inputs),
                         assigned: format(i.employeeFirstName) + ' ' + i.employeeLastName,
                         icon: i.icon,

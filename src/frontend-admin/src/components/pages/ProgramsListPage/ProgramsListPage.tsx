@@ -105,6 +105,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     useEffect(() => {
         setRows(filteredRows)
     }, [filteredData])
+    console.log(rows)
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -159,7 +160,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                 i === 3 ? (
                     <td
                         onClick={e => {
-                            setRows(sortTable(rows, 4, sortState.headerStateCounts[i]))
+                            setRows(sortTable(rows, 3, sortState.headerStateCounts[i]))
                             sortStates(i)
                         }}
                     >

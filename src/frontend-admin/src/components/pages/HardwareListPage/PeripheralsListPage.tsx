@@ -22,6 +22,23 @@ import styles from './HardwareListPage.module.css'
 interface IPeripheralListPageProps {
     history: History
 }
+interface IPeripheralData {
+    name: string
+    id: number
+    purchaseDate: string
+    assigned: string
+    icon: string
+}
+interface IPulledData {
+    peripheralName: string
+    peripheralType: string
+    peripheralId: number
+    purchaseDate: string
+    isAssigned: boolean
+    employeeFirstName: string
+    employeeLastName: string
+    icon: string
+}
 
 // Primary Component
 export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => {
@@ -44,12 +61,12 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     useEffect(() => {
         axios
             .get('/list/peripherals')
-            .then((data: any) => {
-                const peripherals: any[] = []
-                data.map((i: any) =>
+            .then((data: IPulledData[]) => {
+                const peripherals: IPeripheralData[] = []
+                data.map((i: IPulledData) =>
                     peripherals.push({
                         name: format(i.peripheralName + ' ' + i.peripheralType),
-                        id: format(i.peripheralId),
+                        id: i.peripheralId,
                         purchaseDate: format(i.purchaseDate),
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
                         icon: i.icon,
