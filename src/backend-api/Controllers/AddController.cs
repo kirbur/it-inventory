@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.DirectoryServices.AccountManagement;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Controllers
 {
@@ -480,6 +481,65 @@ namespace backend_api.Controllers
 
             // if we get here then the various fields were created and changed and now we can return 201 created.
             return StatusCode(201);
+        }
+
+        // TODO: monitor prep
+        [HttpGet]
+        [Route("MonitorPrep")]
+        public IActionResult GetMonitorPrep()
+        {
+            return Ok();
+        }
+
+
+        // TODO: Monitor POST
+        
+        [HttpPost]
+        [Route("Monitor")]
+        public IActionResult PostMonitor([FromBody] MonitorInput input)
+        {
+            // Add a monitor input
+            try
+            {
+                Monitor monitor = new Monitor(input.Monitor);
+                // Change specific values to be hard coded
+
+                _context.Monitor.Add(monitor);
+
+
+                // Add the history for date bought and for assigning an employee.
+
+                DbSet<HardwareHistory> historyDbSet = _context.HardwareHistory;
+                historyDbSet.Add(new HardwareHistory
+                {
+                    EmployeeId = null,
+                    HardwareType = "Monitor",
+                    EventType = "Bought",
+                    EventDate = input.Monitor.PurchaseDate,
+                });
+
+                // Assigning employee
+                int? EmployeeId = input.Monitor.EmployeeId;
+                if (EmployeeId != null)
+                {
+                    historyDbSet.Add(new HardwareHistory
+                    {
+                        EmployeeId = EmployeeId,
+                        HardwareType = "Monitor",
+                        EventType = "Assigned",
+                        EventDate = DateTime.Now,
+                    });
+                }
+
+                _context.SaveChanges();
+
+                return StatusCode(201);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(error: e);
+                return BadRequest(error: e.Message);
+            }
         }
     }
 }
