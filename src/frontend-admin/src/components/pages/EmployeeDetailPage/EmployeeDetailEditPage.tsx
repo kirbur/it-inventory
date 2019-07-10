@@ -500,13 +500,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleSubmit = () => {
-        //TODO: post request
-        //everything in every removed array needs to be unassigned
-        //everything in every added array needs to be assigned
+        /*ADD NEW EMPLOYEE */
 
-        //If this is a new employee
-        //make sure no inputs are null/undefined/empty
         if (
+            //make sure no inputs are null/undefined/empty
             match.params.id === 'new' &&
             deptInput &&
             selectedEmployee.name !== 'Select An Employee' &&
@@ -558,7 +555,82 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             window.alert(msg)
         }
 
-        //post image
+        //TODO: post request
+        //everything in every removed array needs to be unassigned
+        //everything in every added array needs to be assigned
+
+        /*UPDATE EMPLOYEE */
+        if (
+            //make sure no inputs are null/undefined/empty
+
+            deptInput &&
+            selectedEmployee.name &&
+            roleInput
+        ) {
+            var name = selectedEmployee.name.split(' ')
+            var updateEmployee = {
+                Employee: {
+                    FirstName: name[0],
+                    LastName: name[1],
+                    HireDate: dateInput.toISOString(),
+                    Role: roleInput,
+                    DepartmentID: deptInput.departmentId,
+                    IsAdmin: adminInput,
+                },
+                HardwareAssigned: [
+                    ...hardwareRows.added.map(i => {
+                        var hw = i[0].id.split('/')
+                        return {Type: hw[0], ID: hw[1]}
+                    }),
+                ],
+                ProgramAssigned: [
+                    ...softwareRows.added.map(i => {
+                        return {ID: i[0].id}
+                    }),
+                    ...licenseRows.added.map(i => {
+                        return {ID: i[0].id}
+                    }),
+                ],
+
+                HardwareRemoved: [
+                    ...hardwareRows.removed.map(i => {
+                        var hw = i[0].id.split('/')
+                        return {Type: hw[0], ID: hw[1]}
+                    }),
+                ],
+                ProgramRemoved: [
+                    ...softwareRows.removed.map(i => {
+                        return {ID: i[0].id}
+                    }),
+                    ...licenseRows.removed.map(i => {
+                        return {ID: i[0].id}
+                    }),
+                ],
+            }
+
+            //TODO: verify this endpoint is right, and that updateEmployee is formatted correctly
+            axios
+                .put(`/update/Employee/${match.params.id}`, updateEmployee)
+                .then((response: any) => {
+                    if (response && response.status === 201) {
+                        window.alert(`${selectedEmployee.name} was successfully updated!`)
+                    }
+                })
+                .catch((err: any) => {
+                    window.alert(`Something went wrong`)
+                    console.error(err)
+                })
+        } else {
+            //one or maore of the inputs was null/undefined/empty
+            var msg = 'Failed because:\n'
+
+            msg += selectedEmployee.name === ('' || ' ') ? 'Name feild is empty,' : ''
+            msg += roleInput === '' ? 'Role feild is empty,' : ''
+
+            window.alert(msg)
+        }
+
+        /*CHANGE IMAGE */
         if (imgInput) {
             var formData = new FormData()
             formData.append('file', imgInput)
@@ -570,10 +642,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 .then(data => console.log(data))
                 .catch(err => console.error(err))
         }
-
-        // if (window.confirm('Finished Editing?')) {
-        //     history.push(`/employees/${match.params.id}`)
-        // }
     }
 
     const displayTable = (rows: any, type: string) => {
