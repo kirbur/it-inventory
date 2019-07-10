@@ -67,7 +67,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
                     swCost: Math.round(data[0].totalProgramCostMonthly * 100) / 100,
                 }
-                console.log(data)
+
                 setUserData(user)
 
                 let hw: any[] = []
