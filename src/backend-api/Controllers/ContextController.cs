@@ -87,5 +87,14 @@ namespace backend_api.Controllers
             return ListOfEmployees;
         }
 
+        /* GetClassName(obj) returns the name of the class object
+         *   as a string at runtime.
+         */
+        public string GetClassName<T>(T obj)
+            where T : class
+        {
+            return obj.GetType().Name;
+        }
+
     }
 }

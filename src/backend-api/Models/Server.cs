@@ -3,7 +3,7 @@ using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public partial class Server : IAssignable, ISoftDeletable
+    public partial class Server : IHardwareBase
     {
         public int ServerId { get; set; }
         public string Fqdn { get; set; }
@@ -29,6 +29,8 @@ namespace backend_api.Models
         public string Location { get; set; }
         public string SerialNumber { get; set; }
         public int? MonthsPerRenewal { get; set; }
+
+        public int GetId() { return ServerId; }
 
         // public Employee Employee { get; set; }
     }

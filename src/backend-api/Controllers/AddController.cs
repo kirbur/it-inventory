@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using backend_api.Models;
+using backend_api.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.DirectoryServices.AccountManagement;
 using Newtonsoft.Json.Linq;
@@ -552,69 +551,111 @@ namespace backend_api.Controllers
                 }
          * Return: 201 created if successful, and 400 bad request if not.
          */
-        // TODO: Make this generic
         [HttpPost]
         [Route("Monitor")]
         public IActionResult PostMonitor([FromBody] MonitorInput input)
         {
-            // Add a monitor input
+            return PostHardware(input.Monitor, _context.Monitor);
+        }
+
+        /* POST: api/add/server
+         * Method will add a server row to the server table with the specified
+         *   attribute values if they are valid and will add the appropriate hardware history.
+         * Input format:
+                {
+	                "Server" : 
+	                {
+		                "Fqdn" : string?,
+		                "NumberOfCores" : int?,
+		                "OperatingSystem" : string?,
+		                "Ram" : int?,
+		                "Virtualize" : bool,
+		                "RenewalDate" : string? (formatted yyyy-mm-dd),
+		                "EmployeeId" : int?,
+		                "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		                "FlatCost" : decimal?,
+		                "EndOfLife" : string? (formatted yyyy-mm-dd),
+		                "TextField" : string?,
+		                "CostPerYear" : decimal?,
+		                "MFG" : string?,
+		                "Make" : string?,
+		                "Model" : string?,
+		                "IPAddress" : string?,
+		                "SAN" : string?,
+		                "LocalHHD" : string?,
+		                "Location" : "xx"? (either GR or AA),
+		                "SerialNumber" : string?,
+		                "MonthsPerRenewal" : int?,
+	                }
+                }
+         * Method will add a server row to the server table with the specified
+         *   attribute values if they are valid and will add the appropriate hardware history.
+         * Return: 201 created if successful, and 400 bad request if not.
+         */
+        [HttpPost]
+        [Route("Server")]
+        public IActionResult PostServer([FromBody] ServerInput input)
+        {
+            return PostHardware(input.Server, _context.Server);
+        }
+
+        /* PostHardware<T>(hardware, table) is a method to post any hardware type 
+         *   to it's corresponding table and add hardware history.
+         * Return: 201 created if successful, and 400 bad request if not.
+         */
+        private IActionResult PostHardware<T>(T hardware, DbSet<T> table)
+            where T : class, IHardwareBase
+        {
+            int? EmployeeId = hardware.EmployeeId;
+
+            // Update values we don't want touched by the endpoint call.
+            hardware.IsAssigned = EmployeeId != null ? true : false;
+            hardware.IsDeleted = false;
+
+            // Get class name at runtime
+            string type = GetClassName(hardware);
+
             try
             {
-                Monitor mn = input.Monitor;
-                int? EmployeeId = mn.EmployeeId;
+                table.Add(hardware);
 
-                // Create the monitor entity to add
-                Monitor monitor = new Monitor()
-                {
-                    Make = mn.Make,
-                    Model = mn.Model,
-                    Resolution = mn.Resolution,
-                    Inputs = mn.Inputs,
-                    EmployeeId = EmployeeId,
-                    TextField = mn.TextField,
-                    PurchaseDate = mn.PurchaseDate,
-                    FlatCost = mn.FlatCost,
-                    CostPerYear = mn.CostPerYear,
-                    ScreenSize = mn.ScreenSize,
-                    Mfg = mn.Mfg,
-                    RenewalDate = mn.RenewalDate,
-                    Location = mn.Location,
-                    SerialNumber = mn.SerialNumber,
-                    MonthsPerRenewal = mn.MonthsPerRenewal,
+                // Save the changes to db so given Id can be accessed.
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return BadRequest($"Problem saving new {type} entity to the database");
+            }
 
-                    // Values we don't want touched by the endpoint call.
-                    IsAssigned = EmployeeId != null ? true : false,
-                    IsDeleted = false,
-                };
-                _context.Monitor.Add(monitor);
+            int id = hardware.GetId();
 
-                // Save the changes to db so MonitorId can be accessed.
-                _context.SaveChanges(); 
-
+            try
+            {
                 // Add the history for date bought and for assigning an employee.
-                UpdateHardwareHistory(null, "Monitor", monitor.MonitorId, "Bought", input.Monitor.PurchaseDate);
+                // If the PurchaseDate is null, then use the current date and time.
+                UpdateHardwareHistory(null, type, id, "Bought", hardware.PurchaseDate != null ? hardware.PurchaseDate : DateTime.Now);
 
                 // Add history for assigning employee
                 if (EmployeeId != null)
                 {
-                    UpdateHardwareHistory(EmployeeId, "Monitor", monitor.MonitorId, "Assigned", DateTime.Now);
+                    UpdateHardwareHistory(EmployeeId, type, id, "Assigned", DateTime.Now);
                 }
 
                 _context.SaveChanges();
-
-                return StatusCode(201);
             }
-            catch (Exception e)
+            catch
             {
-                return BadRequest(error: e);
-                return BadRequest(error: e.Message);
+                return BadRequest($"New {type} entity was created but there was an issue creating history for the entity");
             }
+
+            // If we make it here, everything must have succeeded
+            return StatusCode(201);
         }
 
         /* UpdateHardwareHistory(empId, hardwareType, hardwareId, eventType, date) will add an entry into the 
          *   hardware history table.
          */
-         // TODO: Abstract this
+        // TODO: Abstract this
         private void UpdateHardwareHistory(int? empId, string hardwareType, int hardwareId, string eventType, DateTime? date)
         {
             _context.HardwareHistory.Add(new HardwareHistory

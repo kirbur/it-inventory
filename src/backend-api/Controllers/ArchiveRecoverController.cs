@@ -142,13 +142,13 @@ namespace backend_api.Controllers
          * Return: IActionResult 200 if updated. Else, 400 bad request. 
          */
         private IActionResult ArchiveRecoverHardware<T>(DbSet<T> dbSet, bool isDeleted, int id)
-            where T : class, ISoftDeletable, IAssignable
+            where T : class, IHardwareBase
         {
             // Find hardware entity by ID.
             var hardware = dbSet.Find(id);
 
             // Find type name at runtime
-            string type = hardware.GetType().Name;
+            string type = GetClassName(hardware);
 
             // Make sure hardware is not null
             if (hardware != null)
@@ -166,7 +166,7 @@ namespace backend_api.Controllers
          * Return IActionResult 400 if the IsDeleted states are the same.
          */
         private IActionResult CheckEntityDeletedState<T>(T hardware, bool isDeleted, int id, string type)
-            where T : class, ISoftDeletable, IAssignable
+            where T : class, IHardwareBase
         {
             if (hardware.IsDeleted == isDeleted)
             {
@@ -183,7 +183,7 @@ namespace backend_api.Controllers
          * Return IActionResult 200 if the updating works and 400 if there is an error.
          */
         private IActionResult TryUpdatingHardware<T>(T hardware, bool isDeleted, int id, string type)
-            where T : class, ISoftDeletable, IAssignable
+            where T : class, IHardwareBase
         {
             try
             {
@@ -204,7 +204,7 @@ namespace backend_api.Controllers
          *   parameter passed.
          */
         private void UpdateHardwareEntity<T>(T hardware, bool isDeleted)
-            where T : class, ISoftDeletable, IAssignable
+            where T : class, IHardwareBase
         {
             if (!isDeleted && hardware.EmployeeId != null)
             {
@@ -222,7 +222,7 @@ namespace backend_api.Controllers
          *   table recording the change to the hardware entity.
          */
         private void UpdateHardwareHistory<T>(T hardware, bool isDeleted, int id, string type)
-            where T : class, ISoftDeletable, IAssignable
+            where T : class, IHardwareBase
         {
             // Update the history: Archive or Recover
             _context.HardwareHistory.Add(new HardwareHistory
