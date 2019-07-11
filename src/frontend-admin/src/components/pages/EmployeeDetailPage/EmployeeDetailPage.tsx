@@ -98,7 +98,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         },
                         {value: format(i.licenseKey), id: format(i.id), sortBy: i.licenseKey},
                         {
-                            value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
+                            value: '$' + Math.round(i.costPerMonth * 100) / 100,
                             id: format(i.id),
                             sortBy: i.costPerMonth,
                         },
@@ -121,7 +121,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                             sortBy: format(i.licenseKey),
                         },
                         {
-                            value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
+                            value: '$' + Math.round(i.costPerMonth * 100) / 100,
                             sortBy: i.costPerMonth,
                         },
                         {value: format(i.cals), id: format(i.id), sortBy: i.cals},

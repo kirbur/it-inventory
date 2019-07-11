@@ -62,6 +62,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
         axios
             .get('/list/peripherals')
             .then((data: IPulledData[]) => {
+                console.log(data)
                 const peripherals: IPeripheralData[] = []
                 data.map((i: IPulledData) =>
                     peripherals.push({
@@ -114,7 +115,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     useEffect(() => {
         setRows(filteredRows)
     }, [filteredData])
-
+    console.log(rows)
     //-------------- this will all be the same -------------
     const headerStates = []
     const headerStateCounts = []
@@ -204,9 +205,9 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                 case 0:
                     transformedRow[0] = concatenatedName(row)
                 case 1:
-                    transformedRow[2] = <td className={styles.alignLeft}>{formatDate(row[2])}</td>
+                    transformedRow[1] = <td className={styles.alignLeft}>{formatDate(row[2])}</td>
                 case 2:
-                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]}</td>
             }
         }
 
