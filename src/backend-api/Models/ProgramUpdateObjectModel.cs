@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace backend_api.Models
 {
-    public class ProgramObjectModel
+    public class ProgramUpdateObjectModel
     {
-        public ProgramObjectModel() { }
-        public int NumberOfPrograms { get; set; }
-        public string ProgramName { get; set; }
+        public ProgramUpdateObjectModel() { }
+        public string OldProgramName { get; set; }
+        public string NewProgramName { get; set; }
         public decimal ProgramCostPerYear { get; set; }
         public decimal ProgramFlatCost { get; set; }
         public string ProgramLicenseKey { get; set; }
@@ -19,6 +19,5 @@ namespace backend_api.Models
         public DateTime DateBought { get; set; }
         public DateTime? RenewalDate { get; set; }
         public int? MonthsPerRenewal { get; set; }
-        public int? EmployeeId { get; set; }
     }
 }
