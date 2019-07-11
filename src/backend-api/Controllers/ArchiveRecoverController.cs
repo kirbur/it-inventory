@@ -147,8 +147,9 @@ namespace backend_api.Controllers
             // Find hardware entity by ID.
             var hardware = dbSet.Find(id);
 
-            // Find type name at runtime
-            string type = GetClassName(hardware);
+            // Gets the name of the type T in DbSet<T> at runtime
+            string type = dbSet.GetType().GetGenericArguments()
+                .Single().Name;
 
             // Make sure hardware is not null
             if (hardware != null)
