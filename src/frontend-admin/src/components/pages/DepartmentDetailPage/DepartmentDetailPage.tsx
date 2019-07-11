@@ -21,6 +21,7 @@ import {LoginContext} from '../../App/App'
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {async} from 'q'
 
 // Types
 interface IDepartmentDetailPageProps {
@@ -169,10 +170,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
-    const handleArchive = () => {
+    async function handleArchive() {
         if (window.confirm(`Are you sure you want to archive ${deptData.departmentName}?`)) {
-            //TODO: a post request to archive user w/ id match.params.id
-            history.push('/employees')
+            await axios.put(`archive/department/${match.params.id}`, {})
+            history.push('/departments')
         }
     }
 

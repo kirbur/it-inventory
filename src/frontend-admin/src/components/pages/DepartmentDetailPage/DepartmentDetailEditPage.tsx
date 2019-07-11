@@ -168,6 +168,8 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
         setLicenseRows(tempArray)
     }
 
+    //takes in the array of array of objects (type:Defaults) and returns
+    //an array of strings to send to the database
     function formatForPost(rows: Defaults[][]) {
         let tempArray: string[] = []
         console.log(rows)
@@ -176,20 +178,32 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
         }
         return tempArray
     }
-    const handleSubmit = () => {
+    async function handleSubmit() {
         let newDefaultHardware = formatForPost(hardwareRows)
         let newDefaultSoftware = formatForPost(softwareRows)
         let newDefaultLicenses = formatForPost(licenseRows)
-        axios.put(`update/department`, {
-            DefaultHardware: {DefaultHardware: newDefaultHardware},
-            DefaultPrograms: {
-                license: newDefaultLicenses,
-                software: newDefaultSoftware,
-            },
-            name: deptData.departmentName,
-            ID: match.params.id,
-        })
-        history.push(`/departments/${match.params.id}`)
+        if (match.params.id === 'new') {
+            await axios.post(`add/department`, {
+                DefaultHardware: {DefaultHardware: newDefaultHardware},
+                DefaultPrograms: {
+                    license: newDefaultLicenses,
+                    software: newDefaultSoftware,
+                },
+                name: deptData.departmentName,
+            })
+            history.push('/departments')
+        } else {
+            await axios.put(`update/department`, {
+                DefaultHardware: {DefaultHardware: newDefaultHardware},
+                DefaultPrograms: {
+                    license: newDefaultLicenses,
+                    software: newDefaultSoftware,
+                },
+                name: deptData.departmentName,
+                ID: match.params.id,
+            })
+            history.push(`/departments/${match.params.id}`)
+        }
     }
 
     return (
