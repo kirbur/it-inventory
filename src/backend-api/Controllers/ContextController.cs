@@ -76,7 +76,7 @@ namespace backend_api.Controllers
             List<object> ListOfEmployees = new List<object>();
             foreach (var emp in _context.Employee.Where(x => x.IsDeleted == false).ToList())
             {
-                var employeeName = emp.FirstName + " " + emp.LastName;
+                string employeeName = emp.FirstName + " " + emp.LastName;
                 var employee = new
                 {
                     employeeName,

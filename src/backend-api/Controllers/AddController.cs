@@ -16,14 +16,9 @@ namespace backend_api.Controllers
     // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class AddController : ControllerBase
+    public class AddController : ContextController
     {
-        private readonly ITInventoryDBContext _context;
-
-        public AddController(ITInventoryDBContext context)
-        {
-            _context = context;
-        }
+        public AddController(ITInventoryDBContext context) : base(context) { }
 
         /* GET: api/add/employeePrep
          * Returns [ {
@@ -483,12 +478,20 @@ namespace backend_api.Controllers
             return StatusCode(201);
         }
 
-        // TODO: monitor prep
+        /* GET: api/add/hardwarePrep
+         * Returns: [ {
+         *              employeeName: string,
+         *              employeeId: int,
+         *             } ,.. ]
+         * Will return an array of objects with the employee name and
+         *   id for every non-archived employee to be used when assigning 
+         *   a piece of hardware.
+         */
         [HttpGet]
-        [Route("MonitorPrep")]
+        [Route("HardwarePrep")]
         public IActionResult GetMonitorPrep()
         {
-            return Ok();
+            return Ok(ListOfEmployees());
         }
 
 

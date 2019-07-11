@@ -3,6 +3,7 @@ using backend_api.Helpers;
 
 namespace backend_api.Models
 {
+    // Everything except for the MonitorId.
     public interface IMonitorBase
     {
         string Make { get; set; }
@@ -25,9 +26,10 @@ namespace backend_api.Models
     }
     public partial class Monitor : IAssignable, ISoftDeletable, IMonitorBase
     {
+        public Monitor() { }
         public Monitor(IMonitorBase mn)
         {
-            // TODO: Can call another constructor to assign the things of the same names.
+            // TODO: I feel like there has to be a better way to do this.
             Make = mn.Make;
             Model = mn.Model;
             Resolution = mn.Resolution;
@@ -46,8 +48,6 @@ namespace backend_api.Models
             SerialNumber = mn.SerialNumber;
             MonthsPerRenewal = mn.MonthsPerRenewal;
         }
-
-        public Monitor() { }
 
         public int MonitorId { get; set; }
         public string Make { get; set; }

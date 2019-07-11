@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace backend_api.Controllers
 {
     // [Authorize]
-    [Route("api/detail")]
+    [Route("api/[controller]")]
     [ApiController]
     public class DetailController : ContextController
     {
