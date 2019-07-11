@@ -246,7 +246,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         return (
-            <td key={row[8]} className={styles.employees}>
+            <td key={row[7]} className={styles.employees}>
                 <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
