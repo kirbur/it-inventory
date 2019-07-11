@@ -42,12 +42,6 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     const [progRows, setProgRows] = useState<any[]>([])
     const progHeaders = ['License Key', 'Purchase Link']
 
-    const [historyInput, setHistoryInput] = useState<{date: Date; event: string; user: number}>({
-        date: new Date(),
-        event: 'Broken',
-        user: -1,
-    })
-
     useEffect(() => {
         axios
             .get(`/detail/program/${match.params.id}`)
@@ -57,15 +51,14 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     name: data[0].programName,
                     dateBought: formatDate(data[0].dateBought),
                     description: format(data[0].description),
-                    employee: format(data[0].employeeName),
-                    employeeId: format(data[0].employeeId),
+                    employee: data[0].employeeName,
+                    employeeId: data[0].employeeId,
                     icon: format(data[0].picture),
                     renewalDate: formatDate(data[0].renewalDate),
                     isCostPerYear: data[0].isCostPerYear,
                     flatCost: data[0].programFlatCost,
                     costPerYear: data[0].programCostPerYear,
                 })
-                setHistoryInput({...historyInput, user: data[0].employeeId})
                 setProgRows([
                     [
                         {value: format(data[0].programLicenseKey ? data[0].programLicenseKey : '-')},
@@ -154,7 +147,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         <div className={styles.programName}>{progData.name}</div>
                         <div className={styles.programText}>Renewal Date: {progData.renewalDate}</div>
                         <div className={styles.programText}>Purchase Date: {progData.dateBought}</div>
-                        {progData.employee !== '-' && (
+                        {progData.employeeId !== -1 && (
                             <div className={s(styles.programText, styles.assignedTo)}>
                                 Assigned to{' '}
                                 <div

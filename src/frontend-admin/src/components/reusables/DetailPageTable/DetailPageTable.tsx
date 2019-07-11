@@ -129,7 +129,7 @@ export const DetailPageTable = (props: ITableProps) => {
             var click = row[i].onClick ? styles.clickable : ''
             transformedRow[i + start] = row[i].tooltip ? (
                 <td
-                    key={JSON.stringify(row[i])}
+                    key={JSON.stringify(row) + headers[i]}
                     className={s(styles.rowData, row[0].onClick && styles.clickCursor, click)}
                     onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
                 >
@@ -142,7 +142,7 @@ export const DetailPageTable = (props: ITableProps) => {
                 </td>
             ) : (
                 <td
-                    key={JSON.stringify(row[i])}
+                    key={JSON.stringify(row) + headers[i]}
                     className={s(styles.rowData, row[i].onClick && styles.clickCursor, click)}
                     onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
                 >

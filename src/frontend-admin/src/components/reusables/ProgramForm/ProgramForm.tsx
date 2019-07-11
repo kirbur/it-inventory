@@ -12,17 +12,17 @@ import styles from './ProgramForm.module.css'
 
 // Types
 export interface IProgramFormInputs {
-    name: string
-    programName: string
-    description: string
-    cost: number
-    flatCost: number
-    renewalDate: Date
-    monthsPerRenewal: number
-    purchaseDate: Date
-    purchaseLink: string
-    licenseKey: string
-    isLicense: boolean
+    name: {value: string; changed: boolean}
+    programName: {value: string; changed: boolean}
+    description: {value: string; changed: boolean}
+    cost: {value: number; changed: boolean}
+    flatCost: {value: number; changed: boolean}
+    renewalDate: {value: Date; changed: boolean}
+    monthsPerRenewal: {value: number; changed: boolean}
+    purchaseDate: {value: Date; changed: boolean}
+    purchaseLink: {value: string; changed: boolean}
+    licenseKey: {value: string; changed: boolean}
+    isLicense: {value: boolean; changed: boolean}
 }
 
 interface IProgramFormProps {
@@ -41,8 +41,8 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                     <div className={styles.inputText}>Purchase Date</div>
                     <DatePicker
                         dateFormat='MM/dd/yyyy'
-                        selected={state.purchaseDate}
-                        onChange={e => e && setState({...state, purchaseDate: e})}
+                        selected={state.purchaseDate.value}
+                        onChange={e => e && setState({...state, purchaseDate: {value: e, changed: true}})}
                         className={styles.input}
                     />
                 </div>
@@ -50,8 +50,8 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                     <div className={styles.inputText}>Renewal Date</div>
                     <DatePicker
                         dateFormat='MM/dd/yyyy'
-                        selected={state.renewalDate}
-                        onChange={e => e && setState({...state, renewalDate: e})}
+                        selected={state.renewalDate.value}
+                        onChange={e => e && setState({...state, renewalDate: {value: e, changed: true}})}
                         className={styles.input}
                     />
                 </div>
@@ -65,11 +65,11 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         className={s(styles.input, styles.costInput)}
                         type='number'
                         step='0.01'
-                        value={state.flatCost}
+                        value={state.flatCost.value}
                         onChange={cost =>
                             setState({
                                 ...state,
-                                flatCost: parseFloat(cost.target.value),
+                                flatCost: {value: parseFloat(cost.target.value), changed: true},
                             })
                         }
                     />
@@ -80,11 +80,11 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                         className={s(styles.input, styles.costInput)}
                         type='number'
                         step='0.01'
-                        value={state.cost}
+                        value={state.cost.value}
                         onChange={cost =>
                             setState({
                                 ...state,
-                                cost: parseFloat(cost.target.value),
+                                cost: {value: parseFloat(cost.target.value), changed: true},
                             })
                         }
                     />
@@ -94,11 +94,11 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                     <input
                         type='number'
                         className={styles.input}
-                        value={state.monthsPerRenewal}
+                        value={state.monthsPerRenewal.value}
                         onChange={e =>
                             setState({
                                 ...state,
-                                monthsPerRenewal: parseInt(e.target.value),
+                                monthsPerRenewal: {value: parseInt(e.target.value), changed: true},
                             })
                         }
                     />
@@ -112,8 +112,8 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                     <input
                         type='text'
                         className={styles.input}
-                        value={state.licenseKey}
-                        onChange={e => setState({...state, licenseKey: e.target.value})}
+                        value={state.licenseKey.value}
+                        onChange={e => setState({...state, licenseKey: {value: e.target.value, changed: true}})}
                     />
                 </div>
 
@@ -122,8 +122,8 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                     <input
                         type='text'
                         className={styles.input}
-                        value={state.purchaseLink}
-                        onChange={e => setState({...state, purchaseLink: e.target.value})}
+                        value={state.purchaseLink.value}
+                        onChange={e => setState({...state, purchaseLink: {value: e.target.value, changed: true}})}
                     />
                 </div>
             </Group>
@@ -131,8 +131,8 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                 <div className={styles.inputText}>Description</div>
                 <textarea
                     className={s(styles.input, styles.description)}
-                    value={state.description}
-                    onChange={e => setState({...state, description: e.target.value})}
+                    value={state.description.value}
+                    onChange={e => setState({...state, description: {value: e.target.value, changed: true}})}
                 />
             </div>
 

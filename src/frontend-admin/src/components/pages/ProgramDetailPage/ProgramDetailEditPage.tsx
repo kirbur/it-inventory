@@ -36,14 +36,11 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     const axios = new AxiosService(accessToken, refreshToken)
     const [progData, setProgData] = useState<any>({})
 
-    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'First Last', id: 1}])
-    const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>({
-        name: 'Select An Employee',
-        id: -1,
-    })
+    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>()
+    const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>()
 
     //input feild states:
-    const [formState, setFormState] = useState<IProgramFormInputs>()
+    const [programInput, setProgramInput] = useState<IProgramFormInputs>()
     const [imgInput, setImgInput] = useState<File>()
 
     useEffect(() => {
@@ -55,18 +52,23 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     employee: data[0].employeeName,
                 })
 
-                setFormState({
-                    name: data[0].programName,
-                    programName: data[0].programName,
-                    description: data[0].description,
-                    renewalDate: new Date(data[0].renewalDate),
-                    purchaseDate: new Date(data[0].dateBought),
-                    purchaseLink: data[0].programPurchaseLink,
-                    licenseKey: data[0].programLicenseKey,
-                    isLicense: false,
-                    cost: data[0].programCostPerYear,
-                    flatCost: data[0].programFlatCost ? data[0].programFlatCost : 0,
-                    monthsPerRenewal: 0,
+                setProgramInput({
+                    name: {value: data[0].programName, changed: false},
+                    programName: {value: data[0].programName, changed: false},
+                    description: {value: data[0].description, changed: false},
+                    renewalDate: {value: new Date(data[0].renewalDate), changed: false},
+                    purchaseDate: {value: new Date(data[0].dateBought), changed: false},
+                    purchaseLink: {value: data[0].programPurchaseLink, changed: false},
+                    licenseKey: {value: data[0].programLicenseKey ? data[0].programLicenseKey : '', changed: false},
+                    cost: {value: data[0].programCostPerYear, changed: false},
+                    flatCost: {value: data[0].programFlatCost ? data[0].programFlatCost : 0, changed: false},
+                    monthsPerRenewal: {
+                        value: data[0].monthsPerRenewal
+                            ? data[0].monthsPerRenewal
+                            : 1 /*TODO: make sure this is added*/,
+                        changed: false,
+                    },
+                    isLicense: {value: false, changed: false},
                 })
 
                 const employees: any[] = []
@@ -77,13 +79,13 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     })
                 )
                 setEmployeeDropdown(employees)
+                setSelectedEmployee({name: data[0].employeeName, id: data[0].employeeId})
             })
             .catch((err: any) => console.error(err))
     }, [])
 
     const handleSubmit = () => {
-        //TODO: post
-
+        //update image
         if (imgInput) {
             var formData = new FormData()
             formData.append('file', imgInput)
@@ -92,8 +94,28 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                 .put(`/image/program/${match.params.id}`, formData, {
                     headers: {'Content-Type': 'multipart/form-data'},
                 })
-                .then(data => console.log(data))
                 .catch(err => console.error(err))
+        }
+
+        //update program info
+        if (programInput) {
+            var updateProgram = {
+                program: {
+                    ProgramName: progData.name,
+                    ProgramCostPerYear: programInput.cost.value, //TODO: ask if this needs to be calculated to yearly
+                    ProgramFlatCost: programInput.flatCost.value,
+                    ProgramLicenseKey: programInput.licenseKey.value,
+                    ProgramDescription: programInput.description.value,
+                    ProgramPurchaseLink: programInput.purchaseLink.value,
+                    DateBought: programInput.purchaseDate.value.toISOString(),
+                    RenewalDate: programInput.renewalDate.value.toISOString(),
+                    MonthsPerRenewal: programInput.monthsPerRenewal.value,
+                    EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
+                },
+            }
+
+            axios.put(`update/program/${match.params.id}`, updateProgram).catch((err: any) => console.error(err))
+            history.push(`/programs/details/${match.params.id}`)
         }
     }
 
@@ -117,48 +139,55 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             <div className={styles.secondColumn}>
                 <div className={s(styles.title, styles.paddingBottom)}>Program Information</div>
 
-                {formState && <ProgramForm state={formState} setState={setFormState} />}
+                {programInput && <ProgramForm state={programInput} setState={setProgramInput} />}
 
                 <div className={styles.assignContainer}>
-                    <div className={styles.empText}>
-                        Currently {progData.employee ? ' Assigned to ' + progData.employee : ' Unassigned'}
-                    </div>
+                    <div className={styles.empText}>Assign to:</div>
 
                     <Button className={s(styles.input, styles.employeeDropdownButton)}>
                         <div className={s(dropdownStyles.dropdownContainer, styles.employeeDropdownContainer)}>
-                            <DropdownList
-                                triggerElement={({isOpen, toggle}) => (
-                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                        <div className={s(dropdownStyles.dropdownTitle, styles.employeeDropdownTitle)}>
-                                            <div>{selectedEmployee.name}</div>
+                            {employeeDropdown && (
+                                <DropdownList
+                                    triggerElement={({isOpen, toggle}) => (
+                                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
                                             <div
                                                 className={s(
-                                                    dropdownStyles.dropdownArrow,
-                                                    styles.employeeDropdownArrow
+                                                    dropdownStyles.dropdownTitle,
+                                                    styles.employeeDropdownTitle
                                                 )}
-                                            />
-                                        </div>
-                                    </button>
-                                )}
-                                choicesList={() => (
-                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
-                                        {employeeDropdown.map(i => (
-                                            <li
-                                                className={dropdownStyles.dropdownListItem}
-                                                key={i.name}
-                                                onClick={() => {
-                                                    setSelectedEmployee(i)
-                                                }}
                                             >
-                                                <button className={dropdownStyles.dropdownListItemButton}>
-                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                                listWidthClass={styles.dropdownContent}
-                            />
+                                                <div>
+                                                    {selectedEmployee ? selectedEmployee.name : 'Select An Employee'}
+                                                </div>
+                                                <div
+                                                    className={s(
+                                                        dropdownStyles.dropdownArrow,
+                                                        styles.employeeDropdownArrow
+                                                    )}
+                                                />
+                                            </div>
+                                        </button>
+                                    )}
+                                    choicesList={() => (
+                                        <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
+                                            {employeeDropdown.map(i => (
+                                                <li
+                                                    className={dropdownStyles.dropdownListItem}
+                                                    key={i.name}
+                                                    onClick={() => {
+                                                        setSelectedEmployee(i)
+                                                    }}
+                                                >
+                                                    <button className={dropdownStyles.dropdownListItemButton}>
+                                                        <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                    listWidthClass={styles.dropdownContent}
+                                />
+                            )}
                             <div />
                         </div>
                     </Button>
