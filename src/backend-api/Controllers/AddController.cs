@@ -494,9 +494,32 @@ namespace backend_api.Controllers
             return Ok(ListOfEmployees());
         }
 
-
-        // TODO: Monitor POST
-        
+        /* POST: api/add/monitor
+         * Method will add a monitor row to the monitor table with the specified
+         *   attribute values if they are valid and will add the appropriate hardware history.
+         * Input format:
+                {
+	                "Monitor" : {
+		                "Make" : string?,
+		                "Model" : string?,
+		                "Resolution" : integer?,
+		                "Inputs" : string?,
+		                "EmployeeId" : int?,
+		                "TextField" : string?,
+		                "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		                "FlatCost" : decimal?,
+		                "CostPerYear" : decimal?,
+		                "ScreenSize" : float?,
+		                "Mfg" : string?,
+		                "RenewalDate" : string? (formatted yyyy-mm-dd),
+		                "Location" : "xx"? (either GR or AA),
+		                "SerialNumber" : string?,
+		                "MonthsPerRenewal" : int?,
+	                }
+                }
+         * Return: 201 created if successful, and 400 bad request if not.
+         */
+        // TODO: Make this generic
         [HttpPost]
         [Route("Monitor")]
         public IActionResult PostMonitor([FromBody] MonitorInput input)
@@ -507,6 +530,7 @@ namespace backend_api.Controllers
                 Monitor mn = input.Monitor;
                 int? EmployeeId = mn.EmployeeId;
 
+                // Create the monitor entity to add
                 Monitor monitor = new Monitor()
                 {
                     Make = mn.Make,
@@ -525,20 +549,19 @@ namespace backend_api.Controllers
                     SerialNumber = mn.SerialNumber,
                     MonthsPerRenewal = mn.MonthsPerRenewal,
 
-                    // Values we don't want touched by the call.
+                    // Values we don't want touched by the endpoint call.
                     IsAssigned = EmployeeId != null ? true : false,
                     IsDeleted = false,
                 };
-                // Change specific values to be hard coded such as employee assignment
                 _context.Monitor.Add(monitor);
-                _context.SaveChanges(); // Save the changes to db so I can get the assigned id.
 
-                //return Ok(entity);
+                // Save the changes to db so MonitorId can be accessed.
+                _context.SaveChanges(); 
 
                 // Add the history for date bought and for assigning an employee.
                 UpdateHardwareHistory(null, "Monitor", monitor.MonitorId, "Bought", input.Monitor.PurchaseDate);
 
-                // Assigning employee
+                // Add history for assigning employee
                 if (EmployeeId != null)
                 {
                     UpdateHardwareHistory(EmployeeId, "Monitor", monitor.MonitorId, "Assigned", DateTime.Now);
@@ -556,8 +579,9 @@ namespace backend_api.Controllers
         }
 
         /* UpdateHardwareHistory(empId, hardwareType, hardwareId, eventType, date) will add an entry into the 
-         * TODO:
+         *   hardware history table.
          */
+         // TODO: Abstract this
         private void UpdateHardwareHistory(int? empId, string hardwareType, int hardwareId, string eventType, DateTime? date)
         {
             _context.HardwareHistory.Add(new HardwareHistory
