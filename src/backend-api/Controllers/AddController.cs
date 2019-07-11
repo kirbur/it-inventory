@@ -531,7 +531,7 @@ namespace backend_api.Controllers
          *   attribute values if they are valid and will add the appropriate hardware history.
          * Input format:
                 {
-	                "Monitor" : {
+	                "Entity" : {
 		                "Make" : string?,
 		                "Model" : string?,
 		                "Resolution" : integer?,
@@ -553,9 +553,9 @@ namespace backend_api.Controllers
          */
         [HttpPost]
         [Route("Monitor")]
-        public IActionResult PostMonitor([FromBody] MonitorInput input)
+        public IActionResult PostMonitor([FromBody] EntityInput<Monitor> input)
         {
-            return PostHardware(input.Monitor, _context.Monitor);
+            return PostHardware(input.Entity, _context.Monitor);
         }
 
         /* POST: api/add/server
@@ -563,7 +563,7 @@ namespace backend_api.Controllers
          *   attribute values if they are valid and will add the appropriate hardware history.
          * Input format:
                 {
-	                "Server" : 
+	                "Entity" : 
 	                {
 		                "Fqdn" : string?,
 		                "NumberOfCores" : int?,
@@ -588,15 +588,51 @@ namespace backend_api.Controllers
 		                "MonthsPerRenewal" : int?,
 	                }
                 }
-         * Method will add a server row to the server table with the specified
-         *   attribute values if they are valid and will add the appropriate hardware history.
          * Return: 201 created if successful, and 400 bad request if not.
          */
         [HttpPost]
         [Route("Server")]
-        public IActionResult PostServer([FromBody] ServerInput input)
+        public IActionResult PostServer([FromBody] EntityInput<Server> input)
         {
-            return PostHardware(input.Server, _context.Server);
+            return PostHardware(input.Entity, _context.Server);
+        }
+
+        /* POST: api/add/laptop
+         * Method will add a computer row to the computer table with the specified
+         *   attribute values if they are valid and will add the appropriate hardware history.
+         * Input format:
+                {
+	                "Entity" : {
+		                "Cpu" : string?,
+		                "Ramgb" : int?,
+		                "Ssdgb" : int?,
+		                "PurchaseDate" : "2015-05-05",
+		                "RenewalDate" : "2018-05-05",
+		                "FlatCost" : decimal?,
+		                "MonitorOutput" : string?,
+		                "EndOfLife" : "2020-05-05",
+		                "EmployeeId" : int?,
+		                "TextField" : string?,
+		                "ScreenSize" : float?,
+		                "CostPerYear" : decimal?,
+		                "Resolution" : decimal?,
+		                "Mfg" : string?,
+		                "Make" : string?,
+		                "Model" : string?,
+		                "Fqdn" : string?,
+		                "Location" : "xx"? (either GR or AA),
+		                "SerialNumber" : string?,
+		                "MonthsPerRenewal" : int?
+	                }
+                }
+         * Return: 201 created if successful, and 400 bad request if not.
+         */
+        [HttpPost]
+        [Route("Laptop")]
+        [Route("Computer")]
+        public IActionResult PostComputer([FromBody] EntityInput<Computer> input)
+        {
+            return PostHardware(input.Entity, _context.Computer);
         }
 
         /* PostHardware<T>(hardware, table) is a method to post any hardware type 
