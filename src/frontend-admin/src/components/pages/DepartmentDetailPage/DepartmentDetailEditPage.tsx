@@ -21,12 +21,18 @@ import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {LoginContext} from '../../App/App'
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
-import {cloneDeep} from '@babel/types'
+import {cloneDeep} from 'lodash'
+import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 
 // Types
 interface IDepartmentDetailEditPageProps {
     match: any
     history: any
+}
+interface Defaults {
+    value: string
+    sortBy: string
+    id: number
 }
 
 // Primary Component
@@ -61,8 +67,8 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
 
     //all possible hardware, software, and licenses
     const [hardwareDropdown, setHardwareDropdown] = useState<{name: string; id: number}[]>([])
-    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([])
-    const [licenseDropdown, setLicenseDropdown] = useState<any[]>([])
+    const [softwareDropdown, setSoftwareDropdown] = useState<{name: string; id: number}[]>([])
+    const [licenseDropdown, setLicenseDropdown] = useState<{name: string; id: number}[]>([])
 
     //input feild states:
     const [dateInput, setDateInput] = useState<Date>()
@@ -86,17 +92,23 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                 setDeptData(dept)
 
                 let hw: any[] = []
-                data[0].defaultHardware.map((i: any) => hw.push([format(i.id), i]))
+                data[0].defaultHardware.map((item: string, index: number) =>
+                    hw.push([{value: format(item), sortBy: item, id: index}])
+                )
                 console.log(hw)
                 setHardwareRows(hw)
 
                 let sw: any[] = []
-                data[0].defaultSoftware.map((i: any) => sw.push([format(i.id), i]))
+                data[0].defaultSoftware.map((item: string, index: number) =>
+                    sw.push([{value: format(item), sortBy: item, id: index}])
+                )
                 console.log(sw)
                 setSoftwareRows(sw)
 
                 let l: any[] = []
-                data[0].defaultLicenses.map((i: any) => l.push([format(i.id), i]))
+                data[0].defaultLicenses.map((item: string, index: number) =>
+                    l.push([{value: format(item), sortBy: item, id: index}])
+                )
                 console.log(l)
                 setLicenseRows(l)
             })
@@ -112,7 +124,6 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                 (hardware: string, index: number) => hw.push({name: hardware, id: index}) //gives each hardware unique id
             )
             setHardwareDropdown(hw)
-            // setHardwareDropdown(data[0].hardware)
             let sw: {name: string; id: number}[] = []
             data[0].software.map(
                 (software: string, index: number) => sw.push({name: software, id: index}) //gives each hardware unique id
@@ -133,23 +144,41 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     // }, [deptList, userData])
 
     const handleAddHardware = (name: string) => {
-        console.log(name)
-        setHardwareRows([...hardwareRows, [0, name]])
+        let tempArray = cloneDeep(hardwareRows)
+        tempArray.push([{value: format(name), sortBy: name, id: tempArray.length}])
+        setHardwareRows(tempArray)
+    }
+    const handleRemoveHardware = (name: Defaults[]) => {
+        let tempArray = cloneDeep(hardwareRows)
+        tempArray = tempArray.filter(item => item[0].id != name[0].id)
+        setHardwareRows(tempArray)
     }
 
-    const handleAddSoftware = (id: number) => {
-        //TODO: post request to assign software to user w/ id match.params.id
+    const handleAddSoftware = (name: string) => {
+        let tempArray = cloneDeep(softwareRows)
+        tempArray.push([{value: format(name), sortBy: name, id: tempArray.length}])
+        setSoftwareRows(tempArray)
+    }
+    const handleRemoveSoftware = (name: Defaults[]) => {
+        let tempArray = cloneDeep(softwareRows)
+        tempArray = tempArray.filter(item => item[0].id != name[0].id)
+        setSoftwareRows(tempArray)
     }
 
-    const handleAddLicense = (id: number) => {
-        //TODO: post request to assign license to user w/ id match.params.id
+    const handleAddLicense = (name: string) => {
+        let tempArray = cloneDeep(licenseRows)
+        tempArray.push([{value: format(name), sortBy: name, id: tempArray.length}])
+        setLicenseRows(tempArray)
+    }
+    const handleRemoveLicense = (name: Defaults[]) => {
+        let tempArray = cloneDeep(licenseRows)
+        tempArray = tempArray.filter(item => item[0].id != name[0].id)
+        setLicenseRows(tempArray)
     }
 
     const handleSubmit = () => {
         //TODO: post request
     }
-
-    console.log(deptInput)
 
     return (
         <div className={styles.columns}>
@@ -184,8 +213,14 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                     <div className={styles.firstTableColumn}>
                         {/* default hardware */}
                         <div className={styles.table}>
-                            <DetailEditTable headers={hardwareHeaders} rows={hardwareRows} setRows={setHardwareRows} />
-
+                            <DetailPageTable
+                                headers={hardwareHeaders}
+                                rows={hardwareRows}
+                                setRows={setHardwareRows}
+                                style={styles.newRowThing}
+                                edit={true}
+                                remove={handleRemoveHardware}
+                            />
                             <Button
                                 className={styles.addDefaultContainer}
                                 icon='add'
@@ -232,8 +267,14 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                         </div>
                         {/* default licenses */}
                         <div className={styles.table}>
-                            <DetailEditTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
-
+                            <DetailPageTable
+                                headers={licenseHeaders}
+                                rows={licenseRows}
+                                setRows={setLicenseRows}
+                                style={styles.newRowThing}
+                                edit={true}
+                                remove={handleRemoveLicense}
+                            />
                             <Button
                                 className={styles.addDefaultContainer}
                                 icon='add'
@@ -261,7 +302,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                                                         <li
                                                             className={dropdownStyles.dropdownListItem}
                                                             key={i.name}
-                                                            onClick={() => handleAddSoftware(i.id)}
+                                                            onClick={() => handleAddLicense(i.name)}
                                                         >
                                                             <button className={dropdownStyles.dropdownListItemButton}>
                                                                 <div className={dropdownStyles.dropdownItemLabel}>
@@ -282,7 +323,14 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                     {/* default software */}
                     <div className={styles.secondTableColumn}>
                         <div className={styles.table}>
-                            <DetailEditTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
+                            <DetailPageTable
+                                headers={softwareHeaders}
+                                rows={softwareRows}
+                                setRows={setSoftwareRows}
+                                style={styles.newRowThing}
+                                edit={true}
+                                remove={handleRemoveSoftware}
+                            />
                             <Button
                                 className={styles.addDefaultContainer}
                                 icon='add'
@@ -310,7 +358,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                                                         <li
                                                             className={dropdownStyles.dropdownListItem}
                                                             key={i.name}
-                                                            onClick={() => handleAddSoftware(i.id)}
+                                                            onClick={() => handleAddSoftware(i.name)}
                                                         >
                                                             <button className={dropdownStyles.dropdownListItemButton}>
                                                                 <div className={dropdownStyles.dropdownItemLabel}>

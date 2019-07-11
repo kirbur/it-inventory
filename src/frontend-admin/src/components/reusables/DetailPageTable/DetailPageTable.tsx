@@ -104,7 +104,7 @@ export const DetailPageTable = (props: ITableProps) => {
             )
         }
         for (let i = 0; i < headers.length; i++) {
-            var click = row[i].onClick ? styles.clickable : ''
+            var click = row[i] && row[i].onClick ? styles.clickable : ''
             transformedRow[i + start] = row[i].tooltip ? (
                 <td
                     className={s(styles.rowData, click)}
