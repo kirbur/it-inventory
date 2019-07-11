@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public partial class Monitor
+    public partial class Monitor : IAssignable, ISoftDeletable
     {
         public int MonitorId { get; set; }
         public string Make { get; set; }
