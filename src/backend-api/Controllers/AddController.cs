@@ -606,7 +606,6 @@ namespace backend_api.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(error: e);
                 return BadRequest(error: e.Message);
             }
         }
