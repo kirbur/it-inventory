@@ -1,4 +1,4 @@
-﻿// Generic Input that will take an object from a header.
+﻿// Generic Input that will take an object from request body.
 namespace backend_api.Models
 {
     public class EntityInput<T>

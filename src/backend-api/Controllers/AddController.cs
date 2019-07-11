@@ -606,11 +606,11 @@ namespace backend_api.Controllers
 		                "Cpu" : string?,
 		                "Ramgb" : int?,
 		                "Ssdgb" : int?,
-		                "PurchaseDate" : "2015-05-05",
-		                "RenewalDate" : "2018-05-05",
+		                "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		                "RenewalDate" : string? (formatted yyyy-mm-dd),
 		                "FlatCost" : decimal?,
 		                "MonitorOutput" : string?,
-		                "EndOfLife" : "2020-05-05",
+		                "EndOfLife" : string? (formatted yyyy-mm-dd),
 		                "EmployeeId" : int?,
 		                "TextField" : string?,
 		                "ScreenSize" : float?,
@@ -633,6 +633,35 @@ namespace backend_api.Controllers
         public IActionResult PostComputer([FromBody] EntityInput<Computer> input)
         {
             return PostHardware(input.Entity, _context.Computer);
+        }
+
+        /* POST: api/add/peripheral
+         * Method will add a peripheral row to the peripheral table with the specified
+         *   attribute values if they are valid and will add the appropriate hardware history.
+         * Input format:
+                {
+	                "Entity" : {
+		                "PeripheralName" : string?,
+		                "PeripheralType" : string?,
+		                "TextField" : string?,
+		                "EmployeeId" : int?,
+		                "FlatCost" : decimal?,
+		                "PurchaseDate" : string? (formatted yyyy-mm-dd),,
+		                "CostPerYear" : decimal?,
+		                "Mfg" : string?,
+		                "Location" : "xx"? (either GR or AA),
+		                "RenewalDate" : string? (formatted yyyy-mm-dd),
+		                "SerialNumber" : string?,
+		                "MonthsPerRenewal" : int?,
+	                }
+                }
+         * Return: 201 created if successful, and 400 bad request if not.
+         */
+        [HttpPost]
+        [Route("Peripheral")]
+        public IActionResult PostPeripheral([FromBody] EntityInput<Peripheral> input)
+        {
+            return PostHardware(input.Entity, _context.Peripheral);
         }
 
         /* PostHardware<T>(hardware, table) is a method to post any hardware type 
