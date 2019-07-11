@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public partial class Peripheral
+    public partial class Peripheral : IAssignable, ISoftDeletable
     {
         public int PeripheralId { get; set; }
         public string PeripheralName { get; set; }
