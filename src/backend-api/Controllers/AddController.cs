@@ -504,34 +504,44 @@ namespace backend_api.Controllers
             // Add a monitor input
             try
             {
-                Monitor monitor = new Monitor(input.Monitor);
-                // Change specific values to be hard coded
+                Monitor mn = input.Monitor;
+                int? EmployeeId = mn.EmployeeId;
 
+                Monitor monitor = new Monitor()
+                {
+                    Make = mn.Make,
+                    Model = mn.Model,
+                    Resolution = mn.Resolution,
+                    Inputs = mn.Inputs,
+                    EmployeeId = EmployeeId,
+                    TextField = mn.TextField,
+                    PurchaseDate = mn.PurchaseDate,
+                    FlatCost = mn.FlatCost,
+                    CostPerYear = mn.CostPerYear,
+                    ScreenSize = mn.ScreenSize,
+                    Mfg = mn.Mfg,
+                    RenewalDate = mn.RenewalDate,
+                    Location = mn.Location,
+                    SerialNumber = mn.SerialNumber,
+                    MonthsPerRenewal = mn.MonthsPerRenewal,
+
+                    // Values we don't want touched by the call.
+                    IsAssigned = EmployeeId != null ? true : false,
+                    IsDeleted = false,
+                };
+                // Change specific values to be hard coded such as employee assignment
                 _context.Monitor.Add(monitor);
+                _context.SaveChanges(); // Save the changes to db so I can get the assigned id.
 
+                //return Ok(entity);
 
                 // Add the history for date bought and for assigning an employee.
-
-                DbSet<HardwareHistory> historyDbSet = _context.HardwareHistory;
-                historyDbSet.Add(new HardwareHistory
-                {
-                    EmployeeId = null,
-                    HardwareType = "Monitor",
-                    EventType = "Bought",
-                    EventDate = input.Monitor.PurchaseDate,
-                });
+                UpdateHardwareHistory(null, "Monitor", monitor.MonitorId, "Bought", input.Monitor.PurchaseDate);
 
                 // Assigning employee
-                int? EmployeeId = input.Monitor.EmployeeId;
                 if (EmployeeId != null)
                 {
-                    historyDbSet.Add(new HardwareHistory
-                    {
-                        EmployeeId = EmployeeId,
-                        HardwareType = "Monitor",
-                        EventType = "Assigned",
-                        EventDate = DateTime.Now,
-                    });
+                    UpdateHardwareHistory(EmployeeId, "Monitor", monitor.MonitorId, "Assigned", DateTime.Now);
                 }
 
                 _context.SaveChanges();
@@ -543,6 +553,21 @@ namespace backend_api.Controllers
                 return BadRequest(error: e);
                 return BadRequest(error: e.Message);
             }
+        }
+
+        /* UpdateHardwareHistory(empId, hardwareType, hardwareId, eventType, date) will add an entry into the 
+         * TODO:
+         */
+        private void UpdateHardwareHistory(int? empId, string hardwareType, int hardwareId, string eventType, DateTime? date)
+        {
+            _context.HardwareHistory.Add(new HardwareHistory
+            {
+                EmployeeId = empId,
+                HardwareType = hardwareType,
+                HardwareId = hardwareId,
+                EventType = eventType,
+                EventDate = date,
+            });
         }
     }
 }

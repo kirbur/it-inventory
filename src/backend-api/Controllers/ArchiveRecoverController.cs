@@ -12,6 +12,12 @@ namespace backend_api.Controllers
     [ApiController]
     public class ArchiveRecoverController : ContextController
     {
+        // Makes sure the operation is either "archive" or "recover"
+        public enum ValidOperation
+        {
+            Archive,
+            Recover,
+        }
         public ArchiveRecoverController(ITInventoryDBContext context) : base(context) { }
 
         /* PUT: api/{operation}/{model}/{id}
@@ -28,22 +34,13 @@ namespace backend_api.Controllers
          */
         [HttpPut]
         [Route("{operation}/{model}/{id}")]
-        public IActionResult ArchiveRecoverSwitch([FromRoute] string operation, string model, int id)
+        public IActionResult ArchiveRecoverSwitch([FromRoute] ValidOperation operation, string model, int id)
         {
             // Make the model all lower and change "laptop" to "computer".
             model = VerbatimMatch(model);
 
-            // Checks the validity of the operation (archive or recover), and assigns 
-            //      isDeleted to a boolean according to the operation provided.
-            bool isDeleted;
-            try
-            {
-                isDeleted = OperationCheck(operation);
-            }
-            catch (Exception)
-            {
-                return BadRequest($"Invalid operation: {operation}");
-            }
+            // Assigns isDeleted to a boolean according to the operation provided.
+            bool isDeleted = ValidOperation.Archive == operation ? true : false;
 
             switch (model)
             {
@@ -65,29 +62,6 @@ namespace backend_api.Controllers
                     return ArchiveRecoverHardware(_context.Peripheral, isDeleted, id);
                 default:
                     return BadRequest("Invalid Model");
-            }
-        }
-
-        /* OperationCheck(operation) converts the route path string
-         *      to a boolean value or throws an error if the string
-         *      is not "archive" or "recover".
-         * Params: string operation
-         * Returns: true if "archive" and false if "recover".
-         */
-        private bool OperationCheck(string operation)
-        {
-            operation = operation.ToLower();
-            if (operation == "archive")
-            {
-                return true;
-            }
-            else if (operation == "recover")
-            {
-                return false;
-            }
-            else
-            {
-                throw new ArgumentException($"invalid operation: {operation}");
             }
         }
 
@@ -203,7 +177,7 @@ namespace backend_api.Controllers
                 return TryUpdatingHardware(hardware, isDeleted, id, type);
             }
         }
-        
+
         /* TryUpdatingHardware<T>(hardware, isDeleted, id, type) will attempt to update the hardware entity fields
          *   and also create an entity on the hardware history recording the change.
          * Return IActionResult 200 if the updating works and 400 if there is an error.
