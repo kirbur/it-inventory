@@ -64,7 +64,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     purchaseLink: data[0].programPurchaseLink,
                     licenseKey: data[0].programLicenseKey,
                     isLicense: false,
-                    cost: data[0].isCostPerYear ? data[0].programCostPerYear : data[0].programCostPerYear / 12,
+                    cost: data[0].programCostPerYear,
                     flatCost: data[0].programFlatCost ? data[0].programFlatCost : 0,
                     monthsPerRenewal: 0,
                 })

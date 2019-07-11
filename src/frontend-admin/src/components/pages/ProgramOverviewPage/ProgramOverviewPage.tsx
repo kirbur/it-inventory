@@ -50,7 +50,10 @@ export interface ExpectedPluginType {
     pluginCostPerYear: number
     pluginFlatCost: number
     pluginName: string
+    pluginId: number
     renewalDate: string
+    pluginDescription: string
+    purchaseDate: string
 }
 
 // Primary Component
@@ -118,7 +121,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 let plug: ITableItem[][] = []
                 data[0].listOfPlugins.map((i: ExpectedPluginType) =>
                     plug.push([
-                        {value: format(i.pluginName), sortBy: format(i.pluginName)},
+                        {value: format(i.pluginName), sortBy: format(i.pluginName), tooltip: i.pluginDescription},
                         {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
                         {
                             value: formatCost(i.isCostPerYear, i.pluginCostPerYear, i.pluginFlatCost),
@@ -127,21 +130,27 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     ])
                 )
                 setPluginRows(plug)
+                console.log(data)
             })
             .catch((err: any) => console.error(err))
     }, [])
 
     useEffect(() => {
-        axios
-            .get(programData.icon)
-            .then((data: any) => {
-                if (data !== '') {
-                    setImg(URL + programData.icon)
-                } else {
-                    setImg(placeholder)
-                }
-            })
-            .catch((err: any) => console.error(err))
+        //once icon has a value, check to see if that picture exists. If it doesnt then use the placeholder
+        if (programData.icon !== '') {
+            axios
+                .get(programData.icon)
+                .then((data: any) => {
+                    if (data !== '') {
+                        setImg(URL + programData.icon)
+                    } else {
+                        setImg(placeholder)
+                    }
+                })
+                .catch((err: any) => console.error(err))
+        } else {
+            setImg('')
+        }
     }, [programData.icon])
 
     const handleEmpClick = (id: number) => {

@@ -30,6 +30,18 @@ interface IProgramOverviewEditPageProps {
     match: match<{id: string}>
 }
 
+interface IPluginInfo {
+    id: number
+    name: string
+    programName: string
+    description: string
+    recurringCost: number
+    flatCost: number
+    renewalDate: Date
+    purchaseDate: Date
+    monthsPerRenewal: number
+}
+
 // Primary Component
 export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> = props => {
     const {history, match} = props
@@ -56,25 +68,21 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     const [imgLocation, setImgLocation] = useState<string>()
     const [nameInput, setNameInput] = useState<string>(match.params.id === 'new' ? '' : match.params.id)
     const [numCopies, setNumCopies] = useState(1)
-    const [pluginInput, setPluginInput] = useState<{
-        name: string
-        programName: string
-        description: string
-        costPerMonth: number
-        flatCost: number
-        renewalDate: Date
-        purchaseDate: Date
-        monthsPerRenewal: number
-    }>({
+
+    const defaultPluginInfo = {
+        id: -1,
         name: '',
         programName: nameInput,
         description: '',
-        costPerMonth: 0,
+        recurringCost: 0,
         flatCost: 0,
         renewalDate: new Date(),
         purchaseDate: new Date(),
         monthsPerRenewal: 0,
-    })
+    }
+    const [pluginInput, setPluginInput] = useState<IPluginInfo>({...defaultPluginInfo})
+
+    const [pluginList, setPluginList] = useState<IPluginInfo[]>([])
 
     const [programInput, setProgramInput] = useState<IProgramFormInputs>({
         name: '',
@@ -114,17 +122,36 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     setProgramRows(prog)
 
                     let plug: ITableItem[][] = []
-                    data[0].listOfPlugins.map((i: ExpectedPluginType) =>
+                    let plugList: IPluginInfo[] = []
+                    data[0].listOfPlugins.map((i: ExpectedPluginType) => {
                         plug.push([
-                            {value: format(i.pluginName), sortBy: format(i.pluginName)},
+                            {
+                                value: format(i.pluginName),
+                                sortBy: format(i.pluginName),
+                                id: i.pluginId,
+                                tooltip: i.pluginDescription,
+                            },
                             {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
                             {
                                 value: formatCost(i.isCostPerYear, i.pluginCostPerYear, i.pluginFlatCost),
                                 sortBy: i.pluginCostPerYear,
                             },
                         ])
-                    )
+
+                        plugList.push({
+                            id: i.pluginId ? i.pluginId : 0,
+                            name: i.pluginName,
+                            programName: match.params.id,
+                            description: i.pluginDescription ? i.pluginDescription : '',
+                            recurringCost: i.pluginCostPerYear,
+                            flatCost: i.pluginFlatCost,
+                            renewalDate: i.renewalDate ? new Date(i.renewalDate) : new Date(),
+                            purchaseDate: i.purchaseDate ? new Date(i.purchaseDate) : new Date(),
+                            monthsPerRenewal: i.isCostPerYear ? 12 : 1,
+                        })
+                    })
                     setPluginRows(plug)
+                    setPluginList(plugList)
                 })
                 .catch((err: any) => console.error(err))
         }
@@ -138,6 +165,16 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     const handlePluginRemove = (row: ITableItem[]) => {
         //add to removed array
         setRemovedPluginRows([...removedPluginRows, [...row]])
+    }
+
+    const handlePluginEdit = (row: ITableItem[]) => {
+        //TODO: fill in plugin form w/ current plugin info
+
+        setPluginForm(true)
+
+        //TODO: use id not name
+        var plug = pluginList.filter(plugin => plugin.name === row[0].value)
+        setPluginInput({...plug[0]})
     }
 
     const handleSubmit = () => {
@@ -225,7 +262,18 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
             if (pluginForm) {
                 setPluginInput({...pluginInput, programName: nameInput})
+                var postPlugin = {
+                    plugin: {
+                        //TODO: find out variable names from Joe
+                    },
+                }
                 //TODO: post request for new plugin
+                console.log(pluginInput)
+                if (pluginInput.id === -1) {
+                    //TODO: post request for new plugin
+                } else {
+                    //TODO: put request edit plugin
+                }
             }
 
             //TODO: post request to delete removedPluginRows & removedProgramRows
@@ -277,7 +325,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             pluginRows.forEach((row: ITableItem[], index: number) => {
                 bools[index] = true
                 removedPluginRows.forEach((remove: ITableItem[]) => {
-                    bools[index] = bools[index] && remove[0].id !== row[0].id
+                    //TODO: use id instead of value
+                    bools[index] = bools[index] && remove[0].value !== row[0].value
                 })
             })
             pluginRows.forEach((row: ITableItem[], index: number) => {
@@ -364,6 +413,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                     setRows={setProgramRows}
                                     edit={true}
                                     remove={handleProgramRemove}
+                                    hover={false}
                                 />
                             </div>
 
@@ -372,7 +422,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 icon='add'
                                 onClick={() => {
                                     setProgramForm(!programForm)
-                                    setPluginForm(false)
                                 }}
                                 textInside={false}
                                 text={`Add ${numCopies} Copy(s)`}
@@ -398,6 +447,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 setRows={setPluginRows}
                                 edit={true}
                                 remove={handlePluginRemove}
+                                editRows={handlePluginEdit}
+                                hover={false}
                             />
 
                             <Button
@@ -405,7 +456,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 icon='add'
                                 onClick={() => {
                                     setPluginForm(!pluginForm)
-                                    setProgramForm(false)
+                                    setPluginInput({...defaultPluginInfo})
                                 }}
                                 textInside={false}
                                 text={'Add Plugin'}
@@ -463,14 +514,14 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 </div>
 
                                 <div className={styles.pluginInputContainerRow2}>
-                                    <div className={styles.inputText}>Monthly Cost</div>
+                                    <div className={styles.inputText}>Recurring Cost</div>
                                     <input
                                         type='number'
                                         step='0.01'
                                         className={s(styles.input, styles.pluginInputRow2)}
-                                        value={pluginInput.costPerMonth}
+                                        value={pluginInput.recurringCost}
                                         onChange={e =>
-                                            setPluginInput({...pluginInput, costPerMonth: parseFloat(e.target.value)})
+                                            setPluginInput({...pluginInput, recurringCost: parseFloat(e.target.value)})
                                         }
                                     />
                                 </div>

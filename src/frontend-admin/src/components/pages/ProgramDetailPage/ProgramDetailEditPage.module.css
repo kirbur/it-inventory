@@ -10,7 +10,7 @@
 }
 
 .secondColumn {
-    padding: 125px 50px;
+    padding: 150px 50px;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -88,8 +88,4 @@
     color: #a5a5a5;
     font-size: 24px;
     text-align: left;
-}
-
-.assignContainer {
-    margin: 50px 15px;
 }

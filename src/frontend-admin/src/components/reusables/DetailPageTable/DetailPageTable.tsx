@@ -3,6 +3,7 @@ import React, {useState} from 'react'
 //components
 import ReactTooltip from 'react-tooltip'
 import {MdInfoOutline} from 'react-icons/md'
+import {Button} from '../Button/Button'
 
 //styling
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -29,10 +30,12 @@ interface ITableProps {
     edit?: boolean
     remove?: any
     sort?: boolean
+    editRows?: any
+    hover?: boolean
 }
 
 export const DetailPageTable = (props: ITableProps) => {
-    const {style, headers, rows, setRows, edit = false, remove, sort = false} = props
+    const {style, headers, rows, setRows, edit = false, remove, sort = true, editRows, hover = true} = props
 
     //initialize all the header states and styling to be not sorted
     const headerStates = []
@@ -71,16 +74,16 @@ export const DetailPageTable = (props: ITableProps) => {
     }
 
     var renderedHeaders = []
-    edit && renderedHeaders.push(<td className={styles.deleteRow}></td>)
+    edit && renderedHeaders.push(<td className={styles.editRow}></td>)
     for (let i = 0; i < headers.length; i++) {
         let header = sort ? (
             <td
                 key={headers[i]}
                 onClick={e => {
-                    setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
+                    setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
                     sortStates(i)
                 }}
-                className={styles.header}
+                className={s(styles.header, styles.clickCursor)}
             >
                 <div className={styles.headerContainer}>
                     {headers[i]}
@@ -96,6 +99,8 @@ export const DetailPageTable = (props: ITableProps) => {
         renderedHeaders.push(header)
     }
 
+    editRows && renderedHeaders.push(<td className={styles.editRow}></td>)
+
     var renderedRows: any[] = []
     rows.forEach(row => {
         const transformedRow: any[] = []
@@ -103,7 +108,7 @@ export const DetailPageTable = (props: ITableProps) => {
         if (edit) {
             start = 1
             transformedRow[0] = (
-                <td onClick={e => remove(row)} className={styles.deleteRow}>
+                <td onClick={e => remove(row)} className={styles.editRow}>
                     <div className={styles.delete} />
                     <div className={styles.whiteLine} />
                 </td>
@@ -114,10 +119,10 @@ export const DetailPageTable = (props: ITableProps) => {
             transformedRow[i + start] = row[i].tooltip ? (
                 <td
                     key={JSON.stringify(row[i])}
-                    className={s(styles.rowData, click)}
+                    className={s(styles.rowData, row[0].onClick && styles.clickCursor, click)}
                     onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
                 >
-                    <a data-tip={row[i].tooltip} className={row[i].tooltip === '' ? '' : styles.rowTitle}>
+                    <a data-tip={row[i].tooltip}>
                         <MdInfoOutline size={15} />
                         {row[i].value}
                     </a>
@@ -126,10 +131,18 @@ export const DetailPageTable = (props: ITableProps) => {
             ) : (
                 <td
                     key={JSON.stringify(row[i])}
-                    className={s(styles.rowData, click)}
+                    className={s(styles.rowData, row[i].onClick && styles.clickCursor, click)}
                     onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
                 >
                     {rows[0] && row[i].value}
+                </td>
+            )
+        }
+
+        if (editRows !== undefined) {
+            transformedRow[headers.length + 1] = (
+                <td className={styles.editRow}>
+                    <Button text={'Edit'} className={styles.editButton} onClick={() => editRows(row)} />
                 </td>
             )
         }
@@ -143,7 +156,7 @@ export const DetailPageTable = (props: ITableProps) => {
 
             <tbody>
                 {renderedRows.map((row, i) => (
-                    <tr className={s(style, styles.tr)}>{row}</tr>
+                    <tr className={s(style, styles.tr, hover ? styles.hover : '')}>{row}</tr>
                 ))}
             </tbody>
         </table>
