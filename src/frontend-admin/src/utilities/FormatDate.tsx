@@ -1,6 +1,6 @@
 export const formatDate = (date: string) => {
     const obj = new Date(date)
-    const formatted = obj.getFullYear() + '/' + (obj.getMonth() + 1) + '/' + obj.getDate()
+    const formatted = obj.getMonth() + 1 + '/' + obj.getDate() + '/' + obj.getFullYear()
     return date ? formatted : '-'
 }
 
