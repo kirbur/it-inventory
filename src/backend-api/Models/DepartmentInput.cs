@@ -13,7 +13,7 @@
         }
         public string Name { get; set; }
         public HardwareObject DefaultHardware { get; set; }
-        public ProgramsObject DefaultPrograms { get; set;  }
-        public int? ID { get; set;  }
+        public ProgramsObject DefaultPrograms { get; set; }
+        public int? ID { get; set; }
     }
 }
