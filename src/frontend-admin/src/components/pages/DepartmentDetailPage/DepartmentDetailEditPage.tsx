@@ -84,10 +84,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                 console.log(data)
                 let dept: any = {
                     // photo: data[0].picture,'
-                    employeeCount: data[0].countEmpsInDep,
                     departmentName: data[0].departmentName,
-                    hardwareCost: data[0].totalCostOfActHardwareInDep,
-                    softwareCost: data[0].totalCostOfProgramsInDep,
                 }
                 setDeptData(dept)
 
@@ -138,11 +135,6 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
         })
     }, [])
 
-    // useEffect(() => {
-    //     var d = deptList.filter((i: any) => (i.departmentName = userData.department))
-    //     d[0] && setDeptInput({name: userData.department, id: d[0].departmentID})
-    // }, [deptList, userData])
-
     const handleAddHardware = (name: string) => {
         let tempArray = cloneDeep(hardwareRows)
         tempArray.push([{value: format(name), sortBy: name, id: tempArray.length}])
@@ -176,8 +168,28 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
         setLicenseRows(tempArray)
     }
 
+    function formatForPost(rows: Defaults[][]) {
+        let tempArray: string[] = []
+        console.log(rows)
+        for (let i = 0; i < rows.length; i++) {
+            tempArray.push(rows[i][0].value)
+        }
+        return tempArray
+    }
     const handleSubmit = () => {
-        //TODO: post request
+        let newDefaultHardware = formatForPost(hardwareRows)
+        let newDefaultSoftware = formatForPost(softwareRows)
+        let newDefaultLicenses = formatForPost(licenseRows)
+        axios.put(`update/department`, {
+            DefaultHardware: {DefaultHardware: newDefaultHardware},
+            DefaultPrograms: {
+                license: newDefaultLicenses,
+                software: newDefaultSoftware,
+            },
+            name: deptData.departmentName,
+            ID: match.params.id,
+        })
+        history.push(`/departments/${match.params.id}`)
     }
 
     return (
@@ -205,7 +217,12 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
 
                 <div className={styles.row}>
                     <div className={styles.text}>Department Name</div>
-                    <input type='text' className={styles.input} placeholder={deptData.departmentName} />
+                    <input
+                        type='text'
+                        className={styles.input}
+                        placeholder={deptData.departmentName}
+                        onChange={e => setDeptData({...deptData, departmentName: e.target.value})}
+                    />
                 </div>
 
                 {/* Tables */}
