@@ -11,20 +11,18 @@ using System.Threading.Tasks;
 
 namespace backend_api.Controllers
 {
-    // TODO: These two decorations might not do anything because of the ContextController class not.
     // [Authorize]
+    [Route("api/detail")]
     [ApiController]
     public class DetailController : ContextController
     {
-        // NOTE: I do this because I want to achieve the same route path that [Area] would provide.
-        private const string RoutePrefix = "detail";
         public DetailController(ITInventoryDBContext context) : base(context) { }
 
         /* GET: api/detail/{model}/{id}
          *      Return: A json for the specific model for each id. See before for specifics.
          */
         [HttpGet]
-        [Route(RoutePrefix + "/{model}/{id}")]
+        [Route("{model}/{id}")]
         public IActionResult GetDetail([FromRoute] string model, int id)
         {
             model = VerbatimMatch(model);
@@ -85,7 +83,7 @@ namespace backend_api.Controllers
          *                          
          */
         [HttpGet]
-        [Route(RoutePrefix + "/ProgramOverview/{program}")]
+        [Route("ProgramOverview/{program}")]
         public IActionResult GetProgramOverview([FromRoute] string program)
         {
             // Holds the license key of the program overview if they are all the same.

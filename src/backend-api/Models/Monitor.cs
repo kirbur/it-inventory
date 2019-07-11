@@ -21,6 +21,7 @@ namespace backend_api.Models
         DateTime? RenewalDate { get; set; }
         string Location { get; set; }
         string SerialNumber { get; set; }
+        int? MonthsPerRenewal { get; set; }
     }
     public partial class Monitor : IAssignable, ISoftDeletable, IMonitorBase
     {
@@ -43,6 +44,7 @@ namespace backend_api.Models
             RenewalDate = mn.RenewalDate;
             Location = mn.Location;
             SerialNumber = mn.SerialNumber;
+            MonthsPerRenewal = mn.MonthsPerRenewal;
         }
 
         public Monitor() { }
@@ -64,6 +66,7 @@ namespace backend_api.Models
         public DateTime? RenewalDate { get; set; }
         public string Location { get; set; }
         public string SerialNumber { get; set; }
+        public int? MonthsPerRenewal { get; set; }
 
         // public Employee Employee { get; set; }
     }
