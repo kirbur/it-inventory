@@ -39,23 +39,6 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const softwareHeaders = ['Software', '#', 'Cost']
     const licenseHeaders = ['License', 'CALs']
 
-    //TODO: remove default options
-    const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-    const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-    const [licenseDropdown, setLicenseDropdown] = useState<any[]>([
-        {name: 'option 1', id: 1},
-        {name: 'option 2', id: 1},
-        {name: 'option 3', id: 2},
-    ])
-
     const [deptData, setDeptData] = useState<any>({})
     const [employeeRows, setEmployeeRows] = useState<any[]>([])
     const [softwareRows, setSoftwareRows] = useState<any[]>([])
@@ -68,6 +51,20 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
     } = useContext(LoginContext)
     const isAdmin = true //TODO: remove
+
+    const handleEmployeeClick = (id: number | string) => {
+        history.push(`/employees/${id}`)
+    }
+    const handleProgramClick = (id: number | string) => {
+        history.push(`/programs/${id}`)
+    }
+    function renderProgramCost(isProgramCostPerYear: boolean, programCostPerYear: number) {
+        if (isProgramCostPerYear == true) {
+            return '$' + programCostPerYear.toString() + ' /year'
+        } else {
+            return '$' + programCostPerYear.toString() + ' /mo'
+        }
+    }
 
     const axios = new AxiosService(accessToken, refreshToken)
 
@@ -85,25 +82,53 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 }
                 setDeptData(dept)
 
-                let e: any[] = []
+                let e: any[][] = []
                 data[0].listOfEmployees.map((i: any) =>
-                    e.push([format(i.id), format(i.employeeName), formatDate(i.hireDate), format(i.programCostForEmp)])
+                    e.push([
+                        {
+                            value: format(i.employeeName),
+                            sortBy: i.employeeName,
+                            id: format(i.employeeId),
+                            onClick: handleEmployeeClick,
+                        },
+                        {
+                            value: formatDate(i.hireDate),
+                            sortBy: i.hireDate,
+                        },
+                        {
+                            //all programCostForEmp is per month
+                            value:
+                                'HW: $' +
+                                format(i.hardwareCostForEmp) +
+                                ' | SW: $' +
+                                format(i.programCostForEmp) +
+                                ' /mo',
+                            sortBy: i.hardwareCostForEmp,
+                        },
+                    ])
                 )
                 console.log(e)
                 setEmployeeRows(e)
-
-                // var toolTipArray = []
-                // data[0].hardware.map((i: any) => toolTipArray.push(i.tooltip.cpu ? formatToolTip(i.tooltip) : ''))
 
                 let sw: any[] = []
                 data[0].listOfTablePrograms.map((
                     i: any //not programs - actually software
                 ) =>
                     sw.push([
-                        format(i.id),
-                        format(i.programName),
-                        format(i.programCount),
-                        Math.round(i.programCostPerYear * 100) / 100,
+                        {
+                            value: format(i.programName),
+                            sortBy: i.programName,
+                            id: format(i.programName),
+                            onClick: handleProgramClick,
+                        },
+                        {
+                            value: format(i.programCount),
+                            sortBy: i.programCount,
+                        },
+                        {
+                            value: renderProgramCost(i.programIsCostPerYear, i.programCostPerYear),
+                            sortBy: i.programCostPerYear,
+                        },
                     ])
                 )
                 console.log(sw)
@@ -111,21 +136,32 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
 
                 let l: any[] = []
                 data[0].licensesList.map((i: any) =>
-                    l.push([format(i.id), format(i.progName), format(i.countOfThatLicense)])
+                    l.push([
+                        {
+                            value: format(i.progName),
+                            sortBy: i.progName,
+                            id: format(i.progName),
+                            onClick: handleProgramClick,
+                        },
+                        {
+                            value: format(i.countOfThatLicense),
+                            sortBy: i.countOfThatLicense,
+                        },
+                    ])
                 )
                 console.log(l)
                 setLicenseRows(l)
 
                 let dhw: any[] = []
-                data[0].defaultHardware.map((i: any) => dhw.push([format(i.id), i]))
+                data[0].defaultHardware.map((i: any) => dhw.push([{value: format(i), sortBy: i}]))
                 setDefaultHardware(dhw)
 
                 let dsw: any[] = []
-                data[0].defaultSoftware.map((i: any) => dsw.push([format(i.id), i]))
+                data[0].defaultSoftware.map((i: any) => dsw.push([{value: format(i), sortBy: i}]))
                 setDefaultSoftware(dsw)
 
                 let dl: any[] = []
-                data[0].defaultLicenses.map((i: any) => dl.push([format(i.id), i]))
+                data[0].defaultLicenses.map((i: any) => dl.push([{value: format(i), sortBy: i}]))
                 setDefaultLicenses(dl)
             })
             .catch((err: any) => console.error(err))
