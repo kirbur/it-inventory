@@ -1,7 +1,6 @@
 export function sortTable(rows: any[][], dataIndex: number, sortValue: number) {
     if (rows.length > 0) {
         var compareString = (a: [], b: []) => (a === b ? 0 : a < b ? -1 : 1)
-        console.log('before', dataIndex, sortValue, rows[0][dataIndex])
 
         const reversemodifier = sortValue === 0 ? 1 : -1
         // const sortFunc = x => rows[0][dataIndex].sortBy
@@ -11,7 +10,6 @@ export function sortTable(rows: any[][], dataIndex: number, sortValue: number) {
         } else {
             rows.sort((a, b) => reversemodifier * compareString(a[dataIndex], b[dataIndex]))
         }
-        console.log('after', dataIndex, sortValue, rows[0][dataIndex])
     }
     return rows
 }
