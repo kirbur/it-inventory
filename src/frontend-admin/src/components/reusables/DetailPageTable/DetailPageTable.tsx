@@ -25,7 +25,7 @@ interface ITableProps {
     headers: string[]
     rows: ITableItem[][]
     setRows: any
-    // onRowClick?: (datum: any) => void
+    className?: string
     style?: string
     edit?: boolean
     remove?: any
@@ -35,7 +35,18 @@ interface ITableProps {
 }
 
 export const DetailPageTable = (props: ITableProps) => {
-    const {style, headers, rows, setRows, edit = false, remove, sort = true, editRows, hover = true} = props
+    const {
+        style,
+        headers,
+        rows,
+        setRows,
+        edit = false,
+        remove,
+        sort = true,
+        editRows,
+        hover = true,
+        className = '',
+    } = props
 
     //initialize all the header states and styling to be not sorted
     const headerStates = []
@@ -125,6 +136,7 @@ export const DetailPageTable = (props: ITableProps) => {
                     <a data-tip={row[i].tooltip}>
                         <MdInfoOutline size={15} />
                         {row[i].value}
+                        <MdInfoOutline size={15} />
                     </a>
                     <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
                 </td>
@@ -149,7 +161,7 @@ export const DetailPageTable = (props: ITableProps) => {
         renderedRows.push(transformedRow)
     })
     return (
-        <table className={styles.table}>
+        <table className={s(styles.table, className)}>
             <thead>
                 <tr className={styles.header}>{renderedHeaders.map(header => header)}</tr>
             </thead>

@@ -41,7 +41,7 @@ namespace backend_api.Controllers
         public IActionResult PutDepartment([FromBody] DepartmentInput input)
         {
             // Get department by ID.
-            var dep = _context.Department.Find(input.ID);
+            Department dep = _context.Department.Find(input.ID);
 
             if (dep != null)
             {
@@ -148,6 +148,7 @@ namespace backend_api.Controllers
             int? progEmpId = prog.EmployeeId != null ? prog.EmployeeId : null;
 
             if (prog != null)
+            {
                 try
                 {
                     prog.ProgramCostPerYear = input.Program.ProgramCostPerYear;
@@ -222,11 +223,12 @@ namespace backend_api.Controllers
                 {
                     return BadRequest(error: e.Message);
                 }
+            }
             else
             {
                 return BadRequest("Program does not exist or failed to supply ID");
             }
-
         }
+
     }
 }
