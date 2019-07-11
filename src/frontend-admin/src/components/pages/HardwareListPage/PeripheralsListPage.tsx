@@ -49,8 +49,8 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     const axios = new AxiosService(accessToken, refreshToken)
 
     // state
-    const [listData, setListData] = useState<any[]>([])
-    const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
+    const [listData, setListData] = useState<IPeripheralData[]>([])
+    const [filteredData, setFilteredData] = useState<IPeripheralData[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Make & Model', value: 'name'})
 
@@ -200,16 +200,9 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     //this is where the individual rows are rendered
     rows.forEach(row => {
         const transformedRow: any[] = []
-        for (let i = 0; i < row.length; i++) {
-            switch (i) {
-                case 0:
-                    transformedRow[0] = concatenatedName(row)
-                case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{formatDate(row[2])}</td>
-                case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]}</td>
-            }
-        }
+        transformedRow.push(concatenatedName(row))
+        transformedRow.push(<td className={styles.alignLeft}>{formatDate(row[2])}</td>)
+        transformedRow.push(<td className={styles.alignLeft}>{row[3]}</td>)
 
         renderedRows.push(transformedRow)
     })
