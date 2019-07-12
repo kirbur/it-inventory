@@ -253,6 +253,64 @@ namespace backend_api.Controllers
                 return BadRequest("Program does not exist or failed to supply ID");
             }
         }
+
+        /* POST: api/update/Plugin
+         * Takes in as input:
+         * {
+         *     "PluginId" : int, 
+	     *     "ProgramName" : String,
+	     *     "PluginName" : int,
+	     *     "PluginFlatCost" : Decimal,
+	     *     "TextField" : string,
+	     *     "PluginCostPerYear" : Decimal,
+	     *     "RenewalDate" : DateTime,
+	     *     "MonthsPerRenewal" : int,
+         *     "DateBought" : DateTime
+         * }
+         */
+
+        [HttpPut]
+        [Route("Plugin")]
+        public IActionResult PostPlugin([FromBody] EditPluginInputModel input)
+        {
+            // finding the plugin by the given id
+            var plugin = _context.Plugins.Find(input.PluginId);
+            
+            // if the plugin does not exist then return error message
+            if (plugin == null)
+            {
+                return BadRequest("No such plug-in exists");
+            }
+            // if the Program that is connected to this plugin does not exist then return error message
+            if (!(_context.Program.Select(x => x.ProgramName).ToList().Contains(input.ProgramName)))
+            {
+                return BadRequest("No such program exists");
+            }
+            // try updating the various fields of our plugin
+            try
+            {
+                plugin.PluginName = input.PluginName;
+                plugin.PluginFlatCost = input.PluginFlatCost;
+                plugin.ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First();
+                plugin.TextField = input.TextField;
+                plugin.PluginCostPerYear = input.PLuginCostPerYear;
+                plugin.IsDeleted = false;
+                plugin.ProgramName = input.ProgramName;
+                plugin.RenewalDate = input.RenewalDate;
+                plugin.MonthsPerRenewal = input.MonthsPerRenewal;
+                plugin.Datebought = input.DateBought;
+                plugin.IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false;
+
+                _context.Update(plugin);
+                _context.SaveChanges();
+                return StatusCode(202);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
         /* PUT: api/udpate/employee/
          * Will update the employee identified by the given employeeId from the body
          * {

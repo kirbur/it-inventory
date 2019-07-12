@@ -53,6 +53,7 @@ namespace backend_api.Controllers
                 EventType = $"{(isAssigned ? "Assigned" : "Unassigned")}",
                 EventDate = DateTime.Now,
             });
+        }
         /* isAdmin() determines if the username from the AccessToken is an admin user.
          *  If the user is an admin, we can choose to return specific values to the front end.
          * Return: boolean. True if the user is an admin, and false otherwise.
