@@ -570,6 +570,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             var name = selectedEmployee.name.split(' ')
             var updateEmployee = {
                 Employee: {
+                    EmployeeId: match.params.id,
                     FirstName: name[0],
                     LastName: name[1],
                     HireDate: dateInput.toISOString(),
@@ -592,13 +593,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     }),
                 ],
 
-                HardwareRemoved: [
+                HardwareUnassigned: [
                     ...hardwareRows.removed.map(i => {
                         var hw = i[0].id.split('/')
                         return {Type: hw[0], ID: hw[1]}
                     }),
                 ],
-                ProgramRemoved: [
+                ProgramUnassigned: [
                     ...softwareRows.removed.map(i => {
                         return {ID: i[0].id}
                     }),
@@ -609,17 +610,18 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             }
 
             //TODO: verify this endpoint is right, and that updateEmployee is formatted correctly
-            // axios
-            //     .put(`/update/Employee/${match.params.id}`, updateEmployee)
-            //     .then((response: any) => {
-            //         if (response && response.status === 201) {
-            //             window.alert(`${selectedEmployee.name} was successfully updated!`)
-            //         }
-            //     })
-            //     .catch((err: any) => {
-            //         window.alert(`Something went wrong`)
-            //         console.error(err)
-            //     })
+            axios
+                .put(`/update/Employee`, updateEmployee)
+                .then((response: any) => {
+                    console.log(response)
+                    if (response) {
+                        window.alert(`${selectedEmployee.name} was successfully updated!`)
+                    }
+                })
+                .catch((err: any) => {
+                    window.alert(`Something went wrong`)
+                    console.error(err)
+                })
         } else {
             //one or maore of the inputs was null/undefined/empty
             var msg = 'Failed because:\n'
