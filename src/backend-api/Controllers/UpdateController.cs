@@ -91,17 +91,43 @@ namespace backend_api.Controllers
             {
                 foreach (var program in _context.Program.Where(x => x.ProgramName == input.Program.OldProgramName))
                 {
-                    program.ProgramName = input.Program.NewProgramName;
-                    program.ProgramCostPerYear = input.Program.ProgramCostPerYear;
-                    program.ProgramFlatCost = input.Program.ProgramFlatCost;
-                    program.ProgramLicenseKey = input.Program.ProgramLicenseKey;
-                    program.IsLicense = input.Program.IsLicense;
-                    program.Description = input.Program.ProgramDescription;
-                    program.ProgramPurchaseLink = input.Program.ProgramPurchaseLink;
-                    program.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
-                    program.DateBought = input.Program.DateBought;
-                    program.RenewalDate = input.Program.RenewalDate;
-                    program.MonthsPerRenewal = input.Program.MonthsPerRenewal;
+                    if (input.Program.NewProgramName != null)
+                    {
+                        program.ProgramName = input.Program.NewProgramName;
+                    }
+                    if (input.Program.ProgramCostPerYear != null)
+                    {
+                        program.ProgramCostPerYear = input.Program.ProgramCostPerYear;
+                    }
+                    if (input.Program.ProgramFlatCost != null)
+                    {
+                        program.ProgramFlatCost = input.Program.ProgramFlatCost;
+                    }
+                    if (input.Program.ProgramLicenseKey != null)
+                    {
+                        program.ProgramLicenseKey = input.Program.ProgramLicenseKey;
+                    }
+                    if (input.Program.IsLicense != null)
+                    {
+                        program.IsLicense = input.Program.IsLicense.Value;
+                    }
+                    if (input.Program.ProgramDescription != null)
+                    {
+                        program.Description = input.Program.ProgramDescription;
+                    }
+                    if (input.Program.ProgramPurchaseLink != null)
+                    {
+                        program.ProgramPurchaseLink = input.Program.ProgramPurchaseLink;
+                    }
+                    if (input.Program.MonthsPerRenewal != null)
+                    {
+                        program.MonthsPerRenewal = input.Program.MonthsPerRenewal;
+                        program.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
+                    }
+                    if (input.Program.RenewalDate != null)
+                    {
+                        program.RenewalDate = input.Program.RenewalDate;
+                    }
                 }
                 _context.SaveChanges();
                 return StatusCode(202);
@@ -174,7 +200,7 @@ namespace backend_api.Controllers
                     }
                     // Case 2: When an already assigned program becomes assigned to someone else
                     // This requires 2 entries; one for the unassigning and one for the assigning.
-                    else if (input.Program.EmployeeId != null && progEmpId != null)
+                    else if (input.Program.EmployeeId != null && progEmpId != null && input.Program.EmployeeId != prog.EmployeeId)
                     {
                         // unassigning
                         var History = (new ProgramHistory
@@ -211,8 +237,10 @@ namespace backend_api.Controllers
                         });
                         programHistories.Add(History);
                     }
-                    _context.ProgramHistory.AddRange(programHistories);
-
+                    if (programHistories != null)
+                    {
+                        _context.ProgramHistory.AddRange(programHistories);
+                    }
                     _context.SaveChanges();
                     return StatusCode(202);
                 }
@@ -225,6 +253,173 @@ namespace backend_api.Controllers
             {
                 return BadRequest("Program does not exist or failed to supply ID");
             }
+        }
+        /* PUT: api/udpate/employee/
+         * Will update the employee identified by the given employeeId from the body
+         * {
+         *       "Employee": {
+    	 *           "EmployeeId" : Int,
+         *           "FirstName": String,
+         *           "LastName": String,
+         *           "HireDate": DateTime,
+         *           "Role": String,
+         *           "DepartmentID": int,
+         *           "IsAdmin" : bool
+         *       },
+         *       "HardwareAssigned": [
+         *            {
+         *               "Type": String,
+         *               "ID": int
+         *           }
+         *       ] for all the hardware assigned (this arraylist)
+         *       "ProgramAssigned": [
+         *           {
+         *               "ID": int
+         *           },
+         *       ] for all the programs assigned (this arraylist)
+         *       "HardwareUnassigned": [
+         *           {
+         *               "Type": String,
+         *               "ID": int
+         *           }
+         *       ] for all the hardware unassigned (this arraylist)
+         *       "ProgramUnassigned": [
+         *           {
+         *               "ID": int
+         *           }
+         *       ] for all the programs unassigned (this arraylist)
+         *   }
+         */
+
+        [HttpPut]
+        [Route("Employee")]
+        public IActionResult EditEmployee([FromBody] EditEmployeeInputModel input)
+        {
+            // finding the employee from the given employeeId
+            var emp = _context.Employee.Find(input.Employee.EmployeeId);
+
+            // finding the authID connected to this employee from adGuid
+            var authIdEmp = _context.AuthIdserver.Where(x => x.ActiveDirectoryId == emp.Adguid).FirstOrDefault();
+
+            // making sure that neither of these are null. These are both created when an employee is created
+            if (emp != null && authIdEmp !=null)
+            {
+                try
+                {
+                    // updating the various fields of the current employee
+                    emp.HireDate = input.Employee.HireDate;
+                    emp.FirstName = input.Employee.FirstName;
+                    emp.LastName = input.Employee.LastName;
+                    emp.Role = input.Employee.Role;
+                    emp.DepartmentID = input.Employee.DepartmentID;
+                    _context.Employee.Update(emp);
+
+                    // updating the current isAdmin for the authIdServer connected to the employee
+                    authIdEmp.IsAdmin = input.Employee.IsAdmin;
+                    _context.AuthIdserver.Update(authIdEmp);
+
+                    _context.SaveChanges();
+
+                    // checking if any hardware is to be assigned
+                    if (input.HardwareAssigned != null)
+                    {
+                        // loop through hardware and depending on what type the hardware is, then add the hardware to the specific table. 
+                        // also in the loop, update the hardware history whether the it was assigned or unassigned  
+                        foreach (var hardware in input.HardwareAssigned)
+                        {
+                            switch (hardware.Type.ToLower())
+                            {
+                                case "monitor":
+                                    UpdateHardwareAssignment(_context.Monitor, emp.EmployeeId, true, hardware);
+                                    break;
+                                case "peripheral":
+                                    UpdateHardwareAssignment(_context.Peripheral, emp.EmployeeId, true, hardware);
+                                    break;
+                                case "computer":
+                                    UpdateHardwareAssignment(_context.Computer, emp.EmployeeId, true, hardware);
+                                    break;
+                                case "server":
+                                    UpdateHardwareAssignment(_context.Server, emp.EmployeeId, true, hardware);
+                                    break;
+                            }
+                        }
+                    }
+                    // checking if any hardware is to be unassigned
+                    if (input.HardwareUnassigned != null)
+                    {
+                        foreach (var hardware in input.HardwareUnassigned)
+                        {
+                            switch (hardware.Type.ToLower())
+                            {
+                                case "monitor":
+                                    UpdateHardwareAssignment(_context.Monitor, emp.EmployeeId, false, hardware);
+                                    break;
+                                case "peripheral":
+                                    UpdateHardwareAssignment(_context.Peripheral, emp.EmployeeId, false, hardware);
+                                    break;
+                                case "computer":
+                                    UpdateHardwareAssignment(_context.Computer, emp.EmployeeId, false, hardware);
+                                    break;
+                                case "server":
+                                    UpdateHardwareAssignment(_context.Server, emp.EmployeeId, false, hardware);
+                                    break;
+                            }
+                        }
+                    }
+
+                    // list to hold the histories of programs that will be added
+                    List<ProgramHistory> programHistories = new List<ProgramHistory>();
+
+                    // checking if any programs are to be assigned
+                    if (input.ProgramAssigned != null)
+                    {
+                        foreach (var program in input.ProgramAssigned)
+                        {
+                            var prog = _context.Program.Find(program.ID);
+                            prog.EmployeeId = input.Employee.EmployeeId;
+                            programHistories.Add(UpdateProgramHistory(true, emp.EmployeeId, program.ID));
+                        }
+                    }
+
+                    // checking if any programs are to be unassigned
+                    if (input.ProgramUnassigned != null)
+                    {
+                        foreach (var program in input.ProgramUnassigned)
+                        {
+                            var prog = _context.Program.Find(program.ID);
+                            prog.EmployeeId = null;
+                            programHistories.Add(UpdateProgramHistory(false, emp.EmployeeId, program.ID));
+                        }
+                        // Save multiple entries at once
+
+                    }
+                    if (programHistories != null)
+                    {
+                        _context.ProgramHistory.AddRange(programHistories);
+                    }
+                    _context.SaveChanges();
+
+                    return StatusCode(202);
+                }
+
+                catch (Exception e)
+                {
+                    return BadRequest(error: e.Message);
+                }
+            }
+            else
+            {
+                return BadRequest("Employee does not exist");
+            }
+        }
+        private void UpdateHardwareAssignment<T>(DbSet<T> table, int? employeeId, bool IsAssigned, HardwareAssignedModel hardware)
+            where T : class, IAssignable
+        {
+            var entity = table.Find(hardware.ID);
+            entity.IsAssigned = IsAssigned;
+            entity.EmployeeId = IsAssigned ? employeeId : null;
+            UpdateHardwareHistory(IsAssigned, employeeId, hardware.ID, hardware.Type);
+            _context.SaveChanges();
         }
 
         /* PUT: api/update/server
