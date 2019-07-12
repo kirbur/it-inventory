@@ -30,7 +30,7 @@ namespace backend_api.Controllers
             return routeModel.ToLower() == "laptop" ? "computer" : routeModel.ToLower();
         }
 
-        public void UpdateHardwareHistory(bool isAssigned, int employeeId, int hardwareId, string type)
+        public void UpdateHardwareHistory(bool isAssigned, int? employeeId, int hardwareId, string type)
         {
             // Update the history: Assigned or Unassigned
             _context.HardwareHistory.Add(new HardwareHistory

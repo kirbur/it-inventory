@@ -5,6 +5,8 @@ using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using backend_api.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Controllers
 {
@@ -329,32 +331,16 @@ namespace backend_api.Controllers
                             switch (hardware.Type.ToLower())
                             {
                                 case "monitor":
-                                    var mon = _context.Monitor.Find(hardware.ID);
-                                    mon.EmployeeId = emp.EmployeeId;
-                                    mon.IsAssigned = true;
-                                    UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                    _context.SaveChanges();
+                                    UpdateHardwareAssignment(_context.Monitor, emp.EmployeeId, true, hardware);
                                     break;
                                 case "peripheral":
-                                    var periph = _context.Peripheral.Find(hardware.ID);
-                                    periph.EmployeeId = emp.EmployeeId;
-                                    periph.IsAssigned = true;
-                                    UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                    _context.SaveChanges();
+                                    UpdateHardwareAssignment(_context.Peripheral, emp.EmployeeId, true, hardware);
                                     break;
                                 case "computer":
-                                    var comp = _context.Computer.Find(hardware.ID);
-                                    comp.EmployeeId = emp.EmployeeId;
-                                    comp.IsAssigned = true;
-                                    UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                    _context.SaveChanges();
+                                    UpdateHardwareAssignment(_context.Computer, emp.EmployeeId, true, hardware);
                                     break;
                                 case "server":
-                                    var server = _context.Server.Find(hardware.ID);
-                                    server.EmployeeId = emp.EmployeeId;
-                                    server.IsAssigned = true;
-                                    UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                    _context.SaveChanges();
+                                    UpdateHardwareAssignment(_context.Server, emp.EmployeeId, true, hardware);
                                     break;
                             }
                         }
@@ -367,32 +353,16 @@ namespace backend_api.Controllers
                             switch (hardware.Type.ToLower())
                             {
                                 case "monitor":
-                                    var mon = _context.Monitor.Find(hardware.ID);
-                                    mon.EmployeeId = null;
-                                    mon.IsAssigned = false;
-                                    UpdateHardwareHistory(false, emp.EmployeeId, hardware.ID, hardware.Type);
-                                    _context.SaveChanges();
+                                    UpdateHardwareAssignment(_context.Monitor, emp.EmployeeId, false, hardware);
                                     break;
                                 case "peripheral":
-                                    var periph = _context.Peripheral.Find(hardware.ID);
-                                    periph.EmployeeId = null;
-                                    periph.IsAssigned = false;
-                                    UpdateHardwareHistory(false, emp.EmployeeId, hardware.ID, hardware.Type);
-                                    _context.SaveChanges();
+                                    UpdateHardwareAssignment(_context.Peripheral, emp.EmployeeId, false, hardware);
                                     break;
                                 case "computer":
-                                    var comp = _context.Computer.Find(hardware.ID);
-                                    comp.EmployeeId = null;
-                                    comp.IsAssigned = false;
-                                    UpdateHardwareHistory(false, emp.EmployeeId, hardware.ID, hardware.Type);
-                                    _context.SaveChanges();
+                                    UpdateHardwareAssignment(_context.Computer, emp.EmployeeId, false, hardware);
                                     break;
                                 case "server":
-                                    var server = _context.Server.Find(hardware.ID);
-                                    server.EmployeeId = null;
-                                    server.IsAssigned = false;
-                                    UpdateHardwareHistory(false, emp.EmployeeId, hardware.ID, hardware.Type);
-                                    _context.SaveChanges();
+                                    UpdateHardwareAssignment(_context.Server, emp.EmployeeId, false, hardware);
                                     break;
                             }
                         }
@@ -442,6 +412,15 @@ namespace backend_api.Controllers
             {
                 return BadRequest("Employee does not exist");
             }
+        }
+        private void UpdateHardwareAssignment<T>(DbSet<T> table, int? employeeId, bool IsAssigned, HardwareAssignedModel hardware)
+            where T : class, IAssignable
+        {
+            var entity = table.Find(hardware.ID);
+            entity.IsAssigned = IsAssigned;
+            entity.EmployeeId = IsAssigned ? employeeId : null;
+            UpdateHardwareHistory(IsAssigned, employeeId, hardware.ID, hardware.Type);
+            _context.SaveChanges();
         }
 
     }

@@ -13,8 +13,7 @@ namespace Cql.InventoryManagement.DbMigrations.Migrations._2019._07
             Alter.Table("Plugins")
                 .AddColumn("DateBought")
                 .AsDateTime()
-                .NotNullable()
-                .WithDefaultValue(1800);
+                .Nullable();
         }
     }
 }
