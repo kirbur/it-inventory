@@ -185,7 +185,10 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     function concatenatedDept(row: any[]) {
         return (
             <td key={row[0]} className={styles.programs}>
-                <img className={styles.icon} src={URL + row[6]} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={URL + row[6]} alt={''} />
+                </div>
+
                 <div className={styles.alignLeft}>
                     <div className={styles.programName}>{row[0]}</div>
                 </div>

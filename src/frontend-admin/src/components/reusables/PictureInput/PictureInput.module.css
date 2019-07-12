@@ -13,12 +13,17 @@
     width: 300px;
     height: 300px;
     opacity: 0;
-    background: #636363;
     cursor: pointer;
 }
 
-.img {
-    position: relative;
-    top: 50px;
-    transform: scale(1.5, 1.5);
+.imgContainer {
+    width: 300px;
+    height: 300px;
+    display: flex;
+}
+
+.selectedImage {
+    width: 300px;
+    max-height: 300px;
+    margin: auto;
 }

@@ -140,7 +140,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     })
 
                     setProgramUpdateInput({
-                        ...programInput,
+                        ...programUpdateInput,
                         isLicense: {value: data[0].programOverview.isLicense, changed: false},
                     })
 
@@ -205,7 +205,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             Program: {
                 numberOfPrograms: Number.isNaN(numCopies) ? 0 : numCopies,
                 ProgramName: nameInput,
-                ProgramCostPerYear: Number.isNaN(programInput.cost.value) ? 0 : programInput.cost.value,
+                ProgramCostPerYear: Number.isNaN(programInput.cost.value)
+                    ? 0
+                    : programInput.cost.value * (12 / programInput.monthsPerRenewal.value),
                 ProgramFlatCost: Number.isNaN(programInput.flatCost.value) ? 0 : programInput.flatCost.value,
                 ProgramLicenseKey: programInput.licenseKey.value,
                 IsLicense: programInput.isLicense.value,
@@ -225,7 +227,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         }
 
         if (match.params.id === 'new') {
-            console.log(postProgram)
             var msg: string = ''
             if (
                 postProgram.Program.numberOfPrograms >= 1 &&
@@ -236,7 +237,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 await axios
                     .post('/add/program', postProgram)
                     .then((response: any) => {
-                        console.log(response)
                         if (response.status === 201) {
                             msg = numCopies + ' copies of ' + nameInput + ' were added to inventory!'
                             window.alert(msg)
@@ -298,7 +298,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     Program: {
                         OldProgramName: match.params.id,
                         NewProgramName: programUpdateInput.name.changed ? programUpdateInput.name.value : null,
-                        ProgramCostPerYear: programUpdateInput.cost.changed ? programUpdateInput.cost.value : null,
+                        ProgramCostPerYear: programUpdateInput.cost.changed
+                            ? programUpdateInput.cost.value * (12 / programUpdateInput.monthsPerRenewal.value)
+                            : null,
                         ProgramFlatCost: programUpdateInput.flatCost.changed ? programUpdateInput.flatCost.value : null,
                         ProgramLicenseKey: programUpdateInput.licenseKey.changed
                             ? programUpdateInput.licenseKey.value
@@ -321,12 +323,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             : null,
                     },
                 }
-                //TODO: ask Joe what to send instead of null
 
-                //await axios
-                //     .put(`update/programall`, updateProgram)
-                //     .then((response: any) => console.log(response))
-                //     .catch((err: any) => console.error(err))
+                await axios
+                    .put(`update/programall`, updateProgram)
+                    .then((response: any) => console.log(response))
+                    .catch((err: any) => console.error(err))
 
                 //after submitting go back to detail
                 history.push(`/programs/overview/${match.params.id}`)
@@ -440,7 +441,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             textClassName={styles.backButtonText}
                         />
                     )}
-                    <PictureInput setImage={setImgInput} />
+                    <PictureInput setImage={setImgInput} image={imgInput} />
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
@@ -506,7 +507,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 textInside={false}
                                 text={`Edit All Copies`}
                             />
-                            {/* TODO: figure out how this will work */}
+
                             {programForm.edit && (
                                 <div className={styles.programForm}>
                                     <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} />

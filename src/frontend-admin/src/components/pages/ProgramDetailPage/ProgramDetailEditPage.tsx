@@ -103,7 +103,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             var updateProgram = {
                 program: {
                     ProgramName: progData.name,
-                    ProgramCostPerYear: programInput.cost.value, //TODO: ask if this needs to be calculated to yearly
+                    ProgramCostPerYear: programInput.cost.value * (12 / programInput.monthsPerRenewal.value),
                     ProgramFlatCost: programInput.flatCost.value,
                     ProgramLicenseKey: programInput.licenseKey.value,
                     ProgramDescription: programInput.description.value,
@@ -136,7 +136,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     className={styles.backButton}
                     textClassName={styles.backButtonText}
                 />
-                <PictureInput setImage={setImgInput} />
+                <PictureInput setImage={setImgInput} image={imgInput} />
             </div>
             {/* column 2 */}
             <div className={styles.secondColumn}>

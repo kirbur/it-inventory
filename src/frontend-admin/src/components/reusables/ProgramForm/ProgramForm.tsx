@@ -33,11 +33,11 @@ interface IProgramFormProps {
 // Primary Component
 export const ProgramForm: React.SFC<IProgramFormProps> = props => {
     const {state, setState} = props
-
+    console.log(state)
     return (
         <div className={styles.formMain}>
             <Group direction={'row'}>
-                {state.purchaseDate && (
+                {state.purchaseDate && state.purchaseDate.value !== undefined && (
                     <div className={styles.row1Input}>
                         <div className={styles.inputText}>Purchase Date</div>
                         <DatePicker
