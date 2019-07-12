@@ -1,13 +1,16 @@
 import React from 'react'
 
 import styles from './HistoryLog.module.css'
+import {formatDate} from '../../../utilities/FormatDate'
 
 type eventType = 'Assigned' | 'Unassigned' | 'Bought' | 'Broken' | 'Repaired' | 'Archived' | 'Recovered'
 
 interface IHistoryLogArray {
-    date: string
-    event: eventType
-    user: string
+    eventDate: string
+    eventType: eventType
+    employeeName: string
+    historyId?: number
+    isEdit?: boolean
 }
 
 interface IHistoryLogProps {
@@ -27,26 +30,28 @@ export const HistoryLog = (props: IHistoryLogProps) => {
         for (let i = 0; i < historyLog.length; i++) {
             let tempElement = <div />
 
-            if (historyLog[i].event === 'Assigned') {
-                tempElement = <div className={styles.description}>{' Assigned to ' + historyLog[i].user}</div>
-            } else if (historyLog[i].event === 'Unassigned') {
-                tempElement = <div className={styles.description}>{'Unassigned from ' + historyLog[i].user}</div>
-            } else if (historyLog[i].event === 'Bought') {
-                tempElement = <div className={styles.description}>{'Purchased'}</div>
-            } else if (historyLog[i].event === 'Archived') {
-                tempElement = <div className={styles.description}>{'Archived'}</div>
-            } else if (historyLog[i].event === 'Broken') {
+            if (historyLog[i].eventType === 'Assigned') {
+                tempElement = <div className={styles.description}>{' Assigned to ' + historyLog[i].employeeName}</div>
+            } else if (historyLog[i].eventType === 'Unassigned') {
                 tempElement = (
-                    <div className={styles.description}>{'Broken under the care of ' + historyLog[i].user}</div>
+                    <div className={styles.description}>{'Unassigned from ' + historyLog[i].employeeName}</div>
                 )
-            } else if (historyLog[i].event === 'Repaired') {
+            } else if (historyLog[i].eventType === 'Bought') {
+                tempElement = <div className={styles.description}>{'Purchased'}</div>
+            } else if (historyLog[i].eventType === 'Archived') {
+                tempElement = <div className={styles.description}>{'Archived'}</div>
+            } else if (historyLog[i].eventType === 'Broken') {
+                tempElement = (
+                    <div className={styles.description}>{'Broken under the care of ' + historyLog[i].employeeName}</div>
+                )
+            } else if (historyLog[i].eventType === 'Repaired') {
                 tempElement = <div className={styles.description}>{'Repaired'}</div>
-            } else if (historyLog[i].event === 'Recovered') {
+            } else if (historyLog[i].eventType === 'Recovered') {
                 tempElement = <div className={styles.description}>{'Recovered'}</div>
             }
             rows.push(
                 <div className={styles.rowData}>
-                    <div className={styles.date}>{historyLog[i].date + ' | '} </div>
+                    <div className={styles.date}>{formatDate(historyLog[i].eventDate) + ' | '} </div>
                     {tempElement}
                 </div>
             )

@@ -1051,7 +1051,7 @@ namespace backend_api.Controllers
                     var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
                     var employeeName = empFirst + " " + empLast;
 
-                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate };
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, entry.HardwareHistoryId };
                     ComputerHistory.Add(singleEntry);
                 }
                 var computerClicked = nameof(Computer) + "/" + comp.ComputerId;

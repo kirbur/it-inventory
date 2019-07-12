@@ -170,8 +170,8 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .then((data: any) => {
                     console.log(data)
                     setHeadingInfo([
-                        'Make: ' + data[0].peripheral.peripheralName,
-                        'Model: ' + data[0].peripheral.peripheralType,
+                        'Name: ' + data[0].peripheral.peripheralName,
+                        'Type: ' + data[0].peripheral.peripheralType,
                         'Purchase Date: ' + formatDate(data[0].peripheral.purchaseDate),
                     ])
                     setFirstTableData([data[0].employeeAssignedName, data[0].peripheral.serialNumber])
@@ -186,10 +186,12 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         }
     }, [])
 
-    const handleArchive = () => {
-        if (window.confirm(`Are you sure you want to archive ${hardwareData.name}?`)) {
-            //TODO: a post request to archive user w/ id match.params.id
-            history.push('/employees')
+    async function handleArchive() {
+        if (window.confirm(`Are you sure you want to archive this ${match.params.type}?`)) {
+            await axios.put(`archive/${match.params.type}/${match.params.id}`, {})
+            history.push('/departments')
+
+            history.push('/hardware')
         }
     }
 
@@ -224,8 +226,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     <div className={styles.costText}>
                         {renderFlatCost()}
                         {renderCostPerYear()}
-                        {/* <p>Flat Cost ---------------------- ${flatCost}</p>
-                        <p>Cost Per Year ---------------- ${costPerYear}</p> */}
                     </div>
                 </div>
 

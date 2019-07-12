@@ -20,6 +20,7 @@ import styles from './HardwareDetailEditPage.module.css'
 // Context
 import {LoginContext} from '../../App/App'
 import {cloneDeep} from 'lodash'
+import {handleInputChange} from 'react-select/lib/utils'
 
 // Types
 interface IHardwareDetailEditPageProps {
@@ -43,11 +44,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [firstSectionHeaders, setFirstSectionHeaders] = useState<string[]>(['yeah something went wrong'])
     const [secondSectionHeaders, setSecondSectionHeaders] = useState<string[]>(['yeah something went wrong'])
     const [thirdSectionHeaders, setThirdSectionHeaders] = useState<string[]>(['yeah something went wrong'])
-    const [headingInfo, setHeadingInfo] = useState<(string | number)[]>(['something aint right'])
 
     const [firstSectionData, setFirstSectionData] = useState<(string | number)[]>([])
+    var returnFirstSectionData = {}
     const [secondSectionData, setSecondSectionData] = useState<(string | number)[]>([])
     const [thirdSectionData, setThirdSectionData] = useState<(string | number)[]>([])
+    const [costSection, setCostSection] = useState<(number | string)[]>([])
 
     const [purchaseDateInput, setPurchaseDateInput] = useState<Date>(new Date())
     const [renewalDateInput, setRenewalDateInput] = useState<Date>(new Date())
@@ -56,11 +58,16 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [commentText, setCommentText] = useState('')
 
     const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([])
-    const [eventInput, setEventInput] = useState('')
+    const [addHistoryLog, setAddHistoryLog] = useState<any[]>([])
+    const [removeHistoryLog, setRemoveHistoryLog] = useState<any[]>([])
+    const [eventInput, setEventInput] = useState<'Broken' | 'Repaired'>()
     const [historyLogBool, setHistoryLogBool] = useState(false)
     const [dateInput, setDateInput] = useState<Date>(new Date())
 
     const [isRecurring, setIsRecurring] = useState(false)
+
+    const [hasRecurringCost, setHasRecurringCost] = useState(false)
+    const [hasFlatCost, setHasFlatCost] = useState(false)
 
     useEffect(() => {
         if (match.params.type === 'server') {
@@ -83,6 +90,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
+                    // let pull = data[0].server
                     setFirstSectionData([
                         data[0].server.make,
                         data[0].server.model,
@@ -96,12 +104,30 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].server.san,
                         data[0].server.fqdn,
                     ])
+                    // returnFirstSectionData = {
+                    //     make: pull.make,
+                    //     model: pull.model,
+                    //     os: pull.operatingSystem,
+                    //     ram: pull.ram,
+                    //     hhd: pull.localHHD,
+                    //     cores: pull.numberOfCores,
+                    //     mfg: pull.mfg,
+                    //     serialNumber: pull.serialNumber,
+                    //     ip: pull.ipAddress,
+                    //     san: pull.san,
+                    //     fqdn: pull.fqdn,
+                    // }
+                    // setFirstSectionData(Object.values(returnFirstSectionData)) //turns to array
                     setSecondSectionData([])
                     setPurchaseDateInput(data[0].server.purchaseDate)
                     setRenewalDateInput(data[0].server.renewalDate)
                     setEndOfLifeInput(data[0].server.endOfLife)
-
                     setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].server.location])
+                    setCostSection([
+                        data[0].server.flatCost,
+                        data[0].server.costPerYear,
+                        data[0].server.monthsPerRenewal,
+                    ])
                     setCommentText(data[0].server.textField)
                 })
                 .catch((err: any) => console.error(err))
@@ -122,7 +148,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
+                    console.log(data[0].computerHistory)
                     setFirstSectionData([
                         data[0].computer.make,
                         data[0].computer.model,
@@ -134,9 +160,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].computer.serialNumber,
                         data[0].computer.fqdn,
                     ])
+
                     setSecondSectionData([])
                     setPurchaseDateInput(data[0].computer.purchaseDate)
                     setRenewalDateInput(data[0].computer.renewalDate)
+                    setHistoryLogEntries(data[0].computerHistory)
                     setEndOfLifeInput(data[0].computer.endOfLife)
 
                     setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].computer.location])
@@ -146,7 +174,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         } else if (match.params.type === 'monitor') {
             setFirstSectionHeaders(['Make', 'Model', 'Screen Size', 'Resolution', 'Inputs', 'Serial #'])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date'])
-            setThirdSectionHeaders(['Employee Assigned', 'Dept Assigned'])
+            setThirdSectionHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
             axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
@@ -163,19 +191,29 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     setPurchaseDateInput(data[0].monitor.purchaseDate)
                     setRenewalDateInput(data[0].monitor.renewalDate)
 
-                    setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD'])
+                    setThirdSectionData([
+                        data[0].employeeAssignedName,
+                        data[0].departmentName,
+                        data[0].monitor.location,
+                        data[0].monitor.employeeId,
+                    ])
                     setCommentText(data[0].monitor.textField)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
-            setFirstSectionHeaders(['Employee Assigned', 'Serial #'])
+            setFirstSectionHeaders(['Name', 'Type', 'Employee Assigned', 'Serial #', ''])
             setSecondSectionHeaders(['Purchase Date'])
             setThirdSectionHeaders([])
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
-                    setFirstSectionData([data[0].employeeAssignedName, data[0].peripheral.serialNumber])
+                    setFirstSectionData([
+                        data[0].peripheral.peripheralName,
+                        data[0].peripheral.peripheralType,
+                        data[0].employeeAssignedName,
+                        data[0].peripheral.serialNumber,
+                    ])
                     setPurchaseDateInput(data[0].peripheral.purchaseDate)
 
                     setSecondSectionData([])
@@ -186,13 +224,75 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         }
     }, [])
 
-    const handleArchive = () => {
-        if (window.confirm(`Are you sure you want to archive ${hardwareData.name}?`)) {
-            //TODO: a post request to archive user w/ id match.params.id
-            history.push('/employees')
+    async function handleSubmit() {
+        console.log(match.params.id)
+        if (match.params.id === 'new') {
+            if (match.params.type === 'monitor') {
+                axios.post(`add/monitor`, {
+                    Entity: {
+                        Make: firstSectionData[0],
+                        Model: firstSectionData[1],
+                        ScreenSize: firstSectionData[2],
+                        Resolution: firstSectionData[3],
+                        Inputs: firstSectionData[4],
+                        SerialNumber: firstSectionData[5],
+
+                        Location: thirdSectionData[2],
+                        EmployeeId: thirdSectionData[3],
+
+                        RenewalDate: renewalDateInput,
+                        PurchaseDate: purchaseDateInput,
+
+                        FlatCost: costSection[0],
+                        CostPerYear: costSection[1],
+                        MonthsPerRenewal: costSection[2],
+                        Mfg: null,
+                        TextField: commentText,
+                    },
+                    // setFirstSectionData([
+                    //     data[0].monitor.make,
+                    //     data[0].monitor.model,
+                    //     data[0].monitor.screenSize,
+                    //     data[0].monitor.resolution,
+                    //     data[0].monitor.inputs,
+                    //     data[0].monitor.serialNumber,
+                    // ])
+                    // setSecondSectionData([])
+                    // setPurchaseDateInput(data[0].monitor.purchaseDate)
+                    // setRenewalDateInput(data[0].monitor.renewalDate)
+
+                    // setThirdSectionData([data[0].employeeAssignedName, data[0].departmentName, data[0].monitor.location])
+                    // setCommentText(data[0].monitor.textField)
+                })
+            } else if (match.params.id === 'server') {
+                axios.post(`add/monitor`, {
+                    Entity: {},
+                })
+            } else if (match.params.id === 'laptop') {
+                axios.post(`add/monitor`, {
+                    Entity: {},
+                })
+            } else if (match.params.id === 'peripheral') {
+                axios.post(`add/monitor`, {
+                    Entity: {},
+                })
+            }
+            await history.push('/hardware')
         }
     }
-    const handleSubmit = () => {}
+
+    function handleInputChange(index: number, sectionData: any[], value: string | number) {
+        let tempData = cloneDeep(sectionData)
+        tempData[index] = value
+        if (sectionData == firstSectionData) {
+            setFirstSectionData(tempData)
+        } else if (sectionData == secondSectionData) {
+            setSecondSectionData(tempData)
+        } else if (sectionData == thirdSectionData) {
+            setThirdSectionData(tempData)
+        }
+        console.log(firstSectionData)
+    }
 
     // make first section
     function renderSection(sectionHeaders: string[], sectionData: any[]) {
@@ -244,19 +344,34 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         {sectionHeaders[i] && (
                             <div className={styles.inputContainer}>
                                 <div className={styles.inputHeader}>{sectionHeaders[i]}</div>
-                                <input type='text' className={styles.input} placeholder={sectionData[i]}></input>
+                                <input
+                                    type='text'
+                                    className={styles.input}
+                                    placeholder={sectionData[i]}
+                                    onChange={e => e && handleInputChange(i, sectionData, e.target.value)}
+                                ></input>
                             </div>
                         )}
                         {sectionHeaders[i + 1] && (
                             <div className={styles.inputContainer}>
                                 <div className={styles.inputHeader}>{sectionHeaders[i + 1]}</div>
-                                <input type='text' className={styles.input} placeholder={sectionData[i + 1]}></input>
+                                <input
+                                    type='text'
+                                    className={styles.input}
+                                    placeholder={sectionData[i + 1]}
+                                    onChange={e => e && handleInputChange(i + 1, sectionData, e.target.value)}
+                                ></input>
                             </div>
                         )}
                         {sectionHeaders[i + 2] && (
                             <div className={styles.inputContainer}>
                                 <div className={styles.inputHeader}>{sectionHeaders[i + 2]}</div>
-                                <input type='text' className={styles.input} placeholder={sectionData[i + 2]}></input>
+                                <input
+                                    type='text'
+                                    className={styles.input}
+                                    placeholder={sectionData[i + 2]}
+                                    onChange={e => e && handleInputChange(i + 2, sectionData, e.target.value)}
+                                ></input>
                             </div>
                         )}
                     </div>
@@ -270,22 +385,35 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const toggleHistoryLogForm = () => {
         setHistoryLogBool(!historyLogBool)
     }
-    const submitHistoryLog = () => {
-        console.log(eventInput)
+    const handleSubmitHistoryLog = () => {
         if (eventInput === 'Broken' || eventInput === 'Repaired') {
             console.log(eventInput)
             setHistoryLogBool(!historyLogBool)
             let tempHistoryLog = cloneDeep(historyLogEntries)
             tempHistoryLog.push({
-                user: thirdSectionData[0],
-                event: eventInput,
-                date: formatDate(dateInput.toString()),
+                employeeName: thirdSectionData[0],
+                eventType: eventInput,
+                eventDate: formatDate(dateInput.toString()),
             })
+
             setHistoryLogEntries(tempHistoryLog)
+            tempHistoryLog = cloneDeep(addHistoryLog)
+            tempHistoryLog.push({
+                EventType: eventInput,
+                EventDate: dateInput,
+            })
+            setAddHistoryLog(tempHistoryLog)
         } else {
             window.alert('Need to choose an event!')
         }
-        // TODO: post the entry to the db - wil post one at a time
+        console.log(addHistoryLog)
+    }
+    const handleRemoveHistoryLog = () => {}
+
+    const changeCost = (value: string, index: number) => {
+        let tempArray = cloneDeep(costSection)
+        tempArray[index] = value
+        setCostSection(tempArray)
     }
 
     return (
@@ -328,6 +456,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             <input
                                 type='checkbox'
                                 className={styles.checkmark}
+                                // checked={hasFlatCost}
                                 // checked={state.costType === 'per month'}
                                 // onChange={() => setState({...state, costType: 'per month'})}
                             />
@@ -340,8 +469,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 className={styles.radioInput}
                                 type='number'
                                 step='0.01'
-                                // value={state.costPerMonth}
-                                // onChange={cost => setState({...state, costPerMonth: parseFloat(cost.target.value)})}
+                                value={costSection[0]}
+                                onChange={e => changeCost(e.target.value, 0)}
                             />
                         </div>
                     </div>
@@ -350,7 +479,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             <input
                                 type='checkbox'
                                 className={styles.checkmark}
-                                // checked={setIsRecurring(!isRecurring)}
                                 onChange={() => setIsRecurring(!isRecurring)}
                             />
                             <div className={styles.checkmark} />
@@ -362,20 +490,25 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 className={styles.radioInput}
                                 type='number'
                                 step='0.01'
-                                // value={state.costPerYear}
-                                // onChange={cost => setState({...state, costPerYear: parseFloat(cost.target.value)})}
+                                value={costSection[1]}
+                                onChange={e => changeCost(e.target.value, 1)}
                             />
                         </div>
                         {isRecurring && (
                             <div className={styles.marginLeft}>
                                 <div className={styles.inputHeader}>Months per Renewal</div>
-                                <input className={styles.monthsInput} type='number' step='1' />
+                                <input
+                                    className={styles.monthsInput}
+                                    type='number'
+                                    step='1'
+                                    value={costSection[2]}
+                                    onChange={e => changeCost(e.target.value, 2)}
+                                />
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* history log - will post separately from the rest of the hardware*/}
                 <div className={styles.historyLogContainer}>
                     <HistoryLog historyLog={historyLogEntries} />
                     {historyLogBool && (
@@ -423,7 +556,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             </div>
                             {/* should send back the employee of this page */}
                             <div className={styles.historyLogSubmit}>
-                                <Button icon='add' onClick={submitHistoryLog} className={styles.historyLogButton} />
+                                <Button
+                                    icon='add'
+                                    onClick={handleSubmitHistoryLog}
+                                    className={styles.historyLogButton}
+                                />
                                 Submit Log
                             </div>
                         </div>
