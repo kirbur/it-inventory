@@ -49,7 +49,7 @@ namespace backend_api.Controllers
                 case "program":
                     return BadRequest("Not Archived");
                 case "plugin":
-                    return BadRequest("Not Archived");
+                    return ArchiveRecoverPlugin(isDeleted, id);
                 case "department":
                     return ArchiveRecoverDepartment(isDeleted, id);
                 case "server":
@@ -113,6 +113,57 @@ namespace backend_api.Controllers
             {
                 dep.IsDeleted = isDeleted;
                 _context.Department.Update(dep);
+                _context.SaveChanges();
+
+                return Ok($"{(isDeleted ? "archive" : "recover")} completed");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(error: e.Message);
+            }
+        }
+
+        /* PUT: api/{operation}/plugin/{id}
+         * Route params:
+         *   {operation} is a string. Either "archive" or "recover"
+         *   {id} is a number that is the ID for any of the models.
+         * ArchiveRecoverPlugin(isDeleted, id) is a plugin method for archiving and recovering 
+         *   a plugin. The method will change the IsDeleted field for the plugin of the id corresponding
+         *   to the operation.
+         * Method Params:
+         *   bool isDeleted, is if the plugin is going to be archived or recovered
+         *   int id, the ID of the specified department
+         * Return: IActionResult 200 if updated. Else, 400 bad request. 
+         */
+        private IActionResult ArchiveRecoverPlugin(bool isDeleted, int id)
+        {
+            // find plugin by ID
+            var plugin = _context.Plugins.Find(id);
+            if (plugin != null)
+            {
+                try
+                {
+                    return TryUpdatePlugin(isDeleted, plugin);
+                }
+                catch
+                {
+                    return BadRequest("Plugin does not exist or failed to supply ID");
+                }
+
+            }
+            return BadRequest("Plugin does not exist or failed to supply ID");
+        }
+
+        /* TryUpdatePlugin(isDeleted, dep) will try to update the IsDeleted field on the 
+         *   plugin row.
+         * Result IActionResult. 200 if successful. 400 if not.
+         */
+        private IActionResult TryUpdatePlugin(bool isDeleted, Plugins plugin)
+        {
+            try
+            {
+                plugin.IsDeleted = isDeleted;
+                _context.Plugins.Update(plugin);
                 _context.SaveChanges();
 
                 return Ok($"{(isDeleted ? "archive" : "recover")} completed");
