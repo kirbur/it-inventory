@@ -521,7 +521,7 @@ namespace backend_api.Controllers
          */
         [HttpGet]
         [Route("HardwarePrep")]
-        public IActionResult GetMonitorPrep()
+        public IActionResult GetHardwarePrep()
         {
             return Ok(ListOfEmployees());
         }
@@ -676,6 +676,8 @@ namespace backend_api.Controllers
             // Update values we don't want touched by the endpoint call.
             hardware.IsAssigned = EmployeeId != null ? true : false;
             hardware.IsDeleted = false;
+
+            // NOTE: CostPerYear is calculated on the front end.
 
             // Get class name at runtime
             string type = GetClassName(hardware);
