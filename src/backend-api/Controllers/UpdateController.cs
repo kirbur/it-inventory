@@ -354,6 +354,41 @@ namespace backend_api.Controllers
             return PutHardware(input);
         }
 
+        /* PUT: api/update/peripheral
+             { 
+               "Entity": {
+                    "PeripheralId" : int,
+		            "PeripheralName" : string?,
+		            "PeripheralType" : string?,
+		            "TextField" : string?,
+		            "EmployeeId" : int?,
+		            "FlatCost" : decimal?,
+		            "PurchaseDate" : string? (formatted yyyy-mm-dd),,
+		            "CostPerYear" : decimal?,
+		            "Mfg" : string?,
+		            "Location" : "xx"? (either GR or AA),
+		            "RenewalDate" : string? (formatted yyyy-mm-dd),
+		            "SerialNumber" : string?,
+		            "MonthsPerRenewal" : int?,
+                },
+                "AddHistory": [ {
+                    "EventType": string,
+                    "EventDate": string formatted as "yyyy-mm-dd hr:mn:sc.000",
+                    } ,.. ],
+                "DeleteHistory": int[], 
+              } 
+         * PutHardware<T>(input) will update the entity specified and will automatically generate
+         *   assignment history. The method will also add history provided from the PUT request and 
+         *   delete rows specified in the request.
+         * Return: 200 if updates were successful, and 400 if they were not successful. 
+         */
+        [HttpPut]
+        [Route("peripheral")]
+        public IActionResult PutPeripheral([FromBody] HistoryEntityInput<Peripheral> input)
+        {
+            return PutHardware(input);
+        }
+
         /* PUT: api/update/{hardware}
          * Input param format:
              { 
