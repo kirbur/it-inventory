@@ -310,6 +310,50 @@ namespace backend_api.Controllers
             return PutHardware(input);
         }
 
+        /* PUT: api/update/computer
+             { 
+               "Entity": {
+                    "ComputerId" : int,
+		            "Cpu" : string?,
+		            "Ramgb" : int?,
+		            "Ssdgb" : int?,
+		            "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		            "RenewalDate" : string? (formatted yyyy-mm-dd),
+		            "FlatCost" : decimal?,
+		            "MonitorOutput" : string?,
+		            "EndOfLife" : string? (formatted yyyy-mm-dd),
+		            "EmployeeId" : int?,
+		            "TextField" : string?,
+		            "ScreenSize" : float?,
+		            "CostPerYear" : decimal?,
+		            "Resolution" : decimal?,
+		            "Mfg" : string?,
+		            "Make" : string?,
+		            "Model" : string?,
+		            "Fqdn" : string?,
+		            "Location" : "xx"? (either GR or AA),
+		            "SerialNumber" : string?,
+		            "MonthsPerRenewal" : int?
+                },
+                "AddHistory": [ {
+                    "EventType": string,
+                    "EventDate": string formatted as "yyyy-mm-dd hr:mn:sc.000",
+                    } ,.. ],
+                "DeleteHistory": int[], 
+              } 
+         * PutHardware<T>(input) will update the entity specified and will automatically generate
+         *   assignment history. The method will also add history provided from the PUT request and 
+         *   delete rows specified in the request.
+         * Return: 200 if updates were successful, and 400 if they were not successful. 
+         */
+        [HttpPut]
+        [Route("laptop")]
+        [Route("computer")]
+        public IActionResult PutComputer([FromBody] HistoryEntityInput<Computer> input)
+        {
+            return PutHardware(input);
+        }
+
         /* PUT: api/update/{hardware}
          * Input param format:
              { 
