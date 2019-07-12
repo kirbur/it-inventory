@@ -581,7 +581,7 @@ namespace backend_api.Controllers
                     var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
                     employeeName = empFirst + " " + empLast;
 
-                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate };
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.ProgramHistoryId };
                     entries.Add(singleEntry);
                 }
 
@@ -889,6 +889,8 @@ namespace backend_api.Controllers
                 "icon": partial URL (as string),
                 "serverClicked" : string,
                 "employeeAssignedName": string,
+
+                // TODO: update this comment
                 "serverHistory": [
                     {
                         "hardwareHistoryId": int,
@@ -942,7 +944,7 @@ namespace backend_api.Controllers
                     var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
                     var employeeName = empFirst + " " + empLast;
 
-                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate };
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.HardwareHistoryId };
                     SeverHistory.Add(singleEntry);
                 }
 
@@ -1051,7 +1053,7 @@ namespace backend_api.Controllers
                     var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
                     var employeeName = empFirst + " " + empLast;
 
-                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate };
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.HardwareHistoryId };
                     ComputerHistory.Add(singleEntry);
                 }
                 var computerClicked = nameof(Computer) + "/" + comp.ComputerId;
@@ -1155,7 +1157,7 @@ namespace backend_api.Controllers
                     var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
                     var employeeName = empFirst + " " + empLast;
 
-                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate };
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.HardwareHistoryId };
                     MonitorHistory.Add(singleEntry);
                 }
 
@@ -1256,7 +1258,7 @@ namespace backend_api.Controllers
                     var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
                     var employeeName = empFirst + " " + empLast;
 
-                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate };
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.HardwareHistoryId };
                     peripheralHistory.Add(singleEntry);
                 }
 
