@@ -156,8 +156,16 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         <img className={styles.img} src={URL + userData.photo} alt={''} />
                     </div>
                     <div className={styles.costText}>
-                        <p>Software ---------------- ${userData.swCost} /month</p>
-                        <p>Hardware --------------- ${userData.hwCost}</p>
+                        <Group>
+                            <p>Software</p>
+                            <div className={styles.costLine} />
+                            <p>${userData.swCost} /month</p>
+                        </Group>
+                        <Group>
+                            <p>Hardware</p>
+                            <div className={styles.costLine} />
+                            <p> ${userData.hwCost}</p>
+                        </Group>
                     </div>
                 </div>
                 {/* column 2 */}

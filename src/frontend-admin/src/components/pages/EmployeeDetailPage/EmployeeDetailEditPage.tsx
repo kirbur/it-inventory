@@ -499,7 +499,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         setLicenseDropdown([...licenseDropdown, drop])
     }
 
-    const handleSubmit = () => {
+    async function handleSubmit() {
         /*ADD NEW EMPLOYEE */
 
         if (
@@ -535,7 +535,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 ],
             }
 
-            axios
+            await axios
                 .post('/add/Employee', postEmployee)
                 .then((response: any) => {
                     if (response && response.status === 201) {
@@ -611,11 +611,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 ],
             }
 
-            //TODO: verify this endpoint is right, and that updateEmployee is formatted correctly
-            axios
+            await axios
                 .put(`/update/Employee`, updateEmployee)
                 .then((response: any) => {
-                    console.log(response)
+                    if (response.status >= 400) {
+                        console.error(response)
+                    }
                 })
                 .catch((err: any) => {
                     window.alert(`Something went wrong`)
@@ -638,7 +639,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             var formData = new FormData()
             formData.append('file', imgInput)
 
-            axios
+            await axios
                 .put(userData.photo, formData, {
                     headers: {'Content-Type': 'multipart/form-data'},
                 })
