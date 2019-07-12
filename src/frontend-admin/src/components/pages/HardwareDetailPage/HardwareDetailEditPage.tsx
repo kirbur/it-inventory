@@ -60,6 +60,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [historyLogBool, setHistoryLogBool] = useState(false)
     const [dateInput, setDateInput] = useState<Date>(new Date())
 
+    const [isRecurring, setIsRecurring] = useState(false)
+
     useEffect(() => {
         if (match.params.type === 'server') {
             setFirstSectionHeaders([
@@ -348,22 +350,28 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             <input
                                 type='checkbox'
                                 className={styles.checkmark}
-                                // checked={state.costType === 'per year'}
-                                // onChange={() => setState({...state, costType: 'per year'})}
+                                // checked={setIsRecurring(!isRecurring)}
+                                onChange={() => setIsRecurring(!isRecurring)}
                             />
                             <div className={styles.checkmark} />
                             <div className={styles.insideCheckmark} />
                         </div>
                         <div>
-                            <div className={styles.inputHeader}>Cost per Year</div>
+                            <div className={styles.inputHeader}>Recurring Cost</div>
                             <input
-                                className={s(styles.radioInput, styles.costInput)}
+                                className={styles.radioInput}
                                 type='number'
                                 step='0.01'
                                 // value={state.costPerYear}
                                 // onChange={cost => setState({...state, costPerYear: parseFloat(cost.target.value)})}
                             />
                         </div>
+                        {isRecurring && (
+                            <div className={styles.marginLeft}>
+                                <div className={styles.inputHeader}>Months per Renewal</div>
+                                <input className={styles.monthsInput} type='number' step='1' />
+                            </div>
+                        )}
                     </div>
                 </div>
 
