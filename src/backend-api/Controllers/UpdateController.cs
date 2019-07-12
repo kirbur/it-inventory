@@ -260,6 +260,10 @@ namespace backend_api.Controllers
                     } ,.. ],
                 "DeleteHistory": int[], 
               } 
+         * PutHardware<T>(input) will update the entity specified and will automatically generate
+         *   assignment history. The method will also add history provided from the PUT request and 
+         *   delete rows specified in the request.
+         * Return: 200 if updates were successful, and 400 if they were not successful. 
          */
         [HttpPut]
         [Route("server")]
@@ -268,7 +272,37 @@ namespace backend_api.Controllers
             return PutHardware(input);
         }
 
-        // TODO:
+        /* PUT: api/update/monitor
+             { 
+               "Entity": {
+                    "MonitorId" : int,
+		            "Make" : string?,
+		            "Model" : string?,
+		            "Resolution" : integer?,
+		            "Inputs" : string?,
+		            "EmployeeId" : int?,
+		            "TextField" : string?,
+		            "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		            "FlatCost" : decimal?,
+		            "CostPerYear" : decimal?,
+		            "ScreenSize" : float?,
+		            "Mfg" : string?,
+		            "RenewalDate" : string? (formatted yyyy-mm-dd),
+		            "Location" : "xx"? (either GR or AA),
+		            "SerialNumber" : string?,
+		            "MonthsPerRenewal" : int?,
+                },
+                "AddHistory": [ {
+                    "EventType": string,
+                    "EventDate": string formatted as "yyyy-mm-dd hr:mn:sc.000",
+                    } ,.. ],
+                "DeleteHistory": int[], 
+              } 
+         * PutHardware<T>(input) will update the entity specified and will automatically generate
+         *   assignment history. The method will also add history provided from the PUT request and 
+         *   delete rows specified in the request.
+         * Return: 200 if updates were successful, and 400 if they were not successful. 
+         */
         [HttpPut]
         [Route("monitor")]
         public IActionResult PutMonitor([FromBody] HistoryEntityInput<Monitor> input)
