@@ -103,7 +103,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         programName: {value: nameInput, changed: false},
         description: {value: '', changed: false},
         renewalDate: {value: new Date(), changed: false},
-        purchaseDate: {value: new Date(), changed: false},
         purchaseLink: {value: '', changed: false},
         licenseKey: {value: '', changed: false},
         cost: {value: 0, changed: false},
@@ -212,7 +211,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 IsLicense: programInput.isLicense.value,
                 ProgramDescription: programInput.description.value,
                 ProgramPurchaseLink: programInput.purchaseLink.value,
-                DateBought: programInput.purchaseDate.value.toISOString(),
+                DateBought: programInput.purchaseDate
+                    ? programInput.purchaseDate.value.toISOString()
+                    : new Date().toISOString(),
                 RenewalDate:
                     programInput.monthsPerRenewal.value === 0 ? null : programInput.renewalDate.value.toISOString(),
                 MonthsPerRenewal: programInput.cost.value
@@ -309,9 +310,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         ProgramPurchaseLink: programUpdateInput.purchaseLink.changed
                             ? programUpdateInput.purchaseLink.value
                             : null,
-                        DateBought: programUpdateInput.purchaseDate.changed
-                            ? programUpdateInput.purchaseDate.value.toISOString()
-                            : null,
+                        // DateBought: programUpdateInput.purchaseDate.changed
+                        //     ? programUpdateInput.purchaseDate.value.toISOString()
+                        //     : null,
                         RenewalDate: programUpdateInput.renewalDate.changed
                             ? programUpdateInput.renewalDate.value.toISOString()
                             : null,

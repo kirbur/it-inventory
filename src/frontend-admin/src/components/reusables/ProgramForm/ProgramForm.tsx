@@ -19,7 +19,7 @@ export interface IProgramFormInputs {
     flatCost: {value: number; changed: boolean}
     renewalDate: {value: Date; changed: boolean}
     monthsPerRenewal: {value: number; changed: boolean}
-    purchaseDate: {value: Date; changed: boolean}
+    purchaseDate?: {value: Date; changed: boolean}
     purchaseLink: {value: string; changed: boolean}
     licenseKey: {value: string; changed: boolean}
     isLicense: {value: boolean; changed: boolean}
@@ -37,15 +37,17 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
     return (
         <div className={styles.formMain}>
             <Group direction={'row'}>
-                <div className={styles.row1Input}>
-                    <div className={styles.inputText}>Purchase Date</div>
-                    <DatePicker
-                        dateFormat='MM/dd/yyyy'
-                        selected={state.purchaseDate.value}
-                        onChange={e => e && setState({...state, purchaseDate: {value: e, changed: true}})}
-                        className={styles.input}
-                    />
-                </div>
+                {state.purchaseDate && (
+                    <div className={styles.row1Input}>
+                        <div className={styles.inputText}>Purchase Date</div>
+                        <DatePicker
+                            dateFormat='MM/dd/yyyy'
+                            selected={state.purchaseDate.value}
+                            onChange={e => e && setState({...state, purchaseDate: {value: e, changed: true}})}
+                            className={styles.input}
+                        />
+                    </div>
+                )}
                 <div className={styles.row1Input}>
                     <div className={styles.inputText}>Renewal Date</div>
                     <DatePicker

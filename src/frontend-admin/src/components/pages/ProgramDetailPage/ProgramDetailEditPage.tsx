@@ -50,6 +50,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                 setProgData({
                     name: data[0].programName,
                     employee: data[0].employeeName,
+                    dateBought: data[0].dateBought,
                 })
 
                 setProgramInput({
@@ -107,7 +108,9 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     ProgramLicenseKey: programInput.licenseKey.value,
                     ProgramDescription: programInput.description.value,
                     ProgramPurchaseLink: programInput.purchaseLink.value,
-                    DateBought: programInput.purchaseDate.value.toISOString(),
+                    DateBought: programInput.purchaseDate
+                        ? programInput.purchaseDate.value.toISOString()
+                        : progData.dateBought,
                     RenewalDate: programInput.renewalDate.value.toISOString(),
                     MonthsPerRenewal: programInput.monthsPerRenewal.value,
                     EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,

@@ -46,7 +46,6 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         axios
             .get(`/detail/program/${match.params.id}`)
             .then((data: any) => {
-                console.log(data)
                 setProgData({
                     name: data[0].programName,
                     dateBought: formatDate(data[0].dateBought),
@@ -76,16 +75,20 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     }, [])
 
     useEffect(() => {
-        axios
-            .get(progData.icon)
-            .then((data: any) => {
-                if (data !== '') {
-                    setImg(URL + progData.icon)
-                } else {
-                    setImg(placeholder)
-                }
-            })
-            .catch((err: any) => console.error(err))
+        //Check to see if the given icon string corresponds to
+        //an actual image, if not display the placeholder
+        if (progData.icon) {
+            axios
+                .get(progData.icon)
+                .then((data: any) => {
+                    if (data !== '') {
+                        setImg(URL + progData.icon)
+                    } else {
+                        setImg(placeholder)
+                    }
+                })
+                .catch((err: any) => console.error(err))
+        }
     }, [progData.icon])
 
     const handleArchive = () => {
@@ -113,9 +116,8 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         <img className={styles.img} src={img} alt={''} />
                     </div>
                     <div className={styles.costText}>
-                        {progData.flatCost ? (
-                            <p>Paid ------------------ ${progData.flatCost}</p>
-                        ) : progData.isCostPerYear ? (
+                        {progData.flatCost > 0 && <p>Paid ------------------ ${progData.flatCost}</p>}
+                        {progData.isCostPerYear ? (
                             <p>Yearly ---------------- ${progData.costPerYear}</p>
                         ) : (
                             <p>Monthly --------------- ${progData.costPerYear}</p>
