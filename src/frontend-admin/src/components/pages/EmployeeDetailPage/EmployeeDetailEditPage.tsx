@@ -56,7 +56,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
@@ -546,6 +546,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     window.alert(`Something went wrong`)
                     console.error(err)
                 })
+
+            history.push(`/employees`)
         } else if (match.params.id === 'new') {
             //one or maore of the inputs was null/undefined/empty
             var msg = 'Failed because:\n'
@@ -614,14 +616,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 .put(`/update/Employee`, updateEmployee)
                 .then((response: any) => {
                     console.log(response)
-                    if (response) {
-                        window.alert(`${selectedEmployee.name} was successfully updated!`)
-                    }
                 })
                 .catch((err: any) => {
                     window.alert(`Something went wrong`)
                     console.error(err)
                 })
+
+            history.push(`/employees/${match.params.id}`)
         } else {
             //one or maore of the inputs was null/undefined/empty
             var msg = 'Failed because:\n'
@@ -687,7 +688,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         return arr
     }
 
-    return (
+    return isAdmin ? (
         <div className={styles.columns}>
             {/* column 1 */}
 
@@ -1048,5 +1049,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 </div>
             </div>
         </div>
+    ) : (
+        //if not admin redirect back to deatial page
+        <div>{history.push(`/employees/${match.params.id}`)}</div>
     )
 }

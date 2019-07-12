@@ -30,9 +30,8 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
-    const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
     const [userData, setUserData] = useState<any>({})

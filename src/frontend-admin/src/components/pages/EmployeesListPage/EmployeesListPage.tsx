@@ -27,7 +27,7 @@ interface IEmployeesListPageProps {
 export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const {history, match} = props
     const {
-        loginContextVariables: {accessToken, refreshToken},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
     const axios = new AxiosService(accessToken, refreshToken)
 
@@ -221,7 +221,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     function concatenatedName(row: any[]) {
         return (
             <td key={row[8]} className={styles.employees}>
-                <img className={styles.icon} src={URL + row[7]} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={URL + row[7]} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
                     <text className={styles.role}>{row[6]}</text>
@@ -250,17 +252,30 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     return (
         <div className={styles.employeesListMain}>
-            <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
+            {isAdmin ? (
+                <Group direction='row' justify='between' className={styles.group}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
 
-                <FilteredSearch
-                    search={search}
-                    setSearch={setSearch}
-                    options={options}
-                    selected={selected}
-                    setSelected={setSelected}
-                />
-            </Group>
+                    <FilteredSearch
+                        search={search}
+                        setSearch={setSearch}
+                        options={options}
+                        selected={selected}
+                        setSelected={setSelected}
+                    />
+                </Group>
+            ) : (
+                <div className={styles.searchContainer}>
+                    {' '}
+                    <FilteredSearch
+                        search={search}
+                        setSearch={setSearch}
+                        options={options}
+                        selected={selected}
+                        setSelected={setSelected}
+                    />
+                </div>
+            )}
 
             <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
         </div>

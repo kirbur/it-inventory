@@ -12,12 +12,24 @@
     padding-bottom: 60px;
 }
 
-.icon {
-    max-height: 75px;
-    max-width: 75px;
-    min-height: 50px;
-    min-width: 50px;
+.searchContainer {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 60px;
+}
+
+.imgContainer {
+    width: 75px;
+    height: 75px;
     padding: 25px;
+    display: flex;
+}
+
+.icon {
+    margin: auto;
+    max-height: 75px;
+    width: 75px;
 }
 
 .alignLeft {
