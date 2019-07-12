@@ -172,6 +172,10 @@ namespace backend_api.Controllers
                     {
                         ListOfPlugins.Add(new
                         {
+                            plugin.PluginId,
+                            plugin.TextField,
+                            plugin.MonthsPerRenewal,
+                            plugin.Datebought,
                             plugin.PluginName,
                             plugin.RenewalDate,
                             plugin.PluginFlatCost,
