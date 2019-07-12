@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using backend_api.Models;
+using backend_api.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.DirectoryServices.AccountManagement;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Controllers
 {
@@ -517,6 +517,231 @@ namespace backend_api.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        /* GET: api/add/hardwarePrep
+         * Returns: [ {
+         *              employeeName: string,
+         *              employeeId: int,
+         *             } ,.. ]
+         * Will return an array of objects with the employee name and
+         *   id for every non-archived employee to be used when assigning 
+         *   a piece of hardware.
+         */
+        [HttpGet]
+        [Route("HardwarePrep")]
+        public IActionResult GetHardwarePrep()
+        {
+            return Ok(ListOfEmployees());
+        }
+
+        /* POST: api/add/monitor
+         * Method will add a monitor row to the monitor table with the specified
+         *   attribute values if they are valid and will add the appropriate hardware history.
+         * Input format:
+                {
+	                "Entity" : {
+		                "Make" : string?,
+		                "Model" : string?,
+		                "Resolution" : integer?,
+		                "Inputs" : string?,
+		                "EmployeeId" : int?,
+		                "TextField" : string?,
+		                "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		                "FlatCost" : decimal?,
+		                "CostPerYear" : decimal?,
+		                "ScreenSize" : float?,
+		                "Mfg" : string?,
+		                "RenewalDate" : string? (formatted yyyy-mm-dd),
+		                "Location" : "xx"? (either GR or AA),
+		                "SerialNumber" : string?,
+		                "MonthsPerRenewal" : int?,
+	                }
+                }
+         * Return: 201 created if successful, and 400 bad request if not.
+         */
+        [HttpPost]
+        [Route("Monitor")]
+        public IActionResult PostMonitor([FromBody] EntityInput<Monitor> input)
+        {
+            return PostHardware(input.Entity, _context.Monitor);
+        }
+
+        /* POST: api/add/server
+         * Method will add a server row to the server table with the specified
+         *   attribute values if they are valid and will add the appropriate hardware history.
+         * Input format:
+                {
+	                "Entity" : 
+	                {
+		                "Fqdn" : string?,
+		                "NumberOfCores" : int?,
+		                "OperatingSystem" : string?,
+		                "Ram" : int?,
+		                "Virtualize" : bool,
+		                "RenewalDate" : string? (formatted yyyy-mm-dd),
+		                "EmployeeId" : int?,
+		                "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		                "FlatCost" : decimal?,
+		                "EndOfLife" : string? (formatted yyyy-mm-dd),
+		                "TextField" : string?,
+		                "CostPerYear" : decimal?,
+		                "MFG" : string?,
+		                "Make" : string?,
+		                "Model" : string?,
+		                "IPAddress" : string?,
+		                "SAN" : string?,
+		                "LocalHHD" : string?,
+		                "Location" : "xx"? (either GR or AA),
+		                "SerialNumber" : string?,
+		                "MonthsPerRenewal" : int?,
+	                }
+                }
+         * Return: 201 created if successful, and 400 bad request if not.
+         */
+        [HttpPost]
+        [Route("Server")]
+        public IActionResult PostServer([FromBody] EntityInput<Server> input)
+        {
+            return PostHardware(input.Entity, _context.Server);
+        }
+
+        /* POST: api/add/laptop
+         * Method will add a computer row to the computer table with the specified
+         *   attribute values if they are valid and will add the appropriate hardware history.
+         * Input format:
+                {
+	                "Entity" : {
+		                "Cpu" : string?,
+		                "Ramgb" : int?,
+		                "Ssdgb" : int?,
+		                "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		                "RenewalDate" : string? (formatted yyyy-mm-dd),
+		                "FlatCost" : decimal?,
+		                "MonitorOutput" : string?,
+		                "EndOfLife" : string? (formatted yyyy-mm-dd),
+		                "EmployeeId" : int?,
+		                "TextField" : string?,
+		                "ScreenSize" : float?,
+		                "CostPerYear" : decimal?,
+		                "Resolution" : decimal?,
+		                "Mfg" : string?,
+		                "Make" : string?,
+		                "Model" : string?,
+		                "Fqdn" : string?,
+		                "Location" : "xx"? (either GR or AA),
+		                "SerialNumber" : string?,
+		                "MonthsPerRenewal" : int?
+	                }
+                }
+         * Return: 201 created if successful, and 400 bad request if not.
+         */
+        [HttpPost]
+        [Route("Laptop")]
+        [Route("Computer")]
+        public IActionResult PostComputer([FromBody] EntityInput<Computer> input)
+        {
+            return PostHardware(input.Entity, _context.Computer);
+        }
+
+        /* POST: api/add/peripheral
+         * Method will add a peripheral row to the peripheral table with the specified
+         *   attribute values if they are valid and will add the appropriate hardware history.
+         * Input format:
+                {
+	                "Entity" : {
+		                "PeripheralName" : string?,
+		                "PeripheralType" : string?,
+		                "TextField" : string?,
+		                "EmployeeId" : int?,
+		                "FlatCost" : decimal?,
+		                "PurchaseDate" : string? (formatted yyyy-mm-dd),,
+		                "CostPerYear" : decimal?,
+		                "Mfg" : string?,
+		                "Location" : "xx"? (either GR or AA),
+		                "RenewalDate" : string? (formatted yyyy-mm-dd),
+		                "SerialNumber" : string?,
+		                "MonthsPerRenewal" : int?,
+	                }
+                }
+         * Return: 201 created if successful, and 400 bad request if not.
+         */
+        [HttpPost]
+        [Route("Peripheral")]
+        public IActionResult PostPeripheral([FromBody] EntityInput<Peripheral> input)
+        {
+            return PostHardware(input.Entity, _context.Peripheral);
+        }
+
+        /* PostHardware<T>(hardware, table) is a method to post any hardware type 
+         *   to it's corresponding table and add hardware history.
+         * Return: 201 created if successful, and 400 bad request if not.
+         */
+        private IActionResult PostHardware<T>(T hardware, DbSet<T> table)
+            where T : class, IHardwareBase
+        {
+            int? EmployeeId = hardware.EmployeeId;
+
+            // Update values we don't want touched by the endpoint call.
+            hardware.IsAssigned = EmployeeId != null ? true : false;
+            hardware.IsDeleted = false;
+
+            // NOTE: CostPerYear is calculated on the front end.
+
+            // Get class name at runtime
+            string type = GetClassName(hardware);
+
+            try
+            {
+                table.Add(hardware);
+
+                // Save the changes to db so given Id can be accessed.
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return BadRequest($"Problem saving new {type} entity to the database");
+            }
+
+            int id = hardware.GetId();
+
+            try
+            {
+                // Add the history for date bought and for assigning an employee.
+                // If the PurchaseDate is null, then use the current date and time.
+                UpdateHardwareHistory(null, type, id, "Bought", hardware.PurchaseDate != null ? hardware.PurchaseDate : DateTime.Now);
+
+                // Add history for assigning employee
+                if (EmployeeId != null)
+                {
+                    UpdateHardwareHistory(EmployeeId, type, id, "Assigned", DateTime.Now);
+                }
+
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return BadRequest($"New {type} entity was created but there was an issue creating history for the entity");
+            }
+
+            // If we make it here, everything must have succeeded
+            return StatusCode(201);
+        }
+
+        /* UpdateHardwareHistory(empId, hardwareType, hardwareId, eventType, date) will add an entry into the 
+         *   hardware history table.
+         */
+        // TODO: Abstract this
+        private void UpdateHardwareHistory(int? empId, string hardwareType, int hardwareId, string eventType, DateTime? date)
+        {
+            _context.HardwareHistory.Add(new HardwareHistory
+            {
+                EmployeeId = empId,
+                HardwareType = hardwareType,
+                HardwareId = hardwareId,
+                EventType = eventType,
+                EventDate = date,
+            });
         }
     }
 }
