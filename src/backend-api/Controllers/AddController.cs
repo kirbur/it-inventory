@@ -457,6 +457,12 @@ namespace backend_api.Controllers
             // list to hold the congruent programs that will be added.
             List<Models.Program> Programs = new List<Models.Program>();
 
+            // make sure the number of programs added is not less than 1
+            if(input.Program.NumberOfPrograms < 1)
+            {
+                return BadRequest("number of programs cannot be less than 1");
+            }
+
             // list to hold the congruent histories of programs that will be added
             List<ProgramHistory> programHistories = new List<ProgramHistory>();
             try
