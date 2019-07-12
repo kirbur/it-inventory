@@ -90,17 +90,43 @@ namespace backend_api.Controllers
             {
                 foreach (var program in _context.Program.Where(x => x.ProgramName == input.Program.OldProgramName))
                 {
-                    program.ProgramName = input.Program.NewProgramName;
-                    program.ProgramCostPerYear = input.Program.ProgramCostPerYear;
-                    program.ProgramFlatCost = input.Program.ProgramFlatCost;
-                    program.ProgramLicenseKey = input.Program.ProgramLicenseKey;
-                    program.IsLicense = input.Program.IsLicense;
-                    program.Description = input.Program.ProgramDescription;
-                    program.ProgramPurchaseLink = input.Program.ProgramPurchaseLink;
-                    program.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
-                    program.DateBought = input.Program.DateBought;
-                    program.RenewalDate = input.Program.RenewalDate;
-                    program.MonthsPerRenewal = input.Program.MonthsPerRenewal;
+                    if (input.Program.NewProgramName != null)
+                    {
+                        program.ProgramName = input.Program.NewProgramName;
+                    }
+                    if (input.Program.ProgramCostPerYear != null)
+                    {
+                        program.ProgramCostPerYear = input.Program.ProgramCostPerYear;
+                    }
+                    if (input.Program.ProgramFlatCost != null)
+                    {
+                        program.ProgramFlatCost = input.Program.ProgramFlatCost;
+                    }
+                    if (input.Program.ProgramLicenseKey != null)
+                    {
+                        program.ProgramLicenseKey = input.Program.ProgramLicenseKey;
+                    }
+                    if (input.Program.IsLicense != null)
+                    {
+                        program.IsLicense = input.Program.IsLicense.Value;
+                    }
+                    if (input.Program.ProgramDescription != null)
+                    {
+                        program.Description = input.Program.ProgramDescription;
+                    }
+                    if (input.Program.ProgramPurchaseLink != null)
+                    {
+                        program.ProgramPurchaseLink = input.Program.ProgramPurchaseLink;
+                    }
+                    if (input.Program.MonthsPerRenewal != null)
+                    {
+                        program.MonthsPerRenewal = input.Program.MonthsPerRenewal;
+                        program.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
+                    }
+                    if (input.Program.RenewalDate != null)
+                    {
+                        program.RenewalDate = input.Program.RenewalDate;
+                    }
                 }
                 _context.SaveChanges();
                 return StatusCode(202);
@@ -173,7 +199,7 @@ namespace backend_api.Controllers
                     }
                     // Case 2: When an already assigned program becomes assigned to someone else
                     // This requires 2 entries; one for the unassigning and one for the assigning.
-                    else if (input.Program.EmployeeId != null && progEmpId != null)
+                    else if (input.Program.EmployeeId != null && progEmpId != null && input.Program.EmployeeId != prog.EmployeeId)
                     {
                         // unassigning
                         var History = (new ProgramHistory
