@@ -268,6 +268,14 @@ namespace backend_api.Controllers
             return PutHardware(input);
         }
 
+        // TODO:
+        [HttpPut]
+        [Route("monitor")]
+        public IActionResult PutMonitor([FromBody] HistoryEntityInput<Monitor> input)
+        {
+            return PutHardware(input);
+        }
+
         /* PUT: api/update/{hardware}
          * Input param format:
              { 
@@ -353,18 +361,26 @@ namespace backend_api.Controllers
 
                     // Create history specified in PUT request.
                     // NOTE: The user added history will be put under whatever the new employeeId is.
-                    foreach (var historyEvent in input.AddHistory)
+                    var addHistory = input.AddHistory;
+                    if (addHistory != null)
                     {
-                        UpdateHardwareHistory(newEmployeeId, type, hardwareId, historyEvent.EventType, historyEvent.EventDate);
+                        foreach (var historyEvent in addHistory)
+                        {
+                            UpdateHardwareHistory(newEmployeeId, type, hardwareId, historyEvent.EventType, historyEvent.EventDate);
+                        }
                     }
 
                     // Delete history rows user wanted to be deleted
-                    foreach (int historyEventId in input.DeleteHistory)
+                    int[] deleteHistory = input.DeleteHistory;
+                    if (deleteHistory != null)
                     {
-                        HardwareHistory historyEvent = _context.HardwareHistory.Find(historyEventId);
-                        if (historyEvent != null)
+                        foreach (int historyEventId in deleteHistory)
                         {
-                            _context.Remove(historyEvent);
+                            HardwareHistory historyEvent = _context.HardwareHistory.Find(historyEventId);
+                            if (historyEvent != null)
+                            {
+                                _context.Remove(historyEvent);
+                            }
                         }
                     }
 
