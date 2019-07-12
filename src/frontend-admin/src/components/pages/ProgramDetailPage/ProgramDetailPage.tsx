@@ -30,9 +30,8 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
-    const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
 
@@ -65,11 +64,11 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     ],
                 ])
 
-                var hist: any[] = []
-                data[0].entries.map((i: any) =>
-                    hist.push({date: formatDate(i.eventDate), event: format(i.eventType), user: format(i.employeeName)})
-                )
-                setHistoryList(hist)
+                // var hist: any[] = []
+                // data[0].entries.map((i: any) =>
+                //     hist.push({date: formatDate(i.eventDate), event: format(i.eventType), user: format(i.employeeName)})
+                // )
+                setHistoryList(data[0].entries)
             })
             .catch((err: any) => console.error(err))
     }, [])

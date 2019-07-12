@@ -61,9 +61,8 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
-    const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
     const [img, setImg] = useState('')
@@ -130,7 +129,6 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     ])
                 )
                 setPluginRows(plug)
-                console.log(data)
             })
             .catch((err: any) => console.error(err))
     }, [])

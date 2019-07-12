@@ -19,6 +19,7 @@ import {LoginContext} from '../../App/App'
 
 // Styles
 import styles from './ProgramsListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
 
 // Types
 interface IProgramsListPageProps {
@@ -29,11 +30,15 @@ interface IProgramsListPageProps {
 export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const {history} = props
     const {
-        loginContextVariables: {accessToken, refreshToken},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
     const axios = new AxiosService(accessToken, refreshToken)
 
     // state
+    const [useImages, setUseImages] = useState(false)
+    const [images, setImages] = useState<{name: string; img: string}[]>([])
+
+    const [displayImages, setDisplayImages] = useState<{name: string; img: string}[]>([])
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState(listData)
     const [search, setSearch] = useState('')
@@ -48,7 +53,8 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             .get('/list/programs')
             .then((data: any) => {
                 var programs: any[] = []
-                data.map((i: any) =>
+                var imgs: any[] = []
+                data.map((i: any) => {
                     programs.push({
                         name: format(i.programName),
                         renewalDate: formatDate(i.renewalDate),
@@ -56,14 +62,41 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                         perYear: i.progCostPerYear,
                         perUse: i.progCostPerUse,
                         isPerYear: i.isCostPerYear,
-                        icon: format(i.icon),
+                        icon: i.icon,
                         cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
                     })
-                )
+                    imgs.push({name: i.programName, img: i.icon})
+                })
                 setListData(programs)
+                setImages(imgs)
+                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
     }, [setListData])
+
+    //Set display Images
+    useEffect(() => {
+        images.map((img: any) =>
+            checkImages(img).then(data => {
+                var list = images.filter(i => i.name !== img.name)
+                setImages([...list, data])
+                displayImages.push(data)
+            })
+        )
+    }, [useImages])
+
+    //check image
+    async function checkImages(img: any) {
+        var arr: any[] = []
+        await axios
+            .get(img.img)
+            .then((data: any) => {
+                arr.push({name: img.name, img: data === '' ? placeholder : URL + img.img})
+            })
+            .catch((err: any) => console.error(err))
+
+        return arr[0]
+    }
 
     useEffect(() => {
         // Search through listData based on current value
@@ -183,10 +216,22 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }
 
     function concatenatedDept(row: any[]) {
-        return (
+        return displayImages &&
+            displayImages.filter(x => x.name === row[0]) &&
+            displayImages.filter(x => x.name === row[0])[0] ? (
             <td key={row[0]} className={styles.programs}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={URL + row[6]} alt={''} />
+                    <img className={styles.icon} src={displayImages.filter(x => x.name === row[0])[0].img} alt={''} />
+                </div>
+
+                <div className={styles.alignLeft}>
+                    <div className={styles.programName}>{row[0]}</div>
+                </div>
+            </td>
+        ) : (
+            <td key={row[0]} className={styles.programs}>
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
                 </div>
 
                 <div className={styles.alignLeft}>
@@ -237,17 +282,29 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             <Switch>
                 <Route path='/programs/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
             </Switch>
-            <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
+            {isAdmin ? (
+                <Group direction='row' justify='between' className={styles.group}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
 
-                <FilteredSearch
-                    search={search}
-                    setSearch={setSearch}
-                    options={options}
-                    selected={selected}
-                    setSelected={setSelected}
-                />
-            </Group>
+                    <FilteredSearch
+                        search={search}
+                        setSearch={setSearch}
+                        options={options}
+                        selected={selected}
+                        setSelected={setSelected}
+                    />
+                </Group>
+            ) : (
+                <div className={styles.searchContainer}>
+                    <FilteredSearch
+                        search={search}
+                        setSearch={setSearch}
+                        options={options}
+                        selected={selected}
+                        setSelected={setSelected}
+                    />
+                </div>
+            )}
 
             <div className={styles.page}>
                 <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
