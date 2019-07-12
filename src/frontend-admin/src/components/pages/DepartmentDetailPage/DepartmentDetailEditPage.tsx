@@ -179,30 +179,40 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
         return tempArray
     }
     async function handleSubmit() {
-        let newDefaultHardware = formatForPost(hardwareRows)
-        let newDefaultSoftware = formatForPost(softwareRows)
-        let newDefaultLicenses = formatForPost(licenseRows)
-        if (match.params.id === 'new') {
-            await axios.post(`add/department`, {
-                DefaultHardware: {DefaultHardware: newDefaultHardware},
-                DefaultPrograms: {
-                    license: newDefaultLicenses,
-                    software: newDefaultSoftware,
-                },
-                name: deptData.departmentName,
-            })
-            history.push('/departments')
+        console.log(deptData.departmentName)
+        if (
+            //check to make sure there is a proper entry in department name
+            deptData.departmentName === '' ||
+            deptData.departmentName === null ||
+            deptData.departmentName === undefined
+        ) {
+            window.alert('Department must have a name!')
         } else {
-            await axios.put(`update/department`, {
-                DefaultHardware: {DefaultHardware: newDefaultHardware},
-                DefaultPrograms: {
-                    license: newDefaultLicenses,
-                    software: newDefaultSoftware,
-                },
-                name: deptData.departmentName,
-                ID: match.params.id,
-            })
-            history.push(`/departments/${match.params.id}`)
+            let newDefaultHardware = formatForPost(hardwareRows)
+            let newDefaultSoftware = formatForPost(softwareRows)
+            let newDefaultLicenses = formatForPost(licenseRows)
+            if (match.params.id === 'new') {
+                await axios.post(`add/department`, {
+                    DefaultHardware: {DefaultHardware: newDefaultHardware},
+                    DefaultPrograms: {
+                        license: newDefaultLicenses,
+                        software: newDefaultSoftware,
+                    },
+                    name: deptData.departmentName,
+                })
+                history.push('/departments')
+            } else {
+                await axios.put(`update/department`, {
+                    DefaultHardware: {DefaultHardware: newDefaultHardware},
+                    DefaultPrograms: {
+                        license: newDefaultLicenses,
+                        software: newDefaultSoftware,
+                    },
+                    name: deptData.departmentName,
+                    ID: match.params.id,
+                })
+                history.push(`/departments/${match.params.id}`)
+            }
         }
     }
 

@@ -171,9 +171,14 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     }, [])
 
     async function handleArchive() {
-        if (window.confirm(`Are you sure you want to archive ${deptData.departmentName}?`)) {
-            await axios.put(`archive/department/${match.params.id}`, {})
-            history.push('/departments')
+        console.log(employeeRows.length)
+        if (employeeRows.length > 0) {
+            window.alert('Cannot archive department with employees in it!')
+        } else {
+            if (window.confirm(`Are you sure you want to archive ${deptData.departmentName}?`)) {
+                await axios.put(`archive/department/${match.params.id}`, {})
+                history.push('/departments')
+            }
         }
     }
 
