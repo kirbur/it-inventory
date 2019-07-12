@@ -2,10 +2,12 @@ import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 
 // Components
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
-import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
+import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
+import {History} from 'history'
+import {match} from 'react-router-dom'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -21,8 +23,8 @@ import {LoginContext} from '../../App/App'
 
 // Types
 interface IProgramDetailPageProps {
-    history: any
-    match: any
+    history: History
+    match: match<{id: string}>
 }
 
 // Primary Component
@@ -36,9 +38,31 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     const axios = new AxiosService(accessToken, refreshToken)
 
     const [img, setImg] = useState('')
-    const [progData, setProgData] = useState<any>({})
-    const [historyList, setHistoryList] = useState<any[]>([])
-    const [progRows, setProgRows] = useState<any[]>([])
+    const [progData, setProgData] = useState<{
+        name: string
+        dateBought: string
+        description: string
+        employee: string
+        employeeId: number
+        icon: string
+        renewalDate: string
+        isCostPerYear: boolean
+        flatCost: number
+        costPerYear: number
+    }>({
+        name: '',
+        dateBought: '',
+        description: '',
+        employee: '',
+        employeeId: -1,
+        icon: placeholder,
+        renewalDate: '',
+        isCostPerYear: false,
+        flatCost: 0,
+        costPerYear: 0,
+    })
+    const [historyList, setHistoryList] = useState<IHistoryLogArray[]>([])
+    const [progRows, setProgRows] = useState<ITableItem[][]>([])
     const progHeaders = ['License Key', 'Purchase Link']
 
     useEffect(() => {
@@ -51,7 +75,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     description: format(data[0].description),
                     employee: data[0].employeeName,
                     employeeId: data[0].employeeId,
-                    icon: format(data[0].picture),
+                    icon: data[0].picture,
                     renewalDate: formatDate(data[0].renewalDate),
                     isCostPerYear: data[0].isCostPerYear,
                     flatCost: data[0].programFlatCost,
@@ -59,15 +83,11 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                 })
                 setProgRows([
                     [
-                        {value: format(data[0].programLicenseKey ? data[0].programLicenseKey : '-')},
-                        {value: format(data[0].programPurchaseLink)},
+                        {value: format(data[0].programLicenseKey ? data[0].programLicenseKey : '-'), sortBy: 0},
+                        {value: format(data[0].programPurchaseLink), sortBy: 0},
                     ],
                 ])
 
-                // var hist: any[] = []
-                // data[0].entries.map((i: any) =>
-                //     hist.push({date: formatDate(i.eventDate), event: format(i.eventType), user: format(i.employeeName)})
-                // )
                 setHistoryList(data[0].entries)
             })
             .catch((err: any) => console.error(err))

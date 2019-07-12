@@ -27,13 +27,13 @@ export interface IProgramFormInputs {
 
 interface IProgramFormProps {
     state: IProgramFormInputs
-    setState: any
+    setState: Function
 }
 
 // Primary Component
 export const ProgramForm: React.SFC<IProgramFormProps> = props => {
     const {state, setState} = props
-    console.log(state)
+
     return (
         <div className={styles.formMain}>
             <Group direction={'row'}>

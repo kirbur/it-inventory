@@ -6,6 +6,8 @@ import {Button} from '../../reusables/Button/Button'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
+import {History} from 'history'
+import {match} from 'react-router-dom'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -19,8 +21,8 @@ import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Types
 interface IProgramDetailEditPageProps {
-    history: any
-    match: any
+    history: History
+    match: match<{id: string}>
 }
 
 // Helpers
@@ -34,9 +36,13 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
-    const [progData, setProgData] = useState<any>({})
+    const [progData, setProgData] = useState<{name: string; employee: string; dateBought: string}>({
+        name: '',
+        employee: '',
+        dateBought: '',
+    })
 
-    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>()
+    const [employeeDropdown, setEmployeeDropdown] = useState<{name: string; id: number}[]>()
     const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>()
 
     //input feild states:
@@ -72,8 +78,8 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     isLicense: {value: false, changed: false},
                 })
 
-                const employees: any[] = []
-                data[0].listOfEmployees.map((i: any) =>
+                const employees: {name: string; id: number}[] = []
+                data[0].listOfEmployees.map((i: {employeeName: string; employeeId: number}) =>
                     employees.push({
                         name: i.employeeName,
                         id: i.employeeId,
