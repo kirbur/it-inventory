@@ -193,16 +193,16 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         }
     }
 
-    // function renderFlatCost() {
-    //     if (flatCost !== undefined || null || 0) {
-    //         return <p>Flat Cost ---------------------- ${flatCost}</p>
-    //     }
-    // }
-    // function renderCostPerYear() {
-    //     if (costPerYear !== undefined || null || 0) {
-    //         return <p>Cost Per Year ------------------ ${costPerYear}</p>
-    //     }
-    // }
+    function renderFlatCost() {
+        if (flatCost !== undefined && flatCost !== null && flatCost !== 0) {
+            return <p>Flat Cost ---------------------- ${flatCost}</p>
+        }
+    }
+    function renderCostPerYear() {
+        if (costPerYear !== undefined && costPerYear !== null && costPerYear !== 0) {
+            return <p>Cost Per Year ---------------- ${costPerYear}</p>
+        }
+    }
 
     return (
         <div className={styles.detailMain}>
@@ -222,8 +222,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         {/* <img className={styles.img} src={URL + userData.photo} alt={''} /> */}
                     </div>
                     <div className={styles.costText}>
-                        <p>Flat Cost ---------------------- ${flatCost}</p>
-                        <p>Cost Per Year ---------------- ${costPerYear}</p>
+                        {renderFlatCost()}
+                        {renderCostPerYear()}
+                        {/* <p>Flat Cost ---------------------- ${flatCost}</p>
+                        <p>Cost Per Year ---------------- ${costPerYear}</p> */}
                     </div>
                 </div>
 
