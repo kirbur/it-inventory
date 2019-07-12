@@ -718,22 +718,6 @@ namespace backend_api.Controllers
             // If we make it here, everything must have succeeded
             return StatusCode(201);
         }
-
-        /* UpdateHardwareHistory(empId, hardwareType, hardwareId, eventType, date) will add an entry into the 
-         *   hardware history table.
-         */
-        // TODO: Abstract this
-        private void UpdateHardwareHistory(int? empId, string hardwareType, int hardwareId, string eventType, DateTime? date)
-        {
-            _context.HardwareHistory.Add(new HardwareHistory
-            {
-                EmployeeId = empId,
-                HardwareType = hardwareType,
-                HardwareId = hardwareId,
-                EventType = eventType,
-                EventDate = date,
-            });
-        }
     }
 }
 
