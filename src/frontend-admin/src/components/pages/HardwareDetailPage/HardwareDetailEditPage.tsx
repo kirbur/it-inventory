@@ -269,14 +269,20 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         setHistoryLogBool(!historyLogBool)
     }
     const submitHistoryLog = () => {
-        setHistoryLogBool(!historyLogBool)
-        let tempHistoryLog = cloneDeep(historyLogEntries)
-        tempHistoryLog.push({
-            user: thirdSectionData[0],
-            event: eventInput,
-            date: formatDate(dateInput.toString()),
-        })
-        setHistoryLogEntries(tempHistoryLog)
+        console.log(eventInput)
+        if (eventInput === 'Broken' || eventInput === 'Repaired') {
+            console.log(eventInput)
+            setHistoryLogBool(!historyLogBool)
+            let tempHistoryLog = cloneDeep(historyLogEntries)
+            tempHistoryLog.push({
+                user: thirdSectionData[0],
+                event: eventInput,
+                date: formatDate(dateInput.toString()),
+            })
+            setHistoryLogEntries(tempHistoryLog)
+        } else {
+            window.alert('Need to choose an event!')
+        }
         // TODO: post the entry to the db - wil post one at a time
     }
 
@@ -405,7 +411,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                         <div className={styles.inputHeader}>Repaired</div>
                                     </div>
                                 </div>
-                                {/* the rest of the logs are done on the backend - obsolete when archived */}
+                                {/* the rest of the logs are done on the backend */}
                             </div>
                             {/* should send back the employee of this page */}
                             <div className={styles.historyLogSubmit}>

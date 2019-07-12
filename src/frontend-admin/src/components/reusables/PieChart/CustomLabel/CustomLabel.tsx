@@ -27,9 +27,8 @@ export const CustomLabel: React.FunctionComponent<ICustomLabelProps> = props => 
 
     var radius
     var textColor
-    // console.log(data[index].value)
     if (data[index].value == 0) {
-        radius = innerRadius + (outerRadius - innerRadius) * 1.15
+        radius = innerRadius + (outerRadius - innerRadius) * 1.31
         textColor = '#f4f4f4'
     } else if (sizeOfSlice < 0.15) {
         radius = innerRadius + (outerRadius - innerRadius) * 1.15
