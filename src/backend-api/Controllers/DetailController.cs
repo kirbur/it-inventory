@@ -14,81 +14,12 @@ namespace backend_api.Controllers
     // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class DetailController : ControllerBase
+    public class DetailController : ContextController
     {
-        private readonly ITInventoryDBContext _context;
-
-        public DetailController(ITInventoryDBContext context)
-        {
-            _context = context;
-        }
-
-        /* isAdmin determines if the username from the AccessToken is an admin user.
-         *  If the user is an admin, we can choose to return specific values to the front end.
-         * Return: boolean
-         */
-        private bool isAdmin()
-        {
-            // Take the bearer token string, convert it to a Jwt, and find the username from the claims.
-            var TokenList = Request.Headers["Authorization"].ToString().Split(" ");
-
-            // If there was no bearer token give, an out of range index error will be thrown.
-            try
-            {
-                var JwtToken = new JwtSecurityTokenHandler().ReadJwtToken(TokenList[1]);
-                var username = JwtToken.Claims.First().Value;
-
-                // Check to see if the username is in our AD.
-                using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
-                {
-                    var user = UserPrincipal.FindByIdentity(adContext, username);
-                    if (user != null)
-                    {
-                        // Return the isAdmin field from the AuthIDServer matching the Guid.
-                        return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == user.Guid.Value).First().IsAdmin;
-                    }
-                    else
-                    {
-                        // Return false if the user is not in AuthID.
-                        return false;
-                    }
-                }
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return false;
-            }
-
-        }
-
-        private List<object> listOfEmployees()
-        {
-            List<object> ListOfEmployees = new List<object>();
-            foreach (var emp in _context.Employee.Where(x => x.IsDeleted == false).ToList())
-            {
-                var employeeName = emp.FirstName + " " + emp.LastName;
-                var employee = new
-                {
-                    employeeName,
-                    emp.EmployeeId
-                };
-                ListOfEmployees.Add(employee);
-            }
-            return ListOfEmployees;
-        }
-
-        // TODO: Abstract this reused code from this and the image controller.
-        /* Change the front end to match the back end verbatim. 
-         * Return: "computer" if "laptop" is matched.
-         * Else: return the same string.
-         */
-        private string VerbatimMatch(string routeModel)
-        {
-            return routeModel.ToLower() == "laptop" ? "computer" : routeModel.ToLower();
-        }
+        public DetailController(ITInventoryDBContext context) : base(context) { }
 
         /* GET: api/detail/{model}/{id}
-         *      Return: 
+         *      Return: A json for the specific model for each id. See before for specifics.
          */
         [HttpGet]
         [Route("{model}/{id}")]
@@ -672,7 +603,7 @@ namespace backend_api.Controllers
                     prog.IsCostPerYear,
                     prog.Description,
                     prog.ProgramPurchaseLink,
-                    listOfEmployees = listOfEmployees()
+                    listOfEmployees = ListOfEmployees()
                 };
 
                 return Ok(new List<object> { ProgramDetails });
@@ -1028,7 +959,7 @@ namespace backend_api.Controllers
                     serverClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     SeverHistory,
-                    listOfEmployees = listOfEmployees()
+                    listOfEmployees = ListOfEmployees()
                 });
                 return Ok(new List<object> { serverDetailPage });
             }
@@ -1134,7 +1065,7 @@ namespace backend_api.Controllers
                     computerClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     ComputerHistory,
-                    listOfEmployees = listOfEmployees()
+                    listOfEmployees = ListOfEmployees()
                 });
                 List<object> list = new List<object>();
                 list.Add(computerDetailPage);
@@ -1239,7 +1170,7 @@ namespace backend_api.Controllers
                     monitorClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     MonitorHistory,
-                    listOfEmployees = listOfEmployees()
+                    listOfEmployees = ListOfEmployees()
                 });
                 return Ok(new List<object> { monitorDetailPage });
             }
@@ -1339,12 +1270,10 @@ namespace backend_api.Controllers
                     peripheralClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     peripheralHistory,
-                    listOfEmployees = listOfEmployees()
+                    listOfEmployees = ListOfEmployees()
                 });
                 return Ok(new List<object> { peripheralDetailPage });
             }
         }
-
-
     }
 }
