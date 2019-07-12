@@ -122,7 +122,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     setPurchaseDateInput(data[0].server.purchaseDate)
                     setRenewalDateInput(data[0].server.renewalDate)
                     setEndOfLifeInput(data[0].server.endOfLife)
-                    setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].server.location])
+                    setThirdSectionData([
+                        data[0].employeeAssignedName,
+                        data[0].departmentName,
+                        data[0].server.location,
+                        data[0].server.employeeId,
+                    ])
                     setCostSection([
                         data[0].server.flatCost,
                         data[0].server.costPerYear,
@@ -226,9 +231,10 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
     async function handleSubmit() {
         console.log(match.params.id)
+        console.log(match.params.type)
         if (match.params.id === 'new') {
             if (match.params.type === 'monitor') {
-                axios.post(`add/monitor`, {
+                await axios.post(`add/monitor`, {
                     Entity: {
                         Make: firstSectionData[0],
                         Model: firstSectionData[1],
@@ -249,35 +255,48 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Mfg: null,
                         TextField: commentText,
                     },
-                    // setFirstSectionData([
-                    //     data[0].monitor.make,
-                    //     data[0].monitor.model,
-                    //     data[0].monitor.screenSize,
-                    //     data[0].monitor.resolution,
-                    //     data[0].monitor.inputs,
-                    //     data[0].monitor.serialNumber,
-                    // ])
-                    // setSecondSectionData([])
-                    // setPurchaseDateInput(data[0].monitor.purchaseDate)
-                    // setRenewalDateInput(data[0].monitor.renewalDate)
+                })
+            } else if (match.params.type === 'server') {
+                await axios.post(`add/server`, {
+                    Entity: {
+                        Make: firstSectionData[0],
+                        Model: firstSectionData[1],
+                        OperatingSystem: firstSectionData[2],
+                        Ram: firstSectionData[3],
+                        LocalHHD: firstSectionData[4],
+                        NumberOfCores: firstSectionData[5],
+                        MFG: firstSectionData[6],
+                        SerialNumber: firstSectionData[7],
+                        IPAddress: firstSectionData[8],
+                        SAN: firstSectionData[9],
+                        Fqdn: firstSectionData[10],
 
-                    // setThirdSectionData([data[0].employeeAssignedName, data[0].departmentName, data[0].monitor.location])
-                    // setCommentText(data[0].monitor.textField)
+                        Virtualize: false, //NEED TO ADD THIS
+
+                        RenewalDate: renewalDateInput,
+                        PurchaseDate: purchaseDateInput,
+                        EndOfLife: endOfLifeInput,
+
+                        Location: thirdSectionData[2],
+                        EmployeeId: thirdSectionData[3],
+
+                        FlatCost: costSection[0],
+                        CostPerYear: costSection[1],
+                        MonthsPerRenewal: costSection[2],
+
+                        TextField: commentText,
+                    },
                 })
-            } else if (match.params.id === 'server') {
-                axios.post(`add/monitor`, {
+            } else if (match.params.type === 'laptop') {
+                await axios.post(`add/laptop`, {
                     Entity: {},
                 })
-            } else if (match.params.id === 'laptop') {
-                axios.post(`add/monitor`, {
-                    Entity: {},
-                })
-            } else if (match.params.id === 'peripheral') {
-                axios.post(`add/monitor`, {
+            } else if (match.params.type === 'peripheral') {
+                await axios.post(`add/peripheral`, {
                     Entity: {},
                 })
             }
-            await history.push('/hardware')
+            history.push('/hardware')
         }
     }
 
