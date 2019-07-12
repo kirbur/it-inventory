@@ -172,7 +172,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     setHistoryLogEntries(data[0].computerHistory)
                     setEndOfLifeInput(data[0].computer.endOfLife)
 
-                    setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].computer.location])
+                    setThirdSectionData([
+                        data[0].employeeAssignedName,
+                        data[0].departmentName,
+                        data[0].computer.location,
+                        data[0].computer.employeeId,
+                    ])
                     setCommentText(data[0].computer.textField)
                 })
                 .catch((err: any) => console.error(err))
@@ -222,7 +227,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     setPurchaseDateInput(data[0].peripheral.purchaseDate)
 
                     setSecondSectionData([])
-                    setThirdSectionData([data[0].employeeAssignedName, 'NEED TO ADD'])
+                    setThirdSectionData([
+                        data[0].employeeAssignedName,
+                        data[0].departmentName,
+                        data[0].peripheral.location,
+                        data[0].peripheral.employeeId,
+                    ])
                     setCommentText(data[0].peripheral.textField)
                 })
                 .catch((err: any) => console.error(err))
@@ -289,11 +299,52 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 })
             } else if (match.params.type === 'laptop') {
                 await axios.post(`add/laptop`, {
-                    Entity: {},
+                    Entity: {
+                        Make: firstSectionData[0],
+                        Model: firstSectionData[1],
+                        Cpu: firstSectionData[2],
+                        Ssdgb: firstSectionData[3],
+                        ScreenSize: firstSectionData[4],
+                        MonitorOutput: firstSectionData[5],
+                        MFG: firstSectionData[6],
+                        SerialNumber: firstSectionData[7],
+                        Fqdn: firstSectionData[10],
+
+                        Virtualize: false, //NEED TO ADD THIS
+
+                        RenewalDate: renewalDateInput,
+                        PurchaseDate: purchaseDateInput,
+                        EndOfLife: endOfLifeInput,
+
+                        Location: thirdSectionData[2],
+                        EmployeeId: thirdSectionData[3],
+
+                        FlatCost: costSection[0],
+                        CostPerYear: costSection[1],
+                        MonthsPerRenewal: costSection[2],
+
+                        TextField: commentText,
+                    },
                 })
             } else if (match.params.type === 'peripheral') {
                 await axios.post(`add/peripheral`, {
-                    Entity: {},
+                    Entity: {
+                        PeripheralName: firstSectionData[0],
+                        PeripheralType: firstSectionData[1],
+                        Mfg: null,
+                        SerialNumber: firstSectionData[3],
+
+                        PurchaseDate: purchaseDateInput,
+
+                        Location: thirdSectionData[2],
+                        EmployeeId: thirdSectionData[3],
+
+                        FlatCost: costSection[0],
+                        CostPerYear: costSection[1],
+                        MonthsPerRenewal: costSection[2],
+
+                        TextField: commentText,
+                    },
                 })
             }
             history.push('/hardware')
