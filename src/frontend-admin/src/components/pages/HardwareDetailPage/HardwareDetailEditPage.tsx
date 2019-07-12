@@ -324,7 +324,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 {/* cost section */}
                 <div className={styles.radioSection}>
                     <div className={styles.radioContainer}>
-                        <div className={styles.radio}>
+                        <div className={s(styles.radio, styles.marginTop)}>
                             <input
                                 type='checkbox'
                                 className={styles.checkmark}
@@ -337,7 +337,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         <div>
                             <div className={styles.inputHeader}>Initial Cost</div>
                             <input
-                                className={s(styles.radioInput, styles.costInput)}
+                                className={styles.radioInput}
                                 type='number'
                                 step='0.01'
                                 // value={state.costPerMonth}
@@ -346,7 +346,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         </div>
                     </div>
                     <div className={styles.radioContainer}>
-                        <div className={styles.radio}>
+                        <div className={s(styles.radio, styles.marginTop)}>
                             <input
                                 type='checkbox'
                                 className={styles.checkmark}

@@ -122,6 +122,9 @@
     flex-direction: row;
     align-items: center;
     margin-left: 20px;
+    /* margin-top: 20px; */
+}
+.marginTop {
     margin-top: 20px;
 }
 .radioInput {
