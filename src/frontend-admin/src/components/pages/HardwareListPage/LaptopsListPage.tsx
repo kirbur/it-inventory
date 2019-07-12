@@ -10,7 +10,6 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -35,21 +34,21 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'makeModel', value: 'makeModel'})
+    const [selected, setSelected] = useState({label: 'Make', value: 'make'})
 
-    const columns = ['makeModel', 'id', 'cpu', 'ram', 'ssd', 'assigned', 'mfgtag']
-    const headerList = ['Make & Model', 'ID', 'CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag']
-    const options = columns.map((c, i) => ({label: headerList[i], value: c}))
+    const columns = ['make', 'cpu', 'ram', 'ssd', 'assigned', 'mfgtag', 'model']
+    const searchByHeaders = ['Make', 'CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag', 'Model']
+    const headerList = ['Make & Model', 'CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag']
+    const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
 
     useEffect(() => {
         axios
             .get('/list/laptops')
             .then((data: any) => {
                 const laptops: any[] = []
-                console.log(data)
                 data.map((i: any) => {
                     laptops.push({
-                        makeModel: format(i.make) + ' ' + i.model,
+                        make: format(i.make),
                         id: format(i.computerId),
                         cpu: format(i.cpu),
                         ram: format(i.ramgb),
@@ -57,6 +56,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
                         mfgtag: format(i.mfg),
                         icon: i.icon,
+                        model: format(i.model),
                     })
                 })
                 setListData(laptops)
@@ -89,7 +89,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/laptop/${row[1].props.children}`)
+        history.push(`hardware/laptop/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -108,7 +108,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
+        headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
     var initHeaderStates = cloneDeep(headerStates)
@@ -155,7 +155,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
             let header = (
                 <td
                     onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                        setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                         sortStates(i)
                     }}
                 >
@@ -173,10 +173,11 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         return (
-            <td className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[7]} alt={icon} />
+            <td key={row[1]} className={styles.hardware}>
+                <img className={styles.icon} src={URL + row[7]} alt={''} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text>
+                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={styles.alignLeft}>{row[8]}</text>
                 </div>
             </td>
         )
@@ -190,9 +191,6 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
-
-                case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
                     transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
                 case 3:
@@ -211,7 +209,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
 
     return (
         <div className={styles.listMain}>
-            <Group direction='row' justify='between'>
+            <Group direction='row' justify='between' className={styles.group}>
                 <Button text='Add' icon='add' onClick={handleClick} />
 
                 <FilteredSearch
@@ -222,8 +220,9 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
                     setSelected={setSelected}
                 />
             </Group>
-
-            <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            <div className={styles.table}>
+                <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            </div>
         </div>
     )
 }

@@ -6,12 +6,10 @@ namespace backend_api.Models
     public partial class ProgramHistory
     {
         public int ProgramHistoryId { get; set; }
-        public int? CurrentOwnerId { get; set; }
-        public DateTime? CurrentOwnerStartDate { get; set; }
-        public int? PreviousOwnerId { get; set; }
+        public int? EmployeeId { get; set; }
         public int ProgramId { get; set; }
-        public string EventName { get; set; }
-        public string EventDescription { get; set; }
+        public string EventType { get; set; }
+        public DateTime EventDate { get; set; }
 
         //public Employee CurrentOwner { get; set; }
         //public Employee PreviousOwner { get; set; }

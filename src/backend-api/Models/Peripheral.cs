@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public partial class Peripheral
+    public partial class Peripheral : IHardwareBase
     {
         public int PeripheralId { get; set; }
         public string PeripheralName { get; set; }
@@ -19,6 +19,9 @@ namespace backend_api.Models
         public string Location { get; set; }
         public DateTime? RenewalDate { get; set; }
         public string SerialNumber { get; set; }
+        public int? MonthsPerRenewal { get; set; }
+
+        public int GetId() { return PeripheralId; }
 
         //public Employee Employee { get; set; }
     }

@@ -76,14 +76,9 @@ namespace backend_api.Controllers
                     var ProgCostPerUse = _context.Program.Where(x => x.EmployeeId == emp.EmployeeId && x.ProgramFlatCost != null && x.IsDeleted != true).Sum(x => x.ProgramFlatCost);
 
                     // Dividing the yearly cost into months Adding the programs costs into one variable if the values are not null
-                    decimal? ProgramCostForEmp = 0;
+                    decimal ProgramCostForEmp = 0;
 
-                    if (ProgCostPerUse != null)
-                    {
-                        ProgramCostForEmp = ProgCostPerUse;
-                    }
-                    else if (ProgramCostForEmp != null)
-                        ProgramCostForEmp = ProgCostForEmpPerYear / 12;
+                    ProgramCostForEmp = Math.Round(System.Convert.ToDecimal(ProgCostForEmpPerYear / 12), 2, MidpointRounding.ToEven);
 
                     // concatenating the first and the last name
                     var EmployeeName = emp.FirstName + " " + emp.LastName;
@@ -127,7 +122,7 @@ namespace backend_api.Controllers
                     var ProgForEmp = _context.Program.Where(x => x.EmployeeId == emp.EmployeeId && x.IsDeleted == false).Select(x => x.ProgramName);
 
                     // lambda to select the department of this employee which is not deleted
-                    var EmpDep = _context.Department.Where(x => x.DepartmentId == emp.DepartmentId && x.IsDeleted == false).Select(x => x.DepartmentName).FirstOrDefault().ToString();
+                    var EmpDep = _context.Department.Where(x => x.DepartmentId == emp.DepartmentID && x.IsDeleted == false).Select(x => x.DepartmentName).FirstOrDefault().ToString();
 
                     // photo path.
                     string photo = $"/image/employee/{emp.EmployeeId}";
@@ -168,10 +163,10 @@ namespace backend_api.Controllers
                     decimal? CostOfPrograms = 0;
 
                     // finds number of employees in the current department
-                    var numOfEmp = _context.Employee.Where(x => x.DepartmentId == dep.DepartmentId && x.IsDeleted == false).Count();
+                    var numOfEmp = _context.Employee.Where(x => x.DepartmentID == dep.DepartmentId && x.IsDeleted == false).Count();
 
                     //creates a list of the employees in the current department
-                    var listOfEmpInDep = _context.Employee.Where(x => x.DepartmentId == dep.DepartmentId && x.IsDeleted == false).ToList();
+                    var listOfEmpInDep = _context.Employee.Where(x => x.DepartmentID == dep.DepartmentId && x.IsDeleted == false).ToList();
 
                     //list to store programs that are being used by the current department
                     var ProgUsedByDep = new List<Models.Program>();
@@ -224,7 +219,8 @@ namespace backend_api.Controllers
         /* GET: api/list/Servers 
          * Returns: [ {
          *            serverId: int,
-         *            fdqn: string,
+         *            make : string,
+         *            model : string,
          *            numberOfCores: int,
          *            ram: int,
          *            renewaldate: date
@@ -262,7 +258,7 @@ namespace backend_api.Controllers
                 }
                 string icon = $"/image/server/{sv.ServerId}";
                 // Create a server object to be returned.
-                var Server = new { sv.ServerId, sv.Fqdn, sv.NumberOfCores, sv.Ram, sv.RenewalDate, sv.Mfg, employeeFirstName, employeeLastName, icon };
+                var Server = new { sv.ServerId, sv.Make, sv.Model, sv.NumberOfCores, sv.Ram, sv.RenewalDate, sv.Mfg, employeeFirstName, employeeLastName, icon };
                 listOfservers.Add(Server);
             }
             return Ok(listOfservers);
@@ -271,6 +267,8 @@ namespace backend_api.Controllers
         /* GET: api/list/Laptops
          * Returns: [ {
          *            computerId: int,
+         *            make : string,
+         *            model : string,
          *            cpu: string,
          *            ramgb: int,
          *            ssdgb: int,
@@ -320,6 +318,7 @@ namespace backend_api.Controllers
          * Returns: [ {
          *             monitorId: int,
          *             make: string,
+         *             model : string,
          *             screenSize: float,
          *             resolution: int,
          *             inputs: string,
@@ -354,7 +353,7 @@ namespace backend_api.Controllers
                 }
                 string icon = $"/image/monitor/{mn.MonitorId}";
                 // Create a Monitor object to be returned.
-                var Monitor = new { mn.MonitorId, mn.Make, mn.ScreenSize, mn.Resolution, mn.Inputs, employeeFirstName, employeeLastName, icon };
+                var Monitor = new { mn.MonitorId, mn.Make, mn.Model, mn.ScreenSize, mn.Resolution, mn.Inputs, employeeFirstName, employeeLastName, icon };
                 listOfMonitors.Add(Monitor);
             }
             return Ok(listOfMonitors);
@@ -437,7 +436,7 @@ namespace backend_api.Controllers
             foreach (var prog in DistinctUsefulPrograms)
             {
                 // calculate the count of programs under this specific distinct program name that are in use
-                var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId!= null).Count();
+                var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId != null).Count();
 
                 // calculate the count of programs under this specific distinct program name
                 var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName).Count();

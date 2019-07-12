@@ -1,0 +1,91 @@
+.table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.tr {
+    color: #a5a5a5;
+    font-size: 20px;
+    cursor: pointer;
+    height: 100px;
+}
+
+/* tooltip styling */
+.tooltip {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.52px;
+    line-height: 30px;
+    color: black !important;
+    box-shadow: 1px 1px 6px 0 rgba(114, 114, 114, 0.2) !important;
+    border-radius: 15px;
+}
+.rowTitle {
+    color: #009eff;
+}
+
+/* delete icon next to row */
+.delete {
+    background-color: red;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+}
+.delete:hover {
+    background-color: maroon;
+}
+.whiteLine {
+    width: 18px;
+    height: 2px;
+    background-color: white;
+    position: relative;
+    bottom: 16px;
+    left: 6px;
+}
+
+/* styling for table headers - will have to go on every page with a table*/
+.headerContainer {
+    color: #a5a5a5;
+    font-size: 24px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+    display: flex;
+    cursor: pointer;
+}
+.header {
+    text-align: left;
+    border-bottom: 1px solid #979797;
+}
+.rowData {
+    text-align: left;
+    color: #4a4a4a;
+}
+.notSorted {
+    border-left: 8px solid #636363;
+    border-right: 8px solid #636363;
+    border-top: 2px solid #636363;
+    border-bottom: none;
+    height: 2px;
+    position: relative;
+    top: 15px;
+    left: 5px;
+}
+.ascending {
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid #636363;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: relative;
+    bottom: 10px;
+    left: 5px;
+}
+.descending {
+    border-top: 8px solid #636363;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: relative;
+    top: 15px;
+    left: 5px;
+}

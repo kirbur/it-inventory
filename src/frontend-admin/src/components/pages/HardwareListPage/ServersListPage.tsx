@@ -10,7 +10,6 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import icon from '../../../content/Images/CQL-favicon.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -35,28 +34,32 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'FQDN', value: 'FQDN'})
+    const [selected, setSelected] = useState({label: 'make', value: 'make'})
 
-    const columns = ['FQDN', 'id', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag']
-    const headerList = ['FQDN', 'ID', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
-    const options = columns.map((c, i) => ({label: headerList[i], value: c}))
+    const columns = ['make', 'numberOfCores', 'RAM', 'renewalDate', 'MFGTag', 'model']
+    const searchByHeaders = ['Make', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag', 'Model']
+    const headerList = ['Make & Model', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
+    const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
 
     useEffect(() => {
         axios
             .get('/list/servers')
             .then((data: any) => {
+                console.log(data)
                 const servers: any[] = []
                 data.map((i: any) => {
                     servers.push({
-                        FQDN: format(i.fqdn),
+                        make: format(i.make),
                         id: format(i.serverId),
                         numberOfCores: format(i.numberOfCores),
                         RAM: format(i.ram),
                         renewalDate: formatDate(i.renewalDate),
                         MFGTag: format(i.mfg),
                         icon: i.icon,
+                        model: format(i.model),
                     })
                 })
+                console.log(servers)
                 setListData(servers)
             })
             .catch((err: any) => console.error(err))
@@ -87,7 +90,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/server/${row[1].props.children}`) //TODO: fix this, need id
+        history.push(`hardware/server/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -105,7 +108,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
-        headerStates.push(styles.notSorted)
+        headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
     var initHeaderStates = cloneDeep(headerStates)
@@ -152,7 +155,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             let header = (
                 <td
                     onClick={e => {
-                        setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                        setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                         sortStates(i)
                     }}
                 >
@@ -169,10 +172,11 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         return (
-            <td className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[6]} alt={icon} />
+            <td key={row[1]} className={styles.hardware}>
+                <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text>
+                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={styles.alignLeft}>{row[7]}</text>
                 </div>
             </td>
         )
@@ -182,20 +186,19 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     rows.forEach(row => {
         const transformedRow: any[] = []
+        console.log(row)
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
-                case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
+                    transformedRow[1] = <td className={styles.alignLeft}>{row[2]}</td>
                 case 3:
-                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]}</td>
                 case 4:
-                    transformedRow[4] = <td className={styles.alignLeft}>{row[4]}</td>
+                    transformedRow[3] = <td className={styles.alignLeft}>{row[4]}</td>
                 case 5:
-                    transformedRow[5] = <td className={styles.alignLeft}>{row[5]}</td>
+                    transformedRow[4] = <td className={styles.alignLeft}>{row[5]}</td>
             }
         }
 
@@ -215,8 +218,9 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                     setSelected={setSelected}
                 />
             </Group>
-
-            <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            <div className={styles.table}>
+                <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+            </div>
         </div>
     )
 }

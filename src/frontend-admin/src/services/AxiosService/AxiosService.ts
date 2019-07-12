@@ -32,6 +32,7 @@ export class AxiosService {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
+                crossdomain: true,
             },
         })
     }
@@ -41,16 +42,16 @@ export class AxiosService {
         return this.instance
             .get(
                 url /*, {
-                    headers: {
-                    Authorization: `Bearer ${this.user.accessToken}`
-                    }
-                }*/
+                headers: {
+                    Authorization: `Bearer ${this.user.accessToken}`,
+                },
+            }*/
             )
             .then(response => {
                 this.checkTokenExpired(url)
                 return response.data
             })
-            .catch(err => console.log(err))
+            .catch(err => console.error(err))
     }
 
     //wrapper method for post requests return the promise
@@ -61,8 +62,27 @@ export class AxiosService {
                     Authorization: `Bearer ${this.user.accessToken}`
                 }*/
             })
-            .then(response => this.checkTokenExpired(url, data))
-            .catch(err => console.log(err))
+            .then(response => {
+                this.checkTokenExpired(url)
+                return response
+            })
+            .catch(err => console.error(err))
+    }
+
+    //wrapper method for post requests return the promise
+    public put = (url: string, data: any, headers?: any) => {
+        return this.instance
+            .put(url, data, {
+                /*headers: {
+                    Authorization: `Bearer ${this.user.accessToken}`
+                }*/
+                ...headers,
+            })
+            .then(response => {
+                this.checkTokenExpired(url)
+                return response.data
+            })
+            .catch(err => console.error(err))
     }
 
     //check if token needs refreshing

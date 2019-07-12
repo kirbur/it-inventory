@@ -13,6 +13,9 @@ import {ProgramsListPage} from '../pages/ProgramsListPage/ProgramsListPage'
 import {ProgramDetailPage} from '../pages/ProgramDetailPage/ProgramDetailPage'
 import {Login} from '../reusables/Login/Login'
 import {HelloUser} from '../HelloUser/HelloUser'
+import logo from '../../content/Images/CQL-Logo-Color.png'
+import {EmployeeDetailEditPage} from '../pages/EmployeeDetailPage/EmployeeDetailEditPage'
+import {DepartmentDetailEditPage} from '../pages/DepartmentDetailPage/DepartmentDetailEditPage'
 
 // Styles
 import styles from './App.module.css'
@@ -75,7 +78,7 @@ export const App: React.FC = () => {
                         <div className={styles.navContainer}>
                             <HelloUser name={loginContextVariables.givenName} className={styles.helloMesssage} />
                             <nav className={styles.navBar}>
-                                <h1>CQL</h1>
+                                <img className={styles.navBarLogo} src={logo} alt={'CQL'} />
                                 <div className={styles.navEllipse} />
                                 <div className={styles.navRectangle} />
 
@@ -127,6 +130,17 @@ export const App: React.FC = () => {
                         <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
                         <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
                         <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
+
+                        <Route
+                            exact
+                            path={'/editEmployee/:id'}
+                            render={props => <EmployeeDetailEditPage {...props} />}
+                        />
+                        <Route
+                            exact
+                            path={'/editDepartment/:id'}
+                            render={props => <DepartmentDetailEditPage {...props} />}
+                        />
                     </Switch>
                 </Router>
 

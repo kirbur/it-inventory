@@ -75,6 +75,9 @@ namespace backend_api
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            // Add a DI for the UploadedFileRootPath
+            services.Configure<UploadOptions>(x => x.UploadedFileRootPath = Configuration["UploadedFileRootPath"]);
+
             // Creates a connection to the db in order to make ITInventoryDBContext available to MVC Controllers.
             services.AddDbContext<ITInventoryDBContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ITInventoryDb")));
             // Allows OData for powerful querying.
@@ -82,8 +85,13 @@ namespace backend_api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            // Set up basic console logging.
+            loggerFactory.AddDebug(LogLevel.Debug);
+            var logger = loggerFactory.CreateLogger("Startup");
+            logger.LogWarning("Logger configured!");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

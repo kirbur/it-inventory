@@ -63,6 +63,7 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                 var user = UserPrincipal.FindByIdentity(adContext, request.username);
                 if (result)
                 {
+
                     // boolean to store whether the user is an admin
                     bool isAdmin = false;
 
@@ -108,25 +109,21 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                     var Accesstoken = new JwtSecurityTokenHandler().WriteToken(accessToken);
 
                     //lambda checks if this is the user's first every login
-                    var ExistingEmployee = _context.AuthIdserver.ToList().Any(x => x.ActiveDirectoryId == user.Guid.ToString());
+                    var ExistingEmployee = _context.AuthIdserver.ToList().Any(x => x.ActiveDirectoryId == user.Guid);
 
                     //if employee has logged in before
-                    if (ExistingEmployee)
+                    if (ExistingEmployee == false)
+                    {
+                        return BadRequest("Employee trying to login does not exist in the database yet...");
+                    }
+                    else
                     {
                         //Update their refresh token to the new one just generated and store this in the database
-                        var empAuthId = _context.AuthIdserver.FirstOrDefault(x => x.ActiveDirectoryId == user.Guid.ToString());
+                        var empAuthId = _context.AuthIdserver.FirstOrDefault(x => x.ActiveDirectoryId == user.Guid);
                         empAuthId.RefreshToken = Refreshtoken;
                         _context.SaveChanges();
                         //checks if the employee is an admin
-                        isAdmin = _context.AuthIdserver.ToList().Where(x => x.ActiveDirectoryId == user.Guid.ToString()).Select(x => x.IsAdmin).FirstOrDefault();
-                    }
-                    else
-                    //employee has not logged in before
-                    {
-                        //create new employee AuthId entity
-                        AuthIdserver empAuthId = new AuthIdserver(user.Guid.ToString(), Refreshtoken, false);
-                        _context.AuthIdserver.Add(empAuthId);
-                        _context.SaveChanges();
+                        isAdmin = _context.AuthIdserver.ToList().Where(x => x.ActiveDirectoryId == user.Guid).Select(x => x.IsAdmin).FirstOrDefault();
                     }
 
                     // returning the need information about the employee logged in with their tokens
