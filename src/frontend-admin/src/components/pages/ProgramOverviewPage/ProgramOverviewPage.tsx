@@ -52,8 +52,9 @@ export interface ExpectedPluginType {
     pluginName: string
     pluginId: number
     renewalDate: string
-    pluginDescription: string
-    purchaseDate: string
+    dateBought: string
+    textField: string
+    monthsPerRenewal: number
 }
 
 // Primary Component
@@ -120,7 +121,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 let plug: ITableItem[][] = []
                 data[0].listOfPlugins.map((i: ExpectedPluginType) =>
                     plug.push([
-                        {value: format(i.pluginName), sortBy: format(i.pluginName), tooltip: i.pluginDescription},
+                        {value: format(i.pluginName), sortBy: format(i.pluginName), tooltip: i.textField},
                         {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
                         {
                             value: formatCost(i.isCostPerYear, i.pluginCostPerYear, i.pluginFlatCost),

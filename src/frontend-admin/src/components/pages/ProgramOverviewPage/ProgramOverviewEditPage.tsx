@@ -152,7 +152,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 value: format(i.pluginName),
                                 sortBy: format(i.pluginName),
                                 id: i.pluginId,
-                                tooltip: i.pluginDescription,
+                                tooltip: i.textField,
                             },
                             {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
                             {
@@ -162,15 +162,15 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         ])
 
                         plugList.push({
-                            id: i.pluginId ? i.pluginId : 0,
+                            id: i.pluginId,
                             name: i.pluginName,
                             programName: match.params.id,
-                            description: i.pluginDescription ? i.pluginDescription : '',
-                            recurringCost: i.pluginCostPerYear,
+                            description: i.textField,
+                            recurringCost: i.pluginCostPerYear / (12 / i.monthsPerRenewal),
                             flatCost: i.pluginFlatCost,
                             renewalDate: i.renewalDate ? new Date(i.renewalDate) : new Date(),
-                            purchaseDate: i.purchaseDate ? new Date(i.purchaseDate) : new Date(),
-                            monthsPerRenewal: i.isCostPerYear ? 12 : 1,
+                            purchaseDate: i.dateBought ? new Date(i.dateBought) : new Date(),
+                            monthsPerRenewal: i.monthsPerRenewal,
                         })
                     })
                     setPluginRows(plug)
@@ -324,10 +324,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     },
                 }
 
-                await axios
-                    .put(`update/programall`, updateProgram)
-                    .then((response: any) => console.log(response))
-                    .catch((err: any) => console.error(err))
+                await axios.put(`update/programall`, updateProgram).catch((err: any) => console.error(err))
 
                 //after submitting go back to detail
                 history.push(`/programs/overview/${match.params.id}`)
@@ -336,16 +333,25 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             if (pluginForm) {
                 setPluginInput({...pluginInput, programName: nameInput})
                 var postPlugin = {
-                    plugin: {
-                        //TODO: find out variable names from Joe
-                    },
+                    PluginId: pluginInput.id,
+                    ProgramName: match.params.id,
+                    PluginName: pluginInput.name,
+                    PluginFlatCost: pluginInput.flatCost,
+                    TextFeild: pluginInput.description,
+                    PluginCostPerYear: pluginInput.recurringCost * (12 / pluginInput.monthsPerRenewal),
+                    RenewalDate: pluginInput.renewalDate.toISOString(),
+                    MonthsPerRenewal: pluginInput.monthsPerRenewal,
+                    DateBought: pluginInput.purchaseDate.toISOString(),
                 }
-                //TODO: post request for new plugin
-                console.log(pluginInput)
+
                 if (pluginInput.id === -1) {
                     //TODO: post request for new plugin
+                    // axios.post('/add/plugin', postPlugin)
+                    // .catch((err: any) => console.error(err))
                 } else {
                     //TODO: put request edit plugin
+                    // axios.put('/update/plugin', postPlugin)
+                    // .catch((err: any) => console.error(err))
                 }
             }
 
