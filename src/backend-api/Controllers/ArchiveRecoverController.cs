@@ -12,6 +12,12 @@ namespace backend_api.Controllers
     [ApiController]
     public class ArchiveRecoverController : ContextController
     {
+        // Makes sure the operation is either "archive" or "recover"
+        public enum ValidOperation
+        {
+            Archive,
+            Recover,
+        }
         public ArchiveRecoverController(ITInventoryDBContext context) : base(context) { }
 
         /* PUT: api/{operation}/{model}/{id}
@@ -28,22 +34,13 @@ namespace backend_api.Controllers
          */
         [HttpPut]
         [Route("{operation}/{model}/{id}")]
-        public IActionResult ArchiveRecoverSwitch([FromRoute] string operation, string model, int id)
+        public IActionResult ArchiveRecoverSwitch([FromRoute] ValidOperation operation, string model, int id)
         {
             // Make the model all lower and change "laptop" to "computer".
             model = VerbatimMatch(model);
 
-            // Checks the validity of the operation (archive or recover), and assigns 
-            //      isDeleted to a boolean according to the operation provided.
-            bool isDeleted;
-            try
-            {
-                isDeleted = OperationCheck(operation);
-            }
-            catch (Exception)
-            {
-                return BadRequest($"Invalid operation: {operation}");
-            }
+            // Assigns isDeleted to a boolean according to the operation provided.
+            bool isDeleted = ValidOperation.Archive == operation ? true : false;
 
             switch (model)
             {
@@ -65,29 +62,6 @@ namespace backend_api.Controllers
                     return ArchiveRecoverHardware(_context.Peripheral, isDeleted, id);
                 default:
                     return BadRequest("Invalid Model");
-            }
-        }
-
-        /* OperationCheck(operation) converts the route path string
-         *      to a boolean value or throws an error if the string
-         *      is not "archive" or "recover".
-         * Params: string operation
-         * Returns: true if "archive" and false if "recover".
-         */
-        private bool OperationCheck(string operation)
-        {
-            operation = operation.ToLower();
-            if (operation == "archive")
-            {
-                return true;
-            }
-            else if (operation == "recover")
-            {
-                return false;
-            }
-            else
-            {
-                throw new ArgumentException($"invalid operation: {operation}");
             }
         }
 
@@ -168,13 +142,13 @@ namespace backend_api.Controllers
          * Return: IActionResult 200 if updated. Else, 400 bad request. 
          */
         private IActionResult ArchiveRecoverHardware<T>(DbSet<T> dbSet, bool isDeleted, int id)
-            where T : class, ISoftDeletable, IAssignable
+            where T : class, IHardwareBase
         {
             // Find hardware entity by ID.
             var hardware = dbSet.Find(id);
 
             // Find type name at runtime
-            string type = hardware.GetType().Name;
+            string type = GetClassName(hardware);
 
             // Make sure hardware is not null
             if (hardware != null)
@@ -192,7 +166,7 @@ namespace backend_api.Controllers
          * Return IActionResult 400 if the IsDeleted states are the same.
          */
         private IActionResult CheckEntityDeletedState<T>(T hardware, bool isDeleted, int id, string type)
-            where T : class, ISoftDeletable, IAssignable
+            where T : class, IHardwareBase
         {
             if (hardware.IsDeleted == isDeleted)
             {
@@ -203,13 +177,13 @@ namespace backend_api.Controllers
                 return TryUpdatingHardware(hardware, isDeleted, id, type);
             }
         }
-        
+
         /* TryUpdatingHardware<T>(hardware, isDeleted, id, type) will attempt to update the hardware entity fields
          *   and also create an entity on the hardware history recording the change.
          * Return IActionResult 200 if the updating works and 400 if there is an error.
          */
         private IActionResult TryUpdatingHardware<T>(T hardware, bool isDeleted, int id, string type)
-            where T : class, ISoftDeletable, IAssignable
+            where T : class, IHardwareBase
         {
             try
             {
@@ -230,7 +204,7 @@ namespace backend_api.Controllers
          *   parameter passed.
          */
         private void UpdateHardwareEntity<T>(T hardware, bool isDeleted)
-            where T : class, ISoftDeletable, IAssignable
+            where T : class, IHardwareBase
         {
             if (!isDeleted && hardware.EmployeeId != null)
             {
@@ -248,7 +222,7 @@ namespace backend_api.Controllers
          *   table recording the change to the hardware entity.
          */
         private void UpdateHardwareHistory<T>(T hardware, bool isDeleted, int id, string type)
-            where T : class, ISoftDeletable, IAssignable
+            where T : class, IHardwareBase
         {
             // Update the history: Archive or Recover
             _context.HardwareHistory.Add(new HardwareHistory
