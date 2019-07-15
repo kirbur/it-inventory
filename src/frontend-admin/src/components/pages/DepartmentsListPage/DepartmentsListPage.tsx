@@ -95,11 +95,11 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push(`/editDepartment/new`)
+        history.push(`/departments/edit/new`)
     }
 
     const handleRowClick = (row: any[]) => {
-        history.push(`departments/${row[0].key}`)
+        history.push(`departments/detail/${row[0].key}`)
     }
 
     var filteredRows: any[] = []

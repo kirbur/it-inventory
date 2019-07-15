@@ -110,11 +110,11 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/editHardware/laptop/new')
+        history.push('/hardware/edit/laptop/new')
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/laptop/${row[0].key}`)
+        history.push(`hardware/detail/laptop/${row[0].key}`)
     }
 
     var filteredRows: any[] = []

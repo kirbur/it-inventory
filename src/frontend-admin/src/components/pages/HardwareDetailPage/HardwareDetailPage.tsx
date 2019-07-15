@@ -190,8 +190,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     async function handleArchive() {
         if (window.confirm(`Are you sure you want to archive this ${match.params.type}?`)) {
             await axios.put(`archive/${match.params.type}/${match.params.id}`, {})
-            history.push('/departments')
-
             history.push('/hardware')
         }
     }
@@ -238,7 +236,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                                 text='Edit'
                                 icon='edit'
                                 onClick={() => {
-                                    history.push('/editHardware/' + match.params.type + '/' + match.params.id)
+                                    history.push('/hardware/edit/' + match.params.type + '/' + match.params.id)
                                 }}
                                 className={styles.editbutton}
                             />

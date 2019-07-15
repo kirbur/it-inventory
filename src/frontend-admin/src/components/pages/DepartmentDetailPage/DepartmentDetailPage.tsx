@@ -54,10 +54,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const isAdmin = true //TODO: remove
 
     const handleEmployeeClick = (id: number | string) => {
-        history.push(`/employees/${id}`)
+        history.push(`/employees/detail/${id}`)
     }
     const handleProgramClick = (id: number | string) => {
-        history.push(`/programs/${id}`)
+        history.push(`/programs/detail/${id}`)
     }
     function renderProgramCost(isProgramCostPerYear: boolean, programCostPerYear: number) {
         if (isProgramCostPerYear == true) {
@@ -212,7 +212,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                 text='Edit'
                                 icon='edit'
                                 onClick={() => {
-                                    history.push('/editDepartment/' + match.params.id)
+                                    history.push('/departments/edit/' + match.params.id)
                                     //TODO: wire to edit page in IIWA-155
                                 }}
                                 className={styles.editbutton}

@@ -100,11 +100,11 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/editHardware/monitor/new')
+        history.push('/hardware/edit/monitor/new')
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/monitor/${row[0].key}`)
+        history.push(`hardware/detail/monitor/${row[0].key}`)
     }
 
     var filteredRows: any[] = []

@@ -630,6 +630,14 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         }
         console.log(addHistoryLog)
     }
+
+    function removeLog(index: number) {
+        let tempHistoryLog = cloneDeep(historyLogEntries)
+        console.log(tempHistoryLog)
+        tempHistoryLog = tempHistoryLog.slice(0, index).concat(tempHistoryLog.slice(index + 1, tempHistoryLog.length))
+        console.log(tempHistoryLog)
+        setHistoryLogEntries(tempHistoryLog)
+    }
     const handleRemoveHistoryLog = () => {}
 
     const changeCost = (value: string, index: number) => {
@@ -732,7 +740,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 </div>
 
                 <div className={styles.historyLogContainer}>
-                    <HistoryLog historyLog={historyLogEntries} />
+                    <HistoryLog historyLog={historyLogEntries} remove={removeLog} />
                     {historyLogBool && (
                         <div className={styles.row}>
                             <div className={styles.inputContainer}>

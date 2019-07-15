@@ -53,6 +53,7 @@
     border-radius: 50%;
     width: 20px;
     height: 20px;
+    cursor: pointer;
 }
 .delete:hover {
     background-color: maroon;
@@ -62,6 +63,5 @@
     height: 2px;
     background-color: white;
     position: relative;
-    bottom: 12px;
-    left: 4px;
+    right: 16px;
 }

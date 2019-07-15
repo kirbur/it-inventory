@@ -99,11 +99,11 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/editHardware/peripheral/new')
+        history.push('/hardware/edit/peripheral/new')
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/peripheral/${row[0].key}`)
+        history.push(`hardware/detail/peripheral/${row[0].key}`)
     }
 
     var filteredRows: any[] = []

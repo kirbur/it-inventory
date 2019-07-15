@@ -15,11 +15,12 @@ interface IHistoryLogArray {
 
 interface IHistoryLogProps {
     historyLog: IHistoryLogArray[]
+    remove?: any
 }
 
 // Primary Component
 export const HistoryLog = (props: IHistoryLogProps) => {
-    const {historyLog} = props
+    const {historyLog, remove} = props
 
     //todo: post data automatically when assigning something to an employee
 
@@ -42,10 +43,20 @@ export const HistoryLog = (props: IHistoryLogProps) => {
                 tempElement = <div className={styles.description}>{'Archived'}</div>
             } else if (historyLog[i].eventType === 'Broken') {
                 tempElement = (
-                    <div className={styles.description}>{'Broken under the care of ' + historyLog[i].employeeName}</div>
+                    <div className={styles.description}>
+                        {'Broken under the care of ' + historyLog[i].employeeName} <br />
+                        <div className={styles.delete} onClick={e => remove(i)} />
+                        <div className={styles.whiteLine} />
+                    </div>
                 )
             } else if (historyLog[i].eventType === 'Repaired') {
-                tempElement = <div className={styles.description}>{'Repaired'}</div>
+                tempElement = (
+                    <div className={styles.description}>
+                        {'Repaired'} <br />
+                        <div className={styles.delete} onClick={e => remove(i)} />
+                        <div className={styles.whiteLine} />
+                    </div>
+                )
             } else if (historyLog[i].eventType === 'Recovered') {
                 tempElement = <div className={styles.description}>{'Recovered'}</div>
             }

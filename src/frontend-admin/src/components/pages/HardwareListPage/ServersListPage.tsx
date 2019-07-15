@@ -107,11 +107,11 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }
 
     const handleClick = () => {
-        history.push(`editHardware/server/new`)
+        history.push(`hardware/edit/server/new`)
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/server/${row[0].key}`)
+        history.push(`hardware/detail/server/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
