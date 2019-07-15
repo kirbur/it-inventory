@@ -346,10 +346,10 @@ namespace backend_api.Controllers
                         prog.EmployeeId = emp.EmployeeId;
                         programHistories.Add(UpdateProgramHistory(true, emp.EmployeeId, program.ID));
                     }
-                        // Save multiple entries at once
-                        _context.ProgramHistory.AddRange(programHistories);
-                        _context.SaveChanges();
-                    
+                    // Save multiple entries at once
+                    _context.ProgramHistory.AddRange(programHistories);
+                    _context.SaveChanges();
+
                 }
                 // if we get here then the various fields were created and changed and now we can return 201 created.
                 return StatusCode(201);
@@ -457,6 +457,12 @@ namespace backend_api.Controllers
             // list to hold the congruent programs that will be added.
             List<Models.Program> Programs = new List<Models.Program>();
 
+            // checking to see if number of programs is not less than 1
+            if (input.Program.NumberOfPrograms < 1)
+            {
+                return BadRequest("number of programs must be greater than 0");
+            }
+
             // list to hold the congruent histories of programs that will be added
             List<ProgramHistory> programHistories = new List<ProgramHistory>();
             try
@@ -518,6 +524,53 @@ namespace backend_api.Controllers
                 return BadRequest();
             }
         }
+        /* POST: api/add/Plugin
+         * Takes in as input:
+         * {
+	     *     "ProgramName" : String,
+	     *     "PluginName" : int,
+	     *     "PluginFlatCost" : Decimal,
+	     *     "TextField" : string,
+	     *     "PluginCostPerYear" : Decimal,
+	     *     "RenewalDate" : DateTime,
+	     *     "MonthsPerRenewal" : int,
+         *     "DateBought" : DateTime
+         * }
+         */
+
+        [HttpPost]
+        [Route("Plugin")]
+        public IActionResult PostPlugin([FromBody] PostPluginInputModel input)
+        {
+            if (!(_context.Program.Select(x => x.ProgramName).ToList().Contains(input.ProgramName)))
+                return BadRequest("No such program exists");
+            try
+            {
+                var plugin = new Plugins()
+                {
+                    PluginName = input.PluginName,
+                    PluginFlatCost = input.PluginFlatCost,
+                    ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First(),
+                    TextField = input.TextField,
+                    PluginCostPerYear = input.PLuginCostPerYear,
+                    IsDeleted = false,
+                    ProgramName = input.ProgramName,
+                    RenewalDate = input.RenewalDate,
+                    MonthsPerRenewal = input.MonthsPerRenewal,
+                    Datebought = input.DateBought,
+                    IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false,
+                };
+                _context.Add(plugin);
+                _context.SaveChanges();
+                return StatusCode(201);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+
 
         /* GET: api/add/hardwarePrep
          * Returns: [ {
@@ -726,22 +779,6 @@ namespace backend_api.Controllers
 
             // If we make it here, everything must have succeeded
             return StatusCode(201);
-        }
-
-        /* UpdateHardwareHistory(empId, hardwareType, hardwareId, eventType, date) will add an entry into the 
-         *   hardware history table.
-         */
-        // TODO: Abstract this
-        private void UpdateHardwareHistory(int? empId, string hardwareType, int hardwareId, string eventType, DateTime? date)
-        {
-            _context.HardwareHistory.Add(new HardwareHistory
-            {
-                EmployeeId = empId,
-                HardwareType = hardwareType,
-                HardwareId = hardwareId,
-                EventType = eventType,
-                EventDate = date,
-            });
         }
     }
 }

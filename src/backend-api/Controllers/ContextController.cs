@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using backend_api.Helpers;
 using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Controllers
 {
@@ -120,5 +122,19 @@ namespace backend_api.Controllers
             return obj.GetType().Name;
         }
 
+        /* UpdateHardwareHistory(empId, hardwareType, hardwareId, eventType, date) will add an entry into the 
+         *   hardware history table.
+         */
+        public void UpdateHardwareHistory(int? empId, string hardwareType, int hardwareId, string eventType, DateTime? date)
+        {
+            _context.HardwareHistory.Add(new HardwareHistory
+            {
+                EmployeeId = empId,
+                HardwareType = hardwareType,
+                HardwareId = hardwareId,
+                EventType = eventType,
+                EventDate = date,
+            });
+        }
     }
 }
