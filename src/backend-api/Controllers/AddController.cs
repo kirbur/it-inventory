@@ -544,30 +544,30 @@ namespace backend_api.Controllers
         {
             if (!(_context.Program.Select(x => x.ProgramName).ToList().Contains(input.ProgramName)))
                 return BadRequest("No such program exists");
-            try
+            var plugin = new Plugins()
             {
-                var plugin = new Plugins()
-                {
-                    PluginName = input.PluginName,
-                    PluginFlatCost = input.PluginFlatCost,
-                    ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First(),
-                    TextField = input.TextField,
-                    PluginCostPerYear = input.PLuginCostPerYear,
-                    IsDeleted = false,
-                    ProgramName = input.ProgramName,
-                    RenewalDate = input.RenewalDate,
-                    MonthsPerRenewal = input.MonthsPerRenewal,
-                    Datebought = input.DateBought,
-                    IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false,
-                };
-                _context.Add(plugin);
-                _context.SaveChanges();
-                return StatusCode(201);
-            }
-            catch
-            {
-                return BadRequest();
-            }
+                PluginName = input.PluginName,
+                PluginFlatCost = input.PluginFlatCost,
+                ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First(),
+                TextField = input.TextField,
+                PluginCostPerYear = input.PLuginCostPerYear,
+                IsDeleted = false,
+                ProgramName = input.ProgramName,
+                RenewalDate = input.RenewalDate,
+                MonthsPerRenewal = input.MonthsPerRenewal,
+                Datebought = input.DateBought,
+                IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false,
+            };
+            _context.Add(plugin);
+            _context.SaveChanges();
+
+            // find the specific program tied to this plugin that was just updated
+            var programTiedToPlugin = _context.Program.Find(plugin.ProgramId);
+
+            _context.Program.Where(x => x.ProgramName == programTiedToPlugin.ProgramName).ToList().ForEach(x => x.HasPlugIn = true);
+            _context.SaveChanges();
+            return StatusCode(201);
+
         }
 
 
