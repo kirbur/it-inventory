@@ -67,12 +67,10 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     purchaseDate: {value: new Date(data[0].dateBought), changed: false},
                     purchaseLink: {value: data[0].programPurchaseLink, changed: false},
                     licenseKey: {value: data[0].programLicenseKey ? data[0].programLicenseKey : '', changed: false},
-                    cost: {value: data[0].programCostPerYear, changed: false},
+                    cost: {value: data[0].programCostPerYear / (12 / data[0].monthsPerRenewal), changed: false},
                     flatCost: {value: data[0].programFlatCost ? data[0].programFlatCost : 0, changed: false},
                     monthsPerRenewal: {
-                        value: data[0].monthsPerRenewal
-                            ? data[0].monthsPerRenewal
-                            : 1 /*TODO: make sure this is added*/,
+                        value: data[0].monthsPerRenewal,
                         changed: false,
                     },
                     isLicense: {value: false, changed: false},
@@ -91,7 +89,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             .catch((err: any) => console.error(err))
     }, [])
 
-    const handleSubmit = () => {
+    async function handleSubmit() {
         //update image
         if (imgInput) {
             var formData = new FormData()
@@ -123,7 +121,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                 },
             }
 
-            axios.put(`update/program/${match.params.id}`, updateProgram).catch((err: any) => console.error(err))
+            await axios.put(`update/program/${match.params.id}`, updateProgram).catch((err: any) => console.error(err))
             history.push(`/programs/details/${match.params.id}`)
         }
     }

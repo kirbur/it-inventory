@@ -146,11 +146,11 @@ export const App: React.FC = () => {
                             render={props => <DepartmentDetailEditPage {...props} />}
                         />
                         <Route
-                            path={'/editProgramDetails/:id'}
+                            path={'/programs/edit/details/:id'}
                             render={props => <ProgramDetailEditPage {...props} />}
                         />
                         <Route
-                            path={'/editProgramOverview/:id'}
+                            path={'/programs/edit/overview/:id'}
                             render={props => <ProgramOverviewEditPage {...props} />}
                         />
                     </Switch>

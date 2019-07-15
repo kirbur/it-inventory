@@ -10,6 +10,7 @@ import {Group} from '../../reusables/Group/Group'
 import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
+import {Checkbox} from '../../reusables/Checkbox/Checkbox'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -269,7 +270,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     await axios
                         .post('/add/program', postProgram)
                         .then((response: any) => {
-                            console.log(response)
                             if (response.status === 201) {
                                 msg = numCopies + ' copies of ' + nameInput + ' were added to inventory!'
                                 window.alert(msg)
@@ -337,7 +337,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     ProgramName: match.params.id,
                     PluginName: pluginInput.name,
                     PluginFlatCost: pluginInput.flatCost,
-                    TextFeild: pluginInput.description,
+                    TextField: pluginInput.description,
                     PluginCostPerYear: pluginInput.recurringCost * (12 / pluginInput.monthsPerRenewal),
                     RenewalDate: pluginInput.renewalDate.toISOString(),
                     MonthsPerRenewal: pluginInput.monthsPerRenewal,
@@ -345,13 +345,15 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 }
 
                 if (pluginInput.id === -1) {
-                    //TODO: post request for new plugin
-                    // axios.post('/add/plugin', postPlugin)
-                    // .catch((err: any) => console.error(err))
+                    await axios.post('/add/plugin', postPlugin).catch((err: any) => console.error(err))
+
+                    msg = postPlugin.PluginName + ' was added to ' + postPlugin.ProgramName
+                    window.alert(msg)
                 } else {
-                    //TODO: put request edit plugin
-                    // axios.put('/update/plugin', postPlugin)
-                    // .catch((err: any) => console.error(err))
+                    await axios.put('/update/plugin', postPlugin).catch((err: any) => console.error(err))
+
+                    msg = postPlugin.PluginName + ' was updated'
+                    window.alert(msg)
                 }
             }
 
@@ -366,7 +368,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 .put(imgLocation, formData, {
                     headers: {'Content-Type': 'multipart/form-data'},
                 })
-                .then(data => console.log(data))
                 .catch(err => console.error(err))
 
             //after submitting go back to detail
@@ -453,8 +454,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 <div className={styles.secondColumn}>
                     <div className={styles.title}>Program Information</div>
 
-                    <Group justify={'between'} className={styles.nameInput}>
-                        <div className={styles.inputContainer}>
+                    <Group justify={'between'} className={styles.row1Group}>
+                        <div className={match.params.id !== 'new' ? styles.nameInput : styles.nameInputWithEdit}>
                             <div className={styles.inputText}>Program Name</div>
                             <input
                                 type='text'
@@ -464,32 +465,43 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             />
                         </div>
 
-                        <div className={styles.checkBoxContainer}>
-                            <div className={styles.inputText}>License</div>
-                            <div
-                                className={styles.checkbox}
-                                onClick={() =>
-                                    setProgramUpdateInput({
-                                        ...programUpdateInput,
-                                        isLicense: {value: !programUpdateInput.isLicense.value, changed: true},
-                                    })
-                                }
-                            >
-                                <div className={styles.check} />
-                                {programUpdateInput.isLicense.value && <div className={styles.insideCheck} />}
-                            </div>
-                        </div>
+                        <Checkbox
+                            className={styles.checkBoxContainer}
+                            checked={programUpdateInput.isLicense.value}
+                            title={'License'}
+                            onClick={() =>
+                                setProgramUpdateInput({
+                                    ...programUpdateInput,
+                                    isLicense: {value: !programUpdateInput.isLicense.value, changed: true},
+                                })
+                            }
+                        />
 
-                        <div className={styles.inputContainer}>
+                        <div className={styles.numCopies}>
                             <div className={styles.inputText}># of Copies</div>
                             <input
                                 type='number'
-                                className={s(styles.input, styles.pluginInput)}
+                                className={styles.input}
                                 value={numCopies}
                                 onChange={e => setNumCopies(parseInt(e.target.value))}
                             />
                         </div>
+
+                        {match.params.id !== 'new' && (
+                            <Button
+                                className={styles.editButton}
+                                onClick={() => {
+                                    setProgramForm({add: false, edit: !programForm.edit})
+                                }}
+                                text={`Edit All Copies`}
+                            />
+                        )}
                     </Group>
+                    {programForm.edit && (
+                        <div className={styles.programForm}>
+                            <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} />
+                        </div>
+                    )}
 
                     {match.params.id !== 'new' ? (
                         <Group direction={'column'}>
@@ -508,23 +520,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 className={styles.addContainer}
                                 icon='add'
                                 onClick={() => {
-                                    setProgramForm({...programForm, edit: !programForm.edit})
-                                }}
-                                textInside={false}
-                                text={`Edit All Copies`}
-                            />
-
-                            {programForm.edit && (
-                                <div className={styles.programForm}>
-                                    <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} />
-                                </div>
-                            )}
-
-                            <Button
-                                className={styles.addContainer}
-                                icon='add'
-                                onClick={() => {
-                                    setProgramForm({...programForm, add: !programForm.add})
+                                    setProgramForm({edit: false, add: !programForm.add})
                                 }}
                                 textInside={false}
                                 text={`Add ${numCopies} Copy(s)`}

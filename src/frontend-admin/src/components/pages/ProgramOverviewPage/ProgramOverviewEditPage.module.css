@@ -124,35 +124,24 @@
     margin-top: 50px;
 }
 
-/*input boxes & titles*/
-.inputContainer {
-    width: 40%;
+.row1Group {
+    flex-wrap: wrap;
 }
 
 .checkBoxContainer {
     width: 10%;
 }
-
-.check {
-    border-radius: 3px;
-    height: 45px;
-    width: 100%; /*45px;*/
-    border: 2px solid #979797;
+.numCopies {
+    width: 15%;
 }
-.insideCheck {
-    margin: -48px auto;
-    height: 30px;
-    width: 15px;
-    border-left: 7px solid #009eff;
-    border-top: 7px solid #009eff;
-    transform: rotate(225deg);
+.nameInputWithEdit {
+    width: 65%;
 }
 
-/* changes checkmark after input clicked */
-.checkbox:checked ~ .check {
-    border-color: #009eff;
+.nameInput {
+    width: 40%;
 }
-.checkbox:checked ~ .insideCheck {
-    border-left: 7px solid #009eff;
-    border-top: 7px solid #009eff;
+.editButton {
+    margin-top: 30px;
+    min-width: 160px;
 }

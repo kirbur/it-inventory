@@ -7,12 +7,14 @@ import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {formatDate} from '../../../utilities/FormatDate'
 import {formatCost} from '../../../utilities/FormatCost'
+import {History} from 'history'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import {Checkbox} from '../../reusables/Checkbox/Checkbox'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -23,7 +25,7 @@ import placeholder from '../../../content/Images/Placeholders/program-placeholde
 
 // Types
 interface IProgramsListPageProps {
-    history: any
+    history: History
 }
 
 // Primary Component
@@ -38,7 +40,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const [useImages, setUseImages] = useState(false)
     const [images, setImages] = useState<{name: string; img: string}[]>([])
 
-    const [displayImages, setDisplayImages] = useState<{name: string; img: string}[]>([])
+    const [displayImages] = useState<{name: string; img: string}[]>([])
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState(listData)
     const [search, setSearch] = useState('')
@@ -48,12 +50,16 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const headerList = ['Programs', 'Renewal Date', 'Total Users ', 'Cost']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
+    const [checkboxes, setCheckboxes] = useState(false)
+    const [pinned, setPinned] = useState<{name: string; pinned: boolean}[]>([])
+
     useEffect(() => {
         axios
             .get('/list/programs')
             .then((data: any) => {
                 var programs: any[] = []
                 var imgs: any[] = []
+                var pins: {name: string; pinned: boolean}[] = []
                 data.map((i: any) => {
                     programs.push({
                         name: format(i.programName),
@@ -66,10 +72,13 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                         cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
                     })
                     imgs.push({name: i.programName, img: i.icon})
+                    //TODO: have someone add this to the endpoint
+                    pins.push({name: i.programName, pinned: i.pinned ? true : false})
                 })
                 setListData(programs)
                 setImages(imgs)
                 setUseImages(true)
+                setPinned(pins)
             })
             .catch((err: any) => console.error(err))
     }, [setListData])
@@ -113,12 +122,12 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/editProgramOverview/new')
+        history.push('/programs/edit/overview/new')
     }
 
     const handleRowClick = (row: any) => {
         // go to prog overview
-        history.push(`/programs/overview/${row[0].key}`)
+        history.push(`/programs/overview/${row[0]}`)
     }
 
     var filteredRows: any[] = []
@@ -163,6 +172,13 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
 
     const renderHeaders = () => {
         var headers = []
+
+        //Check Box Row
+        if (checkboxes) {
+            let header = <td key={'checkbox'}></td>
+
+            headers.push(header)
+        }
 
         var firstHeader = (
             <td
@@ -219,7 +235,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         return displayImages &&
             displayImages.filter(x => x.name === row[0]) &&
             displayImages.filter(x => x.name === row[0])[0] ? (
-            <td key={row[0]} className={styles.programs}>
+            <td key={row[0]} className={styles.programs} onClick={() => handleRowClick(row)}>
                 <div className={styles.imgContainer}>
                     <img className={styles.icon} src={displayImages.filter(x => x.name === row[0])[0].img} alt={''} />
                 </div>
@@ -229,7 +245,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                 </div>
             </td>
         ) : (
-            <td key={row[0]} className={styles.programs}>
+            <td key={row[0]} className={styles.programs} onClick={() => handleRowClick(row)}>
                 <div className={styles.imgContainer}>
                     <img className={styles.icon} src={placeholder} alt={''} />
                 </div>
@@ -243,30 +259,48 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
 
     var renderedRows: any[] = []
 
+    const getChecked = (name: string) => {
+        var p = pinned.filter(pin => pin.name === name)
+        return p && p[0] ? p[0].pinned : false
+    }
+
+    const handleChecked = (name: string) => {
+        var p = pinned.filter(pin => pin.name === name)
+        var otherPins = pinned.filter(pin => pin.name !== name)
+        setPinned([...otherPins, {name: name, pinned: p && p[0] ? !p[0].pinned : false}])
+    }
+
     rows.forEach(row => {
         const transformedRow: any[] = []
         for (let i = 0; i < row.length; i++) {
+            if (checkboxes && i === 0) {
+                transformedRow.push(
+                    <td key={i + row[4]} className={styles.checkboxRow}>
+                        <Checkbox checked={getChecked(row[0])} onClick={() => handleChecked(row[0])} />
+                    </td>
+                )
+            }
             switch (i) {
                 case 0:
-                    transformedRow[0] = concatenatedDept(row)
+                    transformedRow.push(concatenatedDept(row))
                     break
                 case 1:
-                    transformedRow[1] = (
-                        <td key={i + row[1]} className={styles.alignLeft}>
+                    transformedRow.push(
+                        <td key={i + row[1]} className={styles.alignLeft} onClick={() => handleRowClick(row)}>
                             {row[1]}
                         </td>
                     )
                     break
                 case 2:
-                    transformedRow[2] = (
-                        <td key={i + row[2]} className={styles.alignLeft}>
+                    transformedRow.push(
+                        <td className={styles.alignLeft} onClick={() => handleRowClick(row)}>
                             {row[2] === 1 ? row[2] + ' user' : row[2] + ' users'}
                         </td>
                     )
                     break
                 case 3:
-                    transformedRow[3] = (
-                        <td key={i + row[3]} className={styles.alignLeft}>
+                    transformedRow.push(
+                        <td key={i + row[3]} className={styles.alignLeft} onClick={() => handleRowClick(row)}>
                             {formatCost(row[5], row[3], row[4])}
                         </td>
                     )
@@ -277,6 +311,12 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         renderedRows.push(transformedRow)
     })
 
+    async function handlePinChanges() {
+        //TODO: put to set pinned programs
+        //async axios.put().cathc((err: any) => console.error(err))
+        setCheckboxes(!checkboxes)
+    }
+
     return (
         <div className={styles.programsListMain}>
             <Switch>
@@ -284,8 +324,18 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             </Switch>
             {isAdmin ? (
                 <Group direction='row' justify='between' className={styles.group}>
-                    <Button text='Add' icon='add' onClick={handleClick} />
-
+                    <Group className={styles.buttonGroup}>
+                        <Button text='Add' icon='add' onClick={handleClick} />
+                        {checkboxes ? (
+                            <Button text='Save Changes' onClick={handlePinChanges} className={styles.dashboardButton} />
+                        ) : (
+                            <Button
+                                text='Pin To Dashboard'
+                                onClick={() => setCheckboxes(!checkboxes)}
+                                className={styles.dashboardButton}
+                            />
+                        )}
+                    </Group>
                     <FilteredSearch
                         search={search}
                         setSearch={setSearch}
@@ -307,7 +357,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             )}
 
             <div className={styles.page}>
-                <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
+                <Table headers={renderHeaders()} rows={renderedRows} />
             </div>
         </div>
     )

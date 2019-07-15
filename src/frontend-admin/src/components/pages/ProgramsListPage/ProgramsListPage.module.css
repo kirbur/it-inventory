@@ -36,6 +36,7 @@
     text-align: left;
     min-width: 100px;
 }
+
 .alignLeftAndPadding {
     text-align: left;
     padding-left: 34px;
@@ -102,4 +103,23 @@
     position: relative;
     top: 15px;
     left: 5px;
+}
+
+.buttonGroup {
+    width: 30%;
+    flex-wrap: nowrap;
+}
+
+.dashboardButton {
+    min-width: 200px;
+    margin-left: 20px;
+}
+
+.checkboxRow {
+    border: 8px solid transparent;
+    border-right: 1px solid #979797;
+}
+
+tr:hover .checkboxRow {
+    background: white;
 }

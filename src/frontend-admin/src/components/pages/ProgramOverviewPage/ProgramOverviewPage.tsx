@@ -88,7 +88,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             .get(`/detail/ProgramOverview/${match.params.id}`)
             .then((data: any) => {
                 setProgramData(data[0].programOverview)
-
+                console.log(data[0])
                 let prog: ITableItem[][] = []
                 data[0].inDivPrograms.map((i: ExpectedProgramType) =>
                     prog.push(
@@ -205,7 +205,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                                 text='Edit'
                                 icon='edit'
                                 onClick={() => {
-                                    history.push('/editProgramOverview/' + match.params.id)
+                                    history.push('/programs/edit/overview/' + match.params.id)
                                 }}
                                 className={styles.editbutton}
                             />
