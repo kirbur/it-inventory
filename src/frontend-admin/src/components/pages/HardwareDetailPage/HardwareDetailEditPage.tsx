@@ -27,6 +27,26 @@ interface IHardwareDetailEditPageProps {
     history: any
     match: any
 }
+export interface MonitorData {
+    Make: string
+    Model: string
+    ScreenSize: number
+    Resolution: number
+    Inputs: number
+    SerialNumber: number
+
+    Location: string
+    EmployeeId: number
+
+    RenewalDate: Date
+    PurchaseDate: Date
+
+    FlatCost: number
+    CostPerYear: number
+    MonthsPerRenewal: number
+    Mfg: null
+    TextField: string
+}
 
 // Primary Component
 export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = props => {
@@ -46,7 +66,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [thirdSectionHeaders, setThirdSectionHeaders] = useState<string[]>(['yeah something went wrong'])
 
     const [firstSectionData, setFirstSectionData] = useState<(string | number)[]>([])
-    var returnFirstSectionData = {}
+    // var returnFirstSectionData = {}
     const [secondSectionData, setSecondSectionData] = useState<(string | number)[]>([])
     const [thirdSectionData, setThirdSectionData] = useState<(string | number)[]>([])
     const [costSection, setCostSection] = useState<(number | string)[]>([])
@@ -348,6 +368,112 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 })
             }
             history.push('/hardware')
+        } else {
+            //not new --> editing existing page
+            if (match.params.type === 'monitor') {
+                await axios.post(`add/monitor`, {
+                    Entity: {
+                        Make: firstSectionData[0],
+                        Model: firstSectionData[1],
+                        ScreenSize: firstSectionData[2],
+                        Resolution: firstSectionData[3],
+                        Inputs: firstSectionData[4],
+                        SerialNumber: firstSectionData[5],
+
+                        Location: thirdSectionData[2],
+                        EmployeeId: thirdSectionData[3],
+
+                        RenewalDate: renewalDateInput,
+                        PurchaseDate: purchaseDateInput,
+
+                        FlatCost: costSection[0],
+                        CostPerYear: costSection[1],
+                        MonthsPerRenewal: costSection[2],
+                        Mfg: null,
+                        TextField: commentText,
+                    },
+                })
+            } else if (match.params.type === 'server') {
+                await axios.post(`add/server`, {
+                    Entity: {
+                        Make: firstSectionData[0],
+                        Model: firstSectionData[1],
+                        OperatingSystem: firstSectionData[2],
+                        Ram: firstSectionData[3],
+                        LocalHHD: firstSectionData[4],
+                        NumberOfCores: firstSectionData[5],
+                        MFG: firstSectionData[6],
+                        SerialNumber: firstSectionData[7],
+                        IPAddress: firstSectionData[8],
+                        SAN: firstSectionData[9],
+                        Fqdn: firstSectionData[10],
+
+                        Virtualize: false, //NEED TO ADD THIS
+
+                        RenewalDate: renewalDateInput,
+                        PurchaseDate: purchaseDateInput,
+                        EndOfLife: endOfLifeInput,
+
+                        Location: thirdSectionData[2],
+                        EmployeeId: thirdSectionData[3],
+
+                        FlatCost: costSection[0],
+                        CostPerYear: costSection[1],
+                        MonthsPerRenewal: costSection[2],
+
+                        TextField: commentText,
+                    },
+                })
+            } else if (match.params.type === 'laptop') {
+                await axios.post(`add/laptop`, {
+                    Entity: {
+                        Make: firstSectionData[0],
+                        Model: firstSectionData[1],
+                        Cpu: firstSectionData[2],
+                        Ssdgb: firstSectionData[3],
+                        ScreenSize: firstSectionData[4],
+                        MonitorOutput: firstSectionData[5],
+                        MFG: firstSectionData[6],
+                        SerialNumber: firstSectionData[7],
+                        Fqdn: firstSectionData[10],
+
+                        Virtualize: false, //NEED TO ADD THIS
+
+                        RenewalDate: renewalDateInput,
+                        PurchaseDate: purchaseDateInput,
+                        EndOfLife: endOfLifeInput,
+
+                        Location: thirdSectionData[2],
+                        EmployeeId: thirdSectionData[3],
+
+                        FlatCost: costSection[0],
+                        CostPerYear: costSection[1],
+                        MonthsPerRenewal: costSection[2],
+
+                        TextField: commentText,
+                    },
+                })
+            } else if (match.params.type === 'peripheral') {
+                await axios.post(`add/peripheral`, {
+                    Entity: {
+                        PeripheralName: firstSectionData[0],
+                        PeripheralType: firstSectionData[1],
+                        Mfg: null,
+                        SerialNumber: firstSectionData[3],
+
+                        PurchaseDate: purchaseDateInput,
+
+                        Location: thirdSectionData[2],
+                        EmployeeId: thirdSectionData[3],
+
+                        FlatCost: costSection[0],
+                        CostPerYear: costSection[1],
+                        MonthsPerRenewal: costSection[2],
+
+                        TextField: commentText,
+                    },
+                })
+            }
         }
     }
 
