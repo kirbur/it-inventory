@@ -10,7 +10,7 @@ interface IHistoryLogArray {
     eventType: eventType
     employeeName: string
     historyId?: number
-    isEdit?: boolean
+    canEdit?: boolean
 }
 
 interface IHistoryLogProps {

@@ -80,9 +80,10 @@ export class AxiosService {
             })
             .then(response => {
                 this.checkTokenExpired(url)
+                console.log(response)
                 return response.data
             })
-            .catch(err => console.error(err))
+            .catch(err => console.error(err.response))
     }
 
     //check if token needs refreshing

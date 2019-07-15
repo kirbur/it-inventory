@@ -154,6 +154,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].server.monthsPerRenewal,
                     ])
                     setCommentText(data[0].server.textField)
+                    setHistoryLogEntries(data[0].serverHistory)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === ('laptop' || 'computer')) {
@@ -260,8 +261,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     }, [])
 
     async function handleSubmit() {
-        console.log(match.params.id)
-        console.log(match.params.type)
         if (match.params.id === 'new') {
             if (match.params.type === 'monitor') {
                 await axios.post(`add/monitor`, {
@@ -369,10 +368,13 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             }
             history.push('/hardware')
         } else {
+            console.log('check')
             //not new --> editing existing page
             if (match.params.type === 'monitor') {
-                await axios.post(`add/monitor`, {
+                await axios.put(`update/monitor`, {
                     Entity: {
+                        MonitorId: match.params.id,
+
                         Make: firstSectionData[0],
                         Model: firstSectionData[1],
                         ScreenSize: firstSectionData[2],
@@ -392,10 +394,14 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Mfg: null,
                         TextField: commentText,
                     },
+                    AddHistory: addHistoryLog,
+                    DeleteHistory: [],
                 })
             } else if (match.params.type === 'server') {
-                await axios.post(`add/server`, {
+                await axios.put(`update/server`, {
                     Entity: {
+                        ServerId: match.params.id,
+
                         Make: firstSectionData[0],
                         Model: firstSectionData[1],
                         OperatingSystem: firstSectionData[2],
@@ -423,10 +429,15 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         TextField: commentText,
                     },
+                    AddHistory: addHistoryLog,
+                    DeleteHistory: [],
                 })
             } else if (match.params.type === 'laptop') {
-                await axios.post(`add/laptop`, {
+                console.log('check')
+                await axios.put(`update/computer`, {
                     Entity: {
+                        ComputerId: match.params.id,
+
                         Make: firstSectionData[0],
                         Model: firstSectionData[1],
                         Cpu: firstSectionData[2],
@@ -452,10 +463,14 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         TextField: commentText,
                     },
+                    AddHistory: addHistoryLog,
+                    DeleteHistory: [],
                 })
             } else if (match.params.type === 'peripheral') {
-                await axios.post(`add/peripheral`, {
+                await axios.put(`update/peripheral`, {
                     Entity: {
+                        PeripheralId: match.params.id,
+
                         PeripheralName: firstSectionData[0],
                         PeripheralType: firstSectionData[1],
                         Mfg: null,
@@ -472,9 +487,14 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         TextField: commentText,
                     },
+                    AddHistory: addHistoryLog,
+                    DeleteHistory: [],
                 })
             }
         }
+
+        console.log(addHistoryLog)
+        history.push('/hardware')
     }
 
     function handleInputChange(index: number, sectionData: any[], value: string | number) {
@@ -583,20 +603,24 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     }
     const handleSubmitHistoryLog = () => {
         if (eventInput === 'Broken' || eventInput === 'Repaired') {
-            console.log(eventInput)
             setHistoryLogBool(!historyLogBool)
-            let tempHistoryLog = cloneDeep(historyLogEntries)
+            let tempHistoryLog = new Array()
+            if (historyLogEntries !== undefined) {
+                tempHistoryLog = cloneDeep(historyLogEntries)
+            }
+            console.log(tempHistoryLog)
             tempHistoryLog.push({
                 employeeName: thirdSectionData[0],
                 eventType: eventInput,
-                eventDate: formatDate(dateInput.toString()),
+                eventDate: dateInput,
             })
 
+            //adding to add history log to send to backend
             setHistoryLogEntries(tempHistoryLog)
             tempHistoryLog = cloneDeep(addHistoryLog)
             tempHistoryLog.push({
                 EventType: eventInput,
-                EventDate: dateInput,
+                EventDate: dateInput.toISOString(),
             })
             setAddHistoryLog(tempHistoryLog)
         } else {
