@@ -166,6 +166,29 @@ namespace backend_api.Controllers
                 _context.Plugins.Update(plugin);
                 _context.SaveChanges();
 
+                var programTiedToPlugin = _context.Program.Find(plugin.ProgramId);
+
+                if (isDeleted == true)
+                {
+                    var wasLastPlugin = !(_context.Plugins.Any(x => x.ProgramId == plugin.ProgramId && x.IsDeleted == false));
+                    if(wasLastPlugin == true)
+                    { 
+                        _context.Program.Where(x => x.ProgramName == programTiedToPlugin.ProgramName).ToList().ForEach(x => x.HasPlugIn = false);
+                        _context.SaveChanges();
+                    }
+                }
+                else
+                {
+                    var wasFirstPlugin = _context.Plugins.Where(x => x.ProgramId == plugin.ProgramId && x.IsDeleted == false).Count() == 1;
+                    if (wasFirstPlugin == true)
+                    {
+                        _context.Program.Where(x => x.ProgramName == programTiedToPlugin.ProgramName).ToList().ForEach(x => x.HasPlugIn = true);
+                        _context.SaveChanges();
+                    }
+                }
+                
+                
+
                 return Ok($"{(isDeleted ? "archive" : "recover")} completed");
             }
             catch (Exception e)
