@@ -4,6 +4,7 @@ import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {History} from 'history'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -19,13 +20,12 @@ import styles from './EmployeesListPage.module.css'
 
 // Types
 interface IEmployeesListPageProps {
-    history: any
-    match: any
+    history: History
 }
 
 // Primary Component
 export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
-    const {history, match} = props
+    const {history} = props
     const {
         loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
@@ -46,7 +46,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             .get('/list/employees')
             .then((data: any) => {
                 const employees: any[] = []
-                data.map((i: any) => {
+                data.map((i: any) =>
                     employees.push({
                         name: format(i.employeeName),
                         dateHired: formatDate(i.hireDate),
@@ -63,7 +63,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         programs: i.progForEmp.join(', '),
                         daysEmployed: calculateDaysEmployed(getDays(i.hireDate)),
                     })
-                })
+                )
                 setListData(employees)
             })
             .catch((err: any) => console.error(err))
@@ -118,11 +118,11 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     const handleClick = () => {
-        history.push(`/editEmployee/new`)
+        history.push(`/employees/edit/new`)
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`${match.url}/${row[0].key}`)
+        history.push(`/employees/detail/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -225,8 +225,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                     <img className={styles.icon} src={URL + row[7]} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <text className={styles.employeeName}>{row[0]}</text> <br />
-                    <text className={styles.role}>{row[6]}</text>
+                    <div className={styles.employeeName}>{row[0]}</div>
+                    <div className={styles.role}>{row[6]}</div>
                 </div>
             </td>
         )
@@ -238,12 +238,16 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
+                    break
                 case 1:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
+                    break
                 case 2:
                     transformedRow[2] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[2])}</td>
+                    break
                 case 3:
                     transformedRow[3] = <td className={styles.alignLeft}>{formatCost(row[4], row[5])}</td>
+                    break
             }
         }
 

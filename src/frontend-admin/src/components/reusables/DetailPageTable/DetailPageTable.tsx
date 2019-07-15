@@ -12,9 +12,9 @@ import styles from './DetailPageTable.module.css'
 import {cloneDeep} from 'lodash'
 import {sortTable} from '../../../utilities/quickSort'
 
-interface ITableItem {
-    value: string
-    id?: string | number
+export interface ITableItem {
+    value: string | number
+    id?: string /*| number*/
     sortBy: string | number
     onClick?: any
     tooltip?: string

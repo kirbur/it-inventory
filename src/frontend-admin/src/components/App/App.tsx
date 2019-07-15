@@ -127,13 +127,13 @@ export const App: React.FC = () => {
                         <Route exact path='/' component={Login} />
 
                         <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
-                        <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
+                        <Route path={'/employees/detail/:id'} render={props => <EmployeeDetailPage {...props} />} />
                         <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
                         <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
 
                         <Route
                             exact
-                            path={'/editEmployee/:id'}
+                            path={'/employees/edit/:id'}
                             render={props => <EmployeeDetailEditPage {...props} />}
                         />
                         <Route

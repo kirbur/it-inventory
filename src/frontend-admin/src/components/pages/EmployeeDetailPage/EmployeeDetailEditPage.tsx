@@ -3,7 +3,7 @@ import {History} from 'history'
 import {match} from 'react-router-dom'
 
 // Components
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {GoCloudUpload} from 'react-icons/go'
 import {FaUserShield, FaUser} from 'react-icons/fa'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
@@ -35,7 +35,7 @@ interface IDepartment {
 
 interface IEmployeeDetailEditPageProps {
     match: match<{id: string}>
-    history: any
+    history: History
 }
 
 interface IEmployee {
@@ -72,17 +72,29 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         hwCost: 0,
         swCost: 0,
     })
-    const [hardwareRows, setHardwareRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+    const [hardwareRows, setHardwareRows] = useState<{
+        assigned: ITableItem[][]
+        added: ITableItem[][]
+        removed: ITableItem[][]
+    }>({
         assigned: [],
         added: [],
         removed: [],
     })
-    const [softwareRows, setSoftwareRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+    const [softwareRows, setSoftwareRows] = useState<{
+        assigned: ITableItem[][]
+        added: ITableItem[][]
+        removed: ITableItem[][]
+    }>({
         assigned: [],
         added: [],
         removed: [],
     })
-    const [licenseRows, setLicenseRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+    const [licenseRows, setLicenseRows] = useState<{
+        assigned: ITableItem[][]
+        added: ITableItem[][]
+        removed: ITableItem[][]
+    }>({
         assigned: [],
         added: [],
         removed: [],
@@ -207,7 +219,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             },
                             {value: format(i.licenseKey), id: format(i.id), sortBy: i.licenseKey},
                             {
-                                value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
+                                value: '$' + Math.round(i.costPerMonth * 100) / 100,
                                 id: format(i.id),
                                 sortBy: i.costPerMonth,
                             },
@@ -229,10 +241,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 sortBy: format(i.licenseKey),
                             },
                             {
-                                value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
+                                value: '$' + Math.round(i.costPerMonth * 100) / 100,
                                 sortBy: i.costPerMonth,
                             },
-                            {value: format(i.cals), id: format(i.id), sortBy: i.cals},
+                            {value: format(i.licensesCount), id: format(i.id), sortBy: i.licensesCount},
                         ])
                     )
                     setLicenseRows({...licenseRows, assigned: [...l]})
@@ -310,8 +322,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                             toBeAdded.push(arr)
                             needFulfilled = true
-                            return
                         }
+                        return
                     })
                 })
 
@@ -342,8 +354,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                             toBeAdded.push(arr)
                             needFulfilled = true
-                            return
                         }
+                        return
                     })
                 })
 
@@ -375,8 +387,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                             toBeAdded.push(arr)
                             needFulfilled = true
-                            return
                         }
+                        return
                     })
                 })
 
@@ -500,8 +512,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     async function handleSubmit() {
-        /*ADD NEW EMPLOYEE */
+        var name = ['first', 'last']
+        var msg = ''
 
+        /*ADD NEW EMPLOYEE */
         if (
             //make sure no inputs are null/undefined/empty
             match.params.id === 'new' &&
@@ -509,7 +523,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             selectedEmployee.name !== 'Select An Employee' &&
             roleInput !== ''
         ) {
-            var name = selectedEmployee.name.split(' ')
+            name = selectedEmployee.name.split(' ')
             var postEmployee = {
                 Employee: {
                     FirstName: name[0],
@@ -521,7 +535,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 },
                 HardwareAssigned: [
                     ...hardwareRows.added.map(i => {
-                        var hw = i[0].id.split('/')
+                        var hw = i[0].id ? i[0].id.split('/') : [null, null]
                         return {Type: hw[0], ID: hw[1]}
                     }),
                 ],
@@ -550,16 +564,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             history.push(`/employees`)
         } else if (match.params.id === 'new') {
             //one or maore of the inputs was null/undefined/empty
-            var msg = 'Failed because:\n'
+            msg = 'Failed because:\n'
             msg += selectedEmployee.name === 'Select An Employee' ? 'No employee was selected,\n' : ''
             msg += roleInput === '' ? 'No role was given,' : ''
 
             window.alert(msg)
         }
-
-        //TODO: post request
-        //everything in every removed array needs to be unassigned
-        //everything in every added array needs to be assigned
 
         /*UPDATE EMPLOYEE */
         if (
@@ -569,7 +579,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             selectedEmployee.name &&
             roleInput
         ) {
-            var name = selectedEmployee.name.split(' ')
+            name = selectedEmployee.name.split(' ')
             var updateEmployee = {
                 Employee: {
                     EmployeeId: match.params.id,
@@ -582,7 +592,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 },
                 HardwareAssigned: [
                     ...hardwareRows.added.map(i => {
-                        var hw = i[0].id.split('/')
+                        var hw = i[0].id ? i[0].id.split('/') : [null, null]
                         return {Type: hw[0], ID: hw[1]}
                     }),
                 ],
@@ -597,7 +607,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 HardwareUnassigned: [
                     ...hardwareRows.removed.map(i => {
-                        var hw = i[0].id.split('/')
+                        var hw = i[0].id ? i[0].id.split('/') : [null, null]
                         return {Type: hw[0], ID: hw[1]}
                     }),
                 ],
@@ -623,10 +633,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     console.error(err)
                 })
 
-            history.push(`/employees/${match.params.id}`)
+            history.push(`/employees/detail/${match.params.id}`)
         } else {
             //one or maore of the inputs was null/undefined/empty
-            var msg = 'Failed because:\n'
+            msg = 'Failed because:\n'
 
             msg += selectedEmployee.name === ('' || ' ') ? 'Name feild is empty,' : ''
             msg += roleInput === '' ? 'Role feild is empty,' : ''
@@ -709,7 +719,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         text={userData.name}
                         icon='back'
                         onClick={() => {
-                            history.push(`/employees/${match.params.id}`)
+                            history.push(`/employees/detail/${match.params.id}`)
                         }}
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
@@ -1051,7 +1061,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             </div>
         </div>
     ) : (
-        //if not admin redirect back to deatial page
-        <div>{history.push(`/employees/${match.params.id}`)}</div>
+        //TODO: redirect to different page?
+        <div />
     )
 }

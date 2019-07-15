@@ -1,15 +1,16 @@
 import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {History} from 'history'
+import {match} from 'react-router-dom'
 
 // Components
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 
 // Utils
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
-import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './EmployeeDetailPage.module.css'
@@ -19,11 +20,19 @@ import {LoginContext} from '../../App/App'
 
 // Types
 interface IEmployeeDetailPageProps {
-    match: any
-    history: any
+    match: match<{id: string}>
+    history: History
 }
 
-// Helpers
+interface IUser {
+    photo: string
+    name: string
+    department: string
+    role: string
+    hireDate: string
+    hwCost: number
+    swCost: number
+}
 
 // Primary Component
 export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => {
@@ -34,10 +43,18 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
-    const [userData, setUserData] = useState<any>({})
-    const [hardwareRows, setHardwareRows] = useState<any[]>([])
-    const [softwareRows, setSoftwareRows] = useState<any[]>([])
-    const [licenseRows, setLicenseRows] = useState<any[]>([])
+    const [userData, setUserData] = useState<IUser>({
+        photo: '',
+        name: '',
+        department: '',
+        role: '',
+        hireDate: '',
+        hwCost: 0,
+        swCost: 0,
+    })
+    const [hardwareRows, setHardwareRows] = useState<ITableItem[][]>([])
+    const [softwareRows, setSoftwareRows] = useState<ITableItem[][]>([])
+    const [licenseRows, setLicenseRows] = useState<ITableItem[][]>([])
 
     const hardwareHeaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
     const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
@@ -57,7 +74,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         axios
             .get(`/detail/employee/${match.params.id}`)
             .then((data: any) => {
-                let user: any = {
+                let user: IUser = {
                     photo: data[0].picture,
                     name: data[0].firstName + ' ' + data[0].lastName,
                     department: data[0].department,
@@ -69,7 +86,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
 
                 setUserData(user)
 
-                let hw: any[] = []
+                let hw: ITableItem[][] = []
                 data[0].hardware.map((i: any) =>
                     hw.push([
                         {
@@ -86,7 +103,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 )
                 setHardwareRows(hw)
 
-                let sw: any[] = []
+                let sw: ITableItem[][] = []
                 data[0].software.map((i: any) =>
                     sw.push([
                         {
@@ -105,7 +122,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 )
                 setSoftwareRows(sw)
 
-                let l: any[] = []
+                let l: ITableItem[][] = []
                 data[0].licenses.map((i: any) =>
                     l.push([
                         {
@@ -123,7 +140,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                             value: '$' + Math.round(i.costPerMonth * 100) / 100,
                             sortBy: i.costPerMonth,
                         },
-                        {value: format(i.cals), id: format(i.id), sortBy: i.cals},
+                        {value: format(i.licensesCount), id: format(i.id), sortBy: i.licensesCount},
                     ])
                 )
                 setLicenseRows(l)
@@ -176,7 +193,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                                 text='Edit'
                                 icon='edit'
                                 onClick={() => {
-                                    history.push('/editEmployee/' + match.params.id)
+                                    history.push('/employees/edit/' + match.params.id)
                                 }}
                                 className={styles.editbutton}
                             />
