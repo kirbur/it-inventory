@@ -166,22 +166,28 @@ namespace backend_api.Controllers
                 _context.Plugins.Update(plugin);
                 _context.SaveChanges();
 
+                // find the specific program tied to this plugin that was just updated
                 var programTiedToPlugin = _context.Program.Find(plugin.ProgramId);
 
+                // if we just deleted this plugin...
                 if (isDeleted == true)
                 {
+                    // if that plugin deleted was the last plugin attached to that program...
                     var wasLastPlugin = !(_context.Plugins.Any(x => x.ProgramId == plugin.ProgramId && x.IsDeleted == false));
                     if(wasLastPlugin == true)
                     { 
+                        // update the has plugin field so that its programs no longer have a plugin
                         _context.Program.Where(x => x.ProgramName == programTiedToPlugin.ProgramName).ToList().ForEach(x => x.HasPlugIn = false);
                         _context.SaveChanges();
                     }
                 }
                 else
                 {
+                    // if the plug-in recovered is the first plugin for the connected programs
                     var wasFirstPlugin = _context.Plugins.Where(x => x.ProgramId == plugin.ProgramId && x.IsDeleted == false).Count() == 1;
                     if (wasFirstPlugin == true)
                     {
+                        // update the has plugin field so that its programs now have a plugin
                         _context.Program.Where(x => x.ProgramName == programTiedToPlugin.ProgramName).ToList().ForEach(x => x.HasPlugIn = true);
                         _context.SaveChanges();
                     }
