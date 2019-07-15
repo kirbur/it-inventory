@@ -21,6 +21,7 @@ import styles from './HardwareDetailEditPage.module.css'
 import {LoginContext} from '../../App/App'
 import {cloneDeep} from 'lodash'
 import {handleInputChange} from 'react-select/lib/utils'
+import {sortByDate} from '../../../utilities/quickSort'
 
 // Types
 interface IHardwareDetailEditPageProps {
@@ -88,6 +89,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
     const [hasRecurringCost, setHasRecurringCost] = useState(false)
     const [hasFlatCost, setHasFlatCost] = useState(false)
+
+    var key = 0
 
     useEffect(() => {
         if (match.params.type === 'server') {
@@ -401,7 +404,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         TextField: commentText,
                     },
                     AddHistory: addHistoryLog,
-                    DeleteHistory: [],
+                    DeleteHistory: removeHistoryLog,
                 })
             } else if (match.params.type === 'server') {
                 await axios.put(`update/server`, {
@@ -436,7 +439,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         TextField: commentText,
                     },
                     AddHistory: addHistoryLog,
-                    DeleteHistory: [],
+                    DeleteHistory: removeHistoryLog,
                 })
             } else if (match.params.type === 'laptop') {
                 console.log('check')
@@ -470,7 +473,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         TextField: commentText,
                     },
                     AddHistory: addHistoryLog,
-                    DeleteHistory: [],
+                    DeleteHistory: removeHistoryLog,
                 })
             } else if (match.params.type === 'peripheral') {
                 await axios.put(`update/peripheral`, {
@@ -494,7 +497,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         TextField: commentText,
                     },
                     AddHistory: addHistoryLog,
-                    DeleteHistory: [],
+                    DeleteHistory: removeHistoryLog,
                 })
             }
         }
@@ -614,21 +617,23 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             if (historyLogEntries !== undefined) {
                 tempHistoryLog = cloneDeep(historyLogEntries)
             }
-            console.log(tempHistoryLog)
             tempHistoryLog.push({
                 employeeName: thirdSectionData[0],
                 eventType: eventInput,
                 eventDate: dateInput,
+                key: key,
             })
+            setHistoryLogEntries(sortByDate(tempHistoryLog))
 
             //adding to add history log to send to backend
-            setHistoryLogEntries(tempHistoryLog)
             tempHistoryLog = cloneDeep(addHistoryLog)
             tempHistoryLog.push({
                 EventType: eventInput,
                 EventDate: dateInput.toISOString(),
+                key: key,
             })
-            setAddHistoryLog(tempHistoryLog)
+            key = key + 1
+            setAddHistoryLog(sortByDate(tempHistoryLog))
         } else {
             window.alert('Need to choose an event!')
         }
@@ -636,13 +641,28 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     }
 
     function removeLog(index: number) {
+        //the backend adds the id to the hardware history logs
+        //so if there is an id then remove that log and add id to removeHistoryLog array
+        //if not, then it was added but removed before submitted and saved in database
+        if (historyLogEntries[index].hasOwnProperty('historyId')) {
+            //add to removeHistoryLog
+            let tempRemoveId = cloneDeep(removeHistoryLog)
+            tempRemoveId.push(historyLogEntries[index].historyId)
+            setRemoveHistoryLog(tempRemoveId)
+        } else {
+            //remove from addHistoryLog
+            let tempAddHistoryLog = cloneDeep(addHistoryLog)
+            console.log(tempAddHistoryLog)
+            console.log(historyLogEntries[index].key)
+            tempAddHistoryLog = tempAddHistoryLog.filter(log => log.key != historyLogEntries[index].key)
+            console.log(tempAddHistoryLog)
+            setAddHistoryLog(tempAddHistoryLog)
+        }
+
         let tempHistoryLog = cloneDeep(historyLogEntries)
-        console.log(tempHistoryLog)
         tempHistoryLog = tempHistoryLog.slice(0, index).concat(tempHistoryLog.slice(index + 1, tempHistoryLog.length))
-        console.log(tempHistoryLog)
         setHistoryLogEntries(tempHistoryLog)
     }
-    const handleRemoveHistoryLog = () => {}
 
     const changeCost = (value: string, index: number) => {
         let tempArray = cloneDeep(costSection)

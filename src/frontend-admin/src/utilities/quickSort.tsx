@@ -14,4 +14,11 @@ export function sortTable(rows: any[][], dataIndex: number, sortValue: number) {
     return rows
 }
 
+export function sortByDate(rows: any[]) {
+    var compareString = (a: [], b: []) => (a === b ? 0 : a < b ? -1 : 1)
+
+    rows.sort((a, b) => compareString(a.EventDate, b.EventDate))
+    return rows
+}
+
 // type SortDirection = 'asc' | 'desc'
