@@ -40,13 +40,11 @@ export class AxiosService {
     //wrapper for get requests return the promise
     public get: any = (url: string) => {
         return this.instance
-            .get(
-                url /*, {
+            .get(url, {
                 headers: {
                     Authorization: `Bearer ${this.user.accessToken}`,
                 },
-            }*/
-            )
+            })
             .then(response => {
                 this.checkTokenExpired(url)
                 return response.data
@@ -58,9 +56,9 @@ export class AxiosService {
     public post = (url: string, data: any) => {
         return this.instance
             .post(url, data, {
-                /*headers: {
-                    Authorization: `Bearer ${this.user.accessToken}`
-                }*/
+                headers: {
+                    Authorization: `Bearer ${this.user.accessToken}`,
+                },
             })
             .then(response => {
                 this.checkTokenExpired(url, data)
@@ -73,9 +71,9 @@ export class AxiosService {
     public put = (url: string, data: any, headers?: any) => {
         return this.instance
             .put(url, data, {
-                /*headers: {
-                    Authorization: `Bearer ${this.user.accessToken}`
-                }*/
+                headers: {
+                    Authorization: `Bearer ${this.user.accessToken}`,
+                },
                 ...headers,
             })
             .then(response => {
