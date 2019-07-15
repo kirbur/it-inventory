@@ -166,7 +166,14 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 `Are you sure you want to archive all copies of ${match.params.id}? ${programData.countProgInUse} are in use.`
             )
         ) {
-            //TODO: a post request to archive program w/ id match.params.id
+            programRows.forEach(program => {
+                console.log(program[0].id)
+                axios
+                    .put(`archive/program/${program[0].id}`, {})
+                    .then((response: any) => console.log(response))
+                    .catch((err: any) => console.error(err))
+            }) //TODO: verify this
+            setProgramRows([])
             history.push('/programs')
         }
     }

@@ -338,26 +338,60 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     PluginName: pluginInput.name,
                     PluginFlatCost: pluginInput.flatCost,
                     TextField: pluginInput.description,
-                    PluginCostPerYear: pluginInput.recurringCost * (12 / pluginInput.monthsPerRenewal),
+                    PluginCostPerYear: pluginInput.monthsPerRenewal
+                        ? pluginInput.recurringCost * (12 / pluginInput.monthsPerRenewal)
+                        : null,
                     RenewalDate: pluginInput.renewalDate.toISOString(),
-                    MonthsPerRenewal: pluginInput.monthsPerRenewal,
+                    MonthsPerRenewal: pluginInput.monthsPerRenewal ? pluginInput.monthsPerRenewal : null,
                     DateBought: pluginInput.purchaseDate.toISOString(),
                 }
 
-                if (pluginInput.id === -1) {
-                    await axios.post('/add/plugin', postPlugin).catch((err: any) => console.error(err))
+                if (
+                    (postPlugin.PluginCostPerYear || postPlugin.PluginFlatCost) &&
+                    format(postPlugin.PluginName) !== '-'
+                ) {
+                    if (pluginInput.id === -1) {
+                        await axios
+                            .post('/add/plugin', postPlugin)
+                            .then((response: any) => console.log(response))
+                            .catch((err: any) => console.error(err))
 
-                    msg = postPlugin.PluginName + ' was added to ' + postPlugin.ProgramName
-                    window.alert(msg)
+                        msg = postPlugin.PluginName + ' was added to ' + postPlugin.ProgramName
+                        window.alert(msg)
+                    } else {
+                        await axios.put('/update/plugin', postPlugin).catch((err: any) => console.error(err))
+
+                        msg = postPlugin.PluginName + ' was updated'
+                        window.alert(msg)
+                    }
                 } else {
-                    await axios.put('/update/plugin', postPlugin).catch((err: any) => console.error(err))
-
-                    msg = postPlugin.PluginName + ' was updated'
+                    msg = 'Failed to Add Plugin Because: \n'
+                    msg += format(postPlugin.PluginName) === '-' ? 'No name entered,\n' : ''
+                    msg += !postPlugin.PluginCostPerYear && !postPlugin.PluginFlatCost ? 'No cost entered,\n' : ''
                     window.alert(msg)
                 }
             }
 
-            //TODO: post request to delete removedPluginRows & removedProgramRows
+            if (removedPluginRows.length > 0) {
+                removedPluginRows.forEach(remove => {
+                    axios
+                        .put(`archive/plugin/${remove[0].id}`, {})
+                        .then((response: any) => console.log(response))
+                        .catch((err: any) => console.error(err))
+                })
+                setRemovedPluginRows([])
+            }
+
+            if (removedProgramRows.length > 0) {
+                //TODO: verify this
+                removedPluginRows.forEach(remove => {
+                    axios
+                        .put(`archive/program/${remove[0].id}`, {})
+                        .then((response: any) => console.log(response))
+                        .catch((err: any) => console.error(err))
+                })
+                setRemovedProgramRows([])
+            }
         }
 
         if (imgInput && imgLocation) {

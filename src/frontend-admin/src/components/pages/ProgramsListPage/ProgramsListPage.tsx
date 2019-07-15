@@ -64,7 +64,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                     programs.push({
                         name: format(i.programName),
                         renewalDate: formatDate(i.renewalDate),
-                        totalUsers: format(i.countProgInUse),
+                        totalUsers: i.countProgInUse,
                         perYear: i.progCostPerYear,
                         perUse: i.progCostPerUse,
                         isPerYear: i.isCostPerYear,

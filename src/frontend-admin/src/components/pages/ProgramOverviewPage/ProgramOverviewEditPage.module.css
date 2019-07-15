@@ -133,6 +133,7 @@
 }
 .numCopies {
     width: 15%;
+    white-space: nowrap;
 }
 .nameInputWithEdit {
     width: 65%;
