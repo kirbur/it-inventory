@@ -10,17 +10,17 @@ interface IHistoryLogArray {
     eventType: eventType
     employeeName: string
     historyId?: number
-    canEdit?: boolean
 }
 
 interface IHistoryLogProps {
     historyLog: IHistoryLogArray[]
+    canEdit: boolean
     remove?: any
 }
 
 // Primary Component
 export const HistoryLog = (props: IHistoryLogProps) => {
-    const {historyLog, remove} = props
+    const {historyLog, remove, canEdit} = props
 
     //todo: post data automatically when assigning something to an employee
 
@@ -42,21 +42,33 @@ export const HistoryLog = (props: IHistoryLogProps) => {
             } else if (historyLog[i].eventType === 'Archived') {
                 tempElement = <div className={styles.description}>{'Archived'}</div>
             } else if (historyLog[i].eventType === 'Broken') {
-                tempElement = (
-                    <div className={styles.description}>
-                        {'Broken under the care of ' + historyLog[i].employeeName} <br />
-                        <div className={styles.delete} onClick={e => remove(i)} />
-                        <div className={styles.whiteLine} />
-                    </div>
-                )
+                if (canEdit) {
+                    tempElement = (
+                        <div className={styles.description}>
+                            {'Broken under the care of ' + historyLog[i].employeeName} <br />
+                            <div className={styles.delete} onClick={e => remove(i)} />
+                            <div className={styles.whiteLine} />
+                        </div>
+                    )
+                } else {
+                    tempElement = (
+                        <div className={styles.description}>
+                            {'Broken under the care of ' + historyLog[i].employeeName}
+                        </div>
+                    )
+                }
             } else if (historyLog[i].eventType === 'Repaired') {
-                tempElement = (
-                    <div className={styles.description}>
-                        {'Repaired'} <br />
-                        <div className={styles.delete} onClick={e => remove(i)} />
-                        <div className={styles.whiteLine} />
-                    </div>
-                )
+                if (canEdit) {
+                    tempElement = (
+                        <div className={styles.description}>
+                            Repaired <br />
+                            <div className={styles.delete} onClick={e => remove(i)} />
+                            <div className={styles.whiteLine} />
+                        </div>
+                    )
+                } else {
+                    tempElement = <div className={styles.description}>Repaired</div>
+                }
             } else if (historyLog[i].eventType === 'Recovered') {
                 tempElement = <div className={styles.description}>{'Recovered'}</div>
             }

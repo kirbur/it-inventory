@@ -155,6 +155,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     ])
                     setCommentText(data[0].server.textField)
                     setHistoryLogEntries(data[0].serverHistory)
+                    setHistoryLogEntries(data[0].serverHistory)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === ('laptop' || 'computer')) {
@@ -202,6 +203,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].computer.employeeId,
                     ])
                     setCommentText(data[0].computer.textField)
+                    setHistoryLogEntries(data[0].computerHistory)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'monitor') {
@@ -231,6 +233,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].monitor.employeeId,
                     ])
                     setCommentText(data[0].monitor.textField)
+                    setHistoryLogEntries(data[0].monitorHistory)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
@@ -257,6 +260,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].peripheral.employeeId,
                     ])
                     setCommentText(data[0].peripheral.textField)
+                    setHistoryLogEntries(data[0].peripheralHistory)
                 })
                 .catch((err: any) => console.error(err))
         }
@@ -740,7 +744,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 </div>
 
                 <div className={styles.historyLogContainer}>
-                    <HistoryLog historyLog={historyLogEntries} remove={removeLog} />
+                    <HistoryLog historyLog={historyLogEntries} remove={removeLog} canEdit={true} />
                     {historyLogBool && (
                         <div className={styles.row}>
                             <div className={styles.inputContainer}>

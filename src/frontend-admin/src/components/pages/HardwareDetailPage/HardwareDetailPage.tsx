@@ -303,7 +303,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
                     {/* history log */}
                     <div className={styles.historyLogContainer}>
-                        <HistoryLog historyLog={historyLogEntries} />
+                        <HistoryLog historyLog={historyLogEntries} canEdit={false} />
                     </div>
 
                     {/* comment section */}
