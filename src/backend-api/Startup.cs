@@ -78,6 +78,10 @@ namespace backend_api
             // Add a DI for the UploadedFileRootPath
             services.Configure<UploadOptions>(x => x.UploadedFileRootPath = Configuration["UploadedFileRootPath"]);
 
+            // Add DI for the email settings.
+            IConfigurationSection emailSettingsSection = Configuration.GetSection("EmailSettings");
+            services.Configure<EmailSettings>(emailSettingsSection);
+
             // Creates a connection to the db in order to make ITInventoryDBContext available to MVC Controllers.
             services.AddDbContext<ITInventoryDBContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ITInventoryDb")));
             // Allows OData for powerful querying.
