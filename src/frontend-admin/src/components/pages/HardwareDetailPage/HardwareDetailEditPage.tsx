@@ -167,6 +167,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 'Screen Size',
                 'Monitor Output',
                 'Serial #',
+                'MFG Tag',
                 'FQDN',
             ])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
@@ -184,6 +185,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].computer.screenSize,
                         data[0].computer.monitorOutput,
                         data[0].computer.serialNumber,
+                        data[0].computer.mfg,
                         data[0].computer.fqdn,
                     ])
 

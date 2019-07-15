@@ -94,7 +94,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'laptop') {
             setFirstTableHeaders(['CPU', 'RAM', 'SSD', 'FQDN'])
-            setSecondTableHeaders(['Monitor Output', 'Screen Size', 'Serial #'])
+            setSecondTableHeaders(['Monitor Output', 'Screen Size', 'Serial #', 'MFG Tag'])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
             // make model purchaseDate renewalDate endOfLife
             setHeadingInfo(['name', 'the make', 'model name'])
@@ -119,6 +119,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         data[0].computer.monitorOutput,
                         data[0].computer.screenSize,
                         data[0].computer.serialNumber,
+                        data[0].computer.mfg,
                     ])
                     setCostPerYear(data[0].computer.costPerYear)
                     setFlatCost(data[0].computer.flatCost)
