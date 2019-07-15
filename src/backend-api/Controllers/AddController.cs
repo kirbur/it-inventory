@@ -346,10 +346,10 @@ namespace backend_api.Controllers
                         prog.EmployeeId = emp.EmployeeId;
                         programHistories.Add(UpdateProgramHistory(true, emp.EmployeeId, program.ID));
                     }
-                    // Save multiple entries at once
-                    _context.ProgramHistory.AddRange(programHistories);
-                    _context.SaveChanges();
-
+                        // Save multiple entries at once
+                        _context.ProgramHistory.AddRange(programHistories);
+                        _context.SaveChanges();
+                    
                 }
                 // if we get here then the various fields were created and changed and now we can return 201 created.
                 return StatusCode(201);
@@ -457,10 +457,10 @@ namespace backend_api.Controllers
             // list to hold the congruent programs that will be added.
             List<Models.Program> Programs = new List<Models.Program>();
 
-            // checking to see if number of programs is not less than 1
-            if (input.Program.NumberOfPrograms < 1)
+            // make sure the number of programs added is not less than 1
+            if(input.Program.NumberOfPrograms < 1)
             {
-                return BadRequest("number of programs must be greater than 0");
+                return BadRequest("number of programs cannot be less than 1");
             }
 
             // list to hold the congruent histories of programs that will be added
