@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using backend_api.Helpers;
 using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Controllers
 {
@@ -30,6 +32,30 @@ namespace backend_api.Controllers
             return routeModel.ToLower() == "laptop" ? "computer" : routeModel.ToLower();
         }
 
+        public void UpdateHardwareHistory(bool isAssigned, int? employeeId, int hardwareId, string type)
+        {
+            // Update the history: Assigned or Unassigned
+            _context.HardwareHistory.Add(new HardwareHistory
+            {
+                HardwareId = hardwareId,
+                EmployeeId = employeeId,
+                HardwareType = type,
+                EventType = $"{(isAssigned ? "Assigned" : "Unassigned")}",
+                EventDate = DateTime.Now,
+            });
+        }
+
+        public ProgramHistory UpdateProgramHistory(bool isAssigned, int employeeId, int programId)
+        {
+            // Update the history: Assigned or Unassigned
+            return (new ProgramHistory
+            {
+                ProgramId = programId,
+                EmployeeId = employeeId,
+                EventType = $"{(isAssigned ? "Assigned" : "Unassigned")}",
+                EventDate = DateTime.Now,
+            });
+        }
         /* isAdmin() determines if the username from the AccessToken is an admin user.
          *  If the user is an admin, we can choose to return specific values to the front end.
          * Return: boolean. True if the user is an admin, and false otherwise.
@@ -96,5 +122,19 @@ namespace backend_api.Controllers
             return obj.GetType().Name;
         }
 
+        /* UpdateHardwareHistory(empId, hardwareType, hardwareId, eventType, date) will add an entry into the 
+         *   hardware history table.
+         */
+        public void UpdateHardwareHistory(int? empId, string hardwareType, int hardwareId, string eventType, DateTime? date)
+        {
+            _context.HardwareHistory.Add(new HardwareHistory
+            {
+                EmployeeId = empId,
+                HardwareType = hardwareType,
+                HardwareId = hardwareId,
+                EventType = eventType,
+                EventDate = date,
+            });
+        }
     }
 }

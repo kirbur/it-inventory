@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using backend_api.Helpers;
 using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace backend_api.Controllers
@@ -11,14 +13,9 @@ namespace backend_api.Controllers
     // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class UpdateController : ControllerBase
+    public class UpdateController : ContextController
     {
-        private readonly ITInventoryDBContext _context;
-
-        public UpdateController(ITInventoryDBContext context)
-        {
-            _context = context;
-        }
+        public UpdateController(ITInventoryDBContext context) : base(context) { }
 
         /* PUT: api/udpate/department
          * Will update a specified row on the department table
@@ -94,17 +91,43 @@ namespace backend_api.Controllers
             {
                 foreach (var program in _context.Program.Where(x => x.ProgramName == input.Program.OldProgramName))
                 {
-                    program.ProgramName = input.Program.NewProgramName;
-                    program.ProgramCostPerYear = input.Program.ProgramCostPerYear;
-                    program.ProgramFlatCost = input.Program.ProgramFlatCost;
-                    program.ProgramLicenseKey = input.Program.ProgramLicenseKey;
-                    program.IsLicense = input.Program.IsLicense;
-                    program.Description = input.Program.ProgramDescription;
-                    program.ProgramPurchaseLink = input.Program.ProgramPurchaseLink;
-                    program.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
-                    program.DateBought = input.Program.DateBought;
-                    program.RenewalDate = input.Program.RenewalDate;
-                    program.MonthsPerRenewal = input.Program.MonthsPerRenewal;
+                    if (input.Program.NewProgramName != null)
+                    {
+                        program.ProgramName = input.Program.NewProgramName;
+                    }
+                    if (input.Program.ProgramCostPerYear != null)
+                    {
+                        program.ProgramCostPerYear = input.Program.ProgramCostPerYear;
+                    }
+                    if (input.Program.ProgramFlatCost != null)
+                    {
+                        program.ProgramFlatCost = input.Program.ProgramFlatCost;
+                    }
+                    if (input.Program.ProgramLicenseKey != null)
+                    {
+                        program.ProgramLicenseKey = input.Program.ProgramLicenseKey;
+                    }
+                    if (input.Program.IsLicense != null)
+                    {
+                        program.IsLicense = input.Program.IsLicense.Value;
+                    }
+                    if (input.Program.ProgramDescription != null)
+                    {
+                        program.Description = input.Program.ProgramDescription;
+                    }
+                    if (input.Program.ProgramPurchaseLink != null)
+                    {
+                        program.ProgramPurchaseLink = input.Program.ProgramPurchaseLink;
+                    }
+                    if (input.Program.MonthsPerRenewal != null)
+                    {
+                        program.MonthsPerRenewal = input.Program.MonthsPerRenewal;
+                        program.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
+                    }
+                    if (input.Program.RenewalDate != null)
+                    {
+                        program.RenewalDate = input.Program.RenewalDate;
+                    }
                 }
                 _context.SaveChanges();
                 return StatusCode(202);
@@ -116,7 +139,7 @@ namespace backend_api.Controllers
 
 
         }
-        /* PUT: api/udpate/program/{id}
+        /* PUT: api/update/program/{id}
         * Will update the program identified by the id from the route
         * Param input format:
         * {     "Program" : {
@@ -177,7 +200,7 @@ namespace backend_api.Controllers
                     }
                     // Case 2: When an already assigned program becomes assigned to someone else
                     // This requires 2 entries; one for the unassigning and one for the assigning.
-                    else if (input.Program.EmployeeId != null && progEmpId != null)
+                    else if (input.Program.EmployeeId != null && progEmpId != null && input.Program.EmployeeId != prog.EmployeeId)
                     {
                         // unassigning
                         var History = (new ProgramHistory
@@ -214,8 +237,10 @@ namespace backend_api.Controllers
                         });
                         programHistories.Add(History);
                     }
-                    _context.ProgramHistory.AddRange(programHistories);
-
+                    if (programHistories != null)
+                    {
+                        _context.ProgramHistory.AddRange(programHistories);
+                    }
                     _context.SaveChanges();
                     return StatusCode(202);
                 }
@@ -227,6 +252,510 @@ namespace backend_api.Controllers
             else
             {
                 return BadRequest("Program does not exist or failed to supply ID");
+            }
+        }
+
+        /* POST: api/update/Plugin
+         * Takes in as input:
+         * {
+         *     "PluginId" : int, 
+	     *     "ProgramName" : String,
+	     *     "PluginName" : int,
+	     *     "PluginFlatCost" : Decimal,
+	     *     "TextField" : string,
+	     *     "PluginCostPerYear" : Decimal,
+	     *     "RenewalDate" : DateTime,
+	     *     "MonthsPerRenewal" : int,
+         *     "DateBought" : DateTime
+         * }
+         */
+
+        [HttpPut]
+        [Route("Plugin")]
+        public IActionResult PostPlugin([FromBody] EditPluginInputModel input)
+        {
+            // finding the plugin by the given id
+            var plugin = _context.Plugins.Find(input.PluginId);
+            
+            // if the plugin does not exist then return error message
+            if (plugin == null)
+            {
+                return BadRequest("No such plug-in exists");
+            }
+            // if the Program that is connected to this plugin does not exist then return error message
+            if (!(_context.Program.Select(x => x.ProgramName).ToList().Contains(input.ProgramName)))
+            {
+                return BadRequest("No such program exists");
+            }
+            // try updating the various fields of our plugin
+            try
+            {
+                plugin.PluginName = input.PluginName;
+                plugin.PluginFlatCost = input.PluginFlatCost;
+                plugin.ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First();
+                plugin.TextField = input.TextField;
+                plugin.PluginCostPerYear = input.PLuginCostPerYear;
+                plugin.IsDeleted = false;
+                plugin.ProgramName = input.ProgramName;
+                plugin.RenewalDate = input.RenewalDate;
+                plugin.MonthsPerRenewal = input.MonthsPerRenewal;
+                plugin.Datebought = input.DateBought;
+                plugin.IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false;
+
+                _context.Update(plugin);
+                _context.SaveChanges();
+                return StatusCode(202);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        /* PUT: api/udpate/employee/
+         * Will update the employee identified by the given employeeId from the body
+         * {
+         *       "Employee": {
+    	 *           "EmployeeId" : Int,
+         *           "FirstName": String,
+         *           "LastName": String,
+         *           "HireDate": DateTime,
+         *           "Role": String,
+         *           "DepartmentID": int,
+         *           "IsAdmin" : bool
+         *       },
+         *       "HardwareAssigned": [
+         *            {
+         *               "Type": String,
+         *               "ID": int
+         *           }
+         *       ] for all the hardware assigned (this arraylist)
+         *       "ProgramAssigned": [
+         *           {
+         *               "ID": int
+         *           },
+         *       ] for all the programs assigned (this arraylist)
+         *       "HardwareUnassigned": [
+         *           {
+         *               "Type": String,
+         *               "ID": int
+         *           }
+         *       ] for all the hardware unassigned (this arraylist)
+         *       "ProgramUnassigned": [
+         *           {
+         *               "ID": int
+         *           }
+         *       ] for all the programs unassigned (this arraylist)
+         *   }
+         */
+
+        [HttpPut]
+        [Route("Employee")]
+        public IActionResult EditEmployee([FromBody] EditEmployeeInputModel input)
+        {
+            // finding the employee from the given employeeId
+            var emp = _context.Employee.Find(input.Employee.EmployeeId);
+
+            // finding the authID connected to this employee from adGuid
+            var authIdEmp = _context.AuthIdserver.Where(x => x.ActiveDirectoryId == emp.Adguid).FirstOrDefault();
+
+            // making sure that neither of these are null. These are both created when an employee is created
+            if (emp != null && authIdEmp !=null)
+            {
+                try
+                {
+                    // updating the various fields of the current employee
+                    emp.HireDate = input.Employee.HireDate;
+                    emp.FirstName = input.Employee.FirstName;
+                    emp.LastName = input.Employee.LastName;
+                    emp.Role = input.Employee.Role;
+                    emp.DepartmentID = input.Employee.DepartmentID;
+                    _context.Employee.Update(emp);
+
+                    // updating the current isAdmin for the authIdServer connected to the employee
+                    authIdEmp.IsAdmin = input.Employee.IsAdmin;
+                    _context.AuthIdserver.Update(authIdEmp);
+
+                    _context.SaveChanges();
+
+                    // checking if any hardware is to be assigned
+                    if (input.HardwareAssigned != null)
+                    {
+                        // loop through hardware and depending on what type the hardware is, then add the hardware to the specific table. 
+                        // also in the loop, update the hardware history whether the it was assigned or unassigned  
+                        foreach (var hardware in input.HardwareAssigned)
+                        {
+                            switch (hardware.Type.ToLower())
+                            {
+                                case "monitor":
+                                    UpdateHardwareAssignment(_context.Monitor, emp.EmployeeId, true, hardware);
+                                    break;
+                                case "peripheral":
+                                    UpdateHardwareAssignment(_context.Peripheral, emp.EmployeeId, true, hardware);
+                                    break;
+                                case "computer":
+                                    UpdateHardwareAssignment(_context.Computer, emp.EmployeeId, true, hardware);
+                                    break;
+                                case "server":
+                                    UpdateHardwareAssignment(_context.Server, emp.EmployeeId, true, hardware);
+                                    break;
+                            }
+                        }
+                    }
+                    // checking if any hardware is to be unassigned
+                    if (input.HardwareUnassigned != null)
+                    {
+                        foreach (var hardware in input.HardwareUnassigned)
+                        {
+                            switch (hardware.Type.ToLower())
+                            {
+                                case "monitor":
+                                    UpdateHardwareAssignment(_context.Monitor, emp.EmployeeId, false, hardware);
+                                    break;
+                                case "peripheral":
+                                    UpdateHardwareAssignment(_context.Peripheral, emp.EmployeeId, false, hardware);
+                                    break;
+                                case "computer":
+                                    UpdateHardwareAssignment(_context.Computer, emp.EmployeeId, false, hardware);
+                                    break;
+                                case "server":
+                                    UpdateHardwareAssignment(_context.Server, emp.EmployeeId, false, hardware);
+                                    break;
+                            }
+                        }
+                    }
+
+                    // list to hold the histories of programs that will be added
+                    List<ProgramHistory> programHistories = new List<ProgramHistory>();
+
+                    // checking if any programs are to be assigned
+                    if (input.ProgramAssigned != null)
+                    {
+                        foreach (var program in input.ProgramAssigned)
+                        {
+                            var prog = _context.Program.Find(program.ID);
+                            prog.EmployeeId = input.Employee.EmployeeId;
+                            programHistories.Add(UpdateProgramHistory(true, emp.EmployeeId, program.ID));
+                        }
+                    }
+
+                    // checking if any programs are to be unassigned
+                    if (input.ProgramUnassigned != null)
+                    {
+                        foreach (var program in input.ProgramUnassigned)
+                        {
+                            var prog = _context.Program.Find(program.ID);
+                            prog.EmployeeId = null;
+                            programHistories.Add(UpdateProgramHistory(false, emp.EmployeeId, program.ID));
+                        }
+                        // Save multiple entries at once
+
+                    }
+                    if (programHistories != null)
+                    {
+                        _context.ProgramHistory.AddRange(programHistories);
+                    }
+                    _context.SaveChanges();
+
+                    return StatusCode(202);
+                }
+
+                catch (Exception e)
+                {
+                    return BadRequest(error: e.Message);
+                }
+            }
+            else
+            {
+                return BadRequest("Employee does not exist");
+            }
+        }
+        private void UpdateHardwareAssignment<T>(DbSet<T> table, int? employeeId, bool IsAssigned, HardwareAssignedModel hardware)
+            where T : class, IAssignable
+        {
+            var entity = table.Find(hardware.ID);
+            entity.IsAssigned = IsAssigned;
+            entity.EmployeeId = IsAssigned ? employeeId : null;
+            UpdateHardwareHistory(IsAssigned, employeeId, hardware.ID, hardware.Type);
+            _context.SaveChanges();
+        }
+
+        /* PUT: api/update/server
+         * Input param format:
+             { 
+               "Entity": {
+                    "ServerId" : int,
+                    "Fqdn" : string?,
+		            "NumberOfCores" : int?,
+		            "OperatingSystem" : string?,
+		            "Ram" : int?,
+		            "Virtualize" : bool,
+		            "RenewalDate" : string? (formatted yyyy-mm-dd),
+		            "EmployeeId" : int?,
+		            "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		            "FlatCost" : decimal?,
+		            "EndOfLife" : string? (formatted yyyy-mm-dd),
+		            "TextField" : string?,
+		            "CostPerYear" : decimal?,
+		            "MFG" : string?,
+		            "Make" : string?,
+		            "Model" : string?,
+		            "IPAddress" : string?,
+		            "SAN" : string?,
+		            "LocalHHD" : string?,
+		            "Location" : "xx"? (either GR or AA),
+		            "SerialNumber" : string?,
+		            "MonthsPerRenewal" : int?,
+                },
+                "AddHistory": [ {
+                    "EventType": string,
+                    "EventDate": string formatted as "yyyy-mm-dd hr:mn:sc.000",
+                    } ,.. ],
+                "DeleteHistory": int[], 
+              } 
+         * PutHardware<T>(input) will update the entity specified and will automatically generate
+         *   assignment history. The method will also add history provided from the PUT request and 
+         *   delete rows specified in the request.
+         * Return: 200 if updates were successful, and 400 if they were not successful. 
+         */
+        [HttpPut]
+        [Route("server")]
+        public IActionResult PutServer([FromBody] HistoryEntityInput<Server> input)
+        {
+            return PutHardware(input);
+        }
+
+        /* PUT: api/update/monitor
+             { 
+               "Entity": {
+                    "MonitorId" : int,
+		            "Make" : string?,
+		            "Model" : string?,
+		            "Resolution" : integer?,
+		            "Inputs" : string?,
+		            "EmployeeId" : int?,
+		            "TextField" : string?,
+		            "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		            "FlatCost" : decimal?,
+		            "CostPerYear" : decimal?,
+		            "ScreenSize" : float?,
+		            "Mfg" : string?,
+		            "RenewalDate" : string? (formatted yyyy-mm-dd),
+		            "Location" : "xx"? (either GR or AA),
+		            "SerialNumber" : string?,
+		            "MonthsPerRenewal" : int?,
+                },
+                "AddHistory": [ {
+                    "EventType": string,
+                    "EventDate": string formatted as "yyyy-mm-dd hr:mn:sc.000",
+                    } ,.. ],
+                "DeleteHistory": int[], 
+              } 
+         * PutHardware<T>(input) will update the entity specified and will automatically generate
+         *   assignment history. The method will also add history provided from the PUT request and 
+         *   delete rows specified in the request.
+         * Return: 200 if updates were successful, and 400 if they were not successful. 
+         */
+        [HttpPut]
+        [Route("monitor")]
+        public IActionResult PutMonitor([FromBody] HistoryEntityInput<Monitor> input)
+        {
+            return PutHardware(input);
+        }
+
+        /* PUT: api/update/computer
+             { 
+               "Entity": {
+                    "ComputerId" : int,
+		            "Cpu" : string?,
+		            "Ramgb" : int?,
+		            "Ssdgb" : int?,
+		            "PurchaseDate" : string? (formatted yyyy-mm-dd),
+		            "RenewalDate" : string? (formatted yyyy-mm-dd),
+		            "FlatCost" : decimal?,
+		            "MonitorOutput" : string?,
+		            "EndOfLife" : string? (formatted yyyy-mm-dd),
+		            "EmployeeId" : int?,
+		            "TextField" : string?,
+		            "ScreenSize" : float?,
+		            "CostPerYear" : decimal?,
+		            "Resolution" : decimal?,
+		            "Mfg" : string?,
+		            "Make" : string?,
+		            "Model" : string?,
+		            "Fqdn" : string?,
+		            "Location" : "xx"? (either GR or AA),
+		            "SerialNumber" : string?,
+		            "MonthsPerRenewal" : int?
+                },
+                "AddHistory": [ {
+                    "EventType": string,
+                    "EventDate": string formatted as "yyyy-mm-dd hr:mn:sc.000",
+                    } ,.. ],
+                "DeleteHistory": int[], 
+              } 
+         * PutHardware<T>(input) will update the entity specified and will automatically generate
+         *   assignment history. The method will also add history provided from the PUT request and 
+         *   delete rows specified in the request.
+         * Return: 200 if updates were successful, and 400 if they were not successful. 
+         */
+        [HttpPut]
+        [Route("laptop")]
+        [Route("computer")]
+        public IActionResult PutComputer([FromBody] HistoryEntityInput<Computer> input)
+        {
+            return PutHardware(input);
+        }
+
+        /* PUT: api/update/peripheral
+             { 
+               "Entity": {
+                    "PeripheralId" : int,
+		            "PeripheralName" : string?,
+		            "PeripheralType" : string?,
+		            "TextField" : string?,
+		            "EmployeeId" : int?,
+		            "FlatCost" : decimal?,
+		            "PurchaseDate" : string? (formatted yyyy-mm-dd),,
+		            "CostPerYear" : decimal?,
+		            "Mfg" : string?,
+		            "Location" : "xx"? (either GR or AA),
+		            "RenewalDate" : string? (formatted yyyy-mm-dd),
+		            "SerialNumber" : string?,
+		            "MonthsPerRenewal" : int?,
+                },
+                "AddHistory": [ {
+                    "EventType": string,
+                    "EventDate": string formatted as "yyyy-mm-dd hr:mn:sc.000",
+                    } ,.. ],
+                "DeleteHistory": int[], 
+              } 
+         * PutHardware<T>(input) will update the entity specified and will automatically generate
+         *   assignment history. The method will also add history provided from the PUT request and 
+         *   delete rows specified in the request.
+         * Return: 200 if updates were successful, and 400 if they were not successful. 
+         */
+        [HttpPut]
+        [Route("peripheral")]
+        public IActionResult PutPeripheral([FromBody] HistoryEntityInput<Peripheral> input)
+        {
+            return PutHardware(input);
+        }
+
+        /* PUT: api/update/{hardware}
+         * Input param format:
+             { 
+               "Entity": {
+                    specific fields for hardware type.
+                },
+                "AddHistory": [ {
+                        "EventType": string,
+                        "EventDate": string formatted as "yyyy-mm-dd hr:mn:sc.000",
+                    } ,.. ],
+                "DeleteHistory": int[], 
+              } 
+         * PutHardware<T>(input) will update the entity specified and will automatically generate
+         *   assignment history. The method will also add history provided from the PUT request and 
+         *   delete rows specified in the request.
+         * Return: 200 if updates were successful, and 400 if they were not successful. 
+         */
+        private IActionResult PutHardware<T>(HistoryEntityInput<T> input)
+            where T : class, IHardwareBase
+        {
+            T newHardware = input.Entity;
+            int hardwareId = newHardware.GetId();
+
+            // Check to make sure an Id was given in the request body.
+            if (hardwareId == 0)
+            {
+                return BadRequest("Id not supplied in body");
+            }
+            else
+            {
+                string type = GetClassName(newHardware);
+
+                // Get the table of the entity's type.
+                DbSet<T> table = _context.Set<T>();
+
+                // Get the old hardware entity from the db.
+                T oldHardware = table.Find(hardwareId);
+
+                // Make sure the id is valid for the type requested.
+                if (oldHardware == null)
+                {
+                    return BadRequest($"Cannot find {type} with id {hardwareId}.");
+                }
+                else
+                {
+                    // Make the old hardware be detached from the DB
+                    _context.Entry(oldHardware).State = EntityState.Detached;
+
+                    // Make this entity be tracked by the DB.
+                    _context.Entry(newHardware).State = EntityState.Modified;
+
+                    int? newEmployeeId = newHardware.EmployeeId;
+                    int? oldEmployeeId = oldHardware.EmployeeId;
+
+                    // Update values not sent by the request body.
+                    newHardware.IsAssigned = newEmployeeId != null ? true : false;
+                    newHardware.IsDeleted = oldHardware.IsDeleted;
+
+                    // Update history on assignment change.
+                    // Case 1: Un --> Assigned
+                    if (oldEmployeeId == null && newEmployeeId != null)
+                    {
+                        // Assign
+                        UpdateHardwareHistory(newEmployeeId, type, hardwareId, "Assigned", DateTime.Now);
+                    }
+
+                    // Case 2: Assigned --> Reassigned
+                    else if (oldEmployeeId != null && newEmployeeId != null && oldEmployeeId != newEmployeeId)
+                    {
+                        // Unassign
+                        UpdateHardwareHistory(oldEmployeeId, type, hardwareId, "Unassigned", DateTime.Now);
+
+                        // Then Assign
+                        UpdateHardwareHistory(newEmployeeId, type, hardwareId, "Assigned", DateTime.Now);
+                    }
+
+                    // Case 3: Assigned --> Un
+                    else if (oldEmployeeId != null && newEmployeeId == null)
+                    {
+                        // Unassign
+                        UpdateHardwareHistory(oldEmployeeId, type, hardwareId, "Unassigned", DateTime.Now);
+                    }
+
+                    // Create history specified in PUT request.
+                    // NOTE: The user added history will be put under whatever the new employeeId is.
+                    var addHistory = input.AddHistory;
+                    if (addHistory != null)
+                    {
+                        foreach (var historyEvent in addHistory)
+                        {
+                            UpdateHardwareHistory(newEmployeeId, type, hardwareId, historyEvent.EventType, historyEvent.EventDate);
+                        }
+                    }
+
+                    // Delete history rows user wanted to be deleted
+                    int[] deleteHistory = input.DeleteHistory;
+                    if (deleteHistory != null)
+                    {
+                        foreach (int historyEventId in deleteHistory)
+                        {
+                            HardwareHistory historyEvent = _context.HardwareHistory.Find(historyEventId);
+                            if (historyEvent != null)
+                            {
+                                _context.Remove(historyEvent);
+                            }
+                        }
+                    }
+
+                    // Update and save.
+                    _context.Update(newHardware);
+                    _context.SaveChanges();
+                    return Ok($"{type} and history updated.");
+                }
+
             }
         }
 
