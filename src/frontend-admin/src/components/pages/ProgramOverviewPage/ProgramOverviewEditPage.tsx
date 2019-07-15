@@ -373,13 +373,15 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             }
 
             if (removedPluginRows.length > 0) {
-                removedPluginRows.forEach(remove => {
+                removedPluginRows.forEach(remove =>
                     axios
                         .put(`archive/plugin/${remove[0].id}`, {})
                         .then((response: any) => console.log(response))
                         .catch((err: any) => console.error(err))
-                })
+                )
                 setRemovedPluginRows([])
+                //after submitting go back to detail
+                history.push(`/programs/overview/${match.params.id}`)
             }
 
             if (removedProgramRows.length > 0) {
@@ -391,6 +393,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         .catch((err: any) => console.error(err))
                 })
                 setRemovedProgramRows([])
+                //after submitting go back to detail
+                history.push(`/programs/overview/${match.params.id}`)
             }
         }
 

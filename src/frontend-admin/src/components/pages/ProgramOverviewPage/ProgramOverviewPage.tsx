@@ -196,11 +196,27 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         <img className={styles.img} src={img} alt={''} />
                     </div>
                     <div className={styles.costText}>
-                        {programData.progFlatCost > 0 && <p>Paid ------------------ ${programData.progFlatCost}</p>}
+                        {programData.progFlatCost > 0 && (
+                            <Group>
+                                <p>Paid</p>
+                                <div className={styles.costLine} />
+                                <p>${programData.progFlatCost} </p>
+                            </Group>
+                        )}
                         {programData.isCostPerYear ? (
-                            <p>Yearly ---------------- ${programData.progCostPerYear}</p>
+                            <Group>
+                                <p>Yearly</p>
+                                <div className={styles.costLine} />
+                                <p>${programData.progCostPerYear} </p>
+                            </Group>
                         ) : (
-                            <p>Monthly --------------- ${programData.progCostPerYear}</p>
+                            programData.progCostPerYear > 0 && (
+                                <Group>
+                                    <p>Monthly</p>
+                                    <div className={styles.costLine} />
+                                    <p>${programData.progCostPerYear} </p>
+                                </Group>
+                            )
                         )}
                     </div>
                 </div>

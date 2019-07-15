@@ -134,12 +134,29 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     <div className={styles.imgPadding}>
                         <img className={styles.img} src={img} alt={''} />
                     </div>
+
                     <div className={styles.costText}>
-                        {progData.flatCost > 0 && <p>Paid ------------------ ${progData.flatCost}</p>}
+                        {progData.flatCost > 0 && (
+                            <Group>
+                                <p>Paid</p>
+                                <div className={styles.costLine} />
+                                <p>${progData.flatCost} </p>
+                            </Group>
+                        )}
                         {progData.isCostPerYear ? (
-                            <p>Yearly ---------------- ${progData.costPerYear}</p>
+                            <Group>
+                                <p>Yearly</p>
+                                <div className={styles.costLine} />
+                                <p>${progData.costPerYear} </p>
+                            </Group>
                         ) : (
-                            <p>Monthly --------------- ${progData.costPerYear}</p>
+                            progData.costPerYear > 0 && (
+                                <Group>
+                                    <p>Monthly</p>
+                                    <div className={styles.costLine} />
+                                    <p>${progData.costPerYear} </p>
+                                </Group>
+                            )
                         )}
                     </div>
                 </div>
