@@ -121,7 +121,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
             deptList.map(i =>
                 axios
                     .get(`/dashboard/departmentTable/${i.DepartmentId}`)
-                    .then((data: (string | number)[]) => {
+                    .then((data: any[]) => {
                         let y: IDashboardTableDatum[] = []
                         data &&
                             data.map((datum: any) =>

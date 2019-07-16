@@ -636,9 +636,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         return <div className={styles.section}>{rows}</div>
     }
 
-    const toggleHistoryLogForm = () => {
-        setHistoryLogBool(!historyLogBool)
-    }
     const handleSubmitHistoryLog = () => {
         if (eventInput === 'Broken' || eventInput === 'Repaired') {
             setHistoryLogBool(!historyLogBool)
@@ -857,7 +854,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     )}
                     {!historyLogBool && (
                         <div className={styles.historyLogAdd}>
-                            <Button icon='add' onClick={toggleHistoryLogForm} className={styles.historyLogButton} />
+                            <Button
+                                icon='add'
+                                onClick={setHistoryLogBool(!historyLogBool)}
+                                className={styles.historyLogButton}
+                            />
                             add log
                         </div>
                     )}

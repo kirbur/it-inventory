@@ -70,13 +70,6 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     const [softwareDropdown, setSoftwareDropdown] = useState<{name: string; id: number}[]>([])
     const [licenseDropdown, setLicenseDropdown] = useState<{name: string; id: number}[]>([])
 
-    //input feild states:
-    const [dateInput, setDateInput] = useState<Date>()
-    const [deptInput, setDeptInput] = useState<{name: string; id: number}>()
-    //TODO: add states for the rest of the inputs
-
-    const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
-
     useEffect(() => {
         axios
             .get(`/detail/department/${match.params.id}`)
