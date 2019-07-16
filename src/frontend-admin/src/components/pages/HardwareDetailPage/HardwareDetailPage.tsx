@@ -1,17 +1,13 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
-import icon from '../../../content/Images/CQL-favicon.png'
-import {IoMdAdd} from 'react-icons/io'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
 
 // Utils
-import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
-import {format} from '../../../utilities/formatEmptyStrings'
-import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {formatDate} from '../../../utilities/FormatDate'
 
 // Styles
 import styles from './HardwareDetailPage.module.css'
@@ -64,7 +60,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setHeadingInfo([
                         'Make: ' + data[0].server.make,
                         'Model: ' + data[0].server.model,
@@ -102,7 +97,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setHeadingInfo([
                         'Make: ' + data[0].computer.make,
                         'Model: ' + data[0].computer.model,
@@ -139,7 +133,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setHeadingInfo([
                         'Make: ' + data[0].monitor.make,
                         'Model: ' + data[0].monitor.model,
@@ -170,7 +163,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setHeadingInfo([
                         'Name: ' + data[0].peripheral.peripheralName,
                         'Type: ' + data[0].peripheral.peripheralType,

@@ -5,23 +5,17 @@ import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
-import {DropdownList} from '../../reusables/Dropdown/DropdownList'
-
-//components
-import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
 
 // Styles
 import styles from './DepartmentDetailPage.module.css'
-import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Context
 import {LoginContext} from '../../App/App'
 
 // Utils
-import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
+import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
-import {async} from 'q'
 
 // Types
 interface IDepartmentDetailPageProps {
@@ -73,7 +67,6 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         axios
             .get(`/detail/department/${match.params.id}`)
             .then((data: any) => {
-                console.log(data)
                 let dept: any = {
                     // photo: data[0].picture,'
                     employeeCount: data[0].countEmpsInDep,
@@ -108,7 +101,6 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         },
                     ])
                 )
-                console.log(e)
                 setEmployeeRows(e)
 
                 let sw: any[] = []
@@ -132,7 +124,6 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         },
                     ])
                 )
-                console.log(sw)
                 setSoftwareRows(sw)
 
                 let l: any[] = []
@@ -150,7 +141,6 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         },
                     ])
                 )
-                console.log(l)
                 setLicenseRows(l)
 
                 let dhw: any[] = []
@@ -171,7 +161,6 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     }, [])
 
     async function handleArchive() {
-        console.log(employeeRows.length)
         if (employeeRows.length > 0) {
             window.alert('Cannot archive department with employees in it!')
         } else {

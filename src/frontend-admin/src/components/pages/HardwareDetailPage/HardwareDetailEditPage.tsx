@@ -1,17 +1,12 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
-import icon from '../../../content/Images/CQL-favicon.png'
-import {IoMdAdd} from 'react-icons/io'
 import {Button} from '../../reusables/Button/Button'
-import {Group} from '../../reusables/Group/Group'
 import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
 import DatePicker from 'react-datepicker'
 
 // Utils
-import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
-import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
@@ -20,7 +15,6 @@ import styles from './HardwareDetailEditPage.module.css'
 // Context
 import {LoginContext} from '../../App/App'
 import {cloneDeep} from 'lodash'
-import {handleInputChange} from 'react-select/lib/utils'
 import {sortByDate} from '../../../utilities/quickSort'
 
 // Types
@@ -59,7 +53,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
-    const [hardwareData, setUserData] = useState<any>({})
 
     //default
     const [employeeList, setEmployeeList] = useState([])

@@ -2,11 +2,7 @@ import React, {useState, useEffect, useContext} from 'react'
 
 // Components
 import icon from '../../../content/Images/CQL-favicon.png'
-import {DetailEditTable} from '../../reusables/DetailEditTable/DetailEditTable'
-import {IoIosPersonAdd, IoMdAdd} from 'react-icons/io'
-import {FaUserShield, FaUser, FaUserGraduate} from 'react-icons/fa'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
-import DatePicker from 'react-datepicker'
 
 import 'react-datepicker/dist/react-datepicker.css'
 
@@ -19,7 +15,6 @@ import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 import {Button} from '../../reusables/Button/Button'
 import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {LoginContext} from '../../App/App'
-import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {cloneDeep} from 'lodash'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
@@ -74,7 +69,6 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
         axios
             .get(`/detail/department/${match.params.id}`)
             .then((data: any) => {
-                console.log(data)
                 let dept: any = {
                     // photo: data[0].picture,'
                     departmentName: data[0].departmentName,
@@ -85,21 +79,18 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                 data[0].defaultHardware.map((item: string, index: number) =>
                     hw.push([{value: format(item), sortBy: item, id: index}])
                 )
-                console.log(hw)
                 setHardwareRows(hw)
 
                 let sw: any[] = []
                 data[0].defaultSoftware.map((item: string, index: number) =>
                     sw.push([{value: format(item), sortBy: item, id: index}])
                 )
-                console.log(sw)
                 setSoftwareRows(sw)
 
                 let l: any[] = []
                 data[0].defaultLicenses.map((item: string, index: number) =>
                     l.push([{value: format(item), sortBy: item, id: index}])
                 )
-                console.log(l)
                 setLicenseRows(l)
             })
             .catch((err: any) => console.error(err))
@@ -108,7 +99,6 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     //get the lists of all possible hardware, licenses, and software
     useEffect(() => {
         axios.get(`/add/departmentprep`).then((data: any) => {
-            console.log(data)
             let hw: {name: string; id: number}[] = []
             data[0].hardware.map(
                 (hardware: string, index: number) => hw.push({name: hardware, id: index}) //gives each hardware unique id
@@ -165,14 +155,12 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     //an array of strings to send to the database
     function formatForPost(rows: Defaults[][]) {
         let tempArray: string[] = []
-        console.log(rows)
         for (let i = 0; i < rows.length; i++) {
             tempArray.push(rows[i][0].value)
         }
         return tempArray
     }
     async function handleSubmit() {
-        console.log(deptData.departmentName)
         if (
             //check to make sure there is a proper entry in department name
             deptData.departmentName === '' ||
