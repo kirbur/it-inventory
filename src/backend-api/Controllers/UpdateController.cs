@@ -435,7 +435,7 @@ namespace backend_api.Controllers
                         {
                             var prog = _context.Program.Find(program.ID);
                             prog.EmployeeId = input.Employee.EmployeeId;
-                            programHistories.Add(UpdateProgramHistory(true, emp.EmployeeId, program.ID));
+                            programHistories.Add(UpdateProgramHistory(program.ID, emp.EmployeeId, "Assigned", DateTime.Now));
                         }
                     }
 
@@ -446,7 +446,7 @@ namespace backend_api.Controllers
                         {
                             var prog = _context.Program.Find(program.ID);
                             prog.EmployeeId = null;
-                            programHistories.Add(UpdateProgramHistory(false, emp.EmployeeId, program.ID));
+                            programHistories.Add(UpdateProgramHistory(program.ID, emp.EmployeeId, "Unassigned", DateTime.Now));
                         }
                         // Save multiple entries at once
 
@@ -470,15 +470,7 @@ namespace backend_api.Controllers
                 return BadRequest("Employee does not exist");
             }
         }
-        private void UpdateHardwareAssignment<T>(DbSet<T> table, int? employeeId, bool IsAssigned, HardwareAssignedModel hardware)
-            where T : class, IAssignable
-        {
-            var entity = table.Find(hardware.ID);
-            entity.IsAssigned = IsAssigned;
-            entity.EmployeeId = IsAssigned ? employeeId : null;
-            UpdateHardwareHistory(IsAssigned, employeeId, hardware.ID, hardware.Type);
-            _context.SaveChanges();
-        }
+        
 
         /* PUT: api/update/server
          * Input param format:
