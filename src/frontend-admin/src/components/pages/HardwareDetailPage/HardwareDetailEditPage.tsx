@@ -106,7 +106,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 'FQDN',
             ])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
-            setThirdSectionHeaders(['Employee Assigned', 'Department Assigned', 'Location'])
+            setThirdSectionHeaders(['Employee Assigned', 'Location'])
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
@@ -130,7 +130,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     setEndOfLifeInput(data[0].server.endOfLife)
                     setThirdSectionData([
                         data[0].employeeAssignedName,
-                        data[0].departmentName,
                         data[0].server.location,
                         data[0].server.employeeId,
                     ])
@@ -159,7 +158,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 'FQDN',
             ])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
-            setThirdSectionHeaders(['Employee Assigned', 'Department Assigned', 'Location'])
+            setThirdSectionHeaders(['Employee Assigned', 'Location'])
             axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
@@ -191,7 +190,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                     setThirdSectionData([
                         data[0].employeeAssignedName,
-                        data[0].departmentName,
                         data[0].computer.location,
                         data[0].computer.employeeId,
                     ])
@@ -202,7 +200,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         } else if (match.params.type === 'monitor') {
             setFirstSectionHeaders(['Make', 'Model', 'Screen Size', 'Resolution', 'Inputs', 'Serial #'])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date'])
-            setThirdSectionHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
+            setThirdSectionHeaders(['Employee Assigned', 'Location'])
             axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
@@ -221,7 +219,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                     setThirdSectionData([
                         data[0].employeeAssignedName,
-                        data[0].departmentName,
                         data[0].monitor.location,
                         data[0].monitor.employeeId,
                     ])
@@ -254,7 +251,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     setSecondSectionData([])
                     setThirdSectionData([
                         data[0].employeeAssignedName,
-                        data[0].departmentName,
                         data[0].peripheral.location,
                         data[0].peripheral.employeeId,
                     ])
