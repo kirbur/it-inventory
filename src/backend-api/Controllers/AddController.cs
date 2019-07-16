@@ -317,6 +317,7 @@ namespace backend_api.Controllers
                         }
 
                     }
+                    _context.SaveChanges();
                 }
                 // list to hold the histories of programs that will be added
                 List<ProgramHistory> programHistories = new List<ProgramHistory>();
