@@ -39,13 +39,12 @@ namespace backend_api.Controllers
             _emailSettings = EmailSettings.Value;
         }
 
-        // Authorize the job with a shared secret.
-        // Made this a patch because it is conflicting with the costBreakdown endpoint from the Dashboard we are inheriting.
         /* PATCH: api/job/{job}
          * {job} is the email operation that we want sent.
          *   Can be either "costbreakdown" or "lowresource".
          * SendCostBreakdown() validates the job request and will send an email according to the job requested.
          * Return 200 if an email was send. 400 otherwise.
+         * Note: Made this a patch because it is conflicting with the costBreakdown endpoint from the Dashboard we are inheriting.
          */
         [HttpPatch]
         [Route("{job}")]
@@ -121,8 +120,7 @@ namespace backend_api.Controllers
             // List of people message will be sent to.
             // TODO: Add the actual emails.
             InternetAddressList emails = new InternetAddressList();
-            emails.Add(new MailboxAddress("John Doe", "john.doe@cqlcorp.com"));
-            emails.Add(new MailboxAddress("Michael Smith", "michael.smith@cqlcorp.com"));
+            emails.Add(new MailboxAddress("Charles Kornoelje", "charles.kornoelje@cqlcorp.com"));
             message.To.AddRange(emails);
 
             string date = DateTime.UtcNow.Date.ToString("d");
@@ -166,7 +164,7 @@ namespace backend_api.Controllers
             // List of people message will be sent to.
             // TODO: Add the actual emails.
             InternetAddressList emails = new InternetAddressList();
-            emails.Add(new MailboxAddress("Tim Timmer", "tim.timmer@cqlcorp.com"));
+            emails.Add(new MailboxAddress("Charles Kornoelje", "charles.kornoelje@cqlcorp.com"));
             message.To.AddRange(emails);
 
             message.Subject = $"CQL IT Inventory Low Resource{(lowResources.Count() > 1 ? "s" : "")}: {ResourceNameString(lowResources)}";
