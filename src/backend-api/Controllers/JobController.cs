@@ -214,7 +214,7 @@ namespace backend_api.Controllers
             {
                 int CountProgOverall = licenses.Where(x => x.ProgramName == license.ProgramName).Count();
                 int CountProgInUse = licenses.Where(x => x.ProgramName == license.ProgramName && x.EmployeeId != null).Count();
-                double percentageInUse = (double)CountProgInUse / CountProgOverall;
+                double percentageInUse = Math.Round((double)CountProgInUse / CountProgOverall, 2);
 
                 if (percentageInUse >= 0.8)
                 {
