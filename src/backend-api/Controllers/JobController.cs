@@ -33,10 +33,12 @@ namespace backend_api.Controllers
         }
 
         private readonly EmailSettings _emailSettings;
+        private readonly JobSettings _jobSettings;
 
-        public JobController(IOptions<EmailSettings> EmailSettings, ITInventoryDBContext context) : base(context)
+        public JobController(IOptions<EmailSettings> EmailSettings, IOptions<JobSettings> JobSettings, ITInventoryDBContext context) : base(context)
         {
             _emailSettings = EmailSettings.Value;
+            _jobSettings = JobSettings.Value;
         }
 
         /* PATCH: api/job/{job}
@@ -51,7 +53,7 @@ namespace backend_api.Controllers
         public IActionResult SendCostBreakdownEmail([FromRoute] ValidJob job, [FromHeader] string token)
         {
             // Check the token
-            if (token != _emailSettings.Secret)
+            if (token != _jobSettings.AuthToken)
             {
                 return BadRequest($"Invalid token: {token}");
             }
@@ -87,15 +89,16 @@ namespace backend_api.Controllers
                 // Connect to client and send email.
                 using (var client = new SmtpClient())
                 {
-                    // TODO: What does this do?
-                    // For demo-purposes, accept all SSL certificates (in case the server supports STARTTLS)
+                    // Accept all SSL certificates because use is internal.
                     client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                    // TODO: The boolean value sets useSSL. 
+                    // Set the use of SSL to false because we are using this internally.
                     client.Connect(_emailSettings.SMTP, _emailSettings.Port, false);
 
-                    // Note: only needed if the SMTP server requires authentication
-                    client.Authenticate(_emailSettings.Username, _emailSettings.Password);
+                    if (!string.IsNullOrEmpty(_emailSettings.Username))
+                    {
+                        client.Authenticate(_emailSettings.Username, _emailSettings.Password);
+                    }
 
                     client.Send(message);
                     client.Disconnect(true);

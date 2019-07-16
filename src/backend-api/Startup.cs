@@ -82,6 +82,10 @@ namespace backend_api
             IConfigurationSection emailSettingsSection = Configuration.GetSection("EmailSettings");
             services.Configure<EmailSettings>(emailSettingsSection);
 
+            // Add DI for the job settings.
+            IConfigurationSection jobSettingsSection = Configuration.GetSection("JobSettings");
+            services.Configure<JobSettings>(jobSettingsSection);
+
             // Creates a connection to the db in order to make ITInventoryDBContext available to MVC Controllers.
             services.AddDbContext<ITInventoryDBContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ITInventoryDb")));
             // Allows OData for powerful querying.
