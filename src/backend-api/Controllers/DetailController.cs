@@ -14,66 +14,12 @@ namespace backend_api.Controllers
     // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class DetailController : ControllerBase
+    public class DetailController : ContextController
     {
-        private readonly ITInventoryDBContext _context;
-
-        public DetailController(ITInventoryDBContext context)
-        {
-            _context = context;
-        }
-
-        /* isAdmin determines if the username from the AccessToken is an admin user.
-         *  If the user is an admin, we can choose to return specific values to the front end.
-         * Return: boolean
-         */
-        private bool isAdmin()
-        {
-            // Take the bearer token string, convert it to a Jwt, and find the username from the claims.
-            var TokenList = Request.Headers["Authorization"].ToString().Split(" ");
-
-            // If there was no bearer token give, an out of range index error will be thrown.
-            try
-            {
-                var JwtToken = new JwtSecurityTokenHandler().ReadJwtToken(TokenList[1]);
-                var username = JwtToken.Claims.First().Value;
-
-                // Check to see if the username is in our AD.
-                using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
-                {
-                    var user = UserPrincipal.FindByIdentity(adContext, username);
-                    if (user != null)
-                    {
-                        // Return the isAdmin field from the AuthIDServer matching the Guid.
-                        string adGUID = user.Guid.ToString();
-                        return _context.AuthIdserver.Where(x => x.ActiveDirectoryId == adGUID).First().IsAdmin;
-                    }
-                    else
-                    {
-                        // Return false if the user is not in AuthID.
-                        return false;
-                    }
-                }
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return false;
-            }
-
-        }
-
-        // TODO: Abstract this reused code from this and the image controller.
-        /* Change the front end to match the back end verbatim. 
-         * Return: "computer" if "laptop" is matched.
-         * Else: return the same string.
-         */
-        private string VerbatimMatch(string routeModel)
-        {
-            return routeModel.ToLower() == "laptop" ? "computer" : routeModel.ToLower();
-        }
+        public DetailController(ITInventoryDBContext context) : base(context) { }
 
         /* GET: api/detail/{model}/{id}
-         *      Return: 
+         *      Return: A json for the specific model for each id. See before for specifics.
          */
         [HttpGet]
         [Route("{model}/{id}")]
@@ -111,6 +57,7 @@ namespace backend_api.Controllers
          *              CountOfProgramsInUse: int,
          *              CountOfProgramsOverall: int
          *              Program(name) : string,
+         *              IsLicense : bool,
          *              ProgramCostFlatCost : int or null,
          *              ProgramCostPerYear : int or null,
          *              isCostPerYear : bool,
@@ -120,6 +67,7 @@ namespace backend_api.Controllers
          *          {
          *              programID : int,
          *              EmployeeName, string,
+         *              EmployeeID : int,
          *              ProgramLicenseKey(if admin) : string or null
          *              Program Renewal date : dateTime
          *          ] for all the individual programs that are part of the program overview
@@ -187,13 +135,18 @@ namespace backend_api.Controllers
                 {
                     // holds the employee name for concatenation purposes 
                     var employeeName = "";
+
+                    // holds the employee id so the front end can set up click-ability 
+                    int employeeId = -1;
                     // Concatenating employees first and last name of the employee who owns the program if the program is assigned
                     // and if the program is not deleted
+                    // finding employee id
                     if (prog.EmployeeId != null && prog.IsDeleted == false)
                     {
                         var empFirst = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.FirstName).FirstOrDefault();
                         var empLast = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.LastName).FirstOrDefault();
                         employeeName = empFirst + " " + empLast;
+                        employeeId = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.EmployeeId).FirstOrDefault();
                     }
                     // Creating the list of individual programs with the necessary returnables. 
                     // Only returning license key if the account that hits the endpoint is an admin.
@@ -201,10 +154,13 @@ namespace backend_api.Controllers
                     {
                         prog.ProgramId,
                         employeeName,
+                        employeeId,
                         ProgramlicenseKey = isAdmin() ? prog.ProgramLicenseKey : null,
                         prog.RenewalDate
                     });
                 }
+                // lambda to check if all the indiv programs under this name are a license
+                bool isLicense = UsefulProgramsList.All(x => x.IsLicense == true) ? true : false;
                 // creating a list of plug-ins that will be returned
                 List<object> ListOfPlugins = new List<object>();
 
@@ -216,6 +172,10 @@ namespace backend_api.Controllers
                     {
                         ListOfPlugins.Add(new
                         {
+                            plugin.PluginId,
+                            plugin.TextField,
+                            plugin.MonthsPerRenewal,
+                            plugin.Datebought,
                             plugin.PluginName,
                             plugin.RenewalDate,
                             plugin.PluginFlatCost,
@@ -233,6 +193,7 @@ namespace backend_api.Controllers
                     CountProgInUse,
                     CountProgOverall,
                     program,
+                    isLicense,
                     ProgFlatCost,
                     ProgCostPerYear,
                     UsefulProgramsList.FirstOrDefault().IsCostPerYear,
@@ -240,9 +201,7 @@ namespace backend_api.Controllers
                 };
                 // returning the amalgamation of the various returnables into a nice JSON object :)
                 var ProgramOverViewPage = new { programOverview, inDivPrograms, ListOfPlugins };
-                List<object> list = new List<object>();
-                list.Add(ProgramOverViewPage);
-                return Ok(list);
+                return Ok(new List<object> { ProgramOverViewPage });
             }
 
         }
@@ -258,9 +217,11 @@ namespace backend_api.Controllers
          *      department: string,
          *      role: string,
          *      hireDate: date (as string),
+         *      isAdmin : bool
          *      hardware: [ {
          *          id: int,
          *          type: string,
+         *          clickable : string
          *          make: string,
          *          model: string,
          *          serialNumber: string,
@@ -284,6 +245,7 @@ namespace backend_api.Controllers
          *          licenseKey: string, //TODO
          *          costPerMonth: decimal,
          *          flatCost: decimal,
+         *          LicensesCount : int
          *      } ,.. ],
          *  } ]           
          */
@@ -316,6 +278,7 @@ namespace backend_api.Controllers
                     {
                         id = sv.ServerId,
                         type = nameof(Server),
+                        clickable = nameof(Server) + "/" + sv.ServerId,
                         sv.Make,
                         sv.Model,
                         sv.SerialNumber,
@@ -340,6 +303,7 @@ namespace backend_api.Controllers
                     {
                         id = cp.ComputerId,
                         type = nameof(Computer),
+                        clickable = nameof(Computer) + "/" + cp.ComputerId,
                         cp.Make,
                         cp.Model,
                         cp.SerialNumber,
@@ -361,6 +325,7 @@ namespace backend_api.Controllers
                     {
                         id = mn.MonitorId,
                         type = nameof(Monitor),
+                        clickable = nameof(Monitor) + "/" + mn.MonitorId,
                         mn.Make,
                         mn.Model,
                         mn.SerialNumber,
@@ -383,6 +348,7 @@ namespace backend_api.Controllers
                     {
                         id = pr.PeripheralId,
                         type = nameof(Peripheral),
+                        clickable = nameof(Peripheral) + "/" + pr.PeripheralId,
                         make = pr.PeripheralName,
                         model = pr.PeripheralType,
                         pr.SerialNumber,
@@ -403,6 +369,7 @@ namespace backend_api.Controllers
                 foreach (Models.Program prog in _context.Program.Where(prog => !prog.IsDeleted && prog.EmployeeId == id))
                 {
                     decimal costPerMonth = prog.ProgramCostPerYear / 12 ?? 0.0m;
+                    costPerMonth = Math.Round(costPerMonth, 2, MidpointRounding.ToEven);
                     totalProgramCostPerMonth += costPerMonth;
 
                     if (prog.IsLicense)
@@ -413,7 +380,8 @@ namespace backend_api.Controllers
                             name = prog.ProgramName,
                             licensesKey = isAdmin ? prog.ProgramLicenseKey : null,
                             costPerMonth,
-                            flatCost = prog.ProgramFlatCost
+                            flatCost = prog.ProgramFlatCost,
+                            licensesCount = 1
                         };
                         licenses.Add(license);
                     }
@@ -436,7 +404,7 @@ namespace backend_api.Controllers
                 string picture = $"/image/employee/{id}";
 
                 // Get the department name
-                var department = _context.Department.Where(dep => dep.DepartmentId == emp.DepartmentId && !dep.IsDeleted).FirstOrDefault().DepartmentName;
+                var department = _context.Department.Where(dep => dep.DepartmentId == emp.DepartmentID && !dep.IsDeleted).FirstOrDefault().DepartmentName;
 
                 // list that will hold the unassigned hardware
                 List<object> UnassignedHardware = new List<object>();
@@ -528,23 +496,23 @@ namespace backend_api.Controllers
                 object employeeDetail = new
                 {
                     picture,
-                    totalProgramCostPerMonth,
+                    totalProgramCostMonthly = Math.Round(totalProgramCostPerMonth, 2, MidpointRounding.ToEven),
                     totalHardwareCost,
                     emp.FirstName,
                     emp.LastName,
                     department,
                     emp.Role,
                     emp.HireDate,
+                    // TODO: This is just a temp fix until we sort when to create authIdserver entries
+                    Admin = false,
                     hardware,
                     software,
                     licenses,
                     UnassignedHardware,
                     UnassignedSoftware,
-                    UnassignedLicenses
+                    UnassignedLicenses,
                 };
-                List<object> returnList = new List<object>();
-                returnList.Add(employeeDetail);
-                return Ok(returnList);
+                return Ok(new List<object> { employeeDetail });
             }
         }
         /*
@@ -556,6 +524,7 @@ namespace backend_api.Controllers
         *    "renewalDate": date,
         *    "dateBought": date,
         *    "employeeName": string,
+        *    "employeeID : int
         *    "progHistory": [
         *           {
         *        "programHistoryId": int,
@@ -566,12 +535,16 @@ namespace backend_api.Controllers
         *        "eventName": string,
         *        "eventDescription": string
         *               ] for the events of this specific program
-        *           }
+        *           }  
         *    "programCostPerYear": int,
         *    "programFlatCost": int,
         *    "isCostPerYear": bool,
         *    "description": string,
-        *    "programPurchaseLink": string
+        *    "programPurchaseLink": string,
+        *    "List of employees" : [
+        *       "EmployeeName : string,
+        *       "EmployeeID : int
+        *    ]
         *   }
         * 
         * 
@@ -594,19 +567,25 @@ namespace backend_api.Controllers
 
                 // holds the employee name for concatenation purposes 
                 var employeeName = "";
+                int employeeId = -1;
                 // Concatenating employees first and last name of the employee who owns the program if the program is assigned
                 // and if the program is not deleted
                 if (prog.EmployeeId != null && prog.IsDeleted == false)
                 {
                     var empFirst = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.FirstName).FirstOrDefault();
                     var empLast = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.LastName).FirstOrDefault();
+                    employeeId = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.EmployeeId).FirstOrDefault();
                     employeeName = empFirst + " " + empLast;
                 }
                 List<object> entries = new List<object>();
                 // find all the events/history of the current program
-                foreach(var entry in _context.ProgramHistory.Where(x => x.ProgramId == prog.ProgramId))
+                foreach (var entry in _context.ProgramHistory.Where(x => x.ProgramId == prog.ProgramId))
                 {
-                    var singleEntry = new { entry.EventName, entry.EventDescription, entry.EventDate };
+                    var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
+                    var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
+                    employeeName = empFirst + " " + empLast;
+
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.ProgramHistoryId };
                     entries.Add(singleEntry);
                 }
 
@@ -618,19 +597,20 @@ namespace backend_api.Controllers
                     picture,
                     prog.RenewalDate,
                     prog.DateBought,
+                    prog.MonthsPerRenewal,
                     employeeName,
+                    employeeId = employeeName != "" ? employeeId : -1,
                     entries,
                     ProgramLicenseKey = isAdmin() ? prog.ProgramLicenseKey : null,
                     prog.ProgramCostPerYear,
                     prog.ProgramFlatCost,
                     prog.IsCostPerYear,
                     prog.Description,
-                    prog.ProgramPurchaseLink
+                    prog.ProgramPurchaseLink,
+                    listOfEmployees = ListOfEmployees()
                 };
 
-                List<object> list = new List<object>();
-                list.Add(ProgramDetails);
-                return Ok(list);
+                return Ok(new List<object> { ProgramDetails });
             }
 
         }
@@ -654,6 +634,7 @@ namespace backend_api.Controllers
        *     },
        *     "listOfEmployees": [
        *        {
+       *             "employeeID : int,
        *             "employeeName": string,
        *             "hireDate": date,
        *             "hardwareCostForEmp": decimal,
@@ -699,7 +680,7 @@ namespace backend_api.Controllers
                 decimal? TotalCostOfActHardwareInDep = 0;
 
                 // lambda to collect all the employees in the current department into a list
-                var empsInDep = _context.Employee.Where(x => x.DepartmentId == DepId && x.IsDeleted == false);
+                var empsInDep = _context.Employee.Where(x => x.DepartmentID == DepId && x.IsDeleted == false);
 
                 // lambda to get the ids of the all the employees in the current department
                 var empsIDsInDep = empsInDep.Select(x => x.EmployeeId).ToList();
@@ -797,6 +778,7 @@ namespace backend_api.Controllers
                     // building employee object
                     var Employee = new
                     {
+                        emp.EmployeeId,
                         EmployeeName,
                         emp.HireDate,
                         HardwareCostForEmp,
@@ -866,15 +848,14 @@ namespace backend_api.Controllers
                     TotalCostOfProgramsInDep,
                     picture,
                     CountEmpsInDep,
-                    jsonHardware,
-                    jsonPrograms,
+                    DefaultHardware = jsonHardware["DefaultHardware"],
+                    DefaultLicenses = jsonPrograms["license"],
+                    DefaultSoftware = jsonPrograms["software"],
                     ListOfEmployees,
                     listOfTablePrograms,
                     LicensesList
                 };
-                List<object> list = new List<object>();
-                list.Add(DepartmentDetailPage);
-                return Ok(list);
+                return Ok(new List<object> { DepartmentDetailPage });
             }
         }
 
@@ -907,8 +888,13 @@ namespace backend_api.Controllers
                     "location": string,
                     "serialNumber": string,
                 },
+                "departmentName : string,
+                "departmentID : int,
                 "icon": partial URL (as string),
+                "serverClicked" : string,
                 "employeeAssignedName": string,
+
+                // TODO: update this comment
                 "serverHistory": [
                     {
                         "hardwareHistoryId": int,
@@ -939,18 +925,49 @@ namespace backend_api.Controllers
                 // Employee the server is assigned to.
                 var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == sv.EmployeeId).FirstOrDefault();
 
-                // Server History
-                var serverHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == serverID);
+                // int to hold the department Id for click-ability. -1 is the default if hardware is not assigned. 
+                int departmentID = -1;
+                // string to hold department name. empty string if hardware is unassigned. 
+                string departmentName = "";
 
-                var serverDetailPage =(new {
+                // if an employee is assigned to this hardware then find their department
+                if (employeeAssigned != null)
+                {
+                    var dep = _context.Department.Where(x => x.DepartmentId == employeeAssigned.DepartmentID).FirstOrDefault();
+                    departmentID = dep.DepartmentId;
+                    departmentName = dep.DepartmentName;
+                }
+
+                // Server History
+                List<object> SeverHistory = new List<object>();
+
+                // Formatting the data returned of this piece of hardware's history and adding it to a list.
+                foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == serverID))
+                {
+                    var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
+                    var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
+                    var employeeName = empFirst + " " + empLast;
+
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.HardwareHistoryId };
+                    SeverHistory.Add(singleEntry);
+                }
+
+                var serverClicked = nameof(Server) + "/" + sv.ServerId;
+
+                // list to hold the list of employees that are not deleted so the front end can assign programs to individuals 
+
+                var serverDetailPage = (new
+                {
                     server = sv,
+                    departmentName,
+                    departmentID,
                     icon,
+                    serverClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
-                    serverHistory,
+                    SeverHistory,
+                    listOfEmployees = ListOfEmployees()
                 });
-                List<object> list = new List<object>();
-                list.Add(serverDetailPage);
-                return Ok(list);
+                return Ok(new List<object> { serverDetailPage });
             }
         }
 
@@ -983,7 +1000,10 @@ namespace backend_api.Controllers
                         "location": string,
                         "serialNumber": string
                     },
+                    "departmentName : string,
+                    "departmentID : int,
                     "icon": partial URL (as string),
+                    "computerClicked" : string,
                     "employeeAssignedName": string,
                     "compHistory": [
                         {
@@ -1002,7 +1022,7 @@ namespace backend_api.Controllers
         private IActionResult GetComputerDetail(string model, int ComputerID)
         {
             // Find the requested server
-            var comp = _context.Server.Find(ComputerID);
+            var comp = _context.Computer.Find(ComputerID);
             if (comp == null || comp.IsDeleted == true)
             {
                 return NotFound();
@@ -1014,15 +1034,44 @@ namespace backend_api.Controllers
                 // Employee the computer is assigned to.
                 var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == comp.EmployeeId).FirstOrDefault();
 
+                // int to hold the department Id for click-ability. -1 is the default if hardware is not assigned. 
+                int departmentID = -1;
+                // string to hold department name. empty string if hardware is unassigned. 
+                string departmentName = "";
+
+                // if an employee is assigned to this hardware then find their department
+                if (employeeAssigned != null)
+                {
+                    var dep = _context.Department.Where(x => x.DepartmentId == employeeAssigned.DepartmentID).FirstOrDefault();
+                    departmentID = dep.DepartmentId;
+                    departmentName = dep.DepartmentName;
+                }
+
                 // Computer History
-                var compHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == ComputerID);
+                List<object> ComputerHistory = new List<object>();
+
+                // Formatting the data returned of this piece of hardware's history and adding it to a list.
+                foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == ComputerID))
+                {
+                    var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
+                    var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
+                    var employeeName = empFirst + " " + empLast;
+
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.HardwareHistoryId };
+                    ComputerHistory.Add(singleEntry);
+                }
+                var computerClicked = nameof(Computer) + "/" + comp.ComputerId;
 
                 var computerDetailPage = (new
                 {
                     computer = comp,
+                    departmentName,
+                    departmentID,
                     icon,
-                    employeeAssignedName =employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
-                    compHistory,
+                    computerClicked,
+                    employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    ComputerHistory,
+                    listOfEmployees = ListOfEmployees()
                 });
                 List<object> list = new List<object>();
                 list.Add(computerDetailPage);
@@ -1053,7 +1102,10 @@ namespace backend_api.Controllers
                     "location": string,
                     "serialNumber": string,
                 },
+                "departmentName : string,
+                "departmentID : int,
                 "icon": partial URL (as string),
+                "monitorClicked" : string,
                 "employeeAssignedName": string,
                 "monitorHistory": [
                     {
@@ -1085,19 +1137,48 @@ namespace backend_api.Controllers
                 // Employee the monitor is assigned to.
                 var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == mn.EmployeeId).FirstOrDefault();
 
-                // Monitor History
-                var monitorHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == monitorID);
+                // int to hold the department Id for click-ability. -1 is the default if hardware is not assigned. 
+                int departmentID = -1;
+                // string to hold department name. empty string if hardware is unassigned. 
+                string departmentName = "";
 
-                var monitorDetailPage =(new
+                // if an employee is assigned to this hardware then find their department
+                if (employeeAssigned != null)
+                {
+                    var dep = _context.Department.Where(x => x.DepartmentId == employeeAssigned.DepartmentID).FirstOrDefault();
+                    departmentID = dep.DepartmentId;
+                    departmentName = dep.DepartmentName;
+                }
+
+
+                // Monitor History
+                List<object> MonitorHistory = new List<object>();
+
+                // Formatting the data returned of this piece of hardware's history and adding it to a list.
+                foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == monitorID))
+                {
+                    var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
+                    var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
+                    var employeeName = empFirst + " " + empLast;
+
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.HardwareHistoryId };
+                    MonitorHistory.Add(singleEntry);
+                }
+
+                var monitorClicked = nameof(Monitor) + "/" + mn.MonitorId;
+
+                var monitorDetailPage = (new
                 {
                     monitor = mn,
+                    departmentName,
+                    departmentID,
                     icon,
+                    monitorClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
-                    monitorHistory,
+                    MonitorHistory,
+                    listOfEmployees = ListOfEmployees()
                 });
-                List<object> list = new List<object>();
-                list.Add(monitorDetailPage);
-                return Ok(list);
+                return Ok(new List<object> { monitorDetailPage });
             }
         }
 
@@ -1121,7 +1202,10 @@ namespace backend_api.Controllers
                     "renewalDate": date (as string),
                     "serialNumber": string,
                 },
+                "departmentName : string,
+                "departmentID : int,
                 "icon": partial URL (as string),
+                "peripheralClicked" : string,
                 "employeeAssignedName": string,
                 "monitorHistory": [
                     {
@@ -1154,22 +1238,48 @@ namespace backend_api.Controllers
                 // Employee the peripheral is assigned to.
                 var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == pr.EmployeeId).FirstOrDefault();
 
-                // Peripheral History
-                var peripheralHistory = _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == peripheralID);
+                // int to hold the department Id for click-ability. -1 is the default if hardware is not assigned. 
+                int departmentID = -1;
+                // string to hold department name. empty string if hardware is unassigned. 
+                string departmentName = "";
 
-                var peripheralDetailPage =(new
+                // if an employee is assigned to this hardware then find their department
+                if (employeeAssigned != null)
+                {
+                    var dep = _context.Department.Where(x => x.DepartmentId == employeeAssigned.DepartmentID).FirstOrDefault();
+                    departmentID = dep.DepartmentId;
+                    departmentName = dep.DepartmentName;
+                }
+
+                // Peripheral History
+
+                List<object> peripheralHistory = new List<object>();
+
+                // Formatting the data returned of this piece of hardware's history and adding it to a list.
+                foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == peripheralID))
+                {
+                    var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
+                    var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
+                    var employeeName = empFirst + " " + empLast;
+
+                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.HardwareHistoryId };
+                    peripheralHistory.Add(singleEntry);
+                }
+
+                var peripheralClicked = nameof(Peripheral) + "/" + pr.PeripheralId;
+                var peripheralDetailPage = (new
                 {
                     peripheral = pr,
+                    departmentName,
+                    departmentID,
                     icon,
+                    peripheralClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     peripheralHistory,
+                    listOfEmployees = ListOfEmployees()
                 });
-                List<object> list = new List<object>();
-                list.Add(peripheralDetailPage);
-                return Ok(list);
+                return Ok(new List<object> { peripheralDetailPage });
             }
         }
-
-
     }
 }

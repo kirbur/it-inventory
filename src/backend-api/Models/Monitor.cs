@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public partial class Monitor
+    public partial class Monitor : IHardwareBase
     {
         public int MonitorId { get; set; }
         public string Make { get; set; }
@@ -22,6 +22,9 @@ namespace backend_api.Models
         public DateTime? RenewalDate { get; set; }
         public string Location { get; set; }
         public string SerialNumber { get; set; }
+        public int? MonthsPerRenewal { get; set; }
+
+        public int GetId() { return MonitorId; }
 
         // public Employee Employee { get; set; }
     }

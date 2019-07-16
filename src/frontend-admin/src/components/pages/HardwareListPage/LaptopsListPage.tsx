@@ -34,11 +34,12 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({label: 'Make & Model', value: 'makeModel'})
+    const [selected, setSelected] = useState({label: 'Make', value: 'make'})
 
-    const columns = ['makeModel', 'cpu', 'ram', 'ssd', 'assigned', 'mfgtag']
+    const columns = ['make', 'cpu', 'ram', 'ssd', 'assigned', 'mfgtag', 'model']
+    const searchByHeaders = ['Make', 'CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag', 'Model']
     const headerList = ['Make & Model', 'CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag']
-    const options = columns.map((c, i) => ({label: headerList[i], value: c}))
+    const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
 
     useEffect(() => {
         axios
@@ -47,7 +48,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
                 const laptops: any[] = []
                 data.map((i: any) => {
                     laptops.push({
-                        makeModel: format(i.make) + ' ' + i.model,
+                        make: format(i.make),
                         id: format(i.computerId),
                         cpu: format(i.cpu),
                         ram: format(i.ramgb),
@@ -55,6 +56,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
                         mfgtag: format(i.mfg),
                         icon: i.icon,
+                        model: format(i.model),
                     })
                 })
                 setListData(laptops)
@@ -174,7 +176,8 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
             <td key={row[1]} className={styles.hardware}>
                 <img className={styles.icon} src={URL + row[7]} alt={''} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text>
+                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={styles.alignLeft}>{row[8]}</text>
                 </div>
             </td>
         )

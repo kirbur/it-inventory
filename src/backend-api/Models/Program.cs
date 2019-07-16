@@ -3,13 +3,11 @@ using System.Collections.Generic;
 
 namespace backend_api.Models
 {
-    public partial class Program
+    public class Program
     {
-        //public Program()
-        //{
-        //    Plugins = new HashSet<Plugins>();
-        //    ProgramHistory = new HashSet<ProgramHistory>();
-        //}
+        public Program()
+        {
+        }
 
         public int ProgramId { get; set; }
         public string ProgramName { get; set; }
@@ -26,9 +24,5 @@ namespace backend_api.Models
         public DateTime? DateBought { get; set; }
         public DateTime? RenewalDate { get; set; }
         public int? MonthsPerRenewal { get; set; }
-
-        //public Employee Employee { get; set; }
-        //public ICollection<Plugins> Plugins { get; set; }
-        //public ICollection<ProgramHistory> ProgramHistory { get; set; }
     }
 }

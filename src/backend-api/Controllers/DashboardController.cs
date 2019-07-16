@@ -114,7 +114,7 @@ namespace backend_api.Controllers
         public async Task<ActionResult<object>> GetDashboardPieCharts()
         {
             // Removing the Utilities department from the list of the departments
-            var Departments = _context.Department.Where(x => x.DepartmentName != "Utilities");
+            var Departments = _context.Department.Where(x => x.DepartmentName != "Utilities" && x.IsDeleted == false);
 
             // Instantiating the Pie charts list with the two data lists which will be used to return the data
             // in the correct format
@@ -136,7 +136,7 @@ namespace backend_api.Controllers
                 // Gets the employees that are in the department requested. 
                 foreach (Employee emp in allEmployees)
                 {
-                    if (emp.DepartmentId == Department.DepartmentId)
+                    if (emp.DepartmentID == Department.DepartmentId)
                     {
                         // Adds the IDs of each of the employees.
                         employeeIDsInDepartment.Add(emp.EmployeeId);
@@ -255,7 +255,7 @@ namespace backend_api.Controllers
         [EnableQuery()]
         public IActionResult GetDepartment()
         {
-            return Ok(_context.Department.ToList());
+            return Ok(_context.Department.Where(x => x.IsDeleted == false).ToList());
         }
 
         /* GET: api/dashboard/departmentTable/{departmentID}
@@ -282,7 +282,7 @@ namespace backend_api.Controllers
             // Gets the employees that are in the department requested. 
             foreach (Employee emp in allEmployees)
             {
-                if (emp.DepartmentId == departmentID)
+                if (emp.DepartmentID == departmentID)
                 {
                     // Adds the IDs of each of the employees.
                     employeeIDsInDepartment.Add(emp.EmployeeId);
@@ -368,7 +368,7 @@ namespace backend_api.Controllers
             }
 
             //getting the Admin's entity
-            var AdminEmployee = _context.Employee.FirstOrDefault(x => x.Adguid == "811cbf54-2913-4ffc-8f33-6418ddb4e06d");
+            var AdminEmployee = _context.Employee.FirstOrDefault(x => ActiveDirectoryUtil.IsFirstAdmin(x.Adguid));
             //parsing their user settings from the database into a Json Object
             JObject json = JObject.Parse(AdminEmployee.UserSettings);
             //Getting their licenses from their user settings because that contains both their licenses and software preferences
@@ -443,7 +443,7 @@ namespace backend_api.Controllers
                 return StatusCode(500);
             }
             //getting the Admin's entity
-            var AdminEmployee = _context.Employee.FirstOrDefault(x => x.Adguid == "811cbf54-2913-4ffc-8f33-6418ddb4e06d");
+            var AdminEmployee = _context.Employee.FirstOrDefault(x => x.Adguid.ToString() == "811cbf54-2913-4ffc-8f33-6418ddb4e06d");
             //parsing their user settings from the database into a Json Object
             JObject json = JObject.Parse(AdminEmployee.UserSettings);
             //Getting their licenses from their user settings because that contains both their licenses and software preferences
@@ -462,7 +462,7 @@ namespace backend_api.Controllers
             */
             // Sorts the program history with the most recent changes.
             var programHistory = _context.ProgramHistory.ToList();
-            var sortedProgramHistory = programHistory.OrderByDescending(ph => ph.CurrentOwnerStartDate);
+            var sortedProgramHistory = programHistory.OrderByDescending(ph => ph.EventDate);
 
             // Create a list of programs that have the programs with the most recent changes first.
             List<Models.Program> sortedSoftware = new List<Models.Program>();
