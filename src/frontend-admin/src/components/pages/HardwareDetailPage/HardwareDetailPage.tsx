@@ -161,7 +161,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
-            setFirstTableHeaders(['Employee Assigned', 'Serial #'])
+            setFirstTableHeaders(['Employee Assigned', 'Department Assigned', 'Serial #'])
             setSecondTableHeaders([])
             setThirdTableHeaders([])
             // im not sure
@@ -175,9 +175,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         'Type: ' + data[0].peripheral.peripheralType,
                         'Purchase Date: ' + formatDate(data[0].peripheral.purchaseDate),
                     ])
-                    setFirstTableData([data[0].employeeAssignedName, data[0].peripheral.serialNumber])
+                    setFirstTableData([
+                        data[0].employeeAssignedName,
+                        data[0].departmentName,
+                        data[0].peripheral.serialNumber,
+                    ])
                     setSecondTableData([])
-                    setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD'])
+                    setThirdTableData([])
                     setCostPerYear(data[0].peripheral.costPerYear)
                     setFlatCost(data[0].peripheral.flatCost)
                     setCommentText(data[0].peripheral.textField)

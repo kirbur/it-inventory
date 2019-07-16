@@ -85,10 +85,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [historyLogBool, setHistoryLogBool] = useState(false)
     const [dateInput, setDateInput] = useState<Date>(new Date())
 
-    const [isRecurring, setIsRecurring] = useState(false)
-
-    const [hasRecurringCost, setHasRecurringCost] = useState(false)
-    const [hasFlatCost, setHasFlatCost] = useState(false)
+    const [hasRecurringCost, setHasRecurringCost] = useState<boolean>(false)
+    const [hasFlatCost, setHasFlatCost] = useState<boolean>(false)
 
     var key = 0
 
@@ -113,7 +111,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
-                    // let pull = data[0].server
                     setFirstSectionData([
                         data[0].server.make,
                         data[0].server.model,
@@ -127,20 +124,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].server.san,
                         data[0].server.fqdn,
                     ])
-                    // returnFirstSectionData = {
-                    //     make: pull.make,
-                    //     model: pull.model,
-                    //     os: pull.operatingSystem,
-                    //     ram: pull.ram,
-                    //     hhd: pull.localHHD,
-                    //     cores: pull.numberOfCores,
-                    //     mfg: pull.mfg,
-                    //     serialNumber: pull.serialNumber,
-                    //     ip: pull.ipAddress,
-                    //     san: pull.san,
-                    //     fqdn: pull.fqdn,
-                    // }
-                    // setFirstSectionData(Object.values(returnFirstSectionData)) //turns to array
                     setSecondSectionData([])
                     setPurchaseDateInput(data[0].server.purchaseDate)
                     setRenewalDateInput(data[0].server.renewalDate)
@@ -156,6 +139,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].server.costPerYear,
                         data[0].server.monthsPerRenewal,
                     ])
+                    checkCostStates(data[0].server.flatCost, data[0].server.costPerYear)
                     setCommentText(data[0].server.textField)
                     setHistoryLogEntries(data[0].serverHistory)
                     setHistoryLogEntries(data[0].serverHistory)
@@ -194,6 +178,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     ])
 
                     setSecondSectionData([])
+                    setCostSection([
+                        data[0].computer.flatCost,
+                        data[0].computer.costPerYear,
+                        data[0].computer.monthsPerRenewal,
+                    ])
+                    checkCostStates(data[0].computer.flatCost, data[0].computer.costPerYear)
                     setPurchaseDateInput(data[0].computer.purchaseDate)
                     setRenewalDateInput(data[0].computer.renewalDate)
                     setHistoryLogEntries(data[0].computerHistory)
@@ -235,6 +225,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].monitor.location,
                         data[0].monitor.employeeId,
                     ])
+                    setCostSection([
+                        data[0].monitor.flatCost,
+                        data[0].monitor.costPerYear,
+                        data[0].monitor.monthsPerRenewal,
+                    ])
+                    checkCostStates(data[0].monitor.flatCost, data[0].monitor.costPerYear)
                     setCommentText(data[0].monitor.textField)
                     setHistoryLogEntries(data[0].monitorHistory)
                 })
@@ -262,14 +258,47 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         data[0].peripheral.location,
                         data[0].peripheral.employeeId,
                     ])
+                    setCostSection([
+                        data[0].peripheral.flatCost,
+                        data[0].peripheral.costPerYear,
+                        data[0].peripheral.monthsPerRenewal,
+                    ])
+                    checkCostStates(data[0].peripheral.flatCost, data[0].peripheral.costPerYear)
+
                     setCommentText(data[0].peripheral.textField)
                     setHistoryLogEntries(data[0].peripheralHistory)
                 })
                 .catch((err: any) => console.error(err))
         }
+        // checkCostStates()
     }, [])
 
+    function checkCostStates(flatCost: number, recurringCost: number) {
+        if (flatCost != null && flatCost > 0) {
+            setHasFlatCost(true)
+        }
+        if (recurringCost != null && recurringCost > 0) {
+            setHasRecurringCost(true)
+        }
+    }
+
     async function handleSubmit() {
+        //check to make sure cost properly filled out
+        //also return 0 if
+        console.log(hasFlatCost)
+        if (hasRecurringCost) {
+            if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
+                window.alert('Recurring cost and months must have values!')
+                return
+            }
+        }
+        if (hasFlatCost) {
+            if (costSection[0] == 0 || costSection[0] == null) {
+                window.alert('Initial cost must have a value!')
+                return
+            }
+        }
+
         if (match.params.id === 'new') {
             if (match.params.type === 'monitor') {
                 await axios.post(`add/monitor`, {
@@ -287,9 +316,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
 
-                        FlatCost: costSection[0],
-                        CostPerYear: costSection[1],
-                        MonthsPerRenewal: costSection[2],
+                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        CostPerYear: hasRecurringCost ? costSection[1] : null,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
                         Mfg: null,
                         TextField: commentText,
                     },
@@ -318,9 +347,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[2],
                         EmployeeId: thirdSectionData[3],
 
-                        FlatCost: costSection[0],
-                        CostPerYear: costSection[1],
-                        MonthsPerRenewal: costSection[2],
+                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        CostPerYear: hasRecurringCost ? costSection[1] : null,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
 
                         TextField: commentText,
                     },
@@ -347,9 +376,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[2],
                         EmployeeId: thirdSectionData[3],
 
-                        FlatCost: costSection[0],
-                        CostPerYear: costSection[1],
-                        MonthsPerRenewal: costSection[2],
+                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        CostPerYear: hasRecurringCost ? costSection[1] : null,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
 
                         TextField: commentText,
                     },
@@ -367,9 +396,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[2],
                         EmployeeId: thirdSectionData[3],
 
-                        FlatCost: costSection[0],
-                        CostPerYear: costSection[1],
-                        MonthsPerRenewal: costSection[2],
+                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        CostPerYear: hasRecurringCost ? costSection[1] : null,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
 
                         TextField: commentText,
                     },
@@ -377,7 +406,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             }
             history.push('/hardware')
         } else {
-            console.log('check')
             //not new --> editing existing page
             if (match.params.type === 'monitor') {
                 await axios.put(`update/monitor`, {
@@ -397,9 +425,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
 
-                        FlatCost: costSection[0],
-                        CostPerYear: costSection[1],
-                        MonthsPerRenewal: costSection[2],
+                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        CostPerYear: hasRecurringCost ? costSection[1] : null,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
                         Mfg: null,
                         TextField: commentText,
                     },
@@ -432,9 +460,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[2],
                         EmployeeId: thirdSectionData[3],
 
-                        FlatCost: costSection[0],
-                        CostPerYear: costSection[1],
-                        MonthsPerRenewal: costSection[2],
+                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        CostPerYear: hasRecurringCost ? costSection[1] : null,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
 
                         TextField: commentText,
                     },
@@ -466,9 +494,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[2],
                         EmployeeId: thirdSectionData[3],
 
-                        FlatCost: costSection[0],
-                        CostPerYear: costSection[1],
-                        MonthsPerRenewal: costSection[2],
+                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        CostPerYear: hasRecurringCost ? costSection[1] : null,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
 
                         TextField: commentText,
                     },
@@ -490,9 +518,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[2],
                         EmployeeId: thirdSectionData[3],
 
-                        FlatCost: costSection[0],
-                        CostPerYear: costSection[1],
-                        MonthsPerRenewal: costSection[2],
+                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        CostPerYear: hasRecurringCost ? costSection[1] : null,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
 
                         TextField: commentText,
                     },
@@ -503,7 +531,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         }
 
         console.log(addHistoryLog)
-        history.push('/hardware')
+        history.push(`/hardware/detail/${match.params.type}/${match.params.id}`)
     }
 
     function handleInputChange(index: number, sectionData: any[], value: string | number) {
@@ -664,9 +692,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         setHistoryLogEntries(tempHistoryLog)
     }
 
-    const changeCost = (value: string, index: number) => {
+    const changeCost = (cost: string, index: number) => {
         let tempArray = cloneDeep(costSection)
-        tempArray[index] = value
+        tempArray[index] = cost
         setCostSection(tempArray)
     }
 
@@ -710,9 +738,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             <input
                                 type='checkbox'
                                 className={styles.checkmark}
-                                // checked={hasFlatCost}
-                                // checked={state.costType === 'per month'}
-                                // onChange={() => setState({...state, costType: 'per month'})}
+                                checked={hasFlatCost}
+                                onChange={() => setHasFlatCost(!hasFlatCost)}
                             />
                             <div className={styles.checkmark} />
                             <div className={styles.insideCheckmark} />
@@ -724,7 +751,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 type='number'
                                 step='0.01'
                                 value={costSection[0]}
-                                onChange={e => changeCost(e.target.value, 0)}
+                                onChange={e => {
+                                    if (hasFlatCost) {
+                                        changeCost(e.target.value, 0)
+                                    }
+                                }}
                             />
                         </div>
                     </div>
@@ -733,7 +764,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                             <input
                                 type='checkbox'
                                 className={styles.checkmark}
-                                onChange={() => setIsRecurring(!isRecurring)}
+                                checked={hasRecurringCost}
+                                onChange={() => setHasRecurringCost(!hasRecurringCost)}
                             />
                             <div className={styles.checkmark} />
                             <div className={styles.insideCheckmark} />
@@ -745,10 +777,14 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 type='number'
                                 step='0.01'
                                 value={costSection[1]}
-                                onChange={e => changeCost(e.target.value, 1)}
+                                onChange={e => {
+                                    if (hasRecurringCost) {
+                                        changeCost(e.target.value, 1)
+                                    }
+                                }}
                             />
                         </div>
-                        {isRecurring && (
+                        {hasRecurringCost && (
                             <div className={styles.marginLeft}>
                                 <div className={styles.inputHeader}>Months per Renewal</div>
                                 <input

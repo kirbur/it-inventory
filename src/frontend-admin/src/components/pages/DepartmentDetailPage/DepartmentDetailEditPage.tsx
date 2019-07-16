@@ -211,7 +211,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                     name: deptData.departmentName,
                     ID: match.params.id,
                 })
-                history.push(`/departments/${match.params.id}`)
+                history.push(`/departments/detail/${match.params.id}`)
             }
         }
     }
