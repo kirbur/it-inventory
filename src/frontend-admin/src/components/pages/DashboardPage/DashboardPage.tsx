@@ -103,7 +103,6 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
     //Click Handling
     const onRowClick = (datum: IDashboardTableDatum) => {
-        console.log(datum)
         if (datum.name[datum.name.length - 1] === '*') {
             var str = datum.name.substring(0, datum.name.length - 1)
             history.push(`/programs/overview/${str}`)
