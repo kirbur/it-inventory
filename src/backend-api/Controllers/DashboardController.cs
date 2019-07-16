@@ -364,30 +364,18 @@ namespace backend_api.Controllers
             // Make sure there is an employee.
             if (_context.Employee.Count() < 1)
             {
-                return StatusCode(500);
+                return BadRequest("No employees");
             }
 
-            //getting the Admin's entity
-            var AdminEmployee = _context.Employee.FirstOrDefault(x => ActiveDirectoryUtil.IsFirstAdmin(x.Adguid));
-            //parsing their user settings from the database into a Json Object
-            JObject json = JObject.Parse(AdminEmployee.UserSettings);
-            //Getting their licenses from their user settings because that contains both their licenses and software preferences
-            var LicenseChoices = json["license"];
+            var UsefulProgramsList = _context.Program.Where(x => x.IsPinned == true && x.IsLicense == true && x.IsDeleted == false);
 
-            //taking their preferenced programs and selecting them from the list of programs
-            List<Models.Program> usefulPrograms = new List<Models.Program>();
-            foreach (var license in LicenseChoices)
-            {
-                var prog = _context.Program.FirstOrDefault(x => x.ProgramName == license.ToString());
-                usefulPrograms.Add(prog);
-            }
             //temp list to hold the list with the difference field
             List<LicenseBarGraph> ThrowAwayList = new List<LicenseBarGraph>();
-            // First list removes programs that are not licenses and that are deleted
-            var UsefulProgramsList = _context.Program.Where(x => x.IsLicense == true && x.IsDeleted == false);
+            //// First list removes programs that are not licenses and that are deleted
+            //var UsefulProgramsList = _context.Program.Where(x => x.IsLicense == true && x.IsDeleted == false);
 
             //This List takes the usefulPrograms list and makes it distinct
-            var DistinctUsefulPrograms = usefulPrograms.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
+            var DistinctUsefulPrograms = UsefulProgramsList.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
 
 
             //Loop through every program in the distinct programs list
@@ -440,17 +428,11 @@ namespace backend_api.Controllers
             // Make sure there is an employee.
             if (_context.Employee.Count() < 1)
             {
-                return StatusCode(500);
+                return BadRequest("No Employees");
             }
-            //getting the Admin's entity
-            var AdminEmployee = _context.Employee.FirstOrDefault(x => x.Adguid.ToString() == "811cbf54-2913-4ffc-8f33-6418ddb4e06d");
-            //parsing their user settings from the database into a Json Object
-            JObject json = JObject.Parse(AdminEmployee.UserSettings);
-            //Getting their licenses from their user settings because that contains both their licenses and software preferences
-            var SoftwareChoices = json["software"];
 
             // making list of string of the software that is to be pinned
-            var list = SoftwareChoices.Select(x => x.ToString());
+            var list = _context.Program.Where(x=>x.IsPinned == true && x.IsLicense == false && x.IsDeleted == false).GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault()).Select(x=>x.ProgramName).ToList();
 
             // Only software, not licenses. Nothing deleted. Only ones in use.
             var software = _context.Program.Where(program => program.IsLicense == false && program.IsDeleted == false && program.EmployeeId != null);
