@@ -16,33 +16,50 @@ namespace backend_api.Controllers
     [ApiController]
     public class DashboardController : ControllerBase
     {
-        private readonly ITInventoryDBContext _context;
+        public readonly ITInventoryDBContext _context;
 
         public DashboardController(ITInventoryDBContext context)
         {
             _context = context;
         }
 
+        // A helper class that is a cost breakdown object.
+        public class CostBreakDown
+        {
+            public CostBreakDown() { }
+            public decimal? CostOfProgramsPerYear { get; set; }
+            public decimal? CostOfPluginsPerYear { get; set; }
+        }
+
         /* GET: api/dashboard/CostBreakDown
          * Returns [ {
-         *          Program Cost Per Year,
-         *          Plugin Cost Per Year
-         *         } ] which is comprised of all the programs and their plugins in our database
+         *          ProgramCostPerYear: int,
+         *          PluginCostPerYear: int,
+         *          } ,.. ] which is comprised of all the programs and their plugins in our database
          */
-
         [Route("CostBreakdown")]
         [HttpGet]
-        [EnableQuery()]
+        public ActionResult<object> GetDashboardCostBreakDown()
+        {
+            // Return the object as an array so the axios service class will be happy.
+            return new List<object> { DashboardCostBreakDown() };
+        }
 
-        public async Task<ActionResult<object>> GetDashboardCostBreakDown()
+        /* DashboardCostBreakdown() is a helper method used for calculating the cost breakdown cards
+         *   on the dashboard. 
+         * Returns [ {
+         *           ProgramCostPerYear: int,
+         *           PluginCostPerYear: int,
+         *          } ,.. ] which is comprised of all the programs and their plugins in our database
+         */
+        public CostBreakDown DashboardCostBreakDown()
         {
             //Array that will be returned with Programs cost and plugins cost
             decimal?[] ReturningArray = new decimal?[2];
 
             //Getting cost from the program table
 
-            var ProgramsList = await _context.Program.ToListAsync();
-
+            var ProgramsList = _context.Program.ToList();
 
             decimal? CostOfProgramsPerYear = 0;
             // looping through programs table and finding programs that are not "deleted" 
@@ -58,7 +75,7 @@ namespace backend_api.Controllers
             //getting cost from plugin table
 
             decimal? CostOfPluginsPerYear = 0;
-            var PluginsList = await _context.Plugins.ToListAsync();
+            var PluginsList = _context.Plugins.ToList();
             //Selecting distinct programs by name so that they match up with the plugin table
 
             var DistinctProgramsList = ProgramsList.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
@@ -76,12 +93,12 @@ namespace backend_api.Controllers
                     }
                 }
             }
-            var CostBreakDownObject = new { CostOfProgramsPerYear, CostOfPluginsPerYear };
-            // Return the object as an array so the axios service class will be happy.
-            List<object> returnList = new List<object>();
-            returnList.Add(CostBreakDownObject);
-
-            return Ok(returnList);
+            return new CostBreakDown
+            {
+                CostOfProgramsPerYear = CostOfProgramsPerYear,
+                CostOfPluginsPerYear = CostOfPluginsPerYear
+            };
+            
         }
 
         /* GET: api/dashboard/CostPieCharts
@@ -107,7 +124,6 @@ namespace backend_api.Controllers
         *          } 
         *          ]
         */
-
         [Route("CostPieCharts")]
         [HttpGet]
         [EnableQuery()]
