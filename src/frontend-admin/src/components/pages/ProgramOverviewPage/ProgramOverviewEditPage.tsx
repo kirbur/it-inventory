@@ -202,9 +202,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             Program: {
                 numberOfPrograms: Number.isNaN(numCopies) ? 0 : numCopies,
                 ProgramName: overviewInputs.name.value,
-                ProgramCostPerYear: Number.isNaN(programInput.cost.value)
-                    ? 0
-                    : programInput.cost.value * (12 / programInput.monthsPerRenewal.value),
+                ProgramCostPerYear:
+                    Number.isNaN(programInput.cost.value) || programInput.cost.value <= 0
+                        ? 0
+                        : programInput.cost.value * (12 / programInput.monthsPerRenewal.value),
                 ProgramFlatCost: Number.isNaN(programInput.flatCost.value) ? 0 : programInput.flatCost.value,
                 ProgramLicenseKey: programInput.licenseKey.value,
                 IsLicense: overviewInputs.isLicense.value,
@@ -321,7 +322,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 await axios.put(`update/programall`, updateProgram).catch((err: any) => console.error(err))
 
                 //after submitting go back to detail
-                history.push(`/programs/overview/${match.params.id}`)
+                history.push(
+                    `/programs/overview/${overviewInputs.name.changed ? overviewInputs.name.value : match.params.id}`
+                )
             }
 
             if (pluginForm) {
@@ -334,9 +337,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     TextField: pluginInput.description,
                     PluginCostPerYear: pluginInput.monthsPerRenewal
                         ? pluginInput.recurringCost * (12 / pluginInput.monthsPerRenewal)
-                        : null,
+                        : 0,
                     RenewalDate: pluginInput.renewalDate.toISOString(),
-                    MonthsPerRenewal: pluginInput.monthsPerRenewal ? pluginInput.monthsPerRenewal : null,
+                    MonthsPerRenewal: pluginInput.monthsPerRenewal ? pluginInput.monthsPerRenewal : 0,
                     DateBought: pluginInput.purchaseDate.toISOString(),
                 }
 
@@ -345,18 +348,15 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     format(postPlugin.PluginName) !== '-'
                 ) {
                     if (pluginInput.id === -1) {
-                        await axios
-                            .post('/add/plugin', postPlugin)
-                            .then((response: any) => console.log(response))
-                            .catch((err: any) => console.error(err))
+                        await axios.post('/add/plugin', postPlugin).catch((err: any) => console.error(err))
 
-                        msg = postPlugin.PluginName + ' was added to ' + postPlugin.ProgramName
-                        window.alert(msg)
+                        //after submitting go back to detail
+                        history.push(`/programs/overview/${match.params.id}`)
                     } else {
                         await axios.put('/update/plugin', postPlugin).catch((err: any) => console.error(err))
 
-                        msg = postPlugin.PluginName + ' was updated'
-                        window.alert(msg)
+                        //after submitting go back to detail
+                        history.push(`/programs/overview/${match.params.id}`)
                     }
                 } else {
                     msg = 'Failed to Add Plugin Because: \n'
@@ -379,16 +379,17 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             }
 
             if (removedProgramRows.length > 0) {
-                //TODO: verify this
-                removedPluginRows.forEach(remove => {
-                    axios
-                        .put(`archive/program/${remove[0].id}`, {})
-                        .then((response: any) => console.log(response))
-                        .catch((err: any) => console.error(err))
-                })
-                setRemovedProgramRows([])
-                //after submitting go back to detail
-                history.push(`/programs/overview/${match.params.id}`)
+                if (removedProgramRows.length === programRows.length && pluginRows.length > 0) {
+                    window.alert('Please archive the plugins before you archive all copies of this program.')
+                    window.location.reload()
+                } else {
+                    removedProgramRows.forEach(remove => {
+                        axios.put(`archive/program/${remove[0].id}`, {}).catch((err: any) => console.error(err))
+                    })
+                    setRemovedProgramRows([])
+                    //after submitting go back to detail
+                    history.push(`/programs/overview/${match.params.id}`)
+                }
             }
         }
 

@@ -106,8 +106,11 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             var updateProgram = {
                 program: {
                     ProgramName: progData.name,
-                    ProgramCostPerYear: programInput.cost.value * (12 / programInput.monthsPerRenewal.value),
-                    ProgramFlatCost: programInput.flatCost.value,
+                    ProgramCostPerYear:
+                        Number.isNaN(programInput.cost.value) || programInput.cost.value <= 0
+                            ? 0
+                            : programInput.cost.value * (12 / programInput.monthsPerRenewal.value),
+                    ProgramFlatCost: Number.isNaN(programInput.flatCost.value) ? 0 : programInput.flatCost.value,
                     ProgramLicenseKey: programInput.licenseKey.value,
                     ProgramDescription: programInput.description.value,
                     ProgramPurchaseLink: programInput.purchaseLink.value,
@@ -115,7 +118,9 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                         ? programInput.purchaseDate.value.toISOString()
                         : progData.dateBought,
                     RenewalDate: programInput.renewalDate.value.toISOString(),
-                    MonthsPerRenewal: programInput.monthsPerRenewal.value,
+                    MonthsPerRenewal: Number.isNaN(programInput.monthsPerRenewal.value)
+                        ? 0
+                        : programInput.monthsPerRenewal.value,
                     EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
                 },
             }

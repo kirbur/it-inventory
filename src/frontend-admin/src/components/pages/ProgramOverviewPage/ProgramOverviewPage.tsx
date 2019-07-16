@@ -160,19 +160,21 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     }
 
     const handleArchive = () => {
-        if (
-            window.confirm(
-                `Are you sure you want to archive all copies of ${match.params.id}? ${programData.countProgInUse} are in use.`
-            )
-        ) {
-            programRows.forEach(program => {
-                axios
-                    .put(`archive/program/${program[0].id}`, {})
-                    .then((response: any) => console.log(response))
-                    .catch((err: any) => console.error(err))
-            }) //TODO: verify this
-            setProgramRows([])
-            history.push('/programs')
+        //cant archive everything unless there are no plugins
+        if (pluginRows.length > 0) {
+            window.alert('Please archive the plugins before you archive this program.')
+        } else {
+            if (
+                window.confirm(
+                    `Are you sure you want to archive all copies of ${match.params.id}? ${programData.countProgInUse} are in use.`
+                )
+            ) {
+                programRows.forEach(program => {
+                    axios.put(`archive/program/${program[0].id}`, {}).catch((err: any) => console.error(err))
+                })
+                setProgramRows([])
+                history.push('/programs')
+            }
         }
     }
 

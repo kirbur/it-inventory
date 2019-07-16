@@ -49,6 +49,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         isCostPerYear: boolean
         flatCost: number
         costPerYear: number
+        hasPlugin: boolean
     }>({
         name: '',
         dateBought: '',
@@ -60,6 +61,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         isCostPerYear: false,
         flatCost: 0,
         costPerYear: 0,
+        hasPlugin: false,
     })
     const [historyList, setHistoryList] = useState<IHistoryLogArray[]>([])
     const [progRows, setProgRows] = useState<ITableItem[][]>([])
@@ -80,6 +82,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     isCostPerYear: data[0].isCostPerYear,
                     flatCost: data[0].programFlatCost,
                     costPerYear: data[0].programCostPerYear,
+                    hasPlugin: data[0].hasPlugIn,
                 })
                 setProgRows([
                     [
@@ -91,8 +94,6 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                 setHistoryList(data[0].entries)
             })
             .catch((err: any) => console.error(err))
-
-        console.log('use')
     }, [match.params.id])
 
     useEffect(() => {
@@ -113,16 +114,18 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     }, [progData.icon])
 
     async function handleArchive() {
-        if (window.confirm(`Are you sure you want to archive this copy of ${progData.name}?`)) {
-            //TODO: verify this
+        if (progData.hasPlugin) {
+            window.alert('Please archive the plugins before you archive this program.')
+        } else {
+            if (window.confirm(`Are you sure you want to archive this copy of ${progData.name}?`)) {
+                await axios
+                    .put(`archive/program/${match.params.id}`, {})
+                    .then((response: any) => console.log(response))
+                    .catch((err: any) => console.error(err))
 
-            await axios
-                .put(`archive/program/${match.params.id}`, {})
-                .then((response: any) => console.log(response))
-                .catch((err: any) => console.error(err))
-
-            //after submitting go back to overview
-            history.push(`/programs/overview/${progData.name}`)
+                //after submitting go back to overview
+                history.push(`/programs/overview/${progData.name}`)
+            }
         }
     }
 
@@ -191,8 +194,12 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.programName}>{progData.name}</div>
-                        <div className={styles.programText}>Renewal Date: {progData.renewalDate}</div>
+                        <div className={styles.programName}>
+                            {progData.name} {match.params.id}
+                        </div>
+                        {progData.renewalDate !== '-' && (
+                            <div className={styles.programText}>Renewal Date: {progData.renewalDate}</div>
+                        )}
                         <div className={styles.programText}>Purchase Date: {progData.dateBought}</div>
                         {progData.employeeId !== -1 && (
                             <div className={s(styles.programText, styles.assignedTo)}>
