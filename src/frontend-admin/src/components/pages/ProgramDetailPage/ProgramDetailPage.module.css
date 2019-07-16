@@ -1,0 +1,115 @@
+.progDetailMain {
+    margin: 0 50px;
+}
+
+.columns {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.firstColumn {
+    padding: 50px;
+}
+
+.secondColumn {
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/*first column*/
+.backButton {
+    margin-bottom: 30px;
+}
+
+.imgPadding {
+    padding: 25px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+    width: 300px;
+    height: 300px;
+    display: flex;
+}
+
+.img {
+    width: 300px;
+    max-height: 300px;
+    margin: auto;
+}
+
+.costText {
+    text-align: left;
+    color: #979797;
+    font-size: 18px;
+}
+
+.costLine {
+    margin: 0 5px;
+    flex-grow: 1;
+    height: 1px;
+    align-self: center;
+    background: #979797;
+}
+
+/*second column*/
+.archivebutton {
+    margin-left: 18px;
+    padding: 0 5px;
+}
+
+.titleText {
+    text-align: left;
+    padding: 100px 0;
+}
+
+.programName {
+    font-size: 36px;
+    color: #000000;
+    font-weight: bold;
+}
+
+.programText {
+    margin: 6px;
+    font-size: 24px;
+    color: #a5a5a5;
+}
+
+.assignedTo {
+    display: flex;
+}
+
+.empName {
+    color: #009eff;
+    padding-left: 5px;
+    cursor: pointer;
+}
+
+.empName:hover {
+    text-decoration: underline;
+}
+
+.descriptionContainer {
+    width: 100%;
+    text-align: left;
+}
+
+.descriptionTitle {
+    border-bottom: 1px solid #979797;
+    color: #a5a5a5;
+    font-size: 24px;
+    padding: 16px 0;
+    margin-bottom: 20px;
+}
+
+.descriptionBody {
+    color: #4a4a4a;
+    font-size: 20px;
+    line-height: 27px;
+}
+
+.spaceBetween {
+    height: 50px;
+}

@@ -4,13 +4,16 @@ import {Route, NavLink, BrowserRouter as Router, Switch, Redirect} from 'react-r
 // Components
 import {DashboardPage} from '../pages/DashboardPage/DashboardPage'
 import {DepartmentsListPage} from '../pages/DepartmentsListPage/DepartmentsListPage'
-import {DepartmentDetailPage} from '../pages/DepartmentDetailPage/DepartmentDetailPage'
+// import {DepartmentDetailPage} from '../pages/DepartmentDetailPage/DepartmentDetailPage'
 import {EmployeesListPage} from '../pages/EmployeesListPage/EmployeesListPage'
 import {EmployeeDetailPage} from '../pages/EmployeeDetailPage/EmployeeDetailPage'
 import {HardwareListPage} from '../pages/HardwareListPage/HardwareListPage'
 import {HardwareDetailPage} from '../pages/HardwareDetailPage/HardwareDetailPage'
 import {ProgramsListPage} from '../pages/ProgramsListPage/ProgramsListPage'
+import {ProgramOverviewPage} from '../pages/ProgramOverviewPage/ProgramOverviewPage'
+import {ProgramOverviewEditPage} from '../pages/ProgramOverviewPage/ProgramOverviewEditPage'
 import {ProgramDetailPage} from '../pages/ProgramDetailPage/ProgramDetailPage'
+import {ProgramDetailEditPage} from '../pages/ProgramDetailPage/ProgramDetailEditPage'
 import {Login} from '../reusables/Login/Login'
 import {HelloUser} from '../HelloUser/HelloUser'
 import logo from '../../content/Images/CQL-Logo-Color.png'
@@ -126,20 +129,29 @@ export const App: React.FC = () => {
                         <Route exact path='/login' component={Login} />
                         <Route exact path='/' component={Login} />
 
-                        <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
+                        {/* <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} /> */}
                         <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
                         <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
-                        <Route path={'/programs/:id'} render={props => <ProgramDetailPage {...props} />} />
-
+                        <Route path={'/programs/overview/:id'} render={props => <ProgramOverviewPage {...props} />} />
+                        <Route path={'/programs/details/:id'} render={props => <ProgramDetailPage {...props} />} />
                         <Route
                             exact
                             path={'/editEmployee/:id'}
                             render={props => <EmployeeDetailEditPage {...props} />}
                         />
+
                         <Route
                             exact
                             path={'/editDepartment/:id'}
                             render={props => <DepartmentDetailEditPage {...props} />}
+                        />
+                        <Route
+                            path={'/programs/edit/details/:id'}
+                            render={props => <ProgramDetailEditPage {...props} />}
+                        />
+                        <Route
+                            path={'/programs/edit/overview/:id'}
+                            render={props => <ProgramOverviewEditPage {...props} />}
                         />
                     </Switch>
                 </Router>
