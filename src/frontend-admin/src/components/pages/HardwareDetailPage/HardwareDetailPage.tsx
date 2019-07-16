@@ -87,7 +87,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCostPerYear(data[0].server.costPerYear)
                     setFlatCost(data[0].server.flatCost)
 
-                    setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].server.location])
+                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].server.location])
                     setCommentText(data[0].server.textField)
                     setHistoryLogEntries(data[0].serverHistory)
                 })
@@ -124,7 +124,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCostPerYear(data[0].computer.costPerYear)
                     setFlatCost(data[0].computer.flatCost)
 
-                    setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD', data[0].computer.location])
+                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].computer.location])
                     setCommentText(data[0].computer.textField)
                     setHistoryLogEntries(data[0].computerHistory)
                 })
@@ -153,7 +153,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         data[0].monitor.serialNumber,
                     ])
                     setSecondTableData([])
-                    setThirdTableData([data[0].employeeAssignedName, 'NEED TO ADD'])
+                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName])
                     setCostPerYear(data[0].monitor.costPerYear)
                     setFlatCost(data[0].monitor.flatCost)
                     setCommentText(data[0].monitor.textField)
