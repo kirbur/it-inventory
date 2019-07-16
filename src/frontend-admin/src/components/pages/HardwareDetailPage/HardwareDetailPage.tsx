@@ -18,6 +18,7 @@ import styles from './HardwareDetailPage.module.css'
 
 // Context
 import {LoginContext} from '../../App/App'
+import {sortByDate} from '../../../utilities/quickSort'
 
 // Types
 interface IHardwareDetailPageProps {
@@ -307,7 +308,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
                     {/* history log */}
                     <div className={styles.historyLogContainer}>
-                        <HistoryLog historyLog={historyLogEntries} canEdit={false} />
+                        <HistoryLog historyLog={sortByDate(historyLogEntries)} canEdit={false} />
                     </div>
 
                     {/* comment section */}

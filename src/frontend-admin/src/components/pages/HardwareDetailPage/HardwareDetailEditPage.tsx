@@ -62,6 +62,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [hardwareData, setUserData] = useState<any>({})
 
     //default
+    const [employeeList, setEmployeeList] = useState([])
+
     const [firstSectionHeaders, setFirstSectionHeaders] = useState<string[]>(['yeah something went wrong'])
     const [secondSectionHeaders, setSecondSectionHeaders] = useState<string[]>(['yeah something went wrong'])
     const [thirdSectionHeaders, setThirdSectionHeaders] = useState<string[]>(['yeah something went wrong'])
@@ -91,6 +93,10 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     var key = 0
 
     useEffect(() => {
+        axios.get(`add/hardwarePrep`).then((data: any) => {
+            console.log(data)
+            setEmployeeList(data)
+        })
         if (match.params.type === 'server') {
             setFirstSectionHeaders([
                 'Make',
@@ -306,8 +312,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Inputs: firstSectionData[4],
                         SerialNumber: firstSectionData[5],
 
-                        Location: thirdSectionData[2],
-                        EmployeeId: thirdSectionData[3],
+                        Location: thirdSectionData[1],
+                        EmployeeId: thirdSectionData[2],
 
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
@@ -340,8 +346,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         PurchaseDate: purchaseDateInput,
                         EndOfLife: endOfLifeInput,
 
-                        Location: thirdSectionData[2],
-                        EmployeeId: thirdSectionData[3],
+                        Location: thirdSectionData[1],
+                        EmployeeId: thirdSectionData[2],
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -389,8 +395,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         PurchaseDate: purchaseDateInput,
 
-                        Location: thirdSectionData[2],
-                        EmployeeId: thirdSectionData[3],
+                        Location: thirdSectionData[1],
+                        EmployeeId: thirdSectionData[2],
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -415,8 +421,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Inputs: firstSectionData[4],
                         SerialNumber: firstSectionData[5],
 
-                        Location: thirdSectionData[2],
-                        EmployeeId: thirdSectionData[3],
+                        Location: thirdSectionData[1],
+                        EmployeeId: thirdSectionData[2],
 
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
@@ -453,8 +459,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         PurchaseDate: purchaseDateInput,
                         EndOfLife: endOfLifeInput,
 
-                        Location: thirdSectionData[2],
-                        EmployeeId: thirdSectionData[3],
+                        Location: thirdSectionData[1],
+                        EmployeeId: thirdSectionData[2],
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -487,8 +493,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         PurchaseDate: purchaseDateInput,
                         EndOfLife: endOfLifeInput,
 
-                        Location: thirdSectionData[2],
-                        EmployeeId: thirdSectionData[3],
+                        Location: thirdSectionData[1],
+                        EmployeeId: thirdSectionData[2],
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -511,8 +517,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         PurchaseDate: purchaseDateInput,
 
-                        Location: thirdSectionData[2],
-                        EmployeeId: thirdSectionData[3],
+                        Location: thirdSectionData[1],
+                        EmployeeId: thirdSectionData[2],
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -525,8 +531,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 })
             }
         }
-
-        console.log(addHistoryLog)
         history.push(`/hardware/detail/${match.params.type}/${match.params.id}`)
     }
 
@@ -644,10 +648,10 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             tempHistoryLog.push({
                 employeeName: thirdSectionData[0],
                 eventType: eventInput,
-                eventDate: dateInput,
+                eventDate: dateInput.toISOString(),
                 key: key,
             })
-            setHistoryLogEntries(sortByDate(tempHistoryLog))
+            setHistoryLogEntries(tempHistoryLog)
 
             //adding to add history log to send to backend
             tempHistoryLog = cloneDeep(addHistoryLog)
@@ -657,11 +661,10 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 key: key,
             })
             key = key + 1
-            setAddHistoryLog(sortByDate(tempHistoryLog))
+            setAddHistoryLog(tempHistoryLog)
         } else {
             window.alert('Need to choose an event!')
         }
-        console.log(addHistoryLog)
     }
 
     function removeLog(index: number) {
@@ -796,7 +799,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 </div>
 
                 <div className={styles.historyLogContainer}>
-                    <HistoryLog historyLog={historyLogEntries} remove={removeLog} canEdit={true} />
+                    <HistoryLog historyLog={sortByDate(historyLogEntries)} remove={removeLog} canEdit={true} />
                     {historyLogBool && (
                         <div className={styles.row}>
                             <div className={styles.inputContainer}>

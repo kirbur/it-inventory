@@ -15,10 +15,13 @@ export function sortTable(rows: any[][], dataIndex: number, sortValue: number) {
 }
 
 export function sortByDate(rows: any[]) {
-    var compareString = (a: [], b: []) => (a === b ? 0 : a < b ? -1 : 1)
-
-    rows.sort((a, b) => compareString(a.EventDate, b.EventDate))
-    return rows
+    var compareString = (a: {}, b: {}) => (a === b ? 0 : a < b ? -1 : 1)
+    if (rows == undefined || rows == null) {
+        return rows
+    } else {
+        rows.sort((a, b) => compareString(a.eventDate, b.eventDate))
+        return rows
+    }
 }
 
 // type SortDirection = 'asc' | 'desc'
