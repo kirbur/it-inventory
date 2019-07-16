@@ -114,7 +114,7 @@ namespace backend_api.Controllers
         public async Task<ActionResult<object>> GetDashboardPieCharts()
         {
             // Removing the Utilities department from the list of the departments
-            var Departments = _context.Department.Where(x => x.DepartmentName != "Utilities");
+            var Departments = _context.Department.Where(x => x.DepartmentName != "Utilities" && x.IsDeleted == false);
 
             // Instantiating the Pie charts list with the two data lists which will be used to return the data
             // in the correct format
@@ -255,7 +255,7 @@ namespace backend_api.Controllers
         [EnableQuery()]
         public IActionResult GetDepartment()
         {
-            return Ok(_context.Department.ToList());
+            return Ok(_context.Department.Where(x => x.IsDeleted == false).ToList());
         }
 
         /* GET: api/dashboard/departmentTable/{departmentID}

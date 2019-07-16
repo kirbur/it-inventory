@@ -3,7 +3,7 @@ using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public partial class Computer : ISoftDeletable, IAssignable
+    public partial class Computer : IHardwareBase
     {
         public int ComputerId { get; set; }
         public string Cpu { get; set; }
@@ -27,6 +27,9 @@ namespace backend_api.Models
         public string Location { get; set; }
         public string Model { get; set; }
         public string SerialNumber { get; set; }
+        public int? MonthsPerRenewal { get; set; }
+
+        public int GetId() { return ComputerId; }
 
 
         //public Employee Employee { get; set; }
