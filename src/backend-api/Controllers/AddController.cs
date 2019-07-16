@@ -302,32 +302,16 @@ namespace backend_api.Controllers
                         switch (hardware.Type.ToLower())
                         {
                             case "monitor":
-                                var mon = _context.Monitor.Find(hardware.ID);
-                                mon.EmployeeId = emp.EmployeeId;
-                                mon.IsAssigned = true;
-                                UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                _context.SaveChanges();
+                                UpdateHardwareAssignment(_context.Monitor, emp.EmployeeId, true, hardware);
                                 break;
                             case "peripheral":
-                                var periph = _context.Peripheral.Find(hardware.ID);
-                                periph.EmployeeId = emp.EmployeeId;
-                                periph.IsAssigned = true;
-                                UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                _context.SaveChanges();
+                                UpdateHardwareAssignment(_context.Peripheral, emp.EmployeeId, true, hardware);
                                 break;
                             case "computer":
-                                var comp = _context.Computer.Find(hardware.ID);
-                                comp.EmployeeId = emp.EmployeeId;
-                                comp.IsAssigned = true;
-                                UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                _context.SaveChanges();
+                                UpdateHardwareAssignment(_context.Computer, emp.EmployeeId, true, hardware);
                                 break;
                             case "server":
-                                var server = _context.Server.Find(hardware.ID);
-                                server.EmployeeId = emp.EmployeeId;
-                                server.IsAssigned = true;
-                                UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                _context.SaveChanges();
+                                UpdateHardwareAssignment(_context.Server, emp.EmployeeId, true, hardware);
                                 break;
 
                         }
@@ -344,7 +328,7 @@ namespace backend_api.Controllers
                     {
                         var prog = _context.Program.Find(program.ID);
                         prog.EmployeeId = emp.EmployeeId;
-                        programHistories.Add(UpdateProgramHistory(true, emp.EmployeeId, program.ID));
+                        programHistories.Add(UpdateProgramHistory(program.ID, emp.EmployeeId, "Assigned", DateTime.Now));
                     }
                         // Save multiple entries at once
                         _context.ProgramHistory.AddRange(programHistories);
@@ -501,15 +485,7 @@ namespace backend_api.Controllers
                 // for the programs we just added
                 foreach (var prog in _context.Program.Where(x => x.ProgramName == input.Program.ProgramName))
                 {
-                    var History = (new ProgramHistory
-                    {
-                        EmployeeId = null,
-                        ProgramId = prog.ProgramId,
-                        EventType = "Bought",
-                        EventDate = prog.DateBought.Value
-
-                    });
-                    programHistories.Add(History);
+                    programHistories.Add(UpdateProgramHistory(prog.ProgramId, null, "Bought", prog.DateBought.Value));
                 }
                 // Save multiple entries at once
                 _context.ProgramHistory.AddRange(programHistories);

@@ -47,7 +47,7 @@ namespace backend_api.Controllers
                 case "employee":
                     return BadRequest("Not Archived");
                 case "program":
-                    return BadRequest("Not Archived");
+                    return ArchiveRecoverProgram(isDeleted, id);
                 case "plugin":
                     return ArchiveRecoverPlugin(isDeleted, id);
                 case "department":
@@ -64,6 +64,54 @@ namespace backend_api.Controllers
                     return BadRequest("Invalid Model");
             }
         }
+
+        /* PUT: api/{operation}/program/{id}
+         * Route params:
+         *   {operation} is a string. Either "archive" or "recover"
+         *   {id} is a number that is the ID for any of the models.
+         * ArchiveRecoverProgram(isDeleted, id) is a program method for archiving and recovering 
+         *   a program. The method will change the IsDeleted field for the program of the id corresponding
+         *   to the operation.
+         * Method Params:
+         *   bool isDeleted, is if the program is going to be archived or recovered
+         *   int id, the ID of the specified program
+         * 
+         */
+        private IActionResult ArchiveRecoverProgram(bool isDeleted, int id)
+        {
+
+            // Get program by ID.
+            Models.Program prog = _context.Program.Find(id);
+
+            if (prog != null)
+            {
+                return TryUpdateProgram(isDeleted, prog);
+            }
+            else
+            {
+                return BadRequest("Program does not exist or failed to supply ID");
+            }
+        }
+
+
+        /* TryUpdateProgram(isDeleted, prog) will try to update the IsDeleted field on the 
+         *   program row.
+         */
+        private IActionResult TryUpdateProgram(bool isDeleted, Models.Program prog)
+        {
+            prog.IsDeleted = isDeleted;
+
+            if (isDeleted)
+            {
+                prog.EmployeeId = null;
+            }
+            _context.Program.Update(prog);
+            _context.SaveChanges();
+
+            return Ok($"{(isDeleted ? "archive" : "recover")} completed");
+
+        }
+
 
         /* PUT: api/{operation}/department/{id}
          * Route params:

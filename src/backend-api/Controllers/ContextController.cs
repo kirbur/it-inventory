@@ -45,16 +45,26 @@ namespace backend_api.Controllers
             });
         }
 
-        public ProgramHistory UpdateProgramHistory(bool isAssigned, int employeeId, int programId)
+        public ProgramHistory UpdateProgramHistory(int programId, int? employeeId, string eventType, DateTime date)
         {
             // Update the history: Assigned or Unassigned
             return (new ProgramHistory
             {
                 ProgramId = programId,
                 EmployeeId = employeeId,
-                EventType = $"{(isAssigned ? "Assigned" : "Unassigned")}",
-                EventDate = DateTime.Now,
+                EventType = eventType,
+                EventDate = date
             });
+        }
+
+        public void UpdateHardwareAssignment<T>(DbSet<T> table, int? employeeId, bool IsAssigned, HardwareAssignedModel hardware)
+            where T : class, IAssignable
+        {
+            var entity = table.Find(hardware.ID);
+            entity.IsAssigned = IsAssigned;
+            entity.EmployeeId = IsAssigned ? employeeId : null;
+            UpdateHardwareHistory(IsAssigned, employeeId, hardware.ID, hardware.Type);
+            _context.SaveChanges();
         }
         /* isAdmin() determines if the username from the AccessToken is an admin user.
          *  If the user is an admin, we can choose to return specific values to the front end.
