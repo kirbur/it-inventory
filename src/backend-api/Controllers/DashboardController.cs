@@ -371,8 +371,6 @@ namespace backend_api.Controllers
 
             //temp list to hold the list with the difference field
             List<LicenseBarGraph> ThrowAwayList = new List<LicenseBarGraph>();
-            //// First list removes programs that are not licenses and that are deleted
-            //var UsefulProgramsList = _context.Program.Where(x => x.IsLicense == true && x.IsDeleted == false);
 
             //This List takes the usefulPrograms list and makes it distinct
             var DistinctUsefulPrograms = UsefulProgramsList.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
