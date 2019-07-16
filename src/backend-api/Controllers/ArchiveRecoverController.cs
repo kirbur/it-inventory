@@ -66,16 +66,16 @@ namespace backend_api.Controllers
             }
         }
 
-        /* PUT: api/{operation}/program/{id}
+        /* PUT: api/{operation}/employee/{id}
          * Route params:
          *   {operation} is a string. Either "archive" or "recover"
          *   {id} is a number that is the ID for any of the models.
-         * ArchiveRecoverProgram(isDeleted, id) is a program method for archiving and recovering 
-         *   a program. The method will change the IsDeleted field for the program of the id corresponding
+         * ArchiveRecoverEmployee(isDeleted, id) is a employee method for archiving and recovering 
+         *   a employee. The method will change the IsDeleted field for the employee of the id corresponding
          *   to the operation.
          * Method Params:
-         *   bool isDeleted, is if the program is going to be archived or recovered
-         *   int id, the ID of the specified program
+         *   bool isDeleted, is if the employee is going to be archived or recovered
+         *   int id, the ID of the specified employee
          * 
          */
         private IActionResult ArchiveRecoverEmployee(bool isDeleted, int id)
@@ -136,7 +136,7 @@ namespace backend_api.Controllers
             }
 
 
-            
+
 
             return Ok($"{(isDeleted ? "archive" : "recover")} completed");
 
@@ -299,8 +299,8 @@ namespace backend_api.Controllers
                 {
                     // if that plugin deleted was the last plugin attached to that program...
                     var wasLastPlugin = !(_context.Plugins.Any(x => x.ProgramId == plugin.ProgramId && x.IsDeleted == false));
-                    if(wasLastPlugin == true)
-                    { 
+                    if (wasLastPlugin == true)
+                    {
                         // update the has plugin field so that its programs no longer have a plugin
                         _context.Program.Where(x => x.ProgramName == programTiedToPlugin.ProgramName).ToList().ForEach(x => x.HasPlugIn = false);
                         _context.SaveChanges();
@@ -317,8 +317,8 @@ namespace backend_api.Controllers
                         _context.SaveChanges();
                     }
                 }
-                
-                
+
+
 
                 return Ok($"{(isDeleted ? "archive" : "recover")} completed");
             }
@@ -436,9 +436,5 @@ namespace backend_api.Controllers
 
         }
 
-        /* UpdateHardwareHistory<T>(hardware, isDeleted, id, type) will add a row to the hardware history
-         *   table recording the change to the hardware entity.
-         */
-        
     }
 }
