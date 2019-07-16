@@ -23,6 +23,15 @@ namespace backend_api.Controllers
             LowResource,
         }
 
+        // Helper class to for a license resource. Used in sending emails.
+        public class LicenseResource
+        {
+            public string Name { get; set; }
+            public double PercentageInUse { get; set; }
+            public int CountOverall { get; set; }
+            public int CountInUse { get; set; }
+        }
+
         private readonly EmailSettings _emailSettings;
 
         public JobController(IOptions<EmailSettings> EmailSettings, ITInventoryDBContext context) : base(context)
@@ -148,41 +157,110 @@ namespace backend_api.Controllers
             return message;
         }
 
-            // Email message to be send. 
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("IT Inventory Notifier", "no-reply@cqlcorp.com"));
+        /* LowResourceMessage(message, lowResource) is a helper method for creating the message body for sending 
+         *   a lowResource notification. It will send if there is 1+ license where 80% or more is being used.
+         * Returns: message, which has the body filled out for the low resource message.
+         */
+        private MimeMessage LowResourceMessage(MimeMessage message, List<LicenseResource> lowResources)
+        {
+            // List of people message will be sent to.
+            // TODO: Add the actual emails.
+            InternetAddressList emails = new InternetAddressList();
+            emails.Add(new MailboxAddress("Tim Timmer", "tim.timmer@cqlcorp.com"));
             message.To.AddRange(emails);
 
-            // TODO: Subject and body will be different for each job
-            message.Subject = $"CQL IT Inventory Cost Breakdown: {DateTime.UtcNow.Date.ToString("d")}";
+            message.Subject = $"CQL IT Inventory Low Resource{(lowResources.Count() > 1 ? "s" : "")}: {ResourceNameString(lowResources)}";
 
-            message.Body = new TextPart("plain")
-            {
-                Text = @"Hi,
+            var bodyBuilder = new BodyBuilder();
+            bodyBuilder.HtmlBody =
+                $@"
+                <head>
+                    <style type=""text / css"">
+                    p {{
+                        font-family: ""Calibri"";
+                    }}
+                    body {{
+                        background-color: #eee;
+                    }}
+                    </style>
+                </head>
+                <body>
+                    <p>Hello,</p>
+                    <p>You are getting this notification because a resource is 80% or more in use and you are running low:</p>
+                    {LowResourcesString(lowResources)}
+                    </br>
+                    <p>- IT Inventory No-Reply</p>
+                </body>";
 
-Let me know if you got this
+            bodyBuilder.TextBody = "This is some plain text";
+            message.Body = bodyBuilder.ToMessageBody();
 
--- Sender"
-            };
-
-            using (var client = new SmtpClient())
-            {
-                // TODO: What does this do?
-                // For demo-purposes, accept all SSL certificates (in case the server supports STARTTLS)
-                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-
-                // TODO: The boolean value sets useSSL. 
-                client.Connect(_emailSettings.SMTP, _emailSettings.Port, false);
-
-                // Note: only needed if the SMTP server requires authentication
-                client.Authenticate(_emailSettings.Username, _emailSettings.Password);
-
-                client.Send(message);
-                client.Disconnect(true);
-            }
-            return Ok("Email sent");
+            return message;
         }
 
+        /* LowResources() calculates all of the licenses that are at an 80% or greater use rate.
+         * Return: List<LicenseResource>
+         */
+        private List<LicenseResource> LowResources()
+        {
+            // All licenses that are not deleted.
+            IQueryable<Models.Program> licenses = _context.Program.Where(x => x.IsLicense && !x.IsDeleted);
 
+            // Distinct programs
+            IQueryable<Models.Program> distinctLicenses = licenses.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
+
+            var lowResources = new List<LicenseResource>();
+
+            // Count the programs overall, and the ones in use. Calculate the usage rate.
+            foreach (Models.Program license in distinctLicenses)
+            {
+                int CountProgOverall = licenses.Where(x => x.ProgramName == license.ProgramName).Count();
+                int CountProgInUse = licenses.Where(x => x.ProgramName == license.ProgramName && x.EmployeeId != null).Count();
+                double percentageInUse = (double)CountProgInUse / CountProgOverall;
+
+                if (percentageInUse >= 0.8)
+                {
+                    lowResources.Add(new LicenseResource()
+                    {
+                        Name = license.ProgramName,
+                        PercentageInUse = percentageInUse,
+                        CountOverall = CountProgOverall,
+                        CountInUse = CountProgInUse,
+                    });
+                }
+            }
+
+            return lowResources;
+        }
+
+        /* LowResourcesString(lowResouces) returns a string is HTML tags for each of the low resources.
+         */
+        private string LowResourcesString(List<LicenseResource> lowResources)
+        {
+            string resourceString = "";
+            foreach (LicenseResource lr in lowResources)
+            {
+                resourceString += $"<p>{lr.Name} is {lr.PercentageInUse * 100}% in use ({lr.CountInUse}/{lr.CountOverall}).";
+            }
+            return resourceString;
+        }
+
+        /* ResourceNameString(lowResources) returns the names of each low license with a comma if
+         *   there are multiple.
+         */
+        private string ResourceNameString(List<LicenseResource> lowResources)
+        {
+            string nameString = "";
+            LicenseResource last = lowResources.Last();
+            foreach (LicenseResource lr in lowResources)
+            {
+                nameString += $"{lr.Name}";
+                if (!lr.Equals(last))
+                {
+                    nameString += ", ";
+                }
+            }
+            return nameString;
+        }
     }
 }
