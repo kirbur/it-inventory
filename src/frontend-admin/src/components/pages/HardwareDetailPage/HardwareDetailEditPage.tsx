@@ -5,6 +5,8 @@ import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {Button} from '../../reusables/Button/Button'
 import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
 import DatePicker from 'react-datepicker'
+import {PictureInput} from '../../reusables/PictureInput/PictureInput'
+import {Checkbox} from '../../reusables/Checkbox/Checkbox'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -725,14 +727,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 <div className={styles.radioSection}>
                     <div className={styles.radioContainer}>
                         <div className={s(styles.radio, styles.marginTop)}>
-                            <input
-                                type='checkbox'
-                                className={styles.checkmark}
+                            <Checkbox
+                                className={styles.checkBoxContainerOne}
                                 checked={hasFlatCost}
-                                onChange={() => setHasFlatCost(!hasFlatCost)}
+                                onClick={() => setHasFlatCost(!hasFlatCost)}
                             />
-                            <div className={styles.checkmark} />
-                            <div className={styles.insideCheckmark} />
                         </div>
                         <div>
                             <div className={styles.inputHeader}>Initial Cost</div>
@@ -750,16 +749,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         </div>
                     </div>
                     <div className={styles.radioContainer}>
-                        <div className={s(styles.radio, styles.marginTop)}>
-                            <input
-                                type='checkbox'
-                                className={styles.checkmark}
-                                checked={hasRecurringCost}
-                                onChange={() => setHasRecurringCost(!hasRecurringCost)}
-                            />
-                            <div className={styles.checkmark} />
-                            <div className={styles.insideCheckmark} />
-                        </div>
+                        <Checkbox
+                            className={styles.checkBoxContainerTwo}
+                            checked={hasRecurringCost}
+                            onClick={() => setHasRecurringCost(!hasRecurringCost)}
+                        />
                         <div>
                             <div className={styles.inputHeader}>Recurring Cost</div>
                             <input

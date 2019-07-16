@@ -5,7 +5,7 @@ import {formatDate} from '../../../utilities/FormatDate'
 
 type eventType = 'Assigned' | 'Unassigned' | 'Bought' | 'Broken' | 'Repaired' | 'Archived' | 'Recovered'
 
-interface IHistoryLogArray {
+export interface IHistoryLogArray {
     eventDate: string
     eventType: eventType
     employeeName: string
