@@ -9,8 +9,6 @@ import {FaUserShield, FaUser} from 'react-icons/fa'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import DatePicker from 'react-datepicker'
 
-import 'react-datepicker/dist/react-datepicker.css'
-
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
@@ -125,8 +123,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             axios
                 .get(`/add/employeePrep/`)
                 .then((data: any) => {
-                    //console.log(data)
-
                     var availableEmp: any[] = []
                     data[0].myDomainUsers
                         .sort()
@@ -170,7 +166,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 })
                 .catch((err: any) => console.error(err))
         } else {
-            axios //TODO: get from edit endpoint
+            axios
                 .get(`/detail/employee/${match.params.id}`)
                 .then((data: any) => {
                     setUserData({
@@ -526,8 +522,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             name = selectedEmployee.name.split(' ')
             var postEmployee = {
                 Employee: {
-                    FirstName: name[0],
-                    LastName: name[1],
+                    FirstName: name.shift(),
+                    LastName: name.join(''),
                     HireDate: dateInput.toISOString(),
                     Role: roleInput,
                     DepartmentID: deptInput.departmentId,
@@ -574,7 +570,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         /*UPDATE EMPLOYEE */
         if (
             //make sure no inputs are null/undefined/empty
-
+            match.params.id !== 'new' &&
             deptInput &&
             selectedEmployee.name &&
             roleInput
@@ -583,8 +579,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             var updateEmployee = {
                 Employee: {
                     EmployeeId: match.params.id,
-                    FirstName: name[0],
-                    LastName: name[1],
+                    FirstName: name.shift(),
+                    LastName: name.join(''),
                     HireDate: dateInput.toISOString(),
                     Role: roleInput,
                     DepartmentID: deptInput.departmentId,
@@ -634,7 +630,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 })
 
             history.push(`/employees/detail/${match.params.id}`)
-        } else {
+        } else if (match.params.id !== 'new') {
             //one or maore of the inputs was null/undefined/empty
             msg = 'Failed because:\n'
 

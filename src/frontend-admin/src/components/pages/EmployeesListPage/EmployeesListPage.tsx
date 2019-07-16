@@ -4,6 +4,7 @@ import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {History} from 'history'
 
 // Components
@@ -82,36 +83,6 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         })
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])
-
-    const formatDate = (hireDate: string) => {
-        const hired = new Date(hireDate)
-        const date = hired.getFullYear() + '/' + (hired.getMonth() + 1) + '/' + hired.getDate()
-        return date
-    }
-
-    const getDays = (hireDate: string) => {
-        const today = new Date()
-        const hired = new Date(hireDate)
-        return Math.round(Math.abs(today.getTime() - hired.getTime()))
-    }
-
-    //does not account for leap years or variable # of days in a month
-    const calculateDaysEmployed = (dif: number) => {
-        var oneDay = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
-
-        var days = Math.floor(dif / oneDay)
-        var months = Math.floor(days / 31)
-        var years = Math.floor(months / 12)
-
-        months = Math.floor(months % 12)
-        days = Math.floor(days % 31)
-
-        var ret: string = ''
-        ret += years !== 0 ? (years === 1 ? years + ' year, ' : years + ' years, ') : ''
-        ret += months !== 0 ? (months === 1 ? months + ' month, ' : months + ' months, ') : ''
-        ret += days === 1 ? days + ' day' : days + ' days'
-        return ret
-    }
 
     const formatCost = (hwCpost: number, progCost: number) => {
         return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo'
@@ -270,7 +241,6 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                 </Group>
             ) : (
                 <div className={styles.searchContainer}>
-                    {' '}
                     <FilteredSearch
                         search={search}
                         setSearch={setSearch}
