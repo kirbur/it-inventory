@@ -104,7 +104,8 @@
     width: 50px;
     margin-right: 10px;
     position: relative;
-    top: 5px;
+    top: 4px;
+    cursor: pointer;
 }
 .checkBoxContainerTwo {
     width: 50px;
@@ -112,6 +113,7 @@
     margin-left: 25px;
     position: relative;
     top: 28px;
+    cursor: pointer;
 }
 .radioSection {
     display: flex;
