@@ -57,7 +57,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     useEffect(() => {
         if (match.params.type === 'server') {
             setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
-            setSecondTableHeaders(['MFG Tag', 'Serial #', 'SAN', 'Local HDD'])
+            setSecondTableHeaders(['MFG Tag', 'Serial #', 'SAN', 'Local HHD'])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
             // make model purchaseDate renewalDate endOfLife virtualized
             setHeadingInfo(['the name', 'another name'])
@@ -83,7 +83,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         data[0].server.mfg,
                         data[0].server.serialNumber,
                         data[0].server.san,
-                        data[0].server.localHDD,
+                        data[0].server.localHHD,
                     ])
                     setCostPerYear(data[0].server.costPerYear)
                     setFlatCost(data[0].server.flatCost)
@@ -133,7 +133,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         } else if (match.params.type === 'monitor') {
             setFirstTableHeaders(['Screen Size', 'Resolution', 'Inputs', 'Serial #'])
             setSecondTableHeaders([])
-            setThirdTableHeaders(['Employee Assigned', 'Dept Assigned'])
+            setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
             // make model
             setHeadingInfo(['the name', 'another name'])
             axios
@@ -145,7 +145,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         'Model: ' + data[0].monitor.model,
                         'Purchase Date: ' + formatDate(data[0].monitor.purchaseDate),
                         'Renewal Date: ' + formatDate(data[0].monitor.renewalDate),
-                        'End of Life: ' + formatDate(data[0].monitor.endOfLife),
+                        // 'End of Life: ' + formatDate(data[0].monitor.endOfLife),
                     ])
                     setFirstTableData([
                         data[0].monitor.screenSize,
@@ -154,7 +154,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         data[0].monitor.serialNumber,
                     ])
                     setSecondTableData([])
-                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName])
+                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].monitor.location])
                     setCostPerYear(data[0].monitor.costPerYear)
                     setFlatCost(data[0].monitor.flatCost)
                     setCommentText(data[0].monitor.textField)

@@ -480,12 +480,13 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Make: firstSectionData[0],
                         Model: firstSectionData[1],
                         Cpu: firstSectionData[2],
-                        Ssdgb: firstSectionData[3],
-                        ScreenSize: firstSectionData[4],
-                        MonitorOutput: firstSectionData[5],
-                        MFG: firstSectionData[6],
+                        Ramgb: firstSectionData[3],
+                        Ssdgb: firstSectionData[4],
+                        ScreenSize: firstSectionData[5],
+                        MonitorOutput: firstSectionData[6],
                         SerialNumber: firstSectionData[7],
-                        Fqdn: firstSectionData[10],
+                        MFG: firstSectionData[8],
+                        Fqdn: firstSectionData[9],
 
                         Virtualize: false, //NEED TO ADD THIS
 
