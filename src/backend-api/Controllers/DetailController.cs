@@ -125,7 +125,7 @@ namespace backend_api.Controllers
                     ProgramLicenseKey = UsefulProgramsList.Select(x => x.ProgramLicenseKey).FirstOrDefault();
 
                 // Lambda to collect all the ids of the programs that belong this program overview
-                var programIds = UsefulProgramsList.Where(x => x.ProgramName == program).Select(x => x.ProgramId).ToList();
+                var programIds = _context.Program.Where(x => x.ProgramName == program).Select(x => x.ProgramId).ToList();
 
                 // list to hold the individual programs from the program overview
                 List<object> inDivPrograms = new List<object>();
@@ -583,9 +583,9 @@ namespace backend_api.Controllers
                 {
                     var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
                     var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
-                    employeeName = empFirst + " " + empLast;
+                    var employeeNameHistory = empFirst + " " + empLast;
 
-                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.ProgramHistoryId };
+                    var singleEntry = new { employeeNameHistory, entry.EventType, entry.EventDate, historyId = entry.ProgramHistoryId };
                     entries.Add(singleEntry);
                 }
 
@@ -607,6 +607,7 @@ namespace backend_api.Controllers
                     prog.IsCostPerYear,
                     prog.Description,
                     prog.ProgramPurchaseLink,
+                    prog.HasPlugIn,
                     listOfEmployees = ListOfEmployees()
                 };
 

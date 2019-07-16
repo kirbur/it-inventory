@@ -24,5 +24,6 @@ namespace backend_api.Models
         public DateTime? DateBought { get; set; }
         public DateTime? RenewalDate { get; set; }
         public int? MonthsPerRenewal { get; set; }
+        public bool IsPinned { get; set; }
     }
 }
