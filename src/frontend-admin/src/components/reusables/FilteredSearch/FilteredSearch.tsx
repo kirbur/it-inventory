@@ -16,7 +16,7 @@ export interface IFilteredSearchProps {
 
 // Primary Component
 export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
-    const {search, setSearch, options, selected, setSelected} = props
+    const {search, setSearch, options, setSelected} = props
 
     const customStyles = {
         container: (provided: any, state: any) => ({

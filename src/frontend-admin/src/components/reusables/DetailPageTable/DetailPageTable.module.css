@@ -6,10 +6,9 @@
 .tr {
     color: #a5a5a5;
     font-size: 20px;
-    cursor: pointer;
     height: 100px;
 }
-.tr:hover {
+.hover:hover {
     background-color: rgba(151, 151, 151, 0.15);
 }
 
@@ -23,23 +22,27 @@
     box-shadow: 1px 1px 6px 0 rgba(114, 114, 114, 0.2) !important;
     border-radius: 15px;
 }
+
 .rowTitle {
     color: #009eff;
 }
 
-/* styling for table headers - will have to go on every page with a table*/
 .headerContainer {
     color: #a5a5a5;
     font-size: 24px;
     padding-bottom: 16px;
     padding-top: 16px;
     display: flex;
-    cursor: pointer;
 }
 .header {
     text-align: left;
     border-bottom: 1px solid #979797;
 }
+
+.clickCursor {
+    cursor: pointer;
+}
+
 .rowData {
     text-align: left;
     color: #4a4a4a;
@@ -78,9 +81,14 @@
     color: #009eff;
 }
 
+.clickable:hover {
+    text-decoration: underline;
+}
+
 /* delete icon next to row */
-.deleteRow {
+.editRow {
     width: 50px;
+    cursor: pointer;
 }
 .delete {
     background-color: red;
@@ -98,4 +106,9 @@
     position: relative;
     bottom: 16px;
     left: 6px;
+}
+
+/*Edit Row*/
+.editButton {
+    width: 50px;
 }

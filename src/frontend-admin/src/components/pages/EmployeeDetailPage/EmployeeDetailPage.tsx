@@ -51,7 +51,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     }
 
     const handleProgramClick = (id: number | string) => {
-        history.push(`/programs/overview/${id}`)
+        history.push(`/programs/details/${id}`)
     }
 
     useEffect(() => {

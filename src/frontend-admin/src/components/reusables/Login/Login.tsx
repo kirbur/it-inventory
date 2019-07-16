@@ -2,7 +2,7 @@ import React, {useState, useContext} from 'react'
 import axios from 'axios'
 
 //useContext
-import {LoginContext} from '../../App/App'
+import {LoginContext, ILoginContext} from '../../App/App'
 import {Redirect} from 'react-router-dom'
 
 //styling
@@ -38,8 +38,16 @@ export const Login: React.FunctionComponent<ILoginProps> = props => {
                 //oddly, axios can only handle sending an array of objects so
                 //response.data looks like [{...data...}]
                 //succesful login, so set context to response data and route to dash
-                currentLoginContext.setLoginContextVariables(response.data[0])
-                localStorage.setItem('user', JSON.stringify(response.data[0]))
+
+                var userInfo: ILoginContext = {
+                    accessToken: response.data[0].accesstoken,
+                    refreshToken: response.data[0].refreshtoken,
+                    validTo: response.data[0].validTo,
+                    isAdmin: response.data[0].isAdmin,
+                    givenName: response.data[0].givenName,
+                }
+                currentLoginContext.setLoginContextVariables(userInfo)
+                localStorage.setItem('user', JSON.stringify(userInfo))
                 //console.log(response.data)
                 return <Redirect to='/dashboard' />
             })
@@ -64,7 +72,7 @@ export const Login: React.FunctionComponent<ILoginProps> = props => {
     return (
         <form className={styles.body}>
             <div className={styles.center}>
-                <img className={styles.logo} src={logo} />
+                <img className={styles.logo} src={logo} alt={''} />
             </div>
             <div className={styles.center}>
                 <input

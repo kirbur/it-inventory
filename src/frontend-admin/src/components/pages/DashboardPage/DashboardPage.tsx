@@ -104,11 +104,16 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
     //Click Handling
     const onRowClick = (datum: IDashboardTableDatum) => {
-        history.push(`/programs/${datum.name}`)
+        if (datum.name[datum.name.length - 1] === '*') {
+            var str = datum.name.substring(0, datum.name.length - 1)
+            history.push(`/programs/overview/${str}`)
+        } else {
+            history.push(`/programs/overview/${datum.name}`)
+        }
     }
 
     const onBarClick = (id: string) => {
-        history.push(`/programs/${id}`)
+        history.push(`/programs/overview/${id}`)
     }
 
     const onSliceClick = (id: string) => {
@@ -142,12 +147,12 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const updateDropdownContent = () => {
         let x: any[] = []
 
-        deptTableData.map((i: any) => {
+        deptTableData.map((i: any) =>
             x.push({
                 id: i.id,
                 name: i.name,
             })
-        })
+        )
         setDropdownContent(x)
     }
 
@@ -219,7 +224,13 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
         axios
             .get('/dashboard/departmentTable?$select=departmentName,departmentID')
-            .then((data: any) => setDeptList(data))
+            .then((data: any) => {
+                setDeptList(data)
+                data &&
+                    data[0] &&
+                    data[0].DepartmentName &&
+                    setSelectedDeptTable({name: data[0].DepartmentName, id: data[0].DepartmentId})
+            })
             .catch((err: any) => console.error(err))
     }, [])
 
