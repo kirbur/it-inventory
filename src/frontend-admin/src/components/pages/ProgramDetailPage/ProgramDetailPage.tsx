@@ -35,7 +35,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    var axios = new AxiosService(accessToken, refreshToken)
 
     const [img, setImg] = useState('')
     const [progData, setProgData] = useState<{
@@ -91,7 +91,9 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                 setHistoryList(data[0].entries)
             })
             .catch((err: any) => console.error(err))
-    }, [])
+
+        console.log('use')
+    }, [match.params.id])
 
     useEffect(() => {
         //Check to see if the given icon string corresponds to
@@ -110,9 +112,16 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         }
     }, [progData.icon])
 
-    const handleArchive = () => {
+    async function handleArchive() {
         if (window.confirm(`Are you sure you want to archive this copy of ${progData.name}?`)) {
-            //TODO: a post request to archive program w/ id match.params.id
+            //TODO: verify this
+
+            await axios
+                .put(`archive/program/${match.params.id}`, {})
+                .then((response: any) => console.log(response))
+                .catch((err: any) => console.error(err))
+
+            //after submitting go back to overview
             history.push(`/programs/overview/${progData.name}`)
         }
     }

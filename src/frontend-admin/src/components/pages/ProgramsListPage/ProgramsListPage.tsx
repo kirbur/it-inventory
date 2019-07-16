@@ -313,7 +313,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
 
     async function handlePinChanges() {
         //TODO: put to set pinned programs
-        //async axios.put().cathc((err: any) => console.error(err))
+        //async axios.put().catch((err: any) => console.error(err))
         setCheckboxes(!checkboxes)
     }
 

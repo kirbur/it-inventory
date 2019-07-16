@@ -67,13 +67,18 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     // input states
     const [imgInput, setImgInput] = useState<File>()
     const [imgLocation, setImgLocation] = useState<string>()
-    const [nameInput, setNameInput] = useState<string>(match.params.id === 'new' ? '' : match.params.id)
+
+    const [overviewInputs, setOverviewInputs] = useState({
+        name: {value: match.params.id === 'new' ? '' : match.params.id, changed: false},
+        isLicense: {value: false, changed: false},
+    })
+    // const [nameInput, setNameInput] = useState<string>(match.params.id === 'new' ? '' : match.params.id)
     const [numCopies, setNumCopies] = useState(1)
 
     const defaultPluginInfo = {
         id: -1,
         name: '',
-        programName: nameInput,
+        programName: overviewInputs.name.value,
         description: '',
         recurringCost: 0,
         flatCost: 0,
@@ -87,7 +92,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
     const [programInput, setProgramInput] = useState<IProgramFormInputs>({
         name: {value: '', changed: false},
-        programName: {value: nameInput, changed: false},
+        programName: {value: overviewInputs.name.value, changed: false},
         description: {value: '', changed: false},
         renewalDate: {value: new Date(), changed: false},
         purchaseDate: {value: new Date(), changed: false},
@@ -96,12 +101,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         cost: {value: 0, changed: false},
         flatCost: {value: 0, changed: false},
         monthsPerRenewal: {value: 0, changed: false},
-        isLicense: {value: false, changed: false},
     })
 
     const [programUpdateInput, setProgramUpdateInput] = useState<IProgramFormInputs>({
         name: {value: '', changed: false},
-        programName: {value: nameInput, changed: false},
+        programName: {value: overviewInputs.name.value, changed: false},
         description: {value: '', changed: false},
         renewalDate: {value: new Date(), changed: false},
         purchaseLink: {value: '', changed: false},
@@ -109,7 +113,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         cost: {value: 0, changed: false},
         flatCost: {value: 0, changed: false},
         monthsPerRenewal: {value: 0, changed: false},
-        isLicense: {value: false, changed: false},
     })
 
     useEffect(() => {
@@ -135,13 +138,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     )
                     setProgramRows(prog)
 
-                    setProgramInput({
-                        ...programInput,
-                        isLicense: {value: data[0].programOverview.isLicense, changed: false},
-                    })
-
-                    setProgramUpdateInput({
-                        ...programUpdateInput,
+                    setOverviewInputs({
+                        ...overviewInputs,
                         isLicense: {value: data[0].programOverview.isLicense, changed: false},
                     })
 
@@ -192,12 +190,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     }
 
     const handlePluginEdit = (row: ITableItem[]) => {
-        //TODO: fill in plugin form w/ current plugin info
-
+        //open the plugin form
         setPluginForm(true)
 
-        //TODO: use id not name
-        var plug = pluginList.filter(plugin => plugin.name === row[0].value)
+        var plug = pluginList.filter(plugin => plugin.id === row[0].id)
         setPluginInput({...plug[0]})
     }
 
@@ -205,13 +201,13 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         var postProgram = {
             Program: {
                 numberOfPrograms: Number.isNaN(numCopies) ? 0 : numCopies,
-                ProgramName: nameInput,
+                ProgramName: overviewInputs.name.value,
                 ProgramCostPerYear: Number.isNaN(programInput.cost.value)
                     ? 0
                     : programInput.cost.value * (12 / programInput.monthsPerRenewal.value),
                 ProgramFlatCost: Number.isNaN(programInput.flatCost.value) ? 0 : programInput.flatCost.value,
                 ProgramLicenseKey: programInput.licenseKey.value,
-                IsLicense: programInput.isLicense.value,
+                IsLicense: overviewInputs.isLicense.value,
                 ProgramDescription: programInput.description.value,
                 ProgramPurchaseLink: programInput.purchaseLink.value,
                 DateBought: programInput.purchaseDate
@@ -239,7 +235,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     .post('/add/program', postProgram)
                     .then((response: any) => {
                         if (response.status === 201) {
-                            msg = numCopies + ' copies of ' + nameInput + ' were added to inventory!'
+                            msg = numCopies + ' copies of ' + overviewInputs.name.value + ' were added to inventory!'
                             window.alert(msg)
                         }
                         return
@@ -271,7 +267,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         .post('/add/program', postProgram)
                         .then((response: any) => {
                             if (response.status === 201) {
-                                msg = numCopies + ' copies of ' + nameInput + ' were added to inventory!'
+                                msg =
+                                    numCopies + ' copies of ' + overviewInputs.name.value + ' were added to inventory!'
                                 window.alert(msg)
                             }
                             return
@@ -293,11 +290,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             }
 
             //Edit all existing copies w/ programInput
-            if (programForm.edit || programUpdateInput.isLicense.changed) {
+            if (programForm.edit || overviewInputs.isLicense.changed || overviewInputs.name.changed) {
                 var updateProgram = {
                     Program: {
                         OldProgramName: match.params.id,
-                        NewProgramName: programUpdateInput.name.changed ? programUpdateInput.name.value : null,
+                        NewProgramName: overviewInputs.name.changed ? overviewInputs.name.value : null,
                         ProgramCostPerYear: programUpdateInput.cost.changed
                             ? programUpdateInput.cost.value * (12 / programUpdateInput.monthsPerRenewal.value)
                             : null,
@@ -305,16 +302,13 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         ProgramLicenseKey: programUpdateInput.licenseKey.changed
                             ? programUpdateInput.licenseKey.value
                             : null,
-                        IsLicense: programUpdateInput.isLicense.value,
+                        IsLicense: overviewInputs.isLicense.changed ? overviewInputs.isLicense.value : null,
                         ProgramDescription: programUpdateInput.description.changed
                             ? programUpdateInput.description.value
                             : null,
                         ProgramPurchaseLink: programUpdateInput.purchaseLink.changed
                             ? programUpdateInput.purchaseLink.value
                             : null,
-                        // DateBought: programUpdateInput.purchaseDate.changed
-                        //     ? programUpdateInput.purchaseDate.value.toISOString()
-                        //     : null,
                         RenewalDate: programUpdateInput.renewalDate.changed
                             ? programUpdateInput.renewalDate.value.toISOString()
                             : null,
@@ -331,7 +325,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             }
 
             if (pluginForm) {
-                setPluginInput({...pluginInput, programName: nameInput})
+                setPluginInput({...pluginInput, programName: overviewInputs.name.value})
                 var postPlugin = {
                     PluginId: pluginInput.id,
                     ProgramName: match.params.id,
@@ -446,8 +440,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             pluginRows.forEach((row: ITableItem[], index: number) => {
                 bools[index] = true
                 removedPluginRows.forEach((remove: ITableItem[]) => {
-                    //TODO: use id instead of value
-                    bools[index] = bools[index] && remove[0].value !== row[0].value
+                    bools[index] = bools[index] && remove[0].id !== row[0].id
                 })
             })
             pluginRows.forEach((row: ITableItem[], index: number) => {
@@ -498,19 +491,21 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             <input
                                 type='text'
                                 className={styles.input}
-                                value={nameInput}
-                                onChange={e => setNameInput(e.target.value)}
+                                value={overviewInputs.name.value}
+                                onChange={e =>
+                                    setOverviewInputs({...overviewInputs, name: {value: e.target.value, changed: true}})
+                                }
                             />
                         </div>
 
                         <Checkbox
                             className={styles.checkBoxContainer}
-                            checked={programUpdateInput.isLicense.value}
+                            checked={overviewInputs.isLicense.value}
                             title={'License'}
                             onClick={() =>
-                                setProgramUpdateInput({
-                                    ...programUpdateInput,
-                                    isLicense: {value: !programUpdateInput.isLicense.value, changed: true},
+                                setOverviewInputs({
+                                    ...overviewInputs,
+                                    isLicense: {value: !overviewInputs.isLicense.value, changed: true},
                                 })
                             }
                         />

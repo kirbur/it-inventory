@@ -73,7 +73,6 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                         value: data[0].monthsPerRenewal,
                         changed: false,
                     },
-                    isLicense: {value: false, changed: false},
                 })
 
                 const employees: {name: string; id: number}[] = []

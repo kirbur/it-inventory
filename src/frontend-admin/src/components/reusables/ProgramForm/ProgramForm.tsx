@@ -22,7 +22,6 @@ export interface IProgramFormInputs {
     purchaseDate?: {value: Date; changed: boolean}
     purchaseLink: {value: string; changed: boolean}
     licenseKey: {value: string; changed: boolean}
-    isLicense: {value: boolean; changed: boolean}
 }
 
 interface IProgramFormProps {

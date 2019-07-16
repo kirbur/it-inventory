@@ -116,6 +116,7 @@
 }
 
 .checkboxRow {
+    min-width: 75px;
     border: 8px solid transparent;
     border-right: 1px solid #979797;
 }

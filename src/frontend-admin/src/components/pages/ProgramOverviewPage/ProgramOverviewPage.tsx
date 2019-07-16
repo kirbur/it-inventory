@@ -88,7 +88,6 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             .get(`/detail/ProgramOverview/${match.params.id}`)
             .then((data: any) => {
                 setProgramData(data[0].programOverview)
-                console.log(data[0])
                 let prog: ITableItem[][] = []
                 data[0].inDivPrograms.map((i: ExpectedProgramType) =>
                     prog.push(
@@ -167,7 +166,6 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             )
         ) {
             programRows.forEach(program => {
-                console.log(program[0].id)
                 axios
                     .put(`archive/program/${program[0].id}`, {})
                     .then((response: any) => console.log(response))
