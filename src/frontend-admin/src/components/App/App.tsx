@@ -130,29 +130,26 @@ export const App: React.FC = () => {
                         <Route exact path='/' component={Login} />
 
                         <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
-                        <Route path={'/employees/detail/:id'} render={props => <EmployeeDetailPage {...props} />} />
+                        <Route path={'/employees/details/:id'} render={props => <EmployeeDetailPage {...props} />} />
                         <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
                         <Route path={'/programs/overview/:id'} render={props => <ProgramOverviewPage {...props} />} />
                         <Route path={'/programs/details/:id'} render={props => <ProgramDetailPage {...props} />} />
-                        <Route
-                            exact
-                            path={'/employees/edit/:id'}
-                            render={props => <EmployeeDetailEditPage {...props} />}
-                        />
 
-                        <Route
-                            exact
-                            path={'/editDepartment/:id'}
-                            render={props => <DepartmentDetailEditPage {...props} />}
-                        />
-                        <Route
-                            path={'/programs/edit/details/:id'}
-                            render={props => <ProgramDetailEditPage {...props} />}
-                        />
-                        <Route
-                            path={'/programs/edit/overview/:id'}
-                            render={props => <ProgramOverviewEditPage {...props} />}
-                        />
+                        {loginContextVariables.isAdmin && (
+                            <Route exact path={'/employees/edit/:id'} component={EmployeeDetailEditPage} />
+                        )}
+
+                        {loginContextVariables.isAdmin && (
+                            <Route exact path={'/editDepartment/:id'} comoponent={DepartmentDetailEditPage} />
+                        )}
+
+                        {loginContextVariables.isAdmin && (
+                            <Route path={'/programs/edit/details/:id'} component={ProgramDetailEditPage} />
+                        )}
+
+                        {loginContextVariables.isAdmin && (
+                            <Route path={'/programs/edit/overview/:id'} component={ProgramOverviewEditPage} />
+                        )}
                     </Switch>
                 </Router>
 

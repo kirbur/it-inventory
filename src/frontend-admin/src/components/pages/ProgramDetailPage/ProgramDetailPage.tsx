@@ -214,7 +214,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                 Assigned to{' '}
                                 <div
                                     className={styles.empName}
-                                    onClick={() => history.push(`/employees/${progData.employeeId}`)}
+                                    onClick={() => history.push(`/employees/details/${progData.employeeId}`)}
                                 >
                                     {progData.employee}
                                 </div>

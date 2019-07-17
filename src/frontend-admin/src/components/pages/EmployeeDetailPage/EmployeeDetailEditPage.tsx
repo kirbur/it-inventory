@@ -54,7 +54,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
@@ -233,9 +233,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 sortBy: i.name,
                             },
                             {
-                                value: format(i.licenseKey),
+                                value: format(i.licensesKey),
                                 id: format(i.id),
-                                sortBy: format(i.licenseKey),
+                                sortBy: format(i.licensesKey),
                             },
                             {
                                 value: '$' + Math.round(i.costPerMonth * 100) / 100,
@@ -427,6 +427,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleAddHardware = (newRow: any) => {
+        setChanged(true)
         //first add to displayed table
         var arr = [
             [
@@ -453,6 +454,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleRemoveHardware = (row: any) => {
+        setChanged(true)
         //if its in added then remove it
         var arr = hardwareRows.added.filter((add: any) => add[0].id !== row[0].id)
 
@@ -465,6 +467,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleAddSoftware = (newRow: any) => {
+        setChanged(true)
         var arr = [
             [
                 {value: newRow.name, id: newRow.id, sortBy: newRow.name},
@@ -487,6 +490,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         setSoftwareDropdown([...drop])
     }
     const handleRemoveSoftware = (row: any) => {
+        setChanged(true)
         //if its in added then remove it
         var arr = softwareRows.added.filter((add: any) => add[0].id !== row[0].id)
 
@@ -499,6 +503,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleAddLicense = (newRow: any) => {
+        setChanged(true)
         var arr = [
             [
                 {value: newRow.name, id: newRow.id, sortBy: newRow.name},
@@ -523,6 +528,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleRemoveLicence = (row: any) => {
+        setChanged(true)
         //if its in added then remove it
         var arr = licenseRows.added.filter((add: any) => add[0].id !== row[0].id)
 
@@ -657,7 +663,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     console.error(err)
                 })
 
-            history.push(`/employees/detail/${match.params.id}`)
+            history.push(`/employees/details/${match.params.id}`)
         } else if (match.params.id !== 'new' && changed) {
             //one or maore of the inputs was null/undefined/empty
             msg = 'Failed because:\n'
@@ -722,7 +728,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         return arr
     }
 
-    return isAdmin ? (
+    return (
         <div className={styles.columns}>
             {/* column 1 */}
 
@@ -742,7 +748,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         text={userData.name}
                         icon='back'
                         onClick={() => {
-                            history.push(`/employees/detail/${match.params.id}`)
+                            history.push(`/employees/details/${match.params.id}`)
                         }}
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
@@ -1083,8 +1089,5 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 </div>
             </div>
         </div>
-    ) : (
-        //TODO: redirect to different page?
-        <div />
     )
 }

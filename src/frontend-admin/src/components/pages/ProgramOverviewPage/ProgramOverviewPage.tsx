@@ -152,7 +152,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     }, [programData.icon])
 
     const handleEmpClick = (id: number) => {
-        history.push(`/employees/${id}`)
+        history.push(`/employees/details/${id}`)
     }
 
     const handleCopyClick = (id: number) => {

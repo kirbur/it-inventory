@@ -32,7 +32,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
@@ -130,7 +130,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
         }
     }
 
-    return isAdmin ? (
+    return (
         <div className={styles.columns}>
             {/* column 1 */}
 
@@ -209,7 +209,5 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                 </div>
             </div>
         </div>
-    ) : (
-        <div />
     )
 }

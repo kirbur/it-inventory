@@ -47,7 +47,7 @@ interface IPluginInfo {
 export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> = props => {
     const {history, match} = props
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
@@ -454,7 +454,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         return arr
     }
 
-    return isAdmin ? (
+    return (
         <div className={styles.progOverviewEditMain}>
             <div className={styles.columns}>
                 {/* column 1 */}
@@ -692,7 +692,5 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 </div>
             </div>
         </div>
-    ) : (
-        <div />
     )
 }
