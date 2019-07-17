@@ -13,6 +13,7 @@ import {Table} from '../../reusables/Table/Table'
 
 // Styles
 import styles from './DepartmentsListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -41,22 +42,29 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const headerList = ['Departments', 'Total Employees', 'Programs Cost']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
+    const [useImages, setUseImages] = useState(false)
+    const [images, setImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages] = useState<{id: number; img: string}[]>([])
+
     useEffect(() => {
         axios
             .get('/list/departments')
             .then((data: any) => {
                 var depts: any[] = []
-                data.map((i: any) =>
+                var imgs: {id: number; img: string}[] = []
+                data.map((i: any) => {
                     depts.push({
                         name: format(i.departmentName),
-                        id: format(i.departmentId),
-                        totalEmployees: format(i.numOfEmp),
-                        //TODO: verify that this recieves a cost per year
-                        cost: format(i.costOfPrograms),
-                        icon: i.icon,
+                        id: i.departmentId,
+                        totalEmployees: i.numOfEmp,
+                        cost: i.costOfPrograms,
                     })
-                )
+                    imgs.push({id: i.departmentId, img: i.icon})
+                })
                 setListData(depts)
+
+                setImages(imgs)
+                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -78,6 +86,30 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         })
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])
+
+    //Set display Images
+    useEffect(() => {
+        images.map((img: {id: number; img: string}) =>
+            checkImage(img).then(data => {
+                var list = images.filter(i => i.id !== img.id)
+                setImages([...list, data])
+                displayImages.push(data)
+            })
+        )
+    }, [useImages])
+
+    //check image
+    async function checkImage(img: {id: number; img: string}) {
+        var arr: {id: number; img: string}[] = []
+        await axios
+            .get(img.img)
+            .then((data: any) => {
+                arr.push({id: img.id, img: data === '' ? placeholder : URL + img.img})
+            })
+            .catch((err: any) => console.error(err))
+
+        return arr[0]
+    }
 
     const handleClick = () => {
         history.push(`/editDepartment/new`)
@@ -167,9 +199,18 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }
 
     function concatenatedDept(row: any[]) {
-        return (
+        return displayImages &&
+            displayImages.filter(x => x.id === row[1]) &&
+            displayImages.filter(x => x.id === row[1])[0] ? (
             <td key={row[1]} className={styles.departments}>
-                <img className={styles.icon} src={URL + row[4]} alt={''} />
+                <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                <div className={styles.alignLeft}>
+                    <text className={styles.departmentName}>{row[0]}</text>
+                </div>
+            </td>
+        ) : (
+            <td key={row[1]} className={styles.departments}>
+                <img className={styles.icon} src={placeholder} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.departmentName}>{row[0]}</text>
                 </div>

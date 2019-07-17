@@ -39,8 +39,8 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     // state
     const [useImages, setUseImages] = useState(false)
     const [images, setImages] = useState<{name: string; img: string}[]>([])
-
     const [displayImages] = useState<{name: string; img: string}[]>([])
+
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState(listData)
     const [search, setSearch] = useState('')
@@ -58,7 +58,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             .get('/list/programs')
             .then((data: any) => {
                 var programs: any[] = []
-                var imgs: any[] = []
+                var imgs: {name: string; img: string}[] = []
                 var pins: {name: string; pinned: boolean}[] = []
                 data.map((i: any) => {
                     programs.push({
@@ -84,8 +84,8 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
 
     //Set display Images
     useEffect(() => {
-        images.map((img: any) =>
-            checkImages(img).then(data => {
+        images.map((img: {name: string; img: string}) =>
+            checkImage(img).then(data => {
                 var list = images.filter(i => i.name !== img.name)
                 setImages([...list, data])
                 displayImages.push(data)
@@ -94,8 +94,8 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }, [useImages])
 
     //check image
-    async function checkImages(img: any) {
-        var arr: any[] = []
+    async function checkImage(img: {name: string; img: string}) {
+        var arr: {name: string; img: string}[] = []
         await axios
             .get(img.img)
             .then((data: any) => {

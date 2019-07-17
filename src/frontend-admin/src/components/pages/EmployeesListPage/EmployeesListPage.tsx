@@ -4,6 +4,7 @@ import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {formatDate, calculateDaysEmployed, getDays} from '../../../utilities/FormatDate'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -16,6 +17,7 @@ import {LoginContext} from '../../App/App'
 
 // Styles
 import styles from './EmployeesListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/employee-placeholder.png'
 
 // Types
 interface IEmployeesListPageProps {
@@ -41,11 +43,16 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
     const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
+    const [useImages, setUseImages] = useState(false)
+    const [images, setImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages] = useState<{id: number; img: string}[]>([])
+
     useEffect(() => {
         axios
             .get('/list/employees')
             .then((data: any) => {
                 const employees: any[] = []
+                var imgs: {id: number; img: string}[] = []
                 data.map((i: any) => {
                     employees.push({
                         name: format(i.employeeName),
@@ -63,8 +70,12 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         programs: i.progForEmp.join(', '),
                         daysEmployed: calculateDaysEmployed(getDays(i.hireDate)),
                     })
+                    imgs.push({id: i.employeeId, img: i.photo})
                 })
                 setListData(employees)
+
+                setImages(imgs)
+                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -83,34 +94,28 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])
 
-    const formatDate = (hireDate: string) => {
-        const hired = new Date(hireDate)
-        const date = hired.getFullYear() + '/' + (hired.getMonth() + 1) + '/' + hired.getDate()
-        return date
-    }
+    //Set display Images
+    useEffect(() => {
+        images.map((img: {id: number; img: string}) =>
+            checkImage(img).then(data => {
+                var list = images.filter(i => i.id !== img.id)
+                setImages([...list, data])
+                displayImages.push(data)
+            })
+        )
+    }, [useImages])
 
-    const getDays = (hireDate: string) => {
-        const today = new Date()
-        const hired = new Date(hireDate)
-        return Math.round(Math.abs(today.getTime() - hired.getTime()))
-    }
+    //check image
+    async function checkImage(img: {id: number; img: string}) {
+        var arr: {id: number; img: string}[] = []
+        await axios
+            .get(img.img)
+            .then((data: any) => {
+                arr.push({id: img.id, img: data === '' ? placeholder : URL + img.img})
+            })
+            .catch((err: any) => console.error(err))
 
-    //does not account for leap years or variable # of days in a month
-    const calculateDaysEmployed = (dif: number) => {
-        var oneDay = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
-
-        var days = Math.floor(dif / oneDay)
-        var months = Math.floor(days / 31)
-        var years = Math.floor(months / 12)
-
-        months = Math.floor(months % 12)
-        days = Math.floor(days % 31)
-
-        var ret: string = ''
-        ret += years !== 0 ? (years === 1 ? years + ' year, ' : years + ' years, ') : ''
-        ret += months !== 0 ? (months === 1 ? months + ' month, ' : months + ' months, ') : ''
-        ret += days === 1 ? days + ' day' : days + ' days'
-        return ret
+        return arr[0]
     }
 
     const formatCost = (hwCpost: number, progCost: number) => {
@@ -219,9 +224,19 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     function concatenatedName(row: any[]) {
-        return (
+        return displayImages &&
+            displayImages.filter(x => x.id === row[8]) &&
+            displayImages.filter(x => x.id === row[8])[0] ? (
             <td key={row[8]} className={styles.employees}>
-                <img className={styles.icon} src={URL + row[7]} alt={''} />
+                <img className={styles.icon} src={displayImages.filter(x => x.id === row[8])[0].img} alt={''} />
+                <div className={styles.alignLeft}>
+                    <text className={styles.employeeName}>{row[0]}</text> <br />
+                    <text className={styles.role}>{row[6]}</text>
+                </div>
+            </td>
+        ) : (
+            <td key={row[8]} className={styles.employees}>
+                <img className={styles.icon} src={placeholder} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
                     <text className={styles.role}>{row[6]}</text>
