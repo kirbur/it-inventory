@@ -10,6 +10,7 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import {History} from 'history'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -19,7 +20,27 @@ import styles from './HardwareListPage.module.css'
 
 // Types
 interface IServersListPageProps {
-    history: any
+    history: History
+}
+interface IServerData {
+    make: string
+    id: number
+    numberOfCores: number
+    RAM: number
+    renewalDate: string
+    MFGTag: string
+    icon: string
+    model: string
+}
+interface IPulledData {
+    make: string
+    serverId: number
+    numberOfCores: number
+    ram: number
+    renewalDate: string
+    mfg: string
+    icon: string
+    model: string
 }
 
 // Primary Component
@@ -44,15 +65,15 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     useEffect(() => {
         axios
             .get('/list/servers')
-            .then((data: any) => {
+            .then((data: IPulledData[]) => {
                 console.log(data)
-                const servers: any[] = []
-                data.map((i: any) => {
+                const servers: IServerData[] = []
+                data.map((i: IPulledData) => {
                     servers.push({
                         make: format(i.make),
-                        id: format(i.serverId),
-                        numberOfCores: format(i.numberOfCores),
-                        RAM: format(i.ram),
+                        id: i.serverId,
+                        numberOfCores: i.numberOfCores,
+                        RAM: i.ram,
                         renewalDate: formatDate(i.renewalDate),
                         MFGTag: format(i.mfg),
                         icon: i.icon,
@@ -86,11 +107,11 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }
 
     const handleClick = () => {
-        history.push(`hardware/server/new`)
+        history.push(`hardware/edit/server/new`)
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/server/${row[0].key}`)
+        history.push(`hardware/detail/server/${row[0].key}`)
     }
 
     var filteredRows: any[] = []

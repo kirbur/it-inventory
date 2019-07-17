@@ -59,9 +59,13 @@ namespace backend_api.Controllers
         public bool isAdmin()
         {
             // Take the bearer token string, convert it to a Jwt, and find the username from the claims.
-            var TokenList = Request.Headers["Authorization"].ToString().Split(" ");
+            string[] TokenList = Request.Headers["Authorization"].ToString().Split(" ");
 
             // If there was no bearer token give, an out of range index error will be thrown.
+            if(TokenList.Count() < 1 || TokenList == null)
+            {
+                return false;
+            }
             try
             {
                 var JwtToken = new JwtSecurityTokenHandler().ReadJwtToken(TokenList[1]);
@@ -84,6 +88,16 @@ namespace backend_api.Controllers
                 }
             }
             catch (IndexOutOfRangeException)
+            {
+                return false;
+            }
+            // If a JWT is passed as undefined.
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            // If there was an error authenticating, the user is probably not an admin.
+            catch (Exception)
             {
                 return false;
             }

@@ -8,7 +8,7 @@
     display: inline-block;
     position: relative;
     align-self: flex-start;
-    z-index: 99;
+    z-index: 1;
 }
 
 .dropdownButton {
@@ -23,7 +23,6 @@
     position: relative;
     align-self: left;
     padding-left: 0;
-
     border: none;
     outline: none;
 }
@@ -47,7 +46,7 @@
 .dropdownList {
     font-size: 14px;
     padding: 0;
-    z-index: 99 !important;
+    /* z-index: 99 !important; */
 }
 
 .dropdownListItemButton {

@@ -10,6 +10,7 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import {History} from 'history'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -19,7 +20,31 @@ import styles from './HardwareListPage.module.css'
 
 // Types
 interface ILaptopsListPageProps {
-    history: any
+    history: History
+}
+interface ILaptopData {
+    make: string
+    id: number
+    cpu: number
+    ram: number
+    ssd: number
+    assigned: string
+    mfgtag: string
+    icon: string
+    model: string
+}
+interface IPulledData {
+    make: string
+    computerId: number
+    cpu: number
+    ramgb: number
+    ssdgb: number
+    isAssigned: boolean
+    employeeFirstName: string
+    employeeLastName: string
+    mfg: string
+    icon: string
+    model: string
 }
 
 // Primary Component
@@ -44,18 +69,18 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     useEffect(() => {
         axios
             .get('/list/laptops')
-            .then((data: any) => {
-                const laptops: any[] = []
-                data.map((i: any) => {
+            .then((data: IPulledData[]) => {
+                const laptops: ILaptopData[] = []
+                data.map((i: IPulledData) => {
                     laptops.push({
                         make: format(i.make),
-                        id: format(i.computerId),
-                        cpu: format(i.cpu),
-                        ram: format(i.ramgb),
-                        ssd: format(i.ssdgb),
+                        id: i.computerId,
+                        cpu: i.cpu,
+                        ram: i.ramgb,
+                        ssd: i.ssdgb,
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
                         mfgtag: format(i.mfg),
-                        icon: i.icon,
+                        icon: format(i.icon),
                         model: format(i.model),
                     })
                 })
@@ -85,11 +110,11 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/hardware/laptop/new')
+        history.push('/hardware/edit/laptop/new')
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/laptop/${row[0].key}`)
+        history.push(`hardware/detail/laptop/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
