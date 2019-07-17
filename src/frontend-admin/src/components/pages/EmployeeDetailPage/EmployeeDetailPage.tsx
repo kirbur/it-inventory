@@ -9,7 +9,6 @@ import {Group} from '../../reusables/Group/Group'
 // Utils
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
-import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './EmployeeDetailPage.module.css'

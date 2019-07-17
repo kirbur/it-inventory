@@ -152,6 +152,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                     setRows(sortTable(rows, 0, sortState.headerStateCounts[0]))
                     sortStates(0)
                 }}
+                key={0}
             >
                 <div className={s(styles.header, styles.nameHeader)}>
                     {headerList[0]}
@@ -168,6 +169,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                         setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
                         sortStates(i)
                     }}
+                    key={i}
                 >
                     <div className={styles.header}>
                         {headerList[i]}
@@ -183,10 +185,10 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
 
     function concatenatedDept(row: any[]) {
         return (
-            <td key={row[1]} className={styles.departments}>
+            <td className={styles.departments} key={row[1]}>
                 <img className={styles.icon} src={URL + row[4]} alt={''} />
                 <div className={styles.alignLeft}>
-                    <text className={styles.departmentName}>{row[0]}</text>
+                    <div className={styles.departmentName}>{row[0]}</div>
                 </div>
             </td>
         )
@@ -202,12 +204,16 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                     transformedRow[0] = concatenatedDept(row)
                 case 2:
                     transformedRow[2] = (
-                        <td className={styles.alignLeft}>
+                        <td className={styles.alignLeft} key={row[i]}>
                             {row[2] === 1 ? row[2] + ' employee' : row[2] + ' employees'}
                         </td>
                     )
                 case 3:
-                    transformedRow[3] = <td className={styles.alignLeft}>{formatCost(row[3])}</td>
+                    transformedRow[3] = (
+                        <td className={styles.alignLeft} key={row[i]}>
+                            {formatCost(row[3])}
+                        </td>
+                    )
             }
         }
 
