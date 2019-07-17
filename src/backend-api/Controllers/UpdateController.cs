@@ -83,6 +83,23 @@ namespace backend_api.Controllers
         * }
         */
 
+        /* PUT: api/udpate/programPins
+        * Will update all the rows of programs to only pin the given programs and unpin everything else
+        *  Param input format:[
+        *  "ProgramName",
+        *  ]
+        */
+        [HttpPut]
+        [Route("ProgramPins")]
+        public IActionResult EditProgramsPins([FromBody] string[] input)
+        {
+            // This line loops through every program and updates its IsPinned field depending on whether
+            // the program is in the given input
+            _context.Program.ToList().ForEach(prog => prog.IsPinned = input.Contains(prog.ProgramName) ? true : false);
+            _context.SaveChanges();
+            return Ok();
+        }
+
         [HttpPut]
         [Route("ProgramAll")]
         public IActionResult EditPrograms([FromBody] UpdateProgramInputModel input)
@@ -188,53 +205,27 @@ namespace backend_api.Controllers
                     // Case 1: When an unassigned program becomes assigned
                     if (input.Program.EmployeeId != null && progEmpId == null)
                     {
-                        var History = (new ProgramHistory
-                        {
-                            EmployeeId = input.Program.EmployeeId,
-                            ProgramId = prog.ProgramId,
-                            EventType = "Assigned",
-                            EventDate = DateTime.Now
-
-                        });
+                        var History = UpdateProgramHistory(prog.ProgramId, input.Program.EmployeeId, "Assigned", DateTime.Now);
                         programHistories.Add(History);
                     }
                     // Case 2: When an already assigned program becomes assigned to someone else
                     // This requires 2 entries; one for the unassigning and one for the assigning.
-                    else if (input.Program.EmployeeId != null && progEmpId != null && input.Program.EmployeeId != prog.EmployeeId)
+                    else if (input.Program.EmployeeId != null && progEmpId != null && input.Program.EmployeeId != progEmpId)
                     {
                         // unassigning
-                        var History = (new ProgramHistory
-                        {
-                            EmployeeId = progEmpId,
-                            ProgramId = prog.ProgramId,
-                            EventType = "Unassigned",
-                            EventDate = DateTime.Now
+                        var History = UpdateProgramHistory(prog.ProgramId, progEmpId, "Unassigned", DateTime.Now);
 
-                        });
-                        // assigning
                         programHistories.Add(History);
 
-                        var HistorySecond = (new ProgramHistory
-                        {
-                            EmployeeId = input.Program.EmployeeId,
-                            ProgramId = prog.ProgramId,
-                            EventType = "Assigned",
-                            EventDate = DateTime.Now
-                        });
+                        // assigning
+                        var HistorySecond = UpdateProgramHistory(prog.ProgramId, input.Program.EmployeeId, "Assigned", DateTime.Now);
                         programHistories.Add(HistorySecond);
 
                     }
                     // Case 3: When an assigned program becomes unassigned
                     else if (input.Program.EmployeeId == null && progEmpId != null)
                     {
-                        var History = (new ProgramHistory
-                        {
-                            EmployeeId = progEmpId,
-                            ProgramId = prog.ProgramId,
-                            EventType = "Unassigned",
-                            EventDate = DateTime.Now
-
-                        });
+                        var History = UpdateProgramHistory(prog.ProgramId, input.Program.EmployeeId, "Assigned", DateTime.Now);
                         programHistories.Add(History);
                     }
                     if (programHistories != null)
