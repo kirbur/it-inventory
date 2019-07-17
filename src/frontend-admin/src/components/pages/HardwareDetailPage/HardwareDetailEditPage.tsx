@@ -364,7 +364,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         EndOfLife: endOfLifeInput,
 
                         Virtualize: isVirtualized,
-                    
+
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
@@ -968,7 +968,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         <div className={styles.historyLogAdd}>
                             <Button
                                 icon='add'
-                                onClick={setHistoryLogBool(!historyLogBool)}
+                                onClick={() => setHistoryLogBool(!historyLogBool)}
                                 className={styles.historyLogButton}
                             />
                             add log
