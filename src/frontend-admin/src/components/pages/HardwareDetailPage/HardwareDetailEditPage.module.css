@@ -115,9 +115,11 @@
     font-size: 18px;
     font-family: cqlRegularFont;
 }
-
 .employeeDropdownArrow {
     top: 14px;
+}
+.rdp {
+    z-index: 100000;
 }
 
 .dropdownList {

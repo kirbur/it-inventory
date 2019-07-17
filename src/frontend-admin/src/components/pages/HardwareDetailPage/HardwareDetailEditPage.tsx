@@ -599,6 +599,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                     selected={new Date(purchaseDateInput)}
                                     onChange={e => e && setPurchaseDateInput(e)}
                                     className={styles.input}
+                                    popperClassName={styles.rdp}
                                 />
                             </div>
                         )}
@@ -627,6 +628,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     </div>
                 )
             }
+            //employee assigned
         } else if (sectionData == thirdSectionData) {
             for (let i = 0; i < sectionHeaders.length; i += 3) {
                 rows.push(
