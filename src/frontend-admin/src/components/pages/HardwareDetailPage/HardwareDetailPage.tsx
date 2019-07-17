@@ -53,6 +53,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     const [flatCost, setFlatCost] = useState(0)
 
     const [img, setImg] = useState()
+    const [initialImg, setInitialImg] = useState()
 
     useEffect(() => {
         if (match.params.type === 'server') {
@@ -65,11 +66,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
                     console.log(data)
-                    if (data !== '') {
-                        setImg(data[0].icon)
-                    } else {
-                        setImg(serverPlaceholder)
-                    }
+                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].server.make,
                         'Model: ' + data[0].server.model,
@@ -108,11 +105,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
-                    if (data !== '') {
-                        setImg(data[0].icon)
-                    } else {
-                        setImg(laptopPlaceholder)
-                    }
+                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].computer.make,
                         'Model: ' + data[0].computer.model,
@@ -149,11 +142,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
-                    if (data !== '') {
-                        setImg(data[0].icon)
-                    } else {
-                        setImg(monitorPlaceholder)
-                    }
+                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].monitor.make,
                         'Model: ' + data[0].monitor.model,
@@ -182,11 +171,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
-                    if (data !== '') {
-                        setImg(data[0].icon)
-                    } else {
-                        setImg(peripheralPlaceholder)
-                    }
+                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Name: ' + data[0].peripheral.peripheralName,
                         'Type: ' + data[0].peripheral.peripheralType,
@@ -207,6 +192,24 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 .catch((err: any) => console.error(err))
         }
     }, [])
+
+    useEffect(() => {
+        if (initialImg) {
+            axios.get(initialImg).then((pic: any) => {
+                if (pic !== '') {
+                    setImg(URL + initialImg)
+                } else if (match.params.type == 'server') {
+                    setImg(serverPlaceholder)
+                } else if (match.params.type == 'laptop') {
+                    setImg(laptopPlaceholder)
+                } else if (match.params.type == 'monitor') {
+                    setImg(monitorPlaceholder)
+                } else if (match.params.type == 'peripheral') {
+                    setImg(peripheralPlaceholder)
+                }
+            })
+        }
+    }, [initialImg])
 
     async function handleArchive() {
         if (window.confirm(`Are you sure you want to archive this ${match.params.type}?`)) {
@@ -238,6 +241,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         }
     }
 
+    console.log(img)
     return (
         <div className={styles.detailMain}>
             <div className={styles.columns}>
@@ -253,7 +257,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         textClassName={styles.backButtonText}
                     />
                     <div className={styles.imgPadding}>
-                        <img className={styles.img} src={URL + img} alt={''} />
+                        <img className={styles.img} src={img} alt={''} />
                     </div>
                     <div className={styles.costText}>
                         {renderFlatCost()}
