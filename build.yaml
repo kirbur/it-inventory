@@ -69,6 +69,10 @@ pipelines:
                   args:
                       credentialsId: itinventory.cqlcorp.net-jwt-secret
                       variable: JWT_SECRET
+                - type: string
+                  args:
+                      credentialsId: itinventory.cqlcorp.net-jobs-authtoken
+                      variable: JOBS_AUTHTOKEN
             script:
                 - export API_SFTPROOT=/www/itinventory.cqlcorp.net
 

@@ -102,7 +102,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                     sw.push([
                         format(i.id),
                         format(i.programName),
-                        format(i.programCount),
+                        i.programCount,
                         Math.round(i.programCostPerYear * 100) / 100,
                     ])
                 )

@@ -32,29 +32,25 @@ namespace backend_api.Controllers
             return routeModel.ToLower() == "laptop" ? "computer" : routeModel.ToLower();
         }
 
-        public void UpdateHardwareHistory(bool isAssigned, int? employeeId, int hardwareId, string type)
-        {
-            // Update the history: Assigned or Unassigned
-            _context.HardwareHistory.Add(new HardwareHistory
-            {
-                HardwareId = hardwareId,
-                EmployeeId = employeeId,
-                HardwareType = type,
-                EventType = $"{(isAssigned ? "Assigned" : "Unassigned")}",
-                EventDate = DateTime.Now,
-            });
-        }
-
-        public ProgramHistory UpdateProgramHistory(bool isAssigned, int employeeId, int programId)
+        public ProgramHistory UpdateProgramHistory(int programId, int? employeeId, string eventType, DateTime date)
         {
             // Update the history: Assigned or Unassigned
             return (new ProgramHistory
             {
                 ProgramId = programId,
                 EmployeeId = employeeId,
-                EventType = $"{(isAssigned ? "Assigned" : "Unassigned")}",
-                EventDate = DateTime.Now,
+                EventType = eventType,
+                EventDate = date
             });
+        }
+
+        public void UpdateHardwareAssignment<T>(DbSet<T> table, int? employeeId, bool IsAssigned, HardwareAssignedModel hardware)
+            where T : class, IAssignable
+        {
+            var entity = table.Find(hardware.ID);
+            entity.IsAssigned = IsAssigned;
+            entity.EmployeeId = IsAssigned ? employeeId : null;
+            UpdateHardwareHistory (employeeId, hardware.Type, hardware.ID, IsAssigned ? "Assigned" : "Unassigned", DateTime.Now);
         }
         /* isAdmin() determines if the username from the AccessToken is an admin user.
          *  If the user is an admin, we can choose to return specific values to the front end.

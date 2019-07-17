@@ -1,8 +1,7 @@
-import React, {useState} from 'react'
+import React from 'react'
 import styles from './Dropdown.module.css'
 import {DropdownList} from './DropdownList'
 import {Title} from '../../reusables/Title/Title'
-import {Card} from '../Card/Card'
 
 export interface IDropdownItem {
     id: number

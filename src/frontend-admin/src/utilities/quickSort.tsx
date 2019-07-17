@@ -79,10 +79,10 @@ export function sortTable(rows: any[][], dataIndex: number, sortValue: number) {
         var low = 0
         var high = rows.length - 1
 
-        if (sortValue == 0) {
+        if (sortValue === 0) {
             //--> ascending order
             quickSortAscend(low, high, dataIndex, tempData)
-        } else if (sortValue == 1) {
+        } else if (sortValue === 1) {
             //--> descending order
             quickSortDescend(low, high, dataIndex, tempData)
         }
