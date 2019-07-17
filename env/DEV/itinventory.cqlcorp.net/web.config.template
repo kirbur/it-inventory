@@ -16,6 +16,9 @@
                     <environmentVariable name="SQLCONNSTR_ITInventoryDb" value="_ITINVENTORYDB_APPUSER_CONNSTRING_" />
                     <environmentVariable name="AppSettings__Secret" value="_JWT_SECRET_" />
                     <environmentVariable name="UploadedFileRootPath" value=".\images" />
+                    <environmentVariable name="EmailSettings__SMTP" value="mail.cqlcorp.net" />
+                    <environmentVariable name="EmailSettings__Port" value="25" />
+                    <environmentVariable name="JobSettings__AuthToken" value="13b5a9fedda34da6a0ea8cd65165bb4e208461f625fa46c5bd607ac93f9bc7f9" />
                 </environmentVariables>
             </aspNetCore>
             <rewrite>
