@@ -1,0 +1,29 @@
+.pictureInputMain {
+    padding: 25px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+    width: 300px;
+    height: 300px;
+    color: #009eff;
+}
+
+.imgInput {
+    position: relative;
+    top: -300px;
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.imgContainer {
+    width: 300px;
+    height: 300px;
+    display: flex;
+}
+
+.selectedImage {
+    width: 300px;
+    max-height: 300px;
+    margin: auto;
+}

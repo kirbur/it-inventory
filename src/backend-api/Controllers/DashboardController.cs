@@ -16,33 +16,50 @@ namespace backend_api.Controllers
     [ApiController]
     public class DashboardController : ControllerBase
     {
-        private readonly ITInventoryDBContext _context;
+        public readonly ITInventoryDBContext _context;
 
         public DashboardController(ITInventoryDBContext context)
         {
             _context = context;
         }
 
+        // A helper class that is a cost breakdown object.
+        public class CostBreakDown
+        {
+            public CostBreakDown() { }
+            public decimal? CostOfProgramsPerYear { get; set; }
+            public decimal? CostOfPluginsPerYear { get; set; }
+        }
+
         /* GET: api/dashboard/CostBreakDown
          * Returns [ {
-         *          Program Cost Per Year,
-         *          Plugin Cost Per Year
-         *         } ] which is comprised of all the programs and their plugins in our database
+         *          ProgramCostPerYear: int,
+         *          PluginCostPerYear: int,
+         *          } ,.. ] which is comprised of all the programs and their plugins in our database
          */
-
         [Route("CostBreakdown")]
         [HttpGet]
-        [EnableQuery()]
+        public ActionResult<object> GetDashboardCostBreakDown()
+        {
+            // Return the object as an array so the axios service class will be happy.
+            return new List<object> { DashboardCostBreakDown() };
+        }
 
-        public async Task<ActionResult<object>> GetDashboardCostBreakDown()
+        /* DashboardCostBreakdown() is a helper method used for calculating the cost breakdown cards
+         *   on the dashboard. 
+         * Returns [ {
+         *           ProgramCostPerYear: int,
+         *           PluginCostPerYear: int,
+         *          } ,.. ] which is comprised of all the programs and their plugins in our database
+         */
+        public CostBreakDown DashboardCostBreakDown()
         {
             //Array that will be returned with Programs cost and plugins cost
             decimal?[] ReturningArray = new decimal?[2];
 
             //Getting cost from the program table
 
-            var ProgramsList = await _context.Program.ToListAsync();
-
+            var ProgramsList = _context.Program.ToList();
 
             decimal? CostOfProgramsPerYear = 0;
             // looping through programs table and finding programs that are not "deleted" 
@@ -58,7 +75,7 @@ namespace backend_api.Controllers
             //getting cost from plugin table
 
             decimal? CostOfPluginsPerYear = 0;
-            var PluginsList = await _context.Plugins.ToListAsync();
+            var PluginsList = _context.Plugins.ToList();
             //Selecting distinct programs by name so that they match up with the plugin table
 
             var DistinctProgramsList = ProgramsList.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
@@ -76,12 +93,12 @@ namespace backend_api.Controllers
                     }
                 }
             }
-            var CostBreakDownObject = new { CostOfProgramsPerYear, CostOfPluginsPerYear };
-            // Return the object as an array so the axios service class will be happy.
-            List<object> returnList = new List<object>();
-            returnList.Add(CostBreakDownObject);
-
-            return Ok(returnList);
+            return new CostBreakDown
+            {
+                CostOfProgramsPerYear = CostOfProgramsPerYear,
+                CostOfPluginsPerYear = CostOfPluginsPerYear
+            };
+            
         }
 
         /* GET: api/dashboard/CostPieCharts
@@ -107,7 +124,6 @@ namespace backend_api.Controllers
         *          } 
         *          ]
         */
-
         [Route("CostPieCharts")]
         [HttpGet]
         [EnableQuery()]
@@ -364,30 +380,16 @@ namespace backend_api.Controllers
             // Make sure there is an employee.
             if (_context.Employee.Count() < 1)
             {
-                return StatusCode(500);
+                return BadRequest("No employees");
             }
 
-            //getting the Admin's entity
-            var AdminEmployee = _context.Employee.FirstOrDefault(x => ActiveDirectoryUtil.IsFirstAdmin(x.Adguid));
-            //parsing their user settings from the database into a Json Object
-            JObject json = JObject.Parse(AdminEmployee.UserSettings);
-            //Getting their licenses from their user settings because that contains both their licenses and software preferences
-            var LicenseChoices = json["license"];
+            var UsefulProgramsList = _context.Program.Where(x => x.IsPinned == true && x.IsLicense == true && x.IsDeleted == false);
 
-            //taking their preferenced programs and selecting them from the list of programs
-            List<Models.Program> usefulPrograms = new List<Models.Program>();
-            foreach (var license in LicenseChoices)
-            {
-                var prog = _context.Program.FirstOrDefault(x => x.ProgramName == license.ToString());
-                usefulPrograms.Add(prog);
-            }
             //temp list to hold the list with the difference field
             List<LicenseBarGraph> ThrowAwayList = new List<LicenseBarGraph>();
-            // First list removes programs that are not licenses and that are deleted
-            var UsefulProgramsList = _context.Program.Where(x => x.IsLicense == true && x.IsDeleted == false);
 
             //This List takes the usefulPrograms list and makes it distinct
-            var DistinctUsefulPrograms = usefulPrograms.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
+            var DistinctUsefulPrograms = UsefulProgramsList.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
 
 
             //Loop through every program in the distinct programs list
@@ -440,17 +442,11 @@ namespace backend_api.Controllers
             // Make sure there is an employee.
             if (_context.Employee.Count() < 1)
             {
-                return StatusCode(500);
+                return BadRequest("No Employees");
             }
-            //getting the Admin's entity
-            var AdminEmployee = _context.Employee.FirstOrDefault(x => x.Adguid.ToString() == "811cbf54-2913-4ffc-8f33-6418ddb4e06d");
-            //parsing their user settings from the database into a Json Object
-            JObject json = JObject.Parse(AdminEmployee.UserSettings);
-            //Getting their licenses from their user settings because that contains both their licenses and software preferences
-            var SoftwareChoices = json["software"];
 
             // making list of string of the software that is to be pinned
-            var list = SoftwareChoices.Select(x => x.ToString());
+            var list = _context.Program.Where(x=>x.IsPinned == true && x.IsLicense == false && x.IsDeleted == false).GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault()).Select(x=>x.ProgramName).ToList();
 
             // Only software, not licenses. Nothing deleted. Only ones in use.
             var software = _context.Program.Where(program => program.IsLicense == false && program.IsDeleted == false && program.EmployeeId != null);
