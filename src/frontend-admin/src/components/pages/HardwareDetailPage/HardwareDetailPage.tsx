@@ -11,7 +11,10 @@ import {formatDate} from '../../../utilities/FormatDate'
 
 // Styles
 import styles from './HardwareDetailPage.module.css'
-import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
+import laptopPlaceholder from '../../../content/Images/Placeholders/laptop-placeholder.png'
+import serverPlaceholder from '../../../content/Images/Placeholders/server-placeholder.png'
+import peripheralPlaceholder from '../../../content/Images/Placeholders/peripheral-placeholder.png'
+import monitorPlaceholder from '../../../content/Images/Placeholders/monitor-placeholder.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -62,7 +65,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
-                    setImg(data[0].icon)
+                    if (data !== '') {
+                        setImg(data[0].icon)
+                    } else {
+                        setImg(serverPlaceholder)
+                    }
                     setHeadingInfo([
                         'Make: ' + data[0].server.make,
                         'Model: ' + data[0].server.model,
@@ -100,7 +107,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
-                    setImg(data[0].icon)
+                    if (data !== '') {
+                        setImg(data[0].icon)
+                    } else {
+                        setImg(laptopPlaceholder)
+                    }
                     setHeadingInfo([
                         'Make: ' + data[0].computer.make,
                         'Model: ' + data[0].computer.model,
@@ -137,7 +148,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
-                    setImg(data[0].icon)
+                    if (data !== '') {
+                        setImg(data[0].icon)
+                    } else {
+                        setImg(monitorPlaceholder)
+                    }
                     setHeadingInfo([
                         'Make: ' + data[0].monitor.make,
                         'Model: ' + data[0].monitor.model,
@@ -166,8 +181,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
-                    setImg(data[0].icon)
+                    if (data !== '') {
+                        setImg(data[0].icon)
+                    } else {
+                        setImg(peripheralPlaceholder)
+                    }
                     setHeadingInfo([
                         'Name: ' + data[0].peripheral.peripheralName,
                         'Type: ' + data[0].peripheral.peripheralType,

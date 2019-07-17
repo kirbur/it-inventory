@@ -361,8 +361,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         SAN: firstSectionData[9],
                         Fqdn: firstSectionData[10],
 
-                        Virtualize: false, //NEED TO ADD THIS
-
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
                         EndOfLife: endOfLifeInput,
