@@ -43,6 +43,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const [defaultSoftware, setDefaultSoftware] = useState<any[]>([])
     const [defaultLicenses, setDefaultLicenses] = useState<any[]>([])
     const [img, setImg] = useState()
+    const [initialImg, setInitialImg] = useState()
 
     const {
         loginContextVariables: {accessToken, refreshToken, isAdmin},
@@ -68,12 +69,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         axios
             .get(`/detail/department/${match.params.id}`)
             .then((data: any) => {
-                console.log(data)
-                if (data !== '') {
-                    setImg(data[0].picture)
-                } else {
-                    setImg(placeholder)
-                }
+                setInitialImg(data[0].picture)
                 let dept: any = {
                     // photo: data[0].picture,'
                     employeeCount: data[0].countEmpsInDep,
@@ -167,6 +163,18 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         //TODO: get dropdown content for all 3 dropdowns
     }, [])
 
+    useEffect(() => {
+        if (initialImg) {
+            axios.get(initialImg).then((pic: any) => {
+                if (pic !== '') {
+                    setImg(URL + initialImg)
+                } else {
+                    setImg(placeholder)
+                }
+            })
+        }
+    }, [initialImg])
+
     async function handleArchive() {
         if (employeeRows.length > 0) {
             window.alert('Cannot archive department with employees in it!')
@@ -193,7 +201,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         textClassName={styles.backButtonText}
                     />
                     <div className={styles.imgPadding}>
-                        <img className={styles.img} src={URL + img} alt={''} />
+                        <img className={styles.img} src={img} alt={''} />
                     </div>
                     <Group>
                         <p>Software</p>
