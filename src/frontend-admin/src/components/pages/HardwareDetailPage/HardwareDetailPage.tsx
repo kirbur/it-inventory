@@ -211,7 +211,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         if (costPerYear !== undefined && costPerYear !== null && costPerYear !== 0) {
             return (
                 <Group>
-                    <p>Initial Cost</p>
+                    <p>Cost Per Year</p>
                     <div className={styles.costLine} />
                     <p>${costPerYear} </p>
                 </Group>
