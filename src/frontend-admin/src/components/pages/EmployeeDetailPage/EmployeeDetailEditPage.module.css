@@ -18,30 +18,8 @@
 }
 
 /*First Column*/
-.imgPadding {
-    padding: 25px;
-    background-color: #f4f4f4;
-    border-radius: 10px;
-    width: 300px;
-    height: 300px;
-
-    color: #009eff;
-}
-
-.imgInput {
-    position: relative;
-    top: -300px;
-    width: 300px;
-    height: 300px;
-    opacity: 0;
-    background: #636363;
-    cursor: pointer;
-}
-
-.img {
-    position: relative;
-    top: 50px;
-    transform: scale(1.5, 1.5);
+.backButton {
+    margin-bottom: 30px;
 }
 
 /*Second Column*/

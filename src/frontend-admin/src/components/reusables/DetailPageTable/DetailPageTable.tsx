@@ -19,6 +19,7 @@ export interface ITableItem {
     sortBy: string | number
     onClick?: any
     tooltip?: string
+    unavailable?: boolean
 }
 
 interface ITableProps {
@@ -118,7 +119,9 @@ export const DetailPageTable = (props: ITableProps) => {
         var start = 0
         if (edit) {
             start = 1
-            transformedRow[0] = (
+            transformedRow[0] = row[0].unavailable ? (
+                <td className={styles.editRow}></td>
+            ) : (
                 <td onClick={e => remove(row)} className={styles.editRow}>
                     <div className={styles.delete} />
                     <div className={styles.whiteLine} />
@@ -142,7 +145,12 @@ export const DetailPageTable = (props: ITableProps) => {
             ) : (
                 <td
                     key={JSON.stringify(row) + headers[i]}
-                    className={s(styles.rowData, row[i].onClick && styles.clickCursor, click)}
+                    className={s(
+                        styles.rowData,
+                        row[i].onClick && styles.clickCursor,
+                        click,
+                        row[0].unavailable ? styles.unavailable : ''
+                    )}
                     onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
                 >
                     {rows[0] && row[i].value}

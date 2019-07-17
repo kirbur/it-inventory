@@ -14,6 +14,7 @@ import {format} from '../../../utilities/formatEmptyStrings'
 
 // Styles
 import styles from './EmployeeDetailPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/employee-placeholder.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -43,6 +44,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
+    const [img, setImg] = useState('')
     const [userData, setUserData] = useState<IUser>({
         photo: '',
         name: '',
@@ -148,6 +150,24 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
             .catch((err: any) => console.error(err))
     }, [])
 
+    useEffect(() => {
+        //once icon has a value, check to see if that picture exists. If it doesnt then use the placeholder
+        if (userData.photo !== '') {
+            axios
+                .get(userData.photo)
+                .then((data: any) => {
+                    if (data !== '') {
+                        setImg(URL + userData.photo)
+                    } else {
+                        setImg(placeholder)
+                    }
+                })
+                .catch((err: any) => console.error(err))
+        } else {
+            setImg('')
+        }
+    }, [userData.photo])
+
     async function handleArchive() {
         if (window.confirm(`Are you sure you want to archive ${userData.name}?`)) {
             //TODO: verify this
@@ -175,7 +195,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         textClassName={styles.backButtonText}
                     />
                     <div className={styles.imgPadding}>
-                        <img className={styles.img} src={URL + userData.photo} alt={''} />
+                        <img className={styles.img} src={img} alt={''} />
                     </div>
                     <div className={styles.costText}>
                         <Group>
