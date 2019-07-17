@@ -8,6 +8,7 @@ import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 
 // Styles
 import styles from './DepartmentDetailPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -69,7 +70,11 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
             .get(`/detail/department/${match.params.id}`)
             .then((data: any) => {
                 console.log(data)
-                setImg(data[0].picture)
+                if (data !== '') {
+                    setImg(data[0].picture)
+                } else {
+                    setImg(placeholder)
+                }
                 let dept: any = {
                     // photo: data[0].picture,'
                     employeeCount: data[0].countEmpsInDep,
