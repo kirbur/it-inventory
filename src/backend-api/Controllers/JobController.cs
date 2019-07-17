@@ -78,7 +78,7 @@ namespace backend_api.Controllers
                     }
                     else
                     {
-                        return BadRequest($"There are no low resources: {count}");
+                        return Ok($"There are no low resources: {count}");
                     }
                 }
                 else
