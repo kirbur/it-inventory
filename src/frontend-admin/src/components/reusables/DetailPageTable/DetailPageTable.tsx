@@ -91,7 +91,7 @@ export const DetailPageTable = (props: ITableProps) => {
             <td
                 key={headers[i]}
                 onClick={e => {
-                    setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                    setRows(sortTable(rows.slice(), i, sortState.headerStateCounts[i]))
                     sortStates(i)
                 }}
                 className={s(styles.header, styles.clickCursor)}
@@ -126,7 +126,7 @@ export const DetailPageTable = (props: ITableProps) => {
             )
         }
         for (let i = 0; i < headers.length; i++) {
-            var click = row[i].onClick ? styles.clickable : ''
+            var click = row[i] && row[i].onClick ? styles.clickable : ''
             transformedRow[i + start] = row[i].tooltip ? (
                 <td
                     key={JSON.stringify(row) + headers[i]}

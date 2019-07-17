@@ -10,6 +10,7 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import {History} from 'history'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -19,7 +20,28 @@ import styles from './HardwareListPage.module.css'
 
 // Types
 interface IMonitorsListPageProps {
-    history: any
+    history: History
+}
+interface IMonitorData {
+    make: string
+    id: number
+    screenSize: number
+    resolution: number
+    assigned: string
+    inputs: string
+    icon: string
+    model: string
+}
+interface IPulledData {
+    make: string
+    monitorId: number
+    screenSize: number
+    resolution: number
+    employeeFirstName: string
+    employeeLastName: string
+    inputs: string
+    icon: string
+    model: string
 }
 
 // Primary Component
@@ -44,14 +66,14 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     useEffect(() => {
         axios
             .get('/list/monitors')
-            .then((data: any) => {
-                const monitors: any[] = []
-                data.map((i: any) => {
+            .then((data: IPulledData[]) => {
+                const monitors: IMonitorData[] = []
+                data.map((i: IPulledData) => {
                     monitors.push({
                         make: format(i.make),
-                        id: format(i.monitorId),
-                        screenSize: format(i.screenSize),
-                        resolution: format(i.resolution),
+                        id: i.monitorId,
+                        screenSize: i.screenSize,
+                        resolution: i.resolution,
                         inputs: format(i.inputs),
                         assigned: format(i.employeeFirstName) + ' ' + i.employeeLastName,
                         icon: i.icon,
@@ -78,11 +100,11 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     }, [search, selected, listData])
 
     const handleClick = () => {
-        history.push('/hardware/monitor/new')
+        history.push('/hardware/edit/monitor/new')
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/monitor/${row[0].key}`)
+        history.push(`hardware/detail/monitor/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
