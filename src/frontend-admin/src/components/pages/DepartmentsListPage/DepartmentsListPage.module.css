@@ -62,6 +62,15 @@
     padding-left: 24px;
 }
 
+.buttonContainer {
+    display: flex;
+    flex: column;
+}
+.archiveButton {
+    width: 150px;
+    margin-left: 25px;
+}
+
 /* sorting states */
 .notSorted {
     border-left: 8px solid #636363;

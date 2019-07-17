@@ -19,7 +19,15 @@
     min-width: 50px;
     padding: 25px;
 }
-
+.buttonContainer {
+    display: flex;
+    flex: column;
+}
+.archiveButton {
+    width: 150px;
+    margin-left: 25px;
+    margin-right: 25px;
+}
 .alignLeft {
     text-align: left;
     min-width: 100px;

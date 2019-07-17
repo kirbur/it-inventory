@@ -417,20 +417,21 @@ namespace backend_api.Controllers
          */
         // NOTE: The plug-in cost is not included in this table.
 
-        [Route("Programs")]
+        [Route("Programs/{isDeleted}")]
         [HttpGet]
         [EnableQuery()]
 
-        public ActionResult<object> GetListOfPrograms()
+
+        public ActionResult<object> GetListOfPrograms([FromRoute]Boolean isDeleted)
         {
             // List that will be returned containing the list of programs
             var ListOfPrograms = new List<object>();
 
             // list of all programs that are not deleted
-            var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == false);
+            var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == isDeleted);
 
             //This List takes all the programs that not deleted and makes it them distinct
-            var DistinctUsefulPrograms = _context.Program.Where(x => x.IsDeleted == false).GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
+            var DistinctUsefulPrograms = _context.Program.Where(x => x.IsDeleted == isDeleted).GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
 
             //loop through all the distinct programs 
             foreach (var prog in DistinctUsefulPrograms)
@@ -442,10 +443,10 @@ namespace backend_api.Controllers
                 var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName).Count();
 
                 // calculate the cost of each distinct program if it is charged yearly 
-                var ProgCostPerYear = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramCostPerYear != null && x.IsDeleted != true).Sum(x => x.ProgramCostPerYear);
+                var ProgCostPerYear = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramCostPerYear != null && x.IsDeleted == isDeleted).Sum(x => x.ProgramCostPerYear);
 
                 // calculate the cost of each distinct program if it is charged as a flat rate 
-                var ProgCostPerUse = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramFlatCost != null && x.IsDeleted != true).Sum(x => x.ProgramFlatCost);
+                var ProgCostPerUse = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramFlatCost != null && x.IsDeleted == isDeleted).Sum(x => x.ProgramFlatCost);
 
                 // icon path.
                 string icon = $"/image/program/{prog.ProgramId}";

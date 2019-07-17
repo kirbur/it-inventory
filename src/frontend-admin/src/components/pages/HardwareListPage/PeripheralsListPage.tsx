@@ -50,6 +50,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
 
     // state
     const [listData, setListData] = useState<IPeripheralData[]>([])
+    const [archivedData, setArchivedData] = useState<IPeripheralData[]>([])
     const [filteredData, setFilteredData] = useState<IPeripheralData[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Make & Model', value: 'name'})
@@ -57,6 +58,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     const columns = ['name', 'purchaseDate', 'assigned']
     const headerList = ['Make & Model', 'Purchase Date', 'Assigned To']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
+    const [isArchive, setIsArchive] = useState(false)
 
     useEffect(() => {
         axios
@@ -76,6 +78,23 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                 setListData(peripherals)
             })
             .catch((err: any) => console.error(err))
+        axios
+            .get('/archivedList/peripheral')
+            .then((data: IPulledData[]) => {
+                console.log(data)
+                const peripherals: IPeripheralData[] = []
+                data.map((i: IPulledData) =>
+                    peripherals.push({
+                        name: format(i.peripheralName + ' ' + i.peripheralType),
+                        id: i.peripheralId,
+                        purchaseDate: format(i.purchaseDate),
+                        assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
+                        icon: i.icon,
+                    })
+                )
+                setArchivedData(peripherals)
+            })
+            .catch((err: any) => console.error(err))
     }, [])
 
     const formatDate = (hireDate: string) => {
@@ -87,16 +106,28 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        var filteredTableInput = listData.filter((row: any) => {
-            return !row[selected.value]
-                ? false
-                : row[selected.value]
-                      .toString()
-                      .toLowerCase()
-                      .search(search.toLowerCase()) !== -1
-        })
-        setFilteredData(filteredTableInput)
-    }, [search, selected, listData])
+        if (isArchive) {
+            var filteredTableInput = archivedData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        } else {
+            var filteredTableInput = listData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        }
+    }, [search, selected, listData, isArchive])
 
     const handleClick = () => {
         history.push('/hardware/edit/peripheral/new')
@@ -210,7 +241,14 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     return (
         <div className={styles.listMain}>
             <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
+                <div className={styles.buttonContainer}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
+                    <Button
+                        text={isArchive ? 'View Active' : 'View Archives'}
+                        onClick={() => setIsArchive(!isArchive)}
+                        className={styles.archiveButton}
+                    />
+                </div>
 
                 <FilteredSearch
                     search={search}

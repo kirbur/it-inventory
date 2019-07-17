@@ -53,6 +53,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     // state
     const [listData, setListData] = useState<any[]>([])
+    const [archivedData, setArchivedData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'make', value: 'make'})
@@ -61,6 +62,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const searchByHeaders = ['Make', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag', 'Model']
     const headerList = ['Make & Model', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
+    const [isArchive, setIsArchive] = useState(false)
 
     useEffect(() => {
         axios
@@ -84,21 +86,54 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                 setListData(servers)
             })
             .catch((err: any) => console.error(err))
+        axios
+            .get('/archivedList/server')
+            .then((data: IPulledData[]) => {
+                console.log(data)
+                const servers: IServerData[] = []
+                data.map((i: IPulledData) => {
+                    servers.push({
+                        make: format(i.make),
+                        id: i.serverId,
+                        numberOfCores: i.numberOfCores,
+                        RAM: i.ram,
+                        renewalDate: formatDate(i.renewalDate),
+                        MFGTag: format(i.mfg),
+                        icon: i.icon,
+                        model: format(i.model),
+                    })
+                })
+                console.log(servers)
+                setArchivedData(servers)
+            })
+            .catch((err: any) => console.error(err))
     }, [])
 
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        var filteredTableInput = listData.filter((row: any) => {
-            return !row[selected.value]
-                ? false
-                : row[selected.value]
-                      .toString()
-                      .toLowerCase()
-                      .search(search.toLowerCase()) !== -1
-        })
-        setFilteredData(filteredTableInput)
-    }, [search, selected, listData])
+        if (isArchive) {
+            var filteredTableInput = archivedData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        } else {
+            var filteredTableInput = listData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        }
+    }, [search, selected, listData, isArchive])
 
     const formatDate = (hireDate: string) => {
         const hired = new Date(hireDate)
@@ -229,7 +264,14 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     return (
         <div className={styles.listMain}>
             <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
+                <div className={styles.buttonContainer}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
+                    <Button
+                        text={isArchive ? 'View Active' : 'View Archives'}
+                        onClick={() => setIsArchive(!isArchive)}
+                        className={styles.archiveButton}
+                    />
+                </div>
 
                 <FilteredSearch
                     search={search}

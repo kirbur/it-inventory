@@ -54,6 +54,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
 
     // state
     const [listData, setListData] = useState<any[]>([])
+    const [archivedData, setArchivedData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'make', value: 'make'})
@@ -62,6 +63,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     const searchByHeaders = ['Make', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To', 'Model']
     const headerList = ['Make & Model', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To']
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
+    const [isArchive, setIsArchive] = useState(false)
 
     useEffect(() => {
         axios
@@ -83,21 +85,52 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                 setListData(monitors)
             })
             .catch((err: any) => console.error(err))
+        axios
+            .get('/archivedList/monitor')
+            .then((data: IPulledData[]) => {
+                const monitors: IMonitorData[] = []
+                data.map((i: IPulledData) => {
+                    monitors.push({
+                        make: format(i.make),
+                        id: i.monitorId,
+                        screenSize: i.screenSize,
+                        resolution: i.resolution,
+                        inputs: format(i.inputs),
+                        assigned: format(i.employeeFirstName) + ' ' + i.employeeLastName,
+                        icon: i.icon,
+                        model: format(i.model),
+                    })
+                })
+                setArchivedData(monitors)
+            })
+            .catch((err: any) => console.error(err))
     }, [])
 
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        var filteredTableInput = listData.filter((row: any) => {
-            return !row[selected.value]
-                ? false
-                : row[selected.value]
-                      .toString()
-                      .toLowerCase()
-                      .search(search.toLowerCase()) !== -1
-        })
-        setFilteredData(filteredTableInput)
-    }, [search, selected, listData])
+        if (isArchive) {
+            var filteredTableInput = archivedData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        } else {
+            var filteredTableInput = listData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        }
+    }, [search, selected, listData, isArchive])
 
     const handleClick = () => {
         history.push('/hardware/edit/monitor/new')
@@ -223,7 +256,14 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     return (
         <div className={styles.listMain}>
             <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
+                <div className={styles.buttonContainer}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
+                    <Button
+                        text={isArchive ? 'View Active' : 'View Archives'}
+                        onClick={() => setIsArchive(!isArchive)}
+                        className={styles.archiveButton}
+                    />
+                </div>
 
                 <FilteredSearch
                     search={search}

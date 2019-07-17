@@ -57,6 +57,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
 
     // state
     const [listData, setListData] = useState<any[]>([])
+    const [archivedData, setArchivedData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Make', value: 'make'})
@@ -65,6 +66,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     const searchByHeaders = ['Make', 'CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag', 'Model']
     const headerList = ['Make & Model', 'CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag']
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
+    const [isArchive, setIsArchive] = useState(false)
 
     useEffect(() => {
         axios
@@ -87,6 +89,27 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
                 setListData(laptops)
             })
             .catch((err: any) => console.error(err))
+
+        axios
+            .get(`/archivedList/laptop`)
+            .then((data: any) => {
+                const laptops: ILaptopData[] = []
+                data.map((i: IPulledData) => {
+                    laptops.push({
+                        make: format(i.make),
+                        id: i.computerId,
+                        cpu: i.cpu,
+                        ram: i.ramgb,
+                        ssd: i.ssdgb,
+                        assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
+                        mfgtag: format(i.mfg),
+                        icon: format(i.icon),
+                        model: format(i.model),
+                    })
+                })
+                setArchivedData(laptops)
+            })
+            .catch((err: any) => console.error(err))
     }, [])
 
     const formatDate = (hireDate: string) => {
@@ -98,16 +121,28 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        var filteredTableInput = listData.filter((row: any) => {
-            return !row[selected.value]
-                ? false
-                : row[selected.value]
-                      .toString()
-                      .toLowerCase()
-                      .search(search.toLowerCase()) !== -1
-        })
-        setFilteredData(filteredTableInput)
-    }, [search, selected, listData])
+        if (isArchive) {
+            var filteredTableInput = archivedData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        } else {
+            var filteredTableInput = listData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        }
+    }, [search, selected, listData, isArchive])
 
     const handleClick = () => {
         history.push('/hardware/edit/laptop/new')
@@ -235,7 +270,14 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     return (
         <div className={styles.listMain}>
             <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
+                <div className={styles.buttonContainer}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
+                    <Button
+                        text={isArchive ? 'View Active' : 'View Archives'}
+                        onClick={() => setIsArchive(!isArchive)}
+                        className={styles.archiveButton}
+                    />
+                </div>
 
                 <FilteredSearch
                     search={search}

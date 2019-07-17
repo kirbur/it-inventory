@@ -22,9 +22,15 @@
     align-self: flex-end;
 }
 
-/* .search {
-    margin-left: -260px;
-} */
+.buttonContainer {
+    display: flex;
+    flex: column;
+}
+.archiveButton {
+    width: 150px;
+    margin-left: 25px;
+    margin-right: 25px;
+}
 
 .table {
     width: 100%;

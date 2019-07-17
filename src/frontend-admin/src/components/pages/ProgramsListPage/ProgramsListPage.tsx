@@ -46,6 +46,9 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Programs', value: 'name'})
 
+    const [archivedData, setArchivedData] = useState<any[]>([])
+    const [isArchive, setIsArchive] = useState(false)
+
     const columns = ['name', 'renewalDate', 'totalUsers', 'cost']
     const headerList = ['Programs', 'Renewal Date', 'Total Users ', 'Cost']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
@@ -55,7 +58,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
 
     useEffect(() => {
         axios
-            .get('/list/programs')
+            .get('/list/programs/false')
             .then((data: any) => {
                 var programs: any[] = []
                 var imgs: any[] = []
@@ -81,7 +84,34 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                 setPinned(pins)
             })
             .catch((err: any) => console.error(err))
-    }, [setListData])
+        axios
+            .get('list/programs/true')
+            .then((data: any) => {
+                console.log(data)
+                var programs: any[] = []
+                var imgs: any[] = []
+                var pins: {name: string; pinned: boolean}[] = []
+                data.map((i: any) => {
+                    programs.push({
+                        name: format(i.programName),
+                        renewalDate: formatDate(i.renewalDate),
+                        totalUsers: 0,
+                        perYear: 0,
+                        perUse: 0,
+                        isPerYear: i.isCostPerYear,
+                        icon: placeholder,
+                        cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
+                    })
+                    imgs.push({name: i.programName, img: i.icon})
+                    //TODO: have someone add this to the endpoint
+                    pins.push({name: i.programName, pinned: i.pinned ? true : false})
+                })
+                setArchivedData(programs)
+                setImages(imgs)
+                setUseImages(true)
+            })
+            .catch((err: any) => console.error(err))
+    }, [])
 
     //Set display Images
     useEffect(() => {
@@ -110,16 +140,28 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        var filteredTableInput = listData.filter((row: any) => {
-            return !row[selected.value]
-                ? false
-                : row[selected.value]
-                      .toString()
-                      .toLowerCase()
-                      .search(search.toLowerCase()) !== -1
-        })
-        setFilteredData(filteredTableInput)
-    }, [search, selected, listData])
+        if (isArchive) {
+            var filteredTableInput = archivedData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        } else {
+            var filteredTableInput = listData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        }
+    }, [search, selected, listData, isArchive])
 
     const handleClick = () => {
         history.push('/programs/edit/overview/new')
@@ -325,9 +367,15 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             </Switch>
             {isAdmin ? (
                 <Group direction='row' justify='between' className={styles.group}>
-                    <Group className={styles.buttonGroup}>
+                    <div className={styles.buttonContainer}>
                         <Button text='Add' icon='add' onClick={handleClick} />
-                        {checkboxes ? (
+                        <Button
+                            text={isArchive ? 'View Active' : 'View Archives'}
+                            onClick={() => setIsArchive(!isArchive)}
+                            className={styles.archiveButton}
+                        />
+
+                        {checkboxes && !isArchive ? (
                             <Button text='Save Changes' onClick={handlePinChanges} className={styles.dashboardButton} />
                         ) : (
                             <Button
@@ -336,7 +384,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                                 className={styles.dashboardButton}
                             />
                         )}
-                    </Group>
+                    </div>
                     <FilteredSearch
                         search={search}
                         setSearch={setSearch}

@@ -14,6 +14,7 @@ import {History} from 'history'
 
 // Styles
 import styles from './DepartmentsListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -51,6 +52,9 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Departments', value: 'name'})
 
+    const [archivedData, setArchivedData] = useState<IDepartmentData[]>([])
+    const [isArchive, setIsArchive] = useState(false)
+
     const columns = ['name', 'totalEmployees', 'cost']
     const headerList = ['Departments', 'Total Employees', 'Programs Cost']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
@@ -66,12 +70,29 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                         name: format(i.departmentName),
                         id: i.departmentId,
                         totalEmployees: i.numOfEmp,
-                        //TODO: verify that this recieves a cost per year
                         cost: i.costOfPrograms,
-                        icon: format(i.icon),
+                        icon: URL + format(i.icon),
                     })
                 )
                 setListData(depts)
+            })
+            .catch((err: any) => console.error(err))
+
+        axios
+            .get(`/archivedList/department`)
+            .then((data: any) => {
+                console.log(data)
+                var depts: IDepartmentData[] = []
+                data.map((i: IPulledData) =>
+                    depts.push({
+                        name: format(i.departmentName),
+                        id: i.departmentId,
+                        totalEmployees: 0,
+                        cost: 0,
+                        icon: placeholder,
+                    })
+                )
+                setArchivedData(depts)
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -83,16 +104,28 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        var filteredTableInput = listData.filter((row: any) => {
-            return !row[selected.value]
-                ? false
-                : row[selected.value]
-                      .toString()
-                      .toLowerCase()
-                      .search(search.toLowerCase()) !== -1
-        })
-        setFilteredData(filteredTableInput)
-    }, [search, selected, listData])
+        if (isArchive) {
+            var filteredTableInput = archivedData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        } else {
+            var filteredTableInput = listData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        }
+    }, [search, selected, listData, isArchive])
 
     const handleClick = () => {
         history.push(`/departments/edit/new`)
@@ -184,7 +217,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     function concatenatedDept(row: any[]) {
         return (
             <td key={row[1]} className={styles.departments}>
-                <img className={styles.icon} src={URL + row[4]} alt={''} />
+                <img className={styles.icon} src={row[4]} alt={''} />
                 <div className={styles.alignLeft}>
                     <text className={styles.departmentName}>{row[0]}</text>
                 </div>
@@ -217,8 +250,14 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     return (
         <div className={styles.departmentsListMain}>
             <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
-
+                <div className={styles.buttonContainer}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
+                    <Button
+                        text={isArchive ? 'View Active' : 'View Archives'}
+                        onClick={() => setIsArchive(!isArchive)}
+                        className={styles.archiveButton}
+                    />
+                </div>
                 <FilteredSearch
                     search={search}
                     setSearch={setSearch}
