@@ -11,7 +11,7 @@ import {formatDate} from '../../../utilities/FormatDate'
 
 // Styles
 import styles from './HardwareDetailPage.module.css'
-import laptopPlaceholder from '../../../content/Images/Placeholders/laptop-placeholder.png'
+import laptopPlaceholder from '../../../content/Images/Placeholders/computer-placeholder.png'
 import serverPlaceholder from '../../../content/Images/Placeholders/server-placeholder.png'
 import peripheralPlaceholder from '../../../content/Images/Placeholders/peripheral-placeholder.png'
 import monitorPlaceholder from '../../../content/Images/Placeholders/monitor-placeholder.png'
@@ -31,9 +31,8 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
-    const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
 
@@ -65,6 +64,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
+                    console.log(data)
                     if (data !== '') {
                         setImg(data[0].icon)
                     } else {
@@ -76,6 +76,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         'Purchase Date: ' + formatDate(data[0].server.purchaseDate),
                         'Renewal Date: ' + formatDate(data[0].server.renewalDate),
                         'End of Life: ' + formatDate(data[0].server.endOfLife),
+                        'Virtualized: ' + data[0].server.virtualize,
                     ])
                     setFirstTableData([
                         data[0].server.fqdn,

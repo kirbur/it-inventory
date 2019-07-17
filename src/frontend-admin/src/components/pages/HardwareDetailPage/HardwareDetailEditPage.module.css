@@ -138,6 +138,12 @@
 }
 
 /* cost radio inputs */
+.checkBoxContainer {
+    width: 50px;
+    margin-right: 10px;
+    position: relative;
+    cursor: pointer;
+}
 .checkBoxContainerOne {
     width: 50px;
     margin-right: 10px;

@@ -70,6 +70,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [secondSectionData, setSecondSectionData] = useState<(string | number)[]>([])
     const [thirdSectionData, setThirdSectionData] = useState<(string | number)[]>([])
     const [costSection, setCostSection] = useState<(number | string)[]>([])
+    const [isVirtualized, setIsVirtualized] = useState<boolean>(false)
 
     const [purchaseDateInput, setPurchaseDateInput] = useState<Date>(new Date())
     const [renewalDateInput, setRenewalDateInput] = useState<Date>(new Date())
@@ -143,11 +144,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     setPurchaseDateInput(data[0].server.purchaseDate)
                     setRenewalDateInput(data[0].server.renewalDate)
                     setEndOfLifeInput(data[0].server.endOfLife)
-                    setThirdSectionData([
-                        data[0].employeeAssignedName,
-                        data[0].server.location,
-                        data[0].server.employeeId,
-                    ])
+                    setThirdSectionData([data[0].employeeAssignedName, data[0].server.location])
+                    setIsVirtualized(data[0].server.virtualize)
                     setCostSection([
                         data[0].server.flatCost,
                         data[0].server.costPerYear,
@@ -365,6 +363,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         PurchaseDate: purchaseDateInput,
                         EndOfLife: endOfLifeInput,
 
+                        Virtualize: isVirtualized,
+                    
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
@@ -389,8 +389,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         MFG: firstSectionData[6],
                         SerialNumber: firstSectionData[7],
                         Fqdn: firstSectionData[10],
-
-                        Virtualize: false, //NEED TO ADD THIS
 
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
@@ -480,7 +478,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         SAN: firstSectionData[9],
                         Fqdn: firstSectionData[10],
 
-                        Virtualize: false, //NEED TO ADD THIS
+                        Virtualize: isVirtualized,
 
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
@@ -516,8 +514,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         SerialNumber: firstSectionData[7],
                         MFG: firstSectionData[8],
                         Fqdn: firstSectionData[9],
-
-                        Virtualize: false, //NEED TO ADD THIS
 
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
@@ -703,6 +699,16 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                     placeholder={sectionData[i + 1]}
                                     onChange={e => e && handleInputChange(i + 1, sectionData, e.target.value)}
                                 ></input>
+                            </div>
+                        )}
+                        {match.params.type == 'server' && (
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>Virtualize</div>
+                                <Checkbox
+                                    className={styles.checkBoxContainer}
+                                    checked={isVirtualized}
+                                    onClick={() => setIsVirtualized(!isVirtualized)}
+                                />
                             </div>
                         )}
                     </div>

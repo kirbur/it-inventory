@@ -45,9 +45,8 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const [img, setImg] = useState()
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
-    const isAdmin = true //TODO: remove
 
     const handleEmployeeClick = (id: number | string) => {
         history.push(`/employees/detail/${id}`)
