@@ -18,6 +18,7 @@ import {LoginContext} from '../../App/App'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {cloneDeep} from 'lodash'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 
 // Types
 interface IDepartmentDetailEditPageProps {
@@ -64,6 +65,8 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     const [hardwareDropdown, setHardwareDropdown] = useState<{name: string; id: number}[]>([])
     const [softwareDropdown, setSoftwareDropdown] = useState<{name: string; id: number}[]>([])
     const [licenseDropdown, setLicenseDropdown] = useState<{name: string; id: number}[]>([])
+
+    const [imgInput, setImgInput] = useState<File>()
 
     useEffect(() => {
         axios
@@ -161,6 +164,16 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
         return tempArray
     }
     async function handleSubmit() {
+        if (imgInput) {
+            var formData = new FormData()
+            formData.append('file', imgInput)
+
+            axios
+                .put(`/image/department/${match.params.id}`, formData, {
+                    headers: {'Content-Type': 'multipart/form-data'},
+                })
+                .catch(err => console.error(err))
+        }
         if (
             //check to make sure there is a proper entry in department name
             deptData.departmentName === '' ||
@@ -211,9 +224,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                     className={styles.backButton}
                     textClassName={styles.backButtonText}
                 />
-                <div className={styles.imgPadding}>
-                    <img className={styles.img} src={icon} />
-                </div>
+                <PictureInput setImage={setImgInput} image={imgInput} />
             </div>
             {/* column 2 */}
             <div className={styles.secondColumn}>

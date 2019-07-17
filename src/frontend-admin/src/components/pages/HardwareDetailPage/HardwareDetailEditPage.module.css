@@ -99,6 +99,42 @@
     padding-left: 12px;
 }
 
+/*Employee Dropdown*/
+.employeeDropdownButton {
+    background: white;
+}
+
+.employeeDropdownButton:hover {
+    background: white;
+}
+
+.employeeDropdownTitle {
+    line-height: 40px;
+    width: 260px;
+    height: 45px;
+    font-size: 18px;
+    font-family: cqlRegularFont;
+}
+
+.employeeDropdownArrow {
+    top: 14px;
+}
+
+.dropdownList {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
+.dropdownContent {
+    width: 250px;
+}
+
+.empText {
+    color: #a5a5a5;
+    font-size: 24px;
+    text-align: left;
+}
+
 /* cost radio inputs */
 .checkBoxContainerOne {
     width: 50px;

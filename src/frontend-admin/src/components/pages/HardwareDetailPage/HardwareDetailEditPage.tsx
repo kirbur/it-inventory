@@ -13,11 +13,13 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './HardwareDetailEditPage.module.css'
+import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Context
 import {LoginContext} from '../../App/App'
 import {cloneDeep} from 'lodash'
 import {sortByDate} from '../../../utilities/quickSort'
+import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 
 // Types
 interface IHardwareDetailEditPageProps {
@@ -85,12 +87,24 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [hasRecurringCost, setHasRecurringCost] = useState<boolean>(false)
     const [hasFlatCost, setHasFlatCost] = useState<boolean>(false)
 
+    const [employeeDropdown, setEmployeeDropdown] = useState<{name: string; id: number}[]>()
+    const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>()
+
+    const [imgInput, setImgInput] = useState<File>()
+
     var key = 0
 
     useEffect(() => {
         axios.get(`add/hardwarePrep`).then((data: any) => {
             console.log(data)
-            setEmployeeList(data)
+            const employees: {name: string; id: number}[] = []
+            data.map((i: {employeeName: string; employeeId: number}) =>
+                employees.push({
+                    name: i.employeeName,
+                    id: i.employeeId,
+                })
+            )
+            setEmployeeDropdown(employees)
         })
         if (match.params.type === 'server') {
             setFirstSectionHeaders([
@@ -143,6 +157,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     setCommentText(data[0].server.textField)
                     setHistoryLogEntries(data[0].serverHistory)
                     setHistoryLogEntries(data[0].serverHistory)
+                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].server.employeeId})
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === ('laptop' || 'computer')) {
@@ -196,6 +211,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     ])
                     setCommentText(data[0].computer.textField)
                     setHistoryLogEntries(data[0].computerHistory)
+                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].computer.employeeId})
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'monitor') {
@@ -231,12 +247,13 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     checkCostStates(data[0].monitor.flatCost, data[0].monitor.costPerYear)
                     setCommentText(data[0].monitor.textField)
                     setHistoryLogEntries(data[0].monitorHistory)
+                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].monitor.employeeId})
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
-            setFirstSectionHeaders(['Name', 'Type', 'Employee Assigned', 'Serial #', ''])
+            setFirstSectionHeaders(['Name', 'Type', 'Serial #', ''])
             setSecondSectionHeaders(['Purchase Date'])
-            setThirdSectionHeaders([])
+            setThirdSectionHeaders(['Employee Assigned'])
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
@@ -244,17 +261,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     setFirstSectionData([
                         data[0].peripheral.peripheralName,
                         data[0].peripheral.peripheralType,
-                        data[0].employeeAssignedName,
                         data[0].peripheral.serialNumber,
                     ])
                     setPurchaseDateInput(data[0].peripheral.purchaseDate)
 
                     setSecondSectionData([])
-                    setThirdSectionData([
-                        data[0].employeeAssignedName,
-                        data[0].peripheral.location,
-                        data[0].peripheral.employeeId,
-                    ])
+                    setThirdSectionData([])
                     setCostSection([
                         data[0].peripheral.flatCost,
                         data[0].peripheral.costPerYear,
@@ -264,6 +276,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                     setCommentText(data[0].peripheral.textField)
                     setHistoryLogEntries(data[0].peripheralHistory)
+                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].peripheral.employeeId})
                 })
                 .catch((err: any) => console.error(err))
         }
@@ -280,6 +293,18 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     }
 
     async function handleSubmit() {
+        //update image
+        if (imgInput) {
+            var formData = new FormData()
+            formData.append('file', imgInput)
+
+            axios
+                .put(`/image/${match.params.type}/${match.params.id}`, formData, {
+                    headers: {'Content-Type': 'multipart/form-data'},
+                })
+                .catch(err => console.error(err))
+        }
+
         //check to make sure cost properly filled out
         //also return 0 if
         console.log(hasFlatCost)
@@ -308,7 +333,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         SerialNumber: firstSectionData[5],
 
                         Location: thirdSectionData[1],
-                        EmployeeId: thirdSectionData[2],
+                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
@@ -342,7 +367,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         EndOfLife: endOfLifeInput,
 
                         Location: thirdSectionData[1],
-                        EmployeeId: thirdSectionData[2],
+                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -371,7 +396,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         EndOfLife: endOfLifeInput,
 
                         Location: thirdSectionData[2],
-                        EmployeeId: thirdSectionData[3],
+                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -391,7 +416,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         PurchaseDate: purchaseDateInput,
 
                         Location: thirdSectionData[1],
-                        EmployeeId: thirdSectionData[2],
+                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -417,7 +442,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         SerialNumber: firstSectionData[5],
 
                         Location: thirdSectionData[1],
-                        EmployeeId: thirdSectionData[2],
+                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
@@ -455,7 +480,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         EndOfLife: endOfLifeInput,
 
                         Location: thirdSectionData[1],
-                        EmployeeId: thirdSectionData[2],
+                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -490,7 +515,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         EndOfLife: endOfLifeInput,
 
                         Location: thirdSectionData[1],
-                        EmployeeId: thirdSectionData[2],
+                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -514,7 +539,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         PurchaseDate: purchaseDateInput,
 
                         Location: thirdSectionData[1],
-                        EmployeeId: thirdSectionData[2],
+                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost ? costSection[1] : null,
@@ -581,6 +606,87 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                     onChange={e => e && setEndOfLifeInput(e)}
                                     className={styles.input}
                                 />
+                            </div>
+                        )}
+                    </div>
+                )
+            }
+        } else if (sectionData == thirdSectionData) {
+            for (let i = 0; i < sectionHeaders.length; i += 3) {
+                rows.push(
+                    <div className={styles.row}>
+                        {sectionHeaders[i] && (
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>{sectionHeaders[i]}</div>
+                                <Button className={s(styles.input, styles.employeeDropdownButton)}>
+                                    <div
+                                        className={s(
+                                            dropdownStyles.dropdownContainer,
+                                            styles.employeeDropdownContainer
+                                        )}
+                                    >
+                                        {employeeDropdown && (
+                                            <DropdownList
+                                                triggerElement={({isOpen, toggle}) => (
+                                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                                        <div
+                                                            className={s(
+                                                                dropdownStyles.dropdownTitle,
+                                                                styles.employeeDropdownTitle
+                                                            )}
+                                                        >
+                                                            <div>
+                                                                {selectedEmployee
+                                                                    ? selectedEmployee.name
+                                                                    : 'Select An Employee'}
+                                                            </div>
+                                                            <div
+                                                                className={s(
+                                                                    dropdownStyles.dropdownArrow,
+                                                                    styles.employeeDropdownArrow
+                                                                )}
+                                                            />
+                                                        </div>
+                                                    </button>
+                                                )}
+                                                choicesList={() => (
+                                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
+                                                        {employeeDropdown.map(item => (
+                                                            <li
+                                                                className={dropdownStyles.dropdownListItem}
+                                                                key={item.name}
+                                                                onClick={() => {
+                                                                    setSelectedEmployee(item)
+                                                                }}
+                                                            >
+                                                                <button
+                                                                    className={dropdownStyles.dropdownListItemButton}
+                                                                >
+                                                                    <div className={dropdownStyles.dropdownItemLabel}>
+                                                                        {item.name}
+                                                                    </div>
+                                                                </button>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                                listWidthClass={styles.dropdownContent}
+                                            />
+                                        )}
+                                        <div />
+                                    </div>
+                                </Button>
+                            </div>
+                        )}
+                        {sectionHeaders[i + 1] && (
+                            <div className={styles.inputContainer}>
+                                <div className={styles.inputHeader}>{sectionHeaders[i + 1]}</div>
+                                <input
+                                    type='text'
+                                    className={styles.input}
+                                    placeholder={sectionData[i + 1]}
+                                    onChange={e => e && handleInputChange(i + 1, sectionData, e.target.value)}
+                                ></input>
                             </div>
                         )}
                     </div>
@@ -703,10 +809,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     className={styles.backButton}
                     textClassName={styles.backButtonText}
                 />
-                <div className={styles.imgPadding}>
-                    {/* <img className={styles.img} src={URL + userData.photo} alt={''} /> */}
-                </div>
-                <div className={styles.costText}></div>
+                <PictureInput setImage={setImgInput} image={imgInput} />
             </div>
 
             {/* column 2 */}

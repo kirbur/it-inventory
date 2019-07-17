@@ -41,6 +41,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const [defaultHardware, setDefaultHardware] = useState<any[]>([])
     const [defaultSoftware, setDefaultSoftware] = useState<any[]>([])
     const [defaultLicenses, setDefaultLicenses] = useState<any[]>([])
+    const [img, setImg] = useState()
 
     const {
         loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
@@ -67,6 +68,8 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         axios
             .get(`/detail/department/${match.params.id}`)
             .then((data: any) => {
+                console.log(data)
+                setImg(data[0].picture)
                 let dept: any = {
                     // photo: data[0].picture,'
                     employeeCount: data[0].countEmpsInDep,
@@ -186,12 +189,18 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         textClassName={styles.backButtonText}
                     />
                     <div className={styles.imgPadding}>
-                        {/* <img className={styles.img} src={URL + userData.photo} alt={''} /> */}
+                        <img className={styles.img} src={URL + img} alt={''} />
                     </div>
-                    <div className={styles.costText}>
-                        <p>Software ---------------- ${deptData.softwareCost} /month</p>
-                        <p>Hardware --------------- ${deptData.hardwareCost}</p>
-                    </div>
+                    <Group>
+                        <p>Software</p>
+                        <div className={styles.costLine} />
+                        <p>${deptData.softwareCost} /month </p>
+                    </Group>
+                    <Group>
+                        <p>Hardware</p>
+                        <div className={styles.costLine} />
+                        <p>${deptData.hardwareCost} </p>
+                    </Group>
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>

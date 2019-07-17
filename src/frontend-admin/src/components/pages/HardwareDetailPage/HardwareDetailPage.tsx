@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 
 // Components
 import {Button} from '../../reusables/Button/Button'
@@ -11,6 +11,7 @@ import {formatDate} from '../../../utilities/FormatDate'
 
 // Styles
 import styles from './HardwareDetailPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -32,7 +33,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
-    const [hardwareData, setUserData] = useState<any>({})
 
     //default
     const [firstTableHeaders, setFirstTableHeaders] = useState(['yeah something went wrong'])
@@ -50,6 +50,8 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     const [costPerYear, setCostPerYear] = useState(0)
     const [flatCost, setFlatCost] = useState(0)
 
+    const [img, setImg] = useState()
+
     useEffect(() => {
         if (match.params.type === 'server') {
             setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
@@ -60,6 +62,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
+                    setImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].server.make,
                         'Model: ' + data[0].server.model,
@@ -97,6 +100,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
+                    setImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].computer.make,
                         'Model: ' + data[0].computer.model,
@@ -133,6 +137,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
+                    setImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].monitor.make,
                         'Model: ' + data[0].monitor.model,
@@ -158,11 +163,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             setFirstTableHeaders(['Employee Assigned', 'Department Assigned', 'Serial #'])
             setSecondTableHeaders([])
             setThirdTableHeaders([])
-            // im not sure
-            setHeadingInfo(['the name', 'another name'])
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
+                    console.log(data)
+                    setImg(data[0].icon)
                     setHeadingInfo([
                         'Name: ' + data[0].peripheral.peripheralName,
                         'Type: ' + data[0].peripheral.peripheralType,
@@ -193,12 +198,24 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
     function renderFlatCost() {
         if (flatCost !== undefined && flatCost !== null && flatCost !== 0) {
-            return <p>Flat Cost ---------------------- ${flatCost}</p>
+            return (
+                <Group>
+                    <p>Initial Cost</p>
+                    <div className={styles.costLine} />
+                    <p>${flatCost} </p>
+                </Group>
+            )
         }
     }
     function renderCostPerYear() {
         if (costPerYear !== undefined && costPerYear !== null && costPerYear !== 0) {
-            return <p>Cost Per Year ---------------- ${costPerYear}</p>
+            return (
+                <Group>
+                    <p>Initial Cost</p>
+                    <div className={styles.costLine} />
+                    <p>${costPerYear} </p>
+                </Group>
+            )
         }
     }
 
@@ -217,7 +234,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         textClassName={styles.backButtonText}
                     />
                     <div className={styles.imgPadding}>
-                        {/* <img className={styles.img} src={URL + userData.photo} alt={''} /> */}
+                        <img className={styles.img} src={URL + img} alt={''} />
                     </div>
                     <div className={styles.costText}>
                         {renderFlatCost()}
