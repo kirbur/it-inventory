@@ -87,6 +87,11 @@ namespace backend_api.Controllers
             {
                 return false;
             }
+            // If a JWT is passed as undefined.
+            catch (ArgumentException)
+            {
+                return false;
+            }
 
         }
 
