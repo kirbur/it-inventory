@@ -208,7 +208,9 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             displayImages.filter(x => x.id === row[1]) &&
             displayImages.filter(x => x.id === row[1])[0] ? (
             <td key={row[1]} className={styles.hardware}>
-                <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text> <br />
                     <text className={styles.alignLeft}>{row[7]}</text>
@@ -216,7 +218,9 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             </td>
         ) : (
             <td key={row[1]} className={styles.hardware}>
-                <img className={styles.icon} src={placeholder} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text> <br />
                     <text className={styles.alignLeft}>{row[7]}</text>

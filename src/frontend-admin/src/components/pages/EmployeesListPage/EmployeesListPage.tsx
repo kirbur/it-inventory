@@ -228,7 +228,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             displayImages.filter(x => x.id === row[8]) &&
             displayImages.filter(x => x.id === row[8])[0] ? (
             <td key={row[8]} className={styles.employees}>
-                <img className={styles.icon} src={displayImages.filter(x => x.id === row[8])[0].img} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[8])[0].img} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
                     <text className={styles.role}>{row[6]}</text>
@@ -236,7 +238,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             </td>
         ) : (
             <td key={row[8]} className={styles.employees}>
-                <img className={styles.icon} src={placeholder} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
                     <text className={styles.role}>{row[6]}</text>
