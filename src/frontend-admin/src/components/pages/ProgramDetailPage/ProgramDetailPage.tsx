@@ -91,7 +91,15 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     ],
                 ])
 
-                setHistoryList(data[0].entries)
+                setHistoryList([
+                    ...data[0].entries.map((entry: any) => {
+                        return {
+                            eventDate: entry.eventDate,
+                            eventType: entry.eventType,
+                            employeeName: entry.employeeNameHistory,
+                        }
+                    }),
+                ])
             })
             .catch((err: any) => console.error(err))
     }, [match.params.id])
