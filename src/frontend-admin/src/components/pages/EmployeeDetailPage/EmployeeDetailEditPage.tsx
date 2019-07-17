@@ -207,7 +207,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             },
                             {value: format(i.licenseKey), id: format(i.id), sortBy: i.licenseKey},
                             {
-                                value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
+                                value: '$' + Math.round(i.costPerMonth * 100) / 100,
                                 id: format(i.id),
                                 sortBy: i.costPerMonth,
                             },
@@ -229,7 +229,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 sortBy: format(i.licenseKey),
                             },
                             {
-                                value: '$' + format(Math.round(i.costPerMonth * 100) / 100),
+                                value: '$' + Math.round(i.costPerMonth * 100) / 100,
                                 sortBy: i.costPerMonth,
                             },
                             {value: format(i.cals), id: format(i.id), sortBy: i.cals},
@@ -748,6 +748,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmarkAdmin} />
+
                                 <div className={styles.title}>Admin User</div>
                                 <div className={styles.adminText}>
                                     This user will be able to edit any detail pages and be able to add new hardware,

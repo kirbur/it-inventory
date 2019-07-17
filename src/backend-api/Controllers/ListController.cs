@@ -451,7 +451,7 @@ namespace backend_api.Controllers
                 string icon = $"/image/program/{prog.ProgramId}";
 
                 //create our object of returnables
-                ListOfPrograms.Add(new { prog.ProgramName, prog.RenewalDate, CountProgOverall, ProgCostPerYear, CountProgInUse, ProgCostPerUse, prog.IsCostPerYear, icon });
+                ListOfPrograms.Add(new { prog.ProgramName, prog.RenewalDate, CountProgOverall, ProgCostPerYear, CountProgInUse, ProgCostPerUse, prog.IsCostPerYear, icon, prog.IsPinned });
             }
             return Ok(ListOfPrograms);
         }

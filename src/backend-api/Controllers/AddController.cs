@@ -274,7 +274,6 @@ namespace backend_api.Controllers
                     HireDate = input.Employee.HireDate,
                     DepartmentID = input.Employee.DepartmentID,
                     IsDeleted = false,
-                    UserSettings = "",
                     FirstName = input.Employee.FirstName,
                     LastName = input.Employee.LastName,
                     Email = "",
@@ -302,37 +301,22 @@ namespace backend_api.Controllers
                         switch (hardware.Type.ToLower())
                         {
                             case "monitor":
-                                var mon = _context.Monitor.Find(hardware.ID);
-                                mon.EmployeeId = emp.EmployeeId;
-                                mon.IsAssigned = true;
-                                UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                _context.SaveChanges();
+                                UpdateHardwareAssignment(_context.Monitor, emp.EmployeeId, true, hardware);
                                 break;
                             case "peripheral":
-                                var periph = _context.Peripheral.Find(hardware.ID);
-                                periph.EmployeeId = emp.EmployeeId;
-                                periph.IsAssigned = true;
-                                UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                _context.SaveChanges();
+                                UpdateHardwareAssignment(_context.Peripheral, emp.EmployeeId, true, hardware);
                                 break;
                             case "computer":
-                                var comp = _context.Computer.Find(hardware.ID);
-                                comp.EmployeeId = emp.EmployeeId;
-                                comp.IsAssigned = true;
-                                UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                _context.SaveChanges();
+                                UpdateHardwareAssignment(_context.Computer, emp.EmployeeId, true, hardware);
                                 break;
                             case "server":
-                                var server = _context.Server.Find(hardware.ID);
-                                server.EmployeeId = emp.EmployeeId;
-                                server.IsAssigned = true;
-                                UpdateHardwareHistory(true, emp.EmployeeId, hardware.ID, hardware.Type);
-                                _context.SaveChanges();
+                                UpdateHardwareAssignment(_context.Server, emp.EmployeeId, true, hardware);
                                 break;
 
                         }
 
                     }
+                    _context.SaveChanges();
                 }
                 // list to hold the histories of programs that will be added
                 List<ProgramHistory> programHistories = new List<ProgramHistory>();
@@ -344,12 +328,12 @@ namespace backend_api.Controllers
                     {
                         var prog = _context.Program.Find(program.ID);
                         prog.EmployeeId = emp.EmployeeId;
-                        programHistories.Add(UpdateProgramHistory(true, emp.EmployeeId, program.ID));
+                        programHistories.Add(UpdateProgramHistory(program.ID, emp.EmployeeId, "Assigned", DateTime.Now));
                     }
-                    // Save multiple entries at once
-                    _context.ProgramHistory.AddRange(programHistories);
-                    _context.SaveChanges();
-
+                        // Save multiple entries at once
+                        _context.ProgramHistory.AddRange(programHistories);
+                        _context.SaveChanges();
+                    
                 }
                 // if we get here then the various fields were created and changed and now we can return 201 created.
                 return StatusCode(201);
@@ -457,10 +441,10 @@ namespace backend_api.Controllers
             // list to hold the congruent programs that will be added.
             List<Models.Program> Programs = new List<Models.Program>();
 
-            // checking to see if number of programs is not less than 1
-            if (input.Program.NumberOfPrograms < 1)
+            // make sure the number of programs added is not less than 1
+            if(input.Program.NumberOfPrograms < 1)
             {
-                return BadRequest("number of programs must be greater than 0");
+                return BadRequest("number of programs cannot be less than 1");
             }
 
             // list to hold the congruent histories of programs that will be added
@@ -501,15 +485,7 @@ namespace backend_api.Controllers
                 // for the programs we just added
                 foreach (var prog in _context.Program.Where(x => x.ProgramName == input.Program.ProgramName))
                 {
-                    var History = (new ProgramHistory
-                    {
-                        EmployeeId = null,
-                        ProgramId = prog.ProgramId,
-                        EventType = "Bought",
-                        EventDate = prog.DateBought.Value
-
-                    });
-                    programHistories.Add(History);
+                    programHistories.Add(UpdateProgramHistory(prog.ProgramId, null, "Bought", prog.DateBought.Value));
                 }
                 // Save multiple entries at once
                 _context.ProgramHistory.AddRange(programHistories);
@@ -544,30 +520,31 @@ namespace backend_api.Controllers
         {
             if (!(_context.Program.Select(x => x.ProgramName).ToList().Contains(input.ProgramName)))
                 return BadRequest("No such program exists");
-            try
+
+            var plugin = new Plugins()
             {
-                var plugin = new Plugins()
-                {
-                    PluginName = input.PluginName,
-                    PluginFlatCost = input.PluginFlatCost,
-                    ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First(),
-                    TextField = input.TextField,
-                    PluginCostPerYear = input.PLuginCostPerYear,
-                    IsDeleted = false,
-                    ProgramName = input.ProgramName,
-                    RenewalDate = input.RenewalDate,
-                    MonthsPerRenewal = input.MonthsPerRenewal,
-                    Datebought = input.DateBought,
-                    IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false,
-                };
-                _context.Add(plugin);
-                _context.SaveChanges();
-                return StatusCode(201);
-            }
-            catch
-            {
-                return BadRequest();
-            }
+                PluginName = input.PluginName,
+                PluginFlatCost = input.PluginFlatCost,
+                ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First(),
+                TextField = input.TextField,
+                PluginCostPerYear = input.PLuginCostPerYear,
+                IsDeleted = false,
+                ProgramName = input.ProgramName,
+                RenewalDate = input.RenewalDate,
+                MonthsPerRenewal = input.MonthsPerRenewal,
+                Datebought = input.DateBought,
+                IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false,
+            };
+            _context.Add(plugin);
+            _context.SaveChanges();
+
+            // find the specific program tied to this plugin that was just updated
+            var programTiedToPlugin = _context.Program.Find(plugin.ProgramId);
+
+            //update the program has plugin field to true
+            _context.Program.Where(x => x.ProgramName == programTiedToPlugin.ProgramName).ToList().ForEach(x => x.HasPlugIn = true);
+            _context.SaveChanges();
+            return StatusCode(201);
         }
 
 

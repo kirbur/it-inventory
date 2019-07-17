@@ -12,18 +12,31 @@
     justify-content: center;
 }
 
-.icon {
-    max-height: 75px;
-    max-width: 75px;
-    min-height: 50px;
-    min-width: 50px;
+.searchContainer {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 60px;
+}
+
+.imgContainer {
+    width: 75px;
+    height: 75px;
     padding: 25px;
+    display: flex;
+}
+
+.icon {
+    margin: auto;
+    max-height: 75px;
+    width: 75px;
 }
 
 .alignLeft {
     text-align: left;
     min-width: 100px;
 }
+
 .alignLeftAndPadding {
     text-align: left;
     padding-left: 34px;
@@ -90,4 +103,24 @@
     position: relative;
     top: 15px;
     left: 5px;
+}
+
+.buttonGroup {
+    width: 30%;
+    flex-wrap: nowrap;
+}
+
+.dashboardButton {
+    min-width: 200px;
+    margin-left: 20px;
+}
+
+.checkboxRow {
+    min-width: 75px;
+    border: 8px solid transparent;
+    border-right: 1px solid #979797;
+}
+
+tr:hover .checkboxRow {
+    background: white;
 }

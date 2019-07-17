@@ -1,0 +1,91 @@
+.columns {
+    padding: 0 50px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.firstColumn {
+    padding: 50px;
+}
+
+.secondColumn {
+    padding: 150px 50px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/*first column*/
+.backButton {
+    margin-bottom: 30px;
+}
+
+/*second column*/
+.title {
+    text-align: left;
+    font-size: 24px;
+    padding-bottom: 25px;
+}
+
+.formContainer {
+    width: 100%;
+}
+
+.submitContainer {
+    padding-top: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+/*Employee Dropdown*/
+.input {
+    width: 380px;
+    height: 45px;
+    border: 1.5px solid #a5a5a5;
+    border-radius: 3px;
+    font-size: 18px;
+    padding-left: 12px;
+    font-family: cqlRegularFont;
+}
+
+.text {
+    color: #a5a5a5;
+    font-size: 24px;
+    text-align: left;
+}
+
+.employeeDropdownButton {
+    background: white;
+}
+
+.employeeDropdownButton:hover {
+    background: white;
+}
+
+.employeeDropdownTitle {
+    line-height: 40px;
+    width: 380px;
+    height: 45px;
+    font-size: 18px;
+    font-family: cqlRegularFont;
+}
+
+.employeeDropdownArrow {
+    top: 14px;
+}
+
+.dropdownList {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
+.dropdownContent {
+    width: 250px;
+}
+
+.empText {
+    color: #a5a5a5;
+    font-size: 24px;
+    text-align: left;
+}
