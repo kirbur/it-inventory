@@ -72,8 +72,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                         cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
                     })
                     imgs.push({name: i.programName, img: i.icon})
-                    //TODO: have someone add this to the endpoint
-                    pins.push({name: i.programName, pinned: i.pinned ? true : false})
+                    pins.push({name: i.programName, pinned: i.isPinned})
                 })
                 setListData(programs)
                 setImages(imgs)
@@ -312,8 +311,14 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     })
 
     async function handlePinChanges() {
-        //TODO: put to set pinned programs
-        //async axios.put().catch((err: any) => console.error(err))
+        var pins: string[] = []
+        pinned.forEach(pin => {
+            if (pin.pinned) {
+                pins.push(pin.name)
+            }
+        })
+
+        await axios.put('/update/programPins', pins).catch((err: any) => console.error(err))
         setCheckboxes(!checkboxes)
     }
 
