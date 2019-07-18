@@ -63,7 +63,6 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         axios
             .get('/list/departments')
             .then((data: IPulledData[]) => {
-                console.log(data)
                 var depts: IDepartmentData[] = []
                 data.map((i: IPulledData) =>
                     depts.push({
@@ -81,7 +80,6 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         axios
             .get(`/archivedList/department`)
             .then((data: any) => {
-                console.log(data)
                 var depts: IDepartmentData[] = []
                 data.map((i: IPulledData) =>
                     depts.push({

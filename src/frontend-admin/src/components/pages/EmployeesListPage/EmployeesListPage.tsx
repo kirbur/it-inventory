@@ -74,7 +74,6 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             .then((data: IPulledData[]) => {
                 let employees: IEmployeeData[] = []
                 data.map((i: IPulledData) => {
-                    console.log(data)
                     employees.push({
                         name: format(i.employeeName),
                         dateHired: formatDate(i.hireDate),
