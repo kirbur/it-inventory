@@ -80,7 +80,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                 data.map((i: IPulledData) => {
                     employees.push({
                         name: format(i.employeeName),
-                        dateHired: formatDate(i.hireDate),
+                        dateHired: i.hireDate,
                         cost: formatCost(i.hardwareCostForEmp, i.programCostForEmp),
                         hwCost: i.hardwareCostForEmp,
                         swCost: i.programCostForEmp,
@@ -287,7 +287,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                 case 1:
                     transformedRow[1] = (
                         <td key={row[7] + row[1]} className={styles.alignLeft}>
-                            {row[1]}
+                            {formatDate(row[1])}
                         </td>
                     )
                 case 2:

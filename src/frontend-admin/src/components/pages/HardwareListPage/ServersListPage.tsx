@@ -4,6 +4,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {formatDate} from '../../../utilities/FormatDate'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -109,12 +110,6 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
         })
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])
-
-    const formatDate = (hireDate: string) => {
-        const hired = new Date(hireDate)
-        const date = hired.getFullYear() + '/' + (hired.getMonth() + 1) + '/' + hired.getDate()
-        return date
-    }
 
     //Set display Images
     useEffect(() => {
