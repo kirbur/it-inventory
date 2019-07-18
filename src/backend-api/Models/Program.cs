@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using backend_api.Helpers;
 
 namespace backend_api.Models

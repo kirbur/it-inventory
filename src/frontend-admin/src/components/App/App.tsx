@@ -19,6 +19,7 @@ import {HelloUser} from '../HelloUser/HelloUser'
 import logo from '../../content/Images/CQL-Logo-Color.png'
 import {EmployeeDetailEditPage} from '../pages/EmployeeDetailPage/EmployeeDetailEditPage'
 import {DepartmentDetailEditPage} from '../pages/DepartmentDetailPage/DepartmentDetailEditPage'
+import {HardwareDetailEditPage} from '../pages/HardwareDetailPage/HardwareDetailEditPage'
 
 // Styles
 import styles from './App.module.css'
@@ -129,9 +130,13 @@ export const App: React.FC = () => {
                         <Route exact path='/login' component={Login} />
                         <Route exact path='/' component={Login} />
 
-                        <Route path={'/departments/:id'} render={props => <DepartmentDetailPage {...props} />} />
+                        <Route path={'/departments/detail/:id'} render={props => <DepartmentDetailPage {...props} />} />
                         <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
-                        <Route path={'/hardware/:hw/:id'} render={props => <HardwareDetailPage {...props} />} />
+                        <Route
+                            path={'/hardware/detail/:type/:id'}
+                            render={props => <HardwareDetailPage {...props} />}
+                        />
+
                         <Route path={'/programs/overview/:id'} render={props => <ProgramOverviewPage {...props} />} />
                         <Route path={'/programs/details/:id'} render={props => <ProgramDetailPage {...props} />} />
                         <Route
@@ -142,9 +147,15 @@ export const App: React.FC = () => {
 
                         <Route
                             exact
-                            path={'/editDepartment/:id'}
+                            path={'/departments/edit/:id'}
                             render={props => <DepartmentDetailEditPage {...props} />}
                         />
+                        <Route
+                            exact
+                            path={'/hardware/edit/:type/:id'}
+                            render={props => <HardwareDetailEditPage {...props} />}
+                        />
+
                         <Route
                             path={'/programs/edit/details/:id'}
                             render={props => <ProgramDetailEditPage {...props} />}

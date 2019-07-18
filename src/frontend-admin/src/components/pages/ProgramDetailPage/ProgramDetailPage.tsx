@@ -224,7 +224,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     </div>
 
                     <div className={styles.spaceBetween} />
-                    <HistoryLog historyLog={historyList} />
+                    <HistoryLog historyLog={historyList} canEdit={false} />
                 </div>
             </div>
         </div>

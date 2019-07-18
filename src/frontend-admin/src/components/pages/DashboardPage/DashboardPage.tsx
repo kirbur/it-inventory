@@ -14,13 +14,14 @@ import {HorizontalBarChart} from '../../reusables/HorizontalBarChart/HorizontalB
 import {DashboardTable, IDashboardTableDatum} from '../../reusables/DashboardTable/DashboardTable'
 import {RechartPieChart, IPieDataProps} from '../../reusables/PieChart/PieChart'
 import {CostCard} from '../Dashboard/CostCard/CostCard'
+import {History} from 'history'
 
 // Context
 import {LoginContext} from '../../App/App'
 
 // Types
 interface IDashboardPageProps {
-    history: any
+    history: History
 }
 
 // Initial props
@@ -125,15 +126,15 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
             deptList.map(i =>
                 axios
                     .get(`/dashboard/departmentTable/${i.DepartmentId}`)
-                    .then((data: any) => {
+                    .then((data: any[]) => {
                         let y: IDashboardTableDatum[] = []
                         data &&
-                            data.map((cur: any) =>
+                            data.map((datum: any) =>
                                 y.push({
-                                    name: cur.programName,
-                                    numberOf: cur.programCount,
-                                    costPerMonth: cur.programCostPerYear / 12,
-                                    projected: cur.programIsCostPerYear ? '' : '*',
+                                    name: datum.programName,
+                                    numberOf: datum.programCount,
+                                    costPerMonth: datum.programCostPerYear / 12,
+                                    projected: datum.programIsCostPerYear ? '' : '*',
                                 })
                             )
                         initDeptTable.push({id: i.DepartmentId, name: i.DepartmentName, tableData: y})
