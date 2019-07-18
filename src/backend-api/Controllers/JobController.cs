@@ -158,6 +158,48 @@ namespace backend_api.Controllers
             return message;
         }
 
+        /* weeklyCostOfItem<T>() calculates the past week's cost for an item. 
+         *   If an item was bought within the past week, then it will be added.
+         *   If an item was renewed in the last week, it will be added and CostPerYear normalized
+         *   to the length of the renewal period (i.e. if something is renewed every month, the
+         *   cost the past week will be CostPerYear/12)
+         * Returns: deciaml? which is the past week's cost of the item.
+         */
+        private decimal? weeklyCostOfItem<T>()
+            where T : class, IPurcahseRenewal, ISoftDeletable
+        {
+            DateTime today = DateTime.Today;
+            DateTime lastWeek = today.AddDays(-7);
+            decimal? costPrograms = _context.Set<T>()
+                    // Don't add any costs of deleted things.
+                    .Where(x => !x.IsDeleted)
+                    .Select(x => new
+                    {
+                        // Find the previous renewal date, and also select vars needed in future.
+                        PreviousRenewal = x.RenewalDate != null ?
+                        x.RenewalDate.Value.AddMonths(x.MonthsPerRenewal != null ? -x.MonthsPerRenewal.Value : -999) : new DateTime(1800),
+                        PurcahseDate = x.GetPurchaseDate(),
+                        CostPerYear = x.GetCostPerYear() ?? 0.0m,
+                        FlatCost = x.GetFlatCost() ?? 0.0m,
+                        MonthsPerRenewal = x.MonthsPerRenewal != null ? x.MonthsPerRenewal.Value : 0,
+                    })
+                .Where(x =>
+                    // See if the item was recently purchased or renewed within the last week.
+                    ((lastWeek < x.PurcahseDate && x.PurcahseDate < today) ||
+                    (lastWeek < x.PreviousRenewal && x.PreviousRenewal < today))
+                )
+                .Select(x => new
+                {
+                    // Calculate the cost.
+                    recurringCost = (x.MonthsPerRenewal != 0) ? x.CostPerYear / (12.0m / x.MonthsPerRenewal) : 0.0m,
+                    initialCost = ((lastWeek < x.PurcahseDate && x.PurcahseDate < today) ? x.FlatCost : 0.0m),
+                })
+                .Select(x => x.recurringCost + x.initialCost)
+                .Sum();
+
+            return costPrograms;
+        }
+
         /* LowResourceMessage(message, lowResource) is a helper method for creating the message body for sending 
          *   a lowResource notification. It will send if there is 1+ license where 80% or more is being used.
          * Returns: message, which has the body filled out for the low resource message.
