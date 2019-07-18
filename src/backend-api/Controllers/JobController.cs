@@ -120,6 +120,17 @@ namespace backend_api.Controllers
             decimal programCost = costBreakDown.CostOfProgramsPerYear ?? 0.0m;
             decimal pluginCost = costBreakDown.CostOfPluginsPerYear ?? 0.0m;
 
+            // Stuff Paid for in the last week. 
+            decimal? lastWeekProgramCost = weeklyCostOfItem<Models.Program>();
+            decimal? lastWeekPluginsCost = weeklyCostOfItem<Plugins>();
+            decimal? lastWeekServerCost = weeklyCostOfItem<Server>();
+            decimal? lastWeekComputerCost = weeklyCostOfItem<Computer>();
+            decimal? lastWeekMonitorCost = weeklyCostOfItem<Monitor>();
+            decimal? lastWeekPeripheralCost = weeklyCostOfItem<Peripheral>();
+            decimal lastWeekTotalCost = (decimal)(lastWeekProgramCost + lastWeekPluginsCost + 
+                lastWeekServerCost + lastWeekComputerCost + lastWeekMonitorCost + lastWeekPeripheralCost);
+            
+
             // List of people message will be sent to.
             // TODO: Add the actual emails.
             InternetAddressList emails = new InternetAddressList();
@@ -145,10 +156,21 @@ namespace backend_api.Controllers
                 <body>
                     <p>Hello,</p>
                     <p>Here is the cost breakdown for the week {date}:</p>
+                    <p>Last week's total cost: ${Math.Round(lastWeekTotalCost, 2)}</p>
+                    <p>Last week's program cost: ${Math.Round((decimal)lastWeekProgramCost, 2)}</p>
+                    <p>Last week's plugins cost: ${Math.Round((decimal)lastWeekPluginsCost, 2)}</p>
+                    <p>Last week's server cost: ${Math.Round((decimal)lastWeekServerCost, 2)}</p>
+                    <p>Last week's computer cost: ${Math.Round((decimal)lastWeekComputerCost, 2)}</p>
+                    <p>Last week's monitor cost: ${Math.Round((decimal)lastWeekMonitorCost, 2)}</p>
+                    <p>Last week's pheripheral cost: ${Math.Round((decimal)lastWeekPeripheralCost, 2)}</p>
+                    <p>Last week's cost includes everything paid for in the last week. 
+                       Any item bought last week or renewed in the last week will be added to the cost.</p>
+                    <hr>
+                    <p>Based on the current programs owned, this is the projected monthly and yearly cost.</p>
                     <p>Total Cost: ${totalCost}/yr | ${Math.Round(totalCost / 12, 2)}/mo</p>
                     <p>Cost of Programs: ${programCost}/yr | ${Math.Round(programCost / 12, 2)}/mo</p>
                     <p>Cost of Plugins: ${pluginCost}/yr | ${Math.Round(pluginCost / 12, 2)}/mo</p>
-                    </br>
+                    <br>
                     <p>- IT Inventory No-Reply</p>
                 </body>";
 
@@ -156,6 +178,48 @@ namespace backend_api.Controllers
             message.Body = bodyBuilder.ToMessageBody();
 
             return message;
+        }
+
+        /* weeklyCostOfItem<T>() calculates the past week's cost for an item. 
+         *   If an item was bought within the past week, then it will be added.
+         *   If an item was renewed in the last week, it will be added and CostPerYear normalized
+         *   to the length of the renewal period (i.e. if something is renewed every month, the
+         *   cost the past week will be CostPerYear/12)
+         * Returns: deciaml? which is the past week's cost of the item.
+         */
+        private decimal? weeklyCostOfItem<T>()
+            where T : class, IPurcahseRenewal, ISoftDeletable
+        {
+            DateTime today = DateTime.Today;
+            DateTime lastWeek = today.AddDays(-7);
+            decimal? costPrograms = _context.Set<T>()
+                    // Don't add any costs of deleted things.
+                    .Where(x => !x.IsDeleted)
+                    .Select(x => new
+                    {
+                        // Find the previous renewal date, and also select vars needed in future.
+                        PreviousRenewal = x.RenewalDate != null ?
+                        x.RenewalDate.Value.AddMonths(x.MonthsPerRenewal != null ? -x.MonthsPerRenewal.Value : -999) : new DateTime(1800),
+                        PurcahseDate = x.GetPurchaseDate(),
+                        CostPerYear = x.GetCostPerYear() ?? 0.0m,
+                        FlatCost = x.GetFlatCost() ?? 0.0m,
+                        MonthsPerRenewal = x.MonthsPerRenewal != null ? x.MonthsPerRenewal.Value : 0,
+                    })
+                .Where(x =>
+                    // See if the item was recently purchased or renewed within the last week.
+                    ((lastWeek < x.PurcahseDate && x.PurcahseDate < today) ||
+                    (lastWeek < x.PreviousRenewal && x.PreviousRenewal < today))
+                )
+                .Select(x => new
+                {
+                    // Calculate the cost.
+                    recurringCost = (x.MonthsPerRenewal != 0) ? x.CostPerYear / (12.0m / x.MonthsPerRenewal) : 0.0m,
+                    initialCost = ((lastWeek < x.PurcahseDate && x.PurcahseDate < today) ? x.FlatCost : 0.0m),
+                })
+                .Select(x => x.recurringCost + x.initialCost)
+                .Sum();
+
+            return costPrograms;
         }
 
         /* LowResourceMessage(message, lowResource) is a helper method for creating the message body for sending 

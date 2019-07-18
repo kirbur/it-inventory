@@ -22,6 +22,9 @@ namespace backend_api.Models
         public int? MonthsPerRenewal { get; set; }
 
         public int GetId() { return PeripheralId; }
+        public decimal? GetCostPerYear() { return CostPerYear; }
+        public decimal? GetFlatCost() { return FlatCost; }
+        public DateTime? GetPurchaseDate() { return PurchaseDate; }
 
         //public Employee Employee { get; set; }
     }

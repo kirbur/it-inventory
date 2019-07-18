@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public partial class Plugins
+    public partial class Plugins : IPurcahseRenewal, ISoftDeletable
     {
         public string PluginName { get; set; }
         public int PluginId { get; set; }
@@ -18,5 +18,8 @@ namespace backend_api.Models
         public bool IsCostPerYear { get; set; }
         public DateTime? Datebought { get; set; } 
 
+        public decimal? GetCostPerYear() { return PluginCostPerYear; }
+        public decimal? GetFlatCost() { return PluginFlatCost; }
+        public DateTime? GetPurchaseDate() { return Datebought; }
     }
 }
