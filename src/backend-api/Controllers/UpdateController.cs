@@ -117,21 +117,18 @@ namespace backend_api.Controllers
                     .ForEach(program =>
                     {
                         // For each property on a Program, loop through it.
-                        foreach (PropertyInfo prop in typeof(Models.Program).GetProperties())
+                        foreach (var propPair in WidgetUtil<Models.Program, ProgramUpdateObjectModel>.PropertyMap)
                         {
-                            // Find the property on the ObjectModel with the same name as the property on the Program.
-                            PropertyInfo propToUpdate = typeof(ProgramUpdateObjectModel).GetProperty(prop.Name);
-                            if (propToUpdate != null)
+                            // Get the value of the property on the ObjectModel
+                            var newValue = propPair.Item2.GetValue(updatedProg, null);
+                            if (newValue != null)
                             {
-                                // Get the value of the property on the ObjectModel
-                                var newValue = propToUpdate.GetValue(updatedProg, null);
-                                if (newValue != null)
-                                {
-                                    // Update the value of the property on the Program.
-                                    prop.SetValue(program, newValue, null);
-                                }
+                                // Update the value of the property on the Program.
+                                propPair.Item1.SetValue(program, newValue, null);
                             }
                         }
+                        // Update a value that needs special calculations.
+                        program.IsCostPerYear = updatedProg.MonthsPerRenewal != null && updatedProg.MonthsPerRenewal - 12 >= 0 ? true : false;
                     }
                 );
                 _context.SaveChanges();
@@ -141,8 +138,6 @@ namespace backend_api.Controllers
             {
                 return BadRequest(error: e.Message);
             }
-
-
         }
 
         /* PUT: api/update/program/{id}
@@ -162,7 +157,6 @@ namespace backend_api.Controllers
         *      }
         * }
         */
-
         [HttpPut]
         [Route("Program/{id}")]
         public IActionResult EditProgram([FromBody] PostProgramInputModel input, [FromRoute] int id)
@@ -249,14 +243,13 @@ namespace backend_api.Controllers
          *     "DateBought" : DateTime
          * }
          */
-
         [HttpPut]
         [Route("Plugin")]
         public IActionResult PostPlugin([FromBody] EditPluginInputModel input)
         {
             // finding the plugin by the given id
             var plugin = _context.Plugins.Find(input.PluginId);
-            
+
             // if the plugin does not exist then return error message
             if (plugin == null)
             {
@@ -328,7 +321,6 @@ namespace backend_api.Controllers
          *       ] for all the programs unassigned (this arraylist)
          *   }
          */
-
         [HttpPut]
         [Route("Employee")]
         public IActionResult EditEmployee([FromBody] EditEmployeeInputModel input)
@@ -340,7 +332,7 @@ namespace backend_api.Controllers
             var authIdEmp = _context.AuthIdserver.Where(x => x.ActiveDirectoryId == emp.Adguid).FirstOrDefault();
 
             // making sure that neither of these are null. These are both created when an employee is created
-            if (emp != null && authIdEmp !=null)
+            if (emp != null && authIdEmp != null)
             {
                 try
                 {
@@ -450,7 +442,7 @@ namespace backend_api.Controllers
                 return BadRequest("Employee does not exist");
             }
         }
-        
+
 
         /* PUT: api/update/server
          * Input param format:
