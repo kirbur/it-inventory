@@ -402,7 +402,7 @@ namespace backend_api.Controllers
             }
             return Ok(listOfPeripherals);
         }
-        /* GET: api/List/programs
+        /* GET: api/List/programs/{archived}
          * Returns [ {
          *              ProgramName : String,
          *              Total Users : Int,
@@ -414,24 +414,26 @@ namespace backend_api.Controllers
          *          
          * If IsCostPerYear is false, then the front end will say 'projected'
          *  for the yearly cost.
+         *  
+         *  If archived is true then the list contains only programs where isDeleted is true
          */
         // NOTE: The plug-in cost is not included in this table.
 
-        [Route("Programs/{isDeleted}")]
+        [Route("Programs/{archived}")]
         [HttpGet]
         [EnableQuery()]
 
 
-        public ActionResult<object> GetListOfPrograms([FromRoute]Boolean isDeleted)
+        public ActionResult<object> GetListOfPrograms([FromRoute]bool archived)
         {
             // List that will be returned containing the list of programs
             var ListOfPrograms = new List<object>();
 
             // list of all programs that are not deleted
-            var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == isDeleted);
+            var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == archived);
 
             //This List takes all the programs that not deleted and makes it them distinct
-            var DistinctUsefulPrograms = _context.Program.Where(x => x.IsDeleted == isDeleted).GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
+            var DistinctUsefulPrograms = _context.Program.Where(x => x.IsDeleted == archived).GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
 
             //loop through all the distinct programs 
             foreach (var prog in DistinctUsefulPrograms)

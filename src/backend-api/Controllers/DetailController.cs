@@ -49,8 +49,9 @@ namespace backend_api.Controllers
 
         }
 
-        /* GET: api/detail/ProgramOverview/{program}
-         * Function returns the program overview information     
+        /* GET: api/detail/ProgramOverview/{program}/{archived}
+         * Function returns the program overview information   
+         * If archived is true then the overview is for programs where isDeleted is true
          * Returns:{
          *          ProgramOverview:{
          *              icon: string,
