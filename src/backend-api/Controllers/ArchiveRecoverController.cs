@@ -436,5 +436,40 @@ namespace backend_api.Controllers
 
         }
 
+
+        [HttpGet]
+        [Route("archivedList/{type}")]
+        public IActionResult GetActionResult([FromRoute] string type)
+        {
+            switch (type.ToLower()) {
+                case "employee":
+                    return archivedList<Employee>();
+                case "program":
+                    return archivedList<Models.Program>();
+                case "monitor":
+                    return archivedList<Monitor>();
+                case "computer":
+                case "laptop":
+                    return archivedList<Computer>();
+                case "department":
+                    return archivedList<Department>();
+                case "peripheral":
+                    return archivedList<Peripheral>();
+                case "server":
+                    return archivedList<Server>();
+                default:
+                    return BadRequest();
+            }
+
+        }
+
+        public IActionResult archivedList<T>()
+            where T : class, ISoftDeletable
+        {
+            var table = _context.Set<T>();
+            var list = table.Where(x => x.IsDeleted);
+            return Ok(list);
+        }
+
     }
 }

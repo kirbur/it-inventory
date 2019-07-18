@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useState, useEffect, useContext, ReactText, SetStateAction} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -12,6 +12,7 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import {History} from 'history'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -23,6 +24,30 @@ import styles from './EmployeesListPage.module.css'
 interface IEmployeesListPageProps {
     history: History
 }
+interface IEmployeeData {
+    name: string
+    dateHired: string
+    cost: string
+    hwCost: number
+    swCost: number
+    role: string
+    icon: string
+    id: number
+    hardware: string
+    programs: string
+    daysEmployed: number
+}
+interface IPulledData {
+    employeeName: string
+    hireDate: string
+    hardwareCostForEmp: number
+    programCostForEmp: number
+    role: string
+    photo: string
+    employeeId: number
+    hardwareList: []
+    progForEmp: []
+}
 
 // Primary Component
 export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
@@ -33,8 +58,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const axios = new AxiosService(accessToken, refreshToken)
 
     // state
-    const [listData, setListData] = useState<any[]>([])
-    const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
+    const [listData, setListData] = useState<IEmployeeData[]>([])
+    const [filteredData, setFilteredData] = useState<IEmployeeData[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Employees', value: 'name'})
 
@@ -45,13 +70,12 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     useEffect(() => {
         axios
             .get('/list/employees')
-            .then((data: any) => {
-                const employees: any[] = []
-                data.map((i: any) =>
+            .then((data: IPulledData[]) => {
+                let employees: IEmployeeData[] = []
+                data.map((i: IPulledData) => {
                     employees.push({
                         name: format(i.employeeName),
                         dateHired: formatDate(i.hireDate),
-                        daysEmployedNumber: getDays(i.hireDate),
                         cost: formatCost(i.hardwareCostForEmp, i.programCostForEmp),
                         hwCost: i.hardwareCostForEmp,
                         swCost: i.programCostForEmp,
@@ -62,9 +86,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         //for searching
                         hardware: i.hardwareList.join(', '),
                         programs: i.progForEmp.join(', '),
-                        daysEmployed: calculateDaysEmployed(getDays(i.hireDate)),
+                        daysEmployed: getDays(i.hireDate),
                     })
-                )
+                })
                 setListData(employees)
             })
             .catch((err: any) => console.error(err))
@@ -96,6 +120,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         history.push(`/employees/details/${row[0].key}`)
     }
 
+    //changes it from array of objects to matrix
+
     var filteredRows: any[] = []
     filteredData.forEach(rowObj => {
         filteredRows.push(Object.values(rowObj))
@@ -109,15 +135,14 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
 
     //-------------- this will all be the same -------------
-    const headerStates = []
-    const headerStateCounts = []
+    const headerStates = [] //styling for arrow sort state
+    const headerStateCounts = [] //1 or 0 for ascending or descending sort state
 
     //initialize all the header states and styling to be not sorted
     for (let i = 0; i < headerList.length; i++) {
         headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
-    //var initHeaderStates = cloneDeep(headerStates)
     var initHeaderStateCounts = cloneDeep(headerStateCounts)
     var tempHeaderStates = cloneDeep(headerStates)
     var tempHeaderStateCounts = cloneDeep(headerStateCounts)
@@ -127,11 +152,13 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     function sortStates(index: number) {
         if (sortState.headerStateCounts[index] === 0) {
+            //already descending or neutral
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
             tempHeaderStateCounts = [...initHeaderStateCounts]
         } else if (sortState.headerStateCounts[index] === 1) {
+            //already ascending
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
@@ -158,10 +185,10 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
         for (let i = 1; i < headerList.length; i++) {
             let header =
-                i === 3 ? (
+                i === 2 ? (
                     <td
                         onClick={e => {
-                            setRows(sortTable(rows, i + 1, sortState.headerStateCounts[i]))
+                            setRows(sortTable(rows, i + 8, sortState.headerStateCounts[i]))
                             sortStates(i)
                         }}
                     >
@@ -191,13 +218,11 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         return (
-            <td key={row[8]} className={styles.employees}>
-                <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={URL + row[7]} alt={''} />
-                </div>
+            <td key={row[7]} className={styles.employees}>
+                <img className={styles.icon} src={URL + row[6]} alt={''} />
                 <div className={styles.alignLeft}>
-                    <div className={styles.employeeName}>{row[0]}</div>
-                    <div className={styles.role}>{row[6]}</div>
+                    <text className={styles.employeeName}>{row[0]}</text> <br />
+                    <text className={styles.role}>{row[5]}</text>
                 </div>
             </td>
         )
@@ -214,11 +239,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                     break
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[2])}</td>
-                    break
+                    transformedRow[2] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[10])}</td>
                 case 3:
-                    transformedRow[3] = <td className={styles.alignLeft}>{formatCost(row[4], row[5])}</td>
-                    break
+                    transformedRow[3] = <td className={styles.alignLeft}>{row[2]}</td>
             }
         }
 

@@ -8,6 +8,7 @@ import {ServersListPage} from './ServersListPage'
 import {MonitorsListPage} from './MonitorsListPage'
 import {PeripheralListPage} from './PeripheralsListPage'
 import {Button} from '../../reusables/Button/Button'
+import {History} from 'history'
 
 // Styles
 import styles from './HardwareListPage.module.css'
@@ -16,13 +17,12 @@ import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 // Types
 
 interface IHardwareListPageProps {
-    history: any
-    match: any
+    history: History
 }
 
 // Primary Component
 export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
-    const {history, match} = props
+    const {history} = props
 
     // state
     const currentList = localStorage.getItem('selectedHW')

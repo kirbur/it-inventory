@@ -4,9 +4,9 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import styles from './Table.module.css'
 
 interface ITableProps {
-    headers: any[]
-    rows: any[][]
-    onRowClick?: (datum: any) => void
+    headers: JSX.Element[]
+    rows: Element[][]
+    onRowClick?: (datum: Element[]) => void
 }
 
 export const Table = (props: ITableProps) => {
