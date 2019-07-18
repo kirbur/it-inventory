@@ -120,6 +120,17 @@ namespace backend_api.Controllers
             decimal programCost = costBreakDown.CostOfProgramsPerYear ?? 0.0m;
             decimal pluginCost = costBreakDown.CostOfPluginsPerYear ?? 0.0m;
 
+            // Stuff Paid for in the last week. 
+            decimal? lastWeekProgramCost = weeklyCostOfItem<Models.Program>();
+            decimal? lastWeekPluginsCost = weeklyCostOfItem<Plugins>();
+            decimal? lastWeekServerCost = weeklyCostOfItem<Server>();
+            decimal? lastWeekComputerCost = weeklyCostOfItem<Computer>();
+            decimal? lastWeekMonitorCost = weeklyCostOfItem<Monitor>();
+            decimal? lastWeekPeripheralCost = weeklyCostOfItem<Peripheral>();
+            decimal lastWeekTotalCost = (decimal)(lastWeekProgramCost + lastWeekPluginsCost + 
+                lastWeekServerCost + lastWeekComputerCost + lastWeekMonitorCost + lastWeekPeripheralCost);
+            
+
             // List of people message will be sent to.
             // TODO: Add the actual emails.
             InternetAddressList emails = new InternetAddressList();
@@ -145,10 +156,21 @@ namespace backend_api.Controllers
                 <body>
                     <p>Hello,</p>
                     <p>Here is the cost breakdown for the week {date}:</p>
+                    <p>Last week's total cost: ${Math.Round(lastWeekTotalCost, 2)}</p>
+                    <p>Last week's program cost: ${Math.Round((decimal)lastWeekProgramCost, 2)}</p>
+                    <p>Last week's plugins cost: ${Math.Round((decimal)lastWeekPluginsCost, 2)}</p>
+                    <p>Last week's server cost: ${Math.Round((decimal)lastWeekServerCost, 2)}</p>
+                    <p>Last week's computer cost: ${Math.Round((decimal)lastWeekComputerCost, 2)}</p>
+                    <p>Last week's monitor cost: ${Math.Round((decimal)lastWeekMonitorCost, 2)}</p>
+                    <p>Last week's pheripheral cost: ${Math.Round((decimal)lastWeekPeripheralCost, 2)}</p>
+                    <p>Last week's cost includes everything paid for in the last week. 
+                       Any item bought last week or renewed in the last week will be added to the cost.</p>
+                    <hr>
+                    <p>Based on the current programs owned, this is the projected monthly and yearly cost.</p>
                     <p>Total Cost: ${totalCost}/yr | ${Math.Round(totalCost / 12, 2)}/mo</p>
                     <p>Cost of Programs: ${programCost}/yr | ${Math.Round(programCost / 12, 2)}/mo</p>
                     <p>Cost of Plugins: ${pluginCost}/yr | ${Math.Round(pluginCost / 12, 2)}/mo</p>
-                    </br>
+                    <br>
                     <p>- IT Inventory No-Reply</p>
                 </body>";
 
