@@ -6,6 +6,7 @@ import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {History} from 'history'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -18,6 +19,7 @@ import {LoginContext} from '../../App/App'
 
 // Styles
 import styles from './EmployeesListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/employee-placeholder.png'
 
 // Types
 interface IEmployeesListPageProps {
@@ -66,15 +68,20 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
     const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
+    const [useImages, setUseImages] = useState(false)
+    const [images, setImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages] = useState<{id: number; img: string}[]>([])
+
     useEffect(() => {
         axios
             .get('/list/employees')
             .then((data: IPulledData[]) => {
                 let employees: IEmployeeData[] = []
+                var imgs: {id: number; img: string}[] = []
                 data.map((i: IPulledData) => {
                     employees.push({
                         name: format(i.employeeName),
-                        dateHired: formatDate(i.hireDate),
+                        dateHired: i.hireDate,
                         cost: formatCost(i.hardwareCostForEmp, i.programCostForEmp),
                         hwCost: i.hardwareCostForEmp,
                         swCost: i.programCostForEmp,
@@ -87,8 +94,12 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         programs: i.progForEmp.join(', '),
                         daysEmployed: getDays(i.hireDate),
                     })
+                    imgs.push({id: i.employeeId, img: i.photo})
                 })
                 setListData(employees)
+
+                setImages(imgs)
+                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -106,6 +117,17 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         })
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])
+
+    //Set display Images
+    useEffect(() => {
+        images.map((img: {id: number; img: string}) =>
+            checkImage(img.img, axios, placeholder).then(data => {
+                var list = images.filter(i => i.id !== img.id)
+                setImages([...list, {id: img.id, img: data}])
+                displayImages.push({id: img.id, img: data})
+            })
+        )
+    }, [useImages])
 
     const formatCost = (hwCpost: number, progCost: number) => {
         return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo'
@@ -169,6 +191,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
         var firstHeader = (
             <td
+                key={headerList[0]}
                 onClick={e => {
                     setRows(sortTable(rows, 0, sortState.headerStateCounts[0]))
                     sortStates(0)
@@ -186,6 +209,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             let header =
                 i === 2 ? (
                     <td
+                        key={headerList[i]}
                         onClick={e => {
                             setRows(sortTable(rows, i + 8, sortState.headerStateCounts[i]))
                             sortStates(i)
@@ -198,6 +222,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                     </td>
                 ) : (
                     <td
+                        key={headerList[i]}
                         onClick={e => {
                             setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
                             sortStates(i)
@@ -216,12 +241,23 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     function concatenatedName(row: any[]) {
-        return (
+        return displayImages &&
+            displayImages.filter(x => x.id === row[7]) &&
+            displayImages.filter(x => x.id === row[7])[0] ? (
             <td key={row[7]} className={styles.employees}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={URL + row[6]} alt={''} />
+                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[7])[0].img} alt={''} />
                 </div>
-
+                <div className={styles.alignLeft}>
+                    <text className={styles.employeeName}>{row[0]}</text> <br />
+                    <text className={styles.role}>{row[5]}</text>
+                </div>
+            </td>
+        ) : (
+            <td key={row[7]} className={styles.employees}>
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
                     <text className={styles.role}>{row[5]}</text>
@@ -238,12 +274,23 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                     transformedRow[0] = concatenatedName(row)
                     break
                 case 1:
-                    transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
-                    break
+                    transformedRow[1] = (
+                        <td key={row[7] + row[1]} className={styles.alignLeft}>
+                            {formatDate(row[1])}
+                        </td>
+                    )
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[10])}</td>
+                    transformedRow[2] = (
+                        <td key={row[7] + row[10]} className={styles.alignLeft}>
+                            {calculateDaysEmployed(row[10])}
+                        </td>
+                    )
                 case 3:
-                    transformedRow[3] = <td className={styles.alignLeft}>{row[2]}</td>
+                    transformedRow[3] = (
+                        <td key={row[7] + row[2]} className={styles.alignLeft}>
+                            {row[2]}
+                        </td>
+                    )
             }
         }
 

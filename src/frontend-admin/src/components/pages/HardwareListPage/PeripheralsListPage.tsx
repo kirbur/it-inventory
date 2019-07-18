@@ -4,6 +4,8 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {formatDate} from '../../../utilities/FormatDate'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -17,6 +19,7 @@ import {LoginContext} from '../../App/App'
 
 // Styles
 import styles from './HardwareListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/peripheral-placeholder.png'
 
 // Types
 interface IPeripheralListPageProps {
@@ -27,7 +30,7 @@ interface IPeripheralData {
     id: number
     purchaseDate: string
     assigned: string
-    icon: string
+    //icon: string
 }
 interface IPulledData {
     peripheralName: string
@@ -58,31 +61,33 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     const headerList = ['Make & Model', 'Purchase Date', 'Assigned To']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
+    const [useImages, setUseImages] = useState(false)
+    const [images, setImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages] = useState<{id: number; img: string}[]>([])
+
     useEffect(() => {
         axios
             .get('/list/peripherals')
             .then((data: IPulledData[]) => {
                 console.log(data)
                 const peripherals: IPeripheralData[] = []
-                data.map((i: IPulledData) =>
+                var imgs: {id: number; img: string}[] = []
+                data.map((i: IPulledData) => {
                     peripherals.push({
                         name: format(i.peripheralName + ' ' + i.peripheralType),
                         id: i.peripheralId,
                         purchaseDate: format(i.purchaseDate),
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
-                        icon: i.icon,
                     })
-                )
+                    imgs.push({id: i.peripheralId, img: i.icon})
+                })
                 setListData(peripherals)
+
+                setImages(imgs)
+                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
     }, [])
-
-    const formatDate = (hireDate: string) => {
-        const hired = new Date(hireDate)
-        const date = hired.getFullYear() + '/' + (hired.getMonth() + 1) + '/' + hired.getDate()
-        return date
-    }
 
     useEffect(() => {
         // Search through listData based on current value
@@ -97,6 +102,17 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
         })
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])
+
+    //Set display Images
+    useEffect(() => {
+        images.map((img: {id: number; img: string}) =>
+            checkImage(img.img, axios, placeholder).then(data => {
+                var list = images.filter(i => i.id !== img.id)
+                setImages([...list, {id: img.id, img: data}])
+                displayImages.push({id: img.id, img: data})
+            })
+        )
+    }, [useImages])
 
     const handleClick = () => {
         history.push('/hardware/edit/peripheral/new')
@@ -185,9 +201,22 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     }
 
     function concatenatedName(row: any[]) {
-        return (
+        return displayImages &&
+            displayImages.filter(x => x.id === row[1]) &&
+            displayImages.filter(x => x.id === row[1])[0] ? (
             <td key={row[1]} className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[4]} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                </div>
+                <div className={styles.alignLeft}>
+                    <div className={styles.hardwareName}>{row[0]}</div>
+                </div>
+            </td>
+        ) : (
+            <td key={row[1]} className={styles.hardware}>
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <div className={styles.hardwareName}>{row[0]}</div>
                 </div>

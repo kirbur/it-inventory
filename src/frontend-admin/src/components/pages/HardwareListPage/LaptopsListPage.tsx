@@ -4,6 +4,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -17,6 +18,7 @@ import {LoginContext} from '../../App/App'
 
 // Styles
 import styles from './HardwareListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/computer-placeholder.png'
 
 // Types
 interface ILaptopsListPageProps {
@@ -66,11 +68,16 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     const headerList = ['Make & Model', 'CPU', 'RAM', 'SSD', 'Assigned To', 'MFG Tag']
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
 
+    const [useImages, setUseImages] = useState(false)
+    const [images, setImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages] = useState<{id: number; img: string}[]>([])
+
     useEffect(() => {
         axios
             .get('/list/laptops')
             .then((data: IPulledData[]) => {
                 const laptops: ILaptopData[] = []
+                var imgs: {id: number; img: string}[] = []
                 data.map((i: IPulledData) => {
                     laptops.push({
                         make: format(i.make),
@@ -83,8 +90,12 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
                         icon: format(i.icon),
                         model: format(i.model),
                     })
+                    imgs.push({id: i.computerId, img: i.icon})
                 })
                 setListData(laptops)
+
+                setImages(imgs)
+                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -108,6 +119,17 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
         })
         setFilteredData(filteredTableInput)
     }, [search, selected, listData])
+
+    //Set display Images
+    useEffect(() => {
+        images.map((img: {id: number; img: string}) =>
+            checkImage(img.img, axios, placeholder).then(data => {
+                var list = images.filter(i => i.id !== img.id)
+                setImages([...list, {id: img.id, img: data}])
+                displayImages.push({id: img.id, img: data})
+            })
+        )
+    }, [useImages])
 
     const handleClick = () => {
         history.push('/hardware/edit/laptop/new')
@@ -197,9 +219,23 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     }
 
     function concatenatedName(row: any[]) {
-        return (
+        return displayImages &&
+            displayImages.filter(x => x.id === row[1]) &&
+            displayImages.filter(x => x.id === row[1])[0] ? (
             <td key={row[1]} className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[7]} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                </div>
+                <div className={styles.alignLeft}>
+                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={styles.alignLeft}>{row[8]}</text>
+                </div>
+            </td>
+        ) : (
+            <td key={row[1]} className={styles.hardware}>
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text> <br />
                     <text className={styles.alignLeft}>{row[8]}</text>
