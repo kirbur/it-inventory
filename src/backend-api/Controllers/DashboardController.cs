@@ -505,7 +505,7 @@ namespace backend_api.Controllers
             // NOTE: If the user settings specify more than 10, it will display all of them.
             foreach (Models.Program sw in distinctSortedSoftware)
             {
-                if (!(distinctPinnedSoftwareNames.Contains(sw.ProgramName)) && listOfTableSoftware.Count < 25)
+                if (!(distinctPinnedSoftwareNames.Contains(sw.ProgramName)) && listOfTableSoftware.Count < 10)
                 {
                     listOfTableSoftware.Add(new SoftwareTableItem(sw.ProgramName, 0, 0, 0, sw.IsCostPerYear ? false : true, false));
                 }
