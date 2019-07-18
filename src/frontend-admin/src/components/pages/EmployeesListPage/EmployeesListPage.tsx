@@ -4,14 +4,14 @@ import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
-import {formatDate, calculateDaysEmployed, getDays} from '../../../utilities/FormatDate'
+import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
+import {History} from 'history'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import {History} from 'history'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -53,7 +53,7 @@ interface IPulledData {
 export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const {history} = props
     const {
-        loginContextVariables: {accessToken, refreshToken},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
     const axios = new AxiosService(accessToken, refreshToken)
 
@@ -146,11 +146,11 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     const handleClick = () => {
-        history.push(`/editEmployee/new`)
+        history.push(`/employees/edit/new`)
     }
 
-    const handleRowClick = (row: any[]) => {
-        history.push(`employees/${row[0].key}`)
+    const handleRowClick = (row: any) => {
+        history.push(`/employees/detail/${row[0].key}`)
     }
 
     //changes it from array of objects to matrix
@@ -284,6 +284,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
+                    break
                 case 1:
                     transformedRow[1] = (
                         <td key={row[7] + row[1]} className={styles.alignLeft}>
@@ -310,17 +311,29 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     return (
         <div className={styles.employeesListMain}>
-            <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
+            {isAdmin ? (
+                <Group direction='row' justify='between' className={styles.group}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
 
-                <FilteredSearch
-                    search={search}
-                    setSearch={setSearch}
-                    options={options}
-                    selected={selected}
-                    setSelected={setSelected}
-                />
-            </Group>
+                    <FilteredSearch
+                        search={search}
+                        setSearch={setSearch}
+                        options={options}
+                        selected={selected}
+                        setSelected={setSelected}
+                    />
+                </Group>
+            ) : (
+                <div className={styles.searchContainer}>
+                    <FilteredSearch
+                        search={search}
+                        setSearch={setSearch}
+                        options={options}
+                        selected={selected}
+                        setSelected={setSelected}
+                    />
+                </div>
+            )}
 
             <Table headers={renderHeaders()} rows={renderedRows} onRowClick={handleRowClick} />
         </div>

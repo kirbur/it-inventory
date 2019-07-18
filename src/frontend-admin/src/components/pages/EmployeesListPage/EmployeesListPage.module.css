@@ -12,6 +12,13 @@
     padding-bottom: 60px;
 }
 
+.searchContainer {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 60px;
+}
+
 .imgContainer {
     width: 75px;
     height: 75px;

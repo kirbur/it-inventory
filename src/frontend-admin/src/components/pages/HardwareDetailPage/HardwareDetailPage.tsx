@@ -96,7 +96,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setHistoryLogEntries(data[0].serverHistory)
                 })
                 .catch((err: any) => console.error(err))
-        } else if (match.params.type === 'laptop') {
+        } else if (match.params.type === 'laptop' || 'computer') {
             setFirstTableHeaders(['CPU', 'RAM', 'SSD', 'FQDN'])
             setSecondTableHeaders(['Monitor Output', 'Screen Size', 'Serial #', 'MFG Tag'])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
