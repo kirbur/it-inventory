@@ -131,13 +131,13 @@ export const App: React.FC = () => {
                         <Route exact path='/' component={Login} />
 
                         <Route path={'/departments/detail/:id'} render={props => <DepartmentDetailPage {...props} />} />
-                        <Route path={'/employees/details/:id'} render={props => <EmployeeDetailPage {...props} />} />
+                        <Route path={'/employees/detail/:id'} render={props => <EmployeeDetailPage {...props} />} />
                         <Route
                             path={'/hardware/detail/:type/:id'}
                             render={props => <HardwareDetailPage {...props} />}
                         />
                         <Route path={'/programs/overview/:id'} render={props => <ProgramOverviewPage {...props} />} />
-                        <Route path={'/programs/details/:id'} render={props => <ProgramDetailPage {...props} />} />
+                        <Route path={'/programs/detail/:id'} render={props => <ProgramDetailPage {...props} />} />
 
                         {loginContextVariables.isAdmin && (
                             <Route exact path={'/employees/edit/:id'} component={EmployeeDetailEditPage} />
@@ -151,7 +151,7 @@ export const App: React.FC = () => {
                         )}
 
                         {loginContextVariables.isAdmin && (
-                            <Route path={'/programs/edit/details/:id'} component={ProgramDetailEditPage} />
+                            <Route path={'/programs/edit/detail/:id'} component={ProgramDetailEditPage} />
                         )}
 
                         {loginContextVariables.isAdmin && (

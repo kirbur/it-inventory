@@ -663,7 +663,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     console.error(err)
                 })
 
-            history.push(`/employees/details/${match.params.id}`)
+            history.push(`/employees/detail/${match.params.id}`)
         } else if (match.params.id !== 'new' && changed) {
             //one or maore of the inputs was null/undefined/empty
             msg = 'Failed because:\n'
@@ -748,7 +748,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         text={userData.name}
                         icon='back'
                         onClick={() => {
-                            history.push(`/employees/details/${match.params.id}`)
+                            history.push(`/employees/detail/${match.params.id}`)
                         }}
                         className={styles.backButton}
                         textClassName={styles.backButtonText}

@@ -126,7 +126,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             }
 
             await axios.put(`update/program/${match.params.id}`, updateProgram).catch((err: any) => console.error(err))
-            history.push(`/programs/details/${match.params.id}`)
+            history.push(`/programs/detail/${match.params.id}`)
         }
     }
 
@@ -139,7 +139,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     text={progData.name + ' ' + match.params.id}
                     icon='back'
                     onClick={() => {
-                        history.push(`/programs/details/${match.params.id}`)
+                        history.push(`/programs/detail/${match.params.id}`)
                     }}
                     className={styles.backButton}
                     textClassName={styles.backButtonText}

@@ -65,11 +65,11 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
     const handleHardwareClick = (id: number | string) => {
-        history.push(`/hardware/${id}`)
+        history.push(`/hardware/detail/${id}`)
     }
 
     const handleProgramClick = (id: number | string) => {
-        history.push(`/programs/details/${id}`)
+        history.push(`/programs/detail/${id}`)
     }
 
     useEffect(() => {

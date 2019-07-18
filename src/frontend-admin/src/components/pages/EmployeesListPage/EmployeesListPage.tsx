@@ -116,7 +116,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`/employees/details/${row[0].key}`)
+        history.push(`/employees/detail/${row[0].key}`)
     }
 
     //changes it from array of objects to matrix

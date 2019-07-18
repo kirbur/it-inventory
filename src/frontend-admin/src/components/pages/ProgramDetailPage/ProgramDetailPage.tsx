@@ -188,7 +188,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                 text='Edit'
                                 icon='edit'
                                 onClick={() => {
-                                    history.push('/programs/edit/details/' + match.params.id)
+                                    history.push('/programs/edit/detail/' + match.params.id)
                                 }}
                                 className={styles.editbutton}
                             />
@@ -214,7 +214,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                 Assigned to{' '}
                                 <div
                                     className={styles.empName}
-                                    onClick={() => history.push(`/employees/details/${progData.employeeId}`)}
+                                    onClick={() => history.push(`/employees/detail/${progData.employeeId}`)}
                                 >
                                     {progData.employee}
                                 </div>
