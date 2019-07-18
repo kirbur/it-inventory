@@ -8,6 +8,7 @@ import {format} from '../../../utilities/formatEmptyStrings'
 import {formatDate} from '../../../utilities/FormatDate'
 import {formatCost} from '../../../utilities/FormatCost'
 import {History} from 'history'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -85,26 +86,13 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     //Set display Images
     useEffect(() => {
         images.map((img: {name: string; img: string}) =>
-            checkImage(img).then(data => {
+            checkImage(img.img, axios, placeholder).then(data => {
                 var list = images.filter(i => i.name !== img.name)
-                setImages([...list, data])
-                displayImages.push(data)
+                setImages([...list, {name: img.name, img: data}])
+                displayImages.push({name: img.name, img: data})
             })
         )
     }, [useImages])
-
-    //check image
-    async function checkImage(img: {name: string; img: string}) {
-        var arr: {name: string; img: string}[] = []
-        await axios
-            .get(img.img)
-            .then((data: any) => {
-                arr.push({name: img.name, img: data === '' ? placeholder : URL + img.img})
-            })
-            .catch((err: any) => console.error(err))
-
-        return arr[0]
-    }
 
     useEffect(() => {
         // Search through listData based on current value

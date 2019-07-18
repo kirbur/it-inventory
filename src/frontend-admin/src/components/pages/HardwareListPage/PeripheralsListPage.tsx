@@ -5,6 +5,7 @@ import {cloneDeep} from 'lodash'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {formatDate} from '../../../utilities/FormatDate'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -105,26 +106,13 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     //Set display Images
     useEffect(() => {
         images.map((img: {id: number; img: string}) =>
-            checkImage(img).then(data => {
+            checkImage(img.img, axios, placeholder).then(data => {
                 var list = images.filter(i => i.id !== img.id)
-                setImages([...list, data])
-                displayImages.push(data)
+                setImages([...list, {id: img.id, img: data}])
+                displayImages.push({id: img.id, img: data})
             })
         )
     }, [useImages])
-
-    //check image
-    async function checkImage(img: {id: number; img: string}) {
-        var arr: {id: number; img: string}[] = []
-        await axios
-            .get(img.img)
-            .then((data: any) => {
-                arr.push({id: img.id, img: data === '' ? placeholder : URL + img.img})
-            })
-            .catch((err: any) => console.error(err))
-
-        return arr[0]
-    }
 
     const handleClick = () => {
         history.push('/hardware/edit/peripheral/new')

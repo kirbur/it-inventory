@@ -11,6 +11,7 @@ import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Styles
 import styles from './EmployeeDetailEditPage.module.css'
@@ -298,26 +299,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     //Set display Images
     useEffect(() => {
         deptList.map((dept: any) =>
-            checkImages(dept).then(data => {
+            checkImage(dept.icon, axios, deptPlaceholder).then(data => {
                 var list = deptList.filter(i => i.departmentId !== dept.departmentId)
                 setDeptList([...list, {...dept, icon: data}])
                 deptImages.push({id: dept.departmentId, img: data})
             })
         )
     }, [useImages])
-
-    //check image
-    async function checkImages(dept: any) {
-        var arr: any[] = []
-        await axios
-            .get(dept.icon)
-            .then((data: any) => {
-                arr.push(data === '' ? deptPlaceholder : URL + dept.icon)
-            })
-            .catch((err: any) => console.error(err))
-
-        return arr[0]
-    }
 
     //Check the current employees department, if they don't have one yet check the first
     useEffect(() => {
