@@ -369,7 +369,10 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                         <Button text='Add' icon='add' onClick={handleClick} />
                         <Button
                             text={isArchive ? 'View Active' : 'View Archives'}
-                            onClick={() => setIsArchive(!isArchive)}
+                            onClick={() => {
+                                setIsArchive(!isArchive)
+                                setCheckboxes(false)
+                            }}
                             className={styles.archiveButton}
                         />
 
