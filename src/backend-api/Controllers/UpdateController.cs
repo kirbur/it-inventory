@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using backend_api.Helpers;
 using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -64,24 +65,6 @@ namespace backend_api.Controllers
                 return BadRequest("Department does not exist or failed to supply ID");
             }
         }
-        /* PUT: api/udpate/programall
-        * Will update all the rows of programs that have the given name
-        * Param input format:
-        * {     "Program" : {
-        *           "OldProgramName" : String,
-        *           "NewProgramName" : String,
-        *           "ProgramCostPerYear" : Decimal,
-        *           "ProgramFlatCost" : Decimal,
-        *           "ProgramLicenseKey" : String,
-        *           "IsLicense" : bool,
-        *           "ProgramDescription" : String,
-        *           "ProgramPurchaseLink" : String,
-        *           "DateBought" : DateTime,
-        *           "RenewalDate" : DateTime,
-        *           "MonthsPerRenewal" : int
-        *       }
-        * }
-        */
 
         /* PUT: api/udpate/programPins
         * Will update all the rows of programs to only pin the given programs and unpin everything else
@@ -95,57 +78,62 @@ namespace backend_api.Controllers
         {
             // This line loops through every program and updates its IsPinned field depending on whether
             // the program is in the given input
-            _context.Program.ToList().ForEach(prog => prog.IsPinned = input.Contains(prog.ProgramName) ? true : false);
+            _context.Program
+                .ToList()
+                .ForEach(prog => prog.IsPinned = input.Contains(prog.ProgramName) ? true : false);
             _context.SaveChanges();
             return Ok();
         }
 
+        /* PUT: api/udpate/programall
+        * Will update all the rows of programs that have the given name
+        * Param input format:
+        * {     "Program" : {
+        *           "OldProgramName" : String,
+        *           "ProgramName" : String,
+        *           "ProgramCostPerYear" : Decimal,
+        *           "ProgramFlatCost" : Decimal,
+        *           "ProgramLicenseKey" : String,
+        *           "IsLicense" : bool,
+        *           "ProgramDescription" : String,
+        *           "ProgramPurchaseLink" : String,
+        *           "DateBought" : DateTime,
+        *           "RenewalDate" : DateTime,
+        *           "MonthsPerRenewal" : int
+        *       }
+        * }
+        */
         [HttpPut]
         [Route("ProgramAll")]
         public IActionResult EditPrograms([FromBody] UpdateProgramInputModel input)
         {
+            var updatedProg = input.Program;
             try
             {
-                foreach (var program in _context.Program.Where(x => x.ProgramName == input.Program.OldProgramName))
-                {
-                    if (input.Program.NewProgramName != null)
+                _context.Program
+                    // Find where the program name matches.
+                    .Where(x => x.ProgramName == updatedProg.OldProgramName)
+                    .ToList()
+                    .ForEach(program =>
                     {
-                        program.ProgramName = input.Program.NewProgramName;
+                        // For each property on a Program, loop through it.
+                        foreach (PropertyInfo prop in typeof(Models.Program).GetProperties())
+                        {
+                            // Find the property on the ObjectModel with the same name as the property on the Program.
+                            PropertyInfo propToUpdate = typeof(ProgramUpdateObjectModel).GetProperty(prop.Name);
+                            if (propToUpdate != null)
+                            {
+                                // Get the value of the property on the ObjectModel
+                                var newValue = propToUpdate.GetValue(updatedProg, null);
+                                if (newValue != null)
+                                {
+                                    // Update the value of the property on the Program.
+                                    prop.SetValue(program, newValue, null);
+                                }
+                            }
+                        }
                     }
-                    if (input.Program.ProgramCostPerYear != null)
-                    {
-                        program.ProgramCostPerYear = input.Program.ProgramCostPerYear;
-                    }
-                    if (input.Program.ProgramFlatCost != null)
-                    {
-                        program.ProgramFlatCost = input.Program.ProgramFlatCost;
-                    }
-                    if (input.Program.ProgramLicenseKey != null)
-                    {
-                        program.ProgramLicenseKey = input.Program.ProgramLicenseKey;
-                    }
-                    if (input.Program.IsLicense != null)
-                    {
-                        program.IsLicense = input.Program.IsLicense.Value;
-                    }
-                    if (input.Program.ProgramDescription != null)
-                    {
-                        program.Description = input.Program.ProgramDescription;
-                    }
-                    if (input.Program.ProgramPurchaseLink != null)
-                    {
-                        program.ProgramPurchaseLink = input.Program.ProgramPurchaseLink;
-                    }
-                    if (input.Program.MonthsPerRenewal != null)
-                    {
-                        program.MonthsPerRenewal = input.Program.MonthsPerRenewal;
-                        program.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
-                    }
-                    if (input.Program.RenewalDate != null)
-                    {
-                        program.RenewalDate = input.Program.RenewalDate;
-                    }
-                }
+                );
                 _context.SaveChanges();
                 return StatusCode(202);
             }
@@ -156,6 +144,7 @@ namespace backend_api.Controllers
 
 
         }
+
         /* PUT: api/update/program/{id}
         * Will update the program identified by the id from the route
         * Param input format:
