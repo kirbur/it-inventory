@@ -49,9 +49,9 @@ namespace backend_api.Controllers
 
         }
 
-        /* GET: api/detail/ProgramOverview/{archived}/{program}
-         * Function returns the program overview information
-         * if archived is true, then the overview is for a deleted program
+        /* GET: api/detail/ProgramOverview/{program}/{archived}
+         * Function returns the program overview information   
+         * If archived is true then the overview is for programs where isDeleted is true
          * Returns:{
          *          ProgramOverview:{
          *              icon: string,
@@ -85,8 +85,8 @@ namespace backend_api.Controllers
          *                          
          */
         [HttpGet]
-        [Route("ProgramOverview/{archived}/{program}")]
-        public IActionResult GetProgramOverview([FromRoute] Boolean archived, [FromRoute] string program)
+        [Route("ProgramOverview/{program}/{archived}")]
+        public IActionResult GetProgramOverview([FromRoute] bool archived, [FromRoute] string program)
         {
             // Holds the license key of the program overview if they are all the same.
             string ProgramLicenseKey = null;

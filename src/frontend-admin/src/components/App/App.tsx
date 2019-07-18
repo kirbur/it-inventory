@@ -138,7 +138,7 @@ export const App: React.FC = () => {
                         />
 
                         <Route
-                            path={'/programs/overview/:archived/:id'}
+                            path={'/programs/overview/:id/:archived'}
                             render={props => <ProgramOverviewPage {...props} />}
                         />
                         <Route path={'/programs/details/:id'} render={props => <ProgramDetailPage {...props} />} />
@@ -164,7 +164,7 @@ export const App: React.FC = () => {
                             render={props => <ProgramDetailEditPage {...props} />}
                         />
                         <Route
-                            path={'/programs/edit/overview/:archived/:id'}
+                            path={'/programs/edit/overview/:id/:archived'}
                             render={props => <ProgramOverviewEditPage {...props} />}
                         />
                     </Switch>

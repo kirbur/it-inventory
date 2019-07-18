@@ -90,7 +90,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
 
     useEffect(() => {
         axios
-            .get(`/detail/ProgramOverview/${archived === 'archived' ? true : false}/${id}`)
+            .get(`/detail/ProgramOverview/${id}/${archived === 'archived' ? true : false}`)
             .then((data: any) => {
                 setProgramData(data[0].programOverview)
                 let prog: ITableItem[][] = []
@@ -254,7 +254,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                                     text='Edit'
                                     icon='edit'
                                     onClick={() => {
-                                        history.push(`/programs/edit/overview/${archived}/${id}`)
+                                        history.push(`/programs/edit/overview/${id}/${archived}`)
                                     }}
                                     className={styles.editbutton}
                                 />

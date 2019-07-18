@@ -129,7 +129,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     .catch((err: any) => console.error(err))
 
                 //after submitting go back to overview
-                history.push(`/programs/overview/inventory/${progData.name}`)
+                history.push(`/programs/overview/${progData.name}/inventory`)
             }
         }
     }
@@ -143,7 +143,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         text={progData.name}
                         icon='back'
                         onClick={() => {
-                            history.push(`/programs/overview/inventory/${progData.name}`)
+                            history.push(`/programs/overview/${progData.name}/inventory`)
                         }}
                         className={styles.backButton}
                         textClassName={styles.backButtonText}

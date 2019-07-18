@@ -122,7 +122,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     useEffect(() => {
         if (id !== 'new') {
             axios
-                .get(`/detail/ProgramOverview/${archived === 'archived' ? true : false}/${id}`)
+                .get(`/detail/ProgramOverview/${id}/${archived === 'archived' ? true : false}`)
                 .then((data: any) => {
                     setImgLocation(data[0].programOverview.icon)
                     setNumCopies(data[0].programOverview.countProgOverall)
@@ -281,7 +281,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         .catch((err: any) => console.error(err))
 
                     //after submitting go back to detail
-                    history.push(`/programs/overview/${archived ? 'archived' : 'inventory'}/${id}`)
+                    history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
                 } else {
                     msg = 'Failed because: \n'
                     msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
@@ -327,9 +327,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
                 //after submitting go back to detail
                 history.push(
-                    `/programs/overview/${archived ? 'archived' : 'inventory'}/${
-                        overviewInputs.name.changed ? overviewInputs.name.value : id
-                    }`
+                    `/programs/overview/${overviewInputs.name.changed ? overviewInputs.name.value : id}/inventory`
                 )
             }
 
@@ -357,12 +355,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         await axios.post('/add/plugin', postPlugin).catch((err: any) => console.error(err))
 
                         //after submitting go back to detail
-                        history.push(`/programs/overview/${archived ? 'archived' : 'inventory'}/${id}`)
+                        history.push(`/programs/overview/${id}/inventory`)
                     } else {
                         await axios.put('/update/plugin', postPlugin).catch((err: any) => console.error(err))
 
                         //after submitting go back to detail
-                        history.push(`/programs/overview/${archived ? 'archived' : 'inventory'}/${id}`)
+                        history.push(`/programs/overview/${id}/inventory`)
                     }
                 } else {
                     msg = 'Failed to Add Plugin Because: \n'
@@ -378,7 +376,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 )
                 setRemovedPluginRows([])
                 //after submitting go back to detail
-                history.push(`/programs/overview/${archived ? 'archived' : 'inventory'}/${id}`)
+                history.push(`/programs/overview/${id}/inventory`)
             }
 
             if (removedProgramRows.length > 0) {
@@ -391,7 +389,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     })
                     setRemovedProgramRows([])
                     //after submitting go back to detail
-                    history.push(`/programs/overview/${archived ? 'archived' : 'inventory'}/${id}`)
+                    history.push(`/programs/overview/${id}/inventory`)
                 }
             }
         }
@@ -407,7 +405,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 .catch(err => console.error(err))
 
             //after submitting go back to detail
-            history.push(`/programs/overview/${archived ? 'archived' : 'inventory'}/${id}`)
+            history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
         }
     }
 
@@ -477,7 +475,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             text={id}
                             icon='back'
                             onClick={() => {
-                                history.push(`/programs/overview/${archived ? 'archived' : 'inventory'}/${id}`)
+                                history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
                             }}
                             className={styles.backButton}
                             textClassName={styles.backButtonText}
