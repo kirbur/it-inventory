@@ -84,8 +84,8 @@ namespace backend_api.Controllers
          *                          
          */
         [HttpGet]
-        [Route("ProgramOverview/{archived}/{program}")]
-        public IActionResult GetProgramOverview([FromRoute] Boolean archived, [FromRoute] string program)
+        [Route("ProgramOverview/{program}/{archived}")]
+        public IActionResult GetProgramOverview([FromRoute] bool archived, [FromRoute] string program)
         {
             // Holds the license key of the program overview if they are all the same.
             string ProgramLicenseKey = null;
