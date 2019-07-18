@@ -23,6 +23,5 @@ namespace backend_api.Models
 
         public int GetId() { return PeripheralId; }
 
-        //public Employee Employee { get; set; }
     }
 }

@@ -92,7 +92,7 @@ namespace backend_api.Controllers
                 }
 
             }
-
+            // list to hold the department objects that will be returned
             List<object> departments = new List<object>();
             foreach (var dep in _context.Department.Where(x => x.IsDeleted == false))
             {
@@ -282,6 +282,7 @@ namespace backend_api.Controllers
                 };
                 _context.Employee.Add(emp);
 
+                // adding a new authIDEmp for the new employee created
                 var AuthEmp = new AuthIdserver()
                 {
                     ActiveDirectoryId = user.Guid.Value,

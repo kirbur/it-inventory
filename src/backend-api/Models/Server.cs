@@ -32,6 +32,5 @@ namespace backend_api.Models
 
         public int GetId() { return ServerId; }
 
-        // public Employee Employee { get; set; }
     }
 }

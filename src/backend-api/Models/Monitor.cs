@@ -26,6 +26,5 @@ namespace backend_api.Models
 
         public int GetId() { return MonitorId; }
 
-        // public Employee Employee { get; set; }
     }
 }
