@@ -683,17 +683,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 ],
             }
 
-            await axios
-                .put(`/update/Employee`, updateEmployee)
-                .then((response: any) => {
-                    if (response.status >= 400) {
-                        console.error(response)
-                    }
-                })
-                .catch((err: any) => {
-                    window.alert(`Something went wrong`)
-                    console.error(err)
-                })
+            await axios.put(`/update/Employee`, updateEmployee).catch((err: any) => console.error(err))
 
             history.push(`/employees/detail/${match.params.id}`)
         } else if (match.params.id !== 'new' && changed) {
