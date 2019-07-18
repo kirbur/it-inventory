@@ -106,14 +106,14 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const onRowClick = (datum: IDashboardTableDatum) => {
         if (datum.name[datum.name.length - 1] === '*') {
             var str = datum.name.substring(0, datum.name.length - 1)
-            history.push(`/programs/overview/${str}`)
+            history.push(`/programs/overview/inventory/${str}`)
         } else {
-            history.push(`/programs/overview/${datum.name}`)
+            history.push(`/programs/overview/inventory/${datum.name}`)
         }
     }
 
     const onBarClick = (id: string) => {
-        history.push(`/programs/overview/${id}`)
+        history.push(`/programs/overview/inventory/${id}`)
     }
 
     const onSliceClick = (id: string) => {

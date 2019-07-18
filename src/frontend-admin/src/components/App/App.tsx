@@ -137,7 +137,10 @@ export const App: React.FC = () => {
                             render={props => <HardwareDetailPage {...props} />}
                         />
 
-                        <Route path={'/programs/overview/:id'} render={props => <ProgramOverviewPage {...props} />} />
+                        <Route
+                            path={'/programs/overview/:archived/:id'}
+                            render={props => <ProgramOverviewPage {...props} />}
+                        />
                         <Route path={'/programs/details/:id'} render={props => <ProgramDetailPage {...props} />} />
                         <Route
                             exact
@@ -161,7 +164,7 @@ export const App: React.FC = () => {
                             render={props => <ProgramDetailEditPage {...props} />}
                         />
                         <Route
-                            path={'/programs/edit/overview/:id'}
+                            path={'/programs/edit/overview/:archived/:id'}
                             render={props => <ProgramOverviewEditPage {...props} />}
                         />
                     </Switch>

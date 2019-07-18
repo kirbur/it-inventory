@@ -87,7 +87,6 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         axios
             .get('list/programs/true')
             .then((data: any) => {
-                console.log(data)
                 var programs: any[] = []
                 var imgs: any[] = []
                 var pins: {name: string; pinned: boolean}[] = []
@@ -164,12 +163,12 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }, [search, selected, listData, isArchive])
 
     const handleClick = () => {
-        history.push('/programs/edit/overview/new')
+        history.push(`/programs/overview/inventory/new`)
     }
 
     const handleRowClick = (row: any) => {
         // go to prog overview
-        history.push(`/programs/overview/${row[0]}`)
+        history.push(`/programs/overview/${isArchive ? 'archived' : 'inventory'}/${row[0]}`)
     }
 
     var filteredRows: any[] = []
@@ -181,7 +180,6 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     useEffect(() => {
         setRows(filteredRows)
     }, [filteredData])
-    console.log(rows)
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -375,14 +373,16 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                             className={styles.archiveButton}
                         />
 
-                        {checkboxes && !isArchive ? (
+                        {!isArchive && checkboxes ? (
                             <Button text='Save Changes' onClick={handlePinChanges} className={styles.dashboardButton} />
                         ) : (
-                            <Button
-                                text='Pin To Dashboard'
-                                onClick={() => setCheckboxes(!checkboxes)}
-                                className={styles.dashboardButton}
-                            />
+                            !isArchive && (
+                                <Button
+                                    text='Pin To Dashboard'
+                                    onClick={() => setCheckboxes(!checkboxes)}
+                                    className={styles.dashboardButton}
+                                />
+                            )
                         )}
                     </div>
                     <FilteredSearch

@@ -84,8 +84,8 @@ namespace backend_api.Controllers
          *                          
          */
         [HttpGet]
-        [Route("ProgramOverview/{program}")]
-        public IActionResult GetProgramOverview([FromRoute] string program)
+        [Route("ProgramOverview/{archived}/{program}")]
+        public IActionResult GetProgramOverview([FromRoute] Boolean archived, [FromRoute] string program)
         {
             // Holds the license key of the program overview if they are all the same.
             string ProgramLicenseKey = null;
@@ -103,7 +103,7 @@ namespace backend_api.Controllers
                 string icon = $"/image/program/{id}";
 
                 // list of all programs that are not deleted
-                var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == true && x.ProgramName == program);
+                var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == archived && x.ProgramName == program);
 
                 // calculate the count of programs under this specific distinct program name that are in use
                 var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == program && x.EmployeeId != null && x.IsDeleted == false).Count();
