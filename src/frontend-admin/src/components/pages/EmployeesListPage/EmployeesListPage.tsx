@@ -65,7 +65,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const [isArchive, setIsArchive] = useState(false)
 
     const columns = ['name', 'role', 'dateHired', 'daysEmployed', 'cost', 'hardware', 'programs']
-    const headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
+    var headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
+    var headerList: string[] = []
     const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
     useEffect(() => {
@@ -102,22 +103,25 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                     employees.push({
                         name: format(i.firstName + ' ' + i.lastName),
                         dateHired: formatDate(i.hireDate),
-                        cost: formatCost(i.hardwareCostForEmp, i.programCostForEmp),
-                        hwCost: i.hardwareCostForEmp,
-                        swCost: i.programCostForEmp,
+                        daysEmployed: calculateDaysEmployed(getDays(i.hireDate, i.archiveDate)),
+                        space4: 0,
+                        space: 0,
                         role: format(i.role),
                         icon: format(i.photo),
                         id: i.employeeId,
+                        space1: 0,
 
-                        //for searching
-                        hardware: i.hardwareList ? i.hardwareList.join(', ') : '',
-                        programs: i.progForEmp ? i.progForEmp.join(', ') : '',
-                        daysEmployed: getDays(i.hireDate),
+                        space2: 0,
+                        dateArchived: formatDate(i.archiveDate), //TODO: make sure this is added to
                     })
                 })
                 setArchivedData(employees)
             })
             .catch((err: any) => console.error(err))
+
+        if (isArchive) {
+            headers = ['Employees', 'Role', 'Date Hired', 'Date Archived', 'Days Employed']
+        }
     }, [])
 
     useEffect(() => {
@@ -152,10 +156,10 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         return date
     }
 
-    const getDays = (hireDate: string) => {
-        const today = new Date()
-        const hired = new Date(hireDate)
-        return Math.round(Math.abs(today.getTime() - hired.getTime()))
+    const getDays = (startDate: string, endDate?: string) => {
+        const end = endDate ? new Date(endDate) : new Date()
+        const start = new Date(startDate)
+        return Math.round(Math.abs(end.getTime() - start.getTime()))
     }
 
     //does not account for leap years or variable # of days in a month
@@ -200,7 +204,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         setRows(filteredRows)
     }, [filteredData])
 
-    const headerList = ['Employees', 'Date Hired', 'Days Employed', 'Cost']
+    headerList = isArchive
+        ? (headerList = ['Employees', 'Date Hired', 'Date Archived', 'Days Employed'])
+        : ['Employees', 'Date Hired', 'Days Employed', 'Cost']
 
     //-------------- this will all be the same -------------
     const headerStates = [] //styling for arrow sort state
@@ -305,7 +311,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                 case 1:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[1]}</td>
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{calculateDaysEmployed(row[10])}</td>
+                    transformedRow[2] = (
+                        <td className={styles.alignLeft}>{isArchive ? row[10] : calculateDaysEmployed(row[10])}</td>
+                    )
                 case 3:
                     transformedRow[3] = <td className={styles.alignLeft}>{row[2]}</td>
             }
