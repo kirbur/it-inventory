@@ -116,7 +116,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([])
     const [licenseDropdown, setLicenseDropdown] = useState<any[]>([])
 
-    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'Select An Employee', id: -1}])
+    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'Select A New Employee', id: -1}])
     const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>(employeeDropdown[0])
 
     useEffect(() => {
@@ -874,9 +874,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                         type='text'
                                         className={styles.input}
                                         value={selectedEmployee.name}
-                                        onChange={e =>
+                                        onChange={e => {
                                             setSelectedEmployee({name: e.target.value, id: parseInt(match.params.id)})
-                                        }
+                                            setChanged(true)
+                                        }}
                                     />
                                 )
                             )}

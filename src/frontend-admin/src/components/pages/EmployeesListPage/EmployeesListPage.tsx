@@ -12,7 +12,6 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
-import {History} from 'history'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -219,7 +218,10 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     function concatenatedName(row: any[]) {
         return (
             <td key={row[7]} className={styles.employees}>
-                <img className={styles.icon} src={URL + row[6]} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={URL + row[6]} alt={''} />
+                </div>
+
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />
                     <text className={styles.role}>{row[5]}</text>
