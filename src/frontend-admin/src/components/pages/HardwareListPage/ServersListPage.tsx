@@ -68,7 +68,6 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
         axios
             .get('/list/servers')
             .then((data: IPulledData[]) => {
-                console.log(data)
                 const servers: IServerData[] = []
                 data.map((i: IPulledData) => {
                     servers.push({
@@ -82,14 +81,12 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                         model: format(i.model),
                     })
                 })
-                console.log(servers)
                 setListData(servers)
             })
             .catch((err: any) => console.error(err))
         axios
             .get('/archivedList/server')
             .then((data: IPulledData[]) => {
-                console.log(data)
                 const servers: IServerData[] = []
                 data.map((i: IPulledData) => {
                     servers.push({
@@ -103,7 +100,6 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                         model: format(i.model),
                     })
                 })
-                console.log(servers)
                 setArchivedData(servers)
             })
             .catch((err: any) => console.error(err))
@@ -242,7 +238,6 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     rows.forEach(row => {
         const transformedRow: any[] = []
-        console.log(row)
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:

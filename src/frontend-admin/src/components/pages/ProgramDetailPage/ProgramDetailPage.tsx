@@ -37,6 +37,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
 
     var axios = new AxiosService(accessToken, refreshToken)
 
+    const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState('')
     const [progData, setProgData] = useState<{
         name: string
@@ -84,6 +85,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     costPerYear: data[0].programCostPerYear,
                     hasPlugin: data[0].hasPlugIn,
                 })
+                setIsDeleted(data[0].isDeleted)
                 setProgRows([
                     [
                         {value: format(data[0].programLicenseKey ? data[0].programLicenseKey : '-'), sortBy: 0},
@@ -117,10 +119,13 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         if (progData.hasPlugin) {
             window.alert('Please archive the plugins before you archive this program.')
         } else {
-            if (window.confirm(`Are you sure you want to archive this copy of ${progData.name}?`)) {
+            if (
+                window.confirm(
+                    `Are you sure you want to ${isDeleted ? 'recover' : 'archive'} this copy of ${progData.name}?`
+                )
+            ) {
                 await axios
-                    .put(`archive/program/${match.params.id}`, {})
-                    .then((response: any) => console.log(response))
+                    .put(`${isDeleted ? 'recover' : 'archive'}/program/${match.params.id}`, {})
                     .catch((err: any) => console.error(err))
 
                 //after submitting go back to overview
@@ -176,17 +181,19 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                 <div className={styles.secondColumn}>
                     {isAdmin && (
                         <Group direction='row' justify='start' className={styles.group}>
-                            <Button
-                                text='Edit'
-                                icon='edit'
-                                onClick={() => {
-                                    history.push('/programs/edit/details/' + match.params.id)
-                                }}
-                                className={styles.editbutton}
-                            />
+                            {!isDeleted && (
+                                <Button
+                                    text='Edit'
+                                    icon='edit'
+                                    onClick={() => {
+                                        history.push('/programs/edit/details/' + match.params.id)
+                                    }}
+                                    className={styles.editbutton}
+                                />
+                            )}
 
                             <Button
-                                text='Archive'
+                                text={isDeleted ? 'Recover' : 'Archive'}
                                 icon='archive'
                                 onClick={handleArchive}
                                 className={styles.archivebutton}

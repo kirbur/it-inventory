@@ -639,7 +639,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 .put(userData.photo, formData, {
                     headers: {'Content-Type': 'multipart/form-data'},
                 })
-                .then(data => console.log(data))
                 .catch(err => console.error(err))
         }
     }

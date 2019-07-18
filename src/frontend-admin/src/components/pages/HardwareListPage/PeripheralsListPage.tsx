@@ -64,7 +64,6 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
         axios
             .get('/list/peripherals')
             .then((data: IPulledData[]) => {
-                console.log(data)
                 const peripherals: IPeripheralData[] = []
                 data.map((i: IPulledData) =>
                     peripherals.push({
@@ -81,7 +80,6 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
         axios
             .get('/archivedList/peripheral')
             .then((data: IPulledData[]) => {
-                console.log(data)
                 const peripherals: IPeripheralData[] = []
                 data.map((i: IPulledData) =>
                     peripherals.push({
@@ -146,7 +144,6 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     useEffect(() => {
         setRows(filteredRows)
     }, [filteredData])
-    console.log(rows)
     //-------------- this will all be the same -------------
     const headerStates = []
     const headerStateCounts = []

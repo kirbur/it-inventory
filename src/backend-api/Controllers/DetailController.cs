@@ -49,8 +49,9 @@ namespace backend_api.Controllers
 
         }
 
-        /* GET: api/detail/ProgramOverview/{program}
-         * Function returns the program overview information     
+        /* GET: api/detail/ProgramOverview/{archived}/{program}
+         * Function returns the program overview information
+         * if archived is true, then the overview is for a deleted program
          * Returns:{
          *          ProgramOverview:{
          *              icon: string,
@@ -209,6 +210,7 @@ namespace backend_api.Controllers
          * GET: api/detail/employee/{id}
          * Function returns the employee detail information.
          * Returns: [ {
+         *      isDeleted: boolean,
          *      picture: partial URL (as string),
          *      totalProgramCostPerMonth: decimal,
          *      totalHardwareCost: decimal,
@@ -495,6 +497,7 @@ namespace backend_api.Controllers
                 // Combine it all into a nice JSON :)
                 object employeeDetail = new
                 {
+                    emp.IsDeleted,
                     picture,
                     totalProgramCostMonthly = Math.Round(totalProgramCostPerMonth, 2, MidpointRounding.ToEven),
                     totalHardwareCost,
@@ -519,6 +522,7 @@ namespace backend_api.Controllers
         * GET: api/detail/program/{id}
         * Function returns the program detail information.
         * Returns: {
+        *    "isDeleted": boolean,
         *    "programName": string,
         *    "picture: partial URL (as string),
         *    "renewalDate": date,
@@ -592,6 +596,7 @@ namespace backend_api.Controllers
                 // Returning the details of the program into a nice JSON object :)
                 var ProgramDetails = new
                 {
+                    prog.IsDeleted,
                     prog.ProgramId,
                     prog.ProgramName,
                     picture,
@@ -620,6 +625,7 @@ namespace backend_api.Controllers
        * GET: api/detail/department/{id}
        * Function returns the program detail information.
        * Returns : {
+       *    "isDeleted": boolean,
        *    "departmentName": String,
        *    "totalCostOfActHardwareInDep": decimal,
        *    "totalCostOfProgramsInDep": decimal,
@@ -844,6 +850,7 @@ namespace backend_api.Controllers
                 // creating list of necessary returnables that are specified in the method comment header
                 var DepartmentDetailPage = new
                 {
+                    dep.IsDeleted,
                     dep.DepartmentName,
                     TotalCostOfActHardwareInDep,
                     TotalCostOfProgramsInDep,
@@ -888,7 +895,8 @@ namespace backend_api.Controllers
                     "localHHD": string,
                     "location": string,
                     "serialNumber": string,
-                },
+                },                
+                "isDeleted": boolean,
                 "departmentName : string,
                 "departmentID : int,
                 "icon": partial URL (as string),
@@ -959,6 +967,7 @@ namespace backend_api.Controllers
 
                 var serverDetailPage = (new
                 {
+                    sv.IsDeleted,
                     server = sv,
                     departmentName,
                     departmentID,
@@ -1000,7 +1009,8 @@ namespace backend_api.Controllers
                         "localHHD": string,
                         "location": string,
                         "serialNumber": string
-                    },
+                    },                    
+                    "isDeleted": boolean,
                     "departmentName : string,
                     "departmentID : int,
                     "icon": partial URL (as string),
@@ -1065,6 +1075,7 @@ namespace backend_api.Controllers
 
                 var computerDetailPage = (new
                 {
+                    comp.IsDeleted,
                     computer = comp,
                     departmentName,
                     departmentID,
@@ -1103,6 +1114,7 @@ namespace backend_api.Controllers
                     "location": string,
                     "serialNumber": string,
                 },
+                "isDeleted": boolean,
                 "departmentName : string,
                 "departmentID : int,
                 "icon": partial URL (as string),
@@ -1170,6 +1182,7 @@ namespace backend_api.Controllers
 
                 var monitorDetailPage = (new
                 {
+                    mn.IsDeleted,
                     monitor = mn,
                     departmentName,
                     departmentID,
@@ -1203,6 +1216,7 @@ namespace backend_api.Controllers
                     "renewalDate": date (as string),
                     "serialNumber": string,
                 },
+                "isDeleted": boolean,
                 "departmentName : string,
                 "departmentID : int,
                 "icon": partial URL (as string),
@@ -1270,6 +1284,7 @@ namespace backend_api.Controllers
                 var peripheralClicked = nameof(Peripheral) + "/" + pr.PeripheralId;
                 var peripheralDetailPage = (new
                 {
+                    pr.IsDeleted,
                     peripheral = pr,
                     departmentName,
                     departmentID,

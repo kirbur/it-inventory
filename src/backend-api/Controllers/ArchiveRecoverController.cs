@@ -135,7 +135,7 @@ namespace backend_api.Controllers
                 _context.SaveChanges();
             }
 
-
+            _context.SaveChanges();
 
 
             return Ok($"{(isDeleted ? "archive" : "recover")} completed");
