@@ -1,44 +1,62 @@
 import React, {useState, useEffect, useContext} from 'react'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {History} from 'history'
+import {match} from 'react-router-dom'
 
 // Components
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 
 // Utils
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
-import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './EmployeeDetailPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/employee-placeholder.png'
 
 // Context
 import {LoginContext} from '../../App/App'
 
 // Types
 interface IEmployeeDetailPageProps {
-    match: any
-    history: any
+    match: match<{id: string}>
+    history: History
 }
 
-// Helpers
+interface IUser {
+    photo: string
+    name: string
+    department: string
+    role: string
+    hireDate: string
+    hwCost: number
+    swCost: number
+}
 
 // Primary Component
 export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => {
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
-    const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
-    const [userData, setUserData] = useState<any>({})
-    const [hardwareRows, setHardwareRows] = useState<any[]>([])
-    const [softwareRows, setSoftwareRows] = useState<any[]>([])
-    const [licenseRows, setLicenseRows] = useState<any[]>([])
+    const [img, setImg] = useState('')
+    const [userData, setUserData] = useState<IUser>({
+        photo: '',
+        name: '',
+        department: '',
+        role: '',
+        hireDate: '',
+        hwCost: 0,
+        swCost: 0,
+    })
+    const [hardwareRows, setHardwareRows] = useState<ITableItem[][]>([])
+    const [softwareRows, setSoftwareRows] = useState<ITableItem[][]>([])
+    const [licenseRows, setLicenseRows] = useState<ITableItem[][]>([])
 
     const hardwareHeaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
     const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
@@ -47,18 +65,18 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
     const handleHardwareClick = (id: number | string) => {
-        history.push(`/hardware/${id}`)
+        history.push(`/hardware/detail/${id}`)
     }
 
     const handleProgramClick = (id: number | string) => {
-        history.push(`/programs/details/${id}`)
+        history.push(`/programs/detail/${id}`)
     }
 
     useEffect(() => {
         axios
             .get(`/detail/employee/${match.params.id}`)
             .then((data: any) => {
-                let user: any = {
+                let user: IUser = {
                     photo: data[0].picture,
                     name: data[0].firstName + ' ' + data[0].lastName,
                     department: data[0].department,
@@ -70,7 +88,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
 
                 setUserData(user)
 
-                let hw: any[] = []
+                let hw: ITableItem[][] = []
                 data[0].hardware.map((i: any) =>
                     hw.push([
                         {
@@ -87,7 +105,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 )
                 setHardwareRows(hw)
 
-                let sw: any[] = []
+                let sw: ITableItem[][] = []
                 data[0].software.map((i: any) =>
                     sw.push([
                         {
@@ -106,7 +124,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 )
                 setSoftwareRows(sw)
 
-                let l: any[] = []
+                let l: ITableItem[][] = []
                 data[0].licenses.map((i: any) =>
                     l.push([
                         {
@@ -116,15 +134,15 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                             sortBy: i.name,
                         },
                         {
-                            value: format(i.licenseKey),
+                            value: format(i.licensesKey),
                             id: format(i.id),
-                            sortBy: format(i.licenseKey),
+                            sortBy: format(i.licensesKey),
                         },
                         {
                             value: '$' + Math.round(i.costPerMonth * 100) / 100,
                             sortBy: i.costPerMonth,
                         },
-                        {value: format(i.cals), id: format(i.id), sortBy: i.cals},
+                        {value: format(i.licensesCount), id: format(i.id), sortBy: i.licensesCount},
                     ])
                 )
                 setLicenseRows(l)
@@ -132,9 +150,28 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
             .catch((err: any) => console.error(err))
     }, [])
 
+    useEffect(() => {
+        //once icon has a value, check to see if that picture exists. If it doesnt then use the placeholder
+        if (userData.photo !== '') {
+            axios
+                .get(userData.photo)
+                .then((data: any) => {
+                    if (data !== '') {
+                        setImg(URL + userData.photo)
+                    } else {
+                        setImg(placeholder)
+                    }
+                })
+                .catch((err: any) => console.error(err))
+        } else {
+            setImg('')
+        }
+    }, [userData.photo])
+
     async function handleArchive() {
         if (window.confirm(`Are you sure you want to archive ${userData.name}?`)) {
             await axios.put(`/archive/employee/${match.params.id}`, {}).catch((err: any) => console.error(err))
+
             history.push('/employees')
         }
     }
@@ -154,11 +191,19 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         textClassName={styles.backButtonText}
                     />
                     <div className={styles.imgPadding}>
-                        <img className={styles.img} src={URL + userData.photo} alt={''} />
+                        <img className={styles.img} src={img} alt={''} />
                     </div>
                     <div className={styles.costText}>
-                        <p>Software ---------------- ${userData.swCost} /month</p>
-                        <p>Hardware --------------- ${userData.hwCost}</p>
+                        <Group>
+                            <p>Software</p>
+                            <div className={styles.costLine} />
+                            <p>${userData.swCost} /month</p>
+                        </Group>
+                        <Group>
+                            <p>Hardware</p>
+                            <div className={styles.costLine} />
+                            <p> ${userData.hwCost}</p>
+                        </Group>
                     </div>
                 </div>
                 {/* column 2 */}
@@ -169,7 +214,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                                 text='Edit'
                                 icon='edit'
                                 onClick={() => {
-                                    history.push('/editEmployee/' + match.params.id)
+                                    history.push('/employees/edit/' + match.params.id)
                                 }}
                                 className={styles.editbutton}
                             />

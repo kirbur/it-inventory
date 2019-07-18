@@ -4,6 +4,8 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {formatDate} from '../../../utilities/FormatDate'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -17,6 +19,7 @@ import {LoginContext} from '../../App/App'
 
 // Styles
 import styles from './HardwareListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/server-placeholder.png'
 
 // Types
 interface IServersListPageProps {
@@ -64,12 +67,17 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
     const [isArchive, setIsArchive] = useState(false)
 
+    const [useImages, setUseImages] = useState(false)
+    const [images, setImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages] = useState<{id: number; img: string}[]>([])
+
     useEffect(() => {
         axios
             .get('/list/servers')
             .then((data: IPulledData[]) => {
                 console.log(data)
                 const servers: IServerData[] = []
+                var imgs: {id: number; img: string}[] = []
                 data.map((i: IPulledData) => {
                     servers.push({
                         make: format(i.make),
@@ -81,9 +89,13 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                         icon: i.icon,
                         model: format(i.model),
                     })
+                    imgs.push({id: i.serverId, img: i.icon})
                 })
-                console.log(servers)
+
                 setListData(servers)
+
+                setImages(imgs)
+                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
         axios
@@ -135,11 +147,16 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
         }
     }, [search, selected, listData, isArchive])
 
-    const formatDate = (hireDate: string) => {
-        const hired = new Date(hireDate)
-        const date = hired.getFullYear() + '/' + (hired.getMonth() + 1) + '/' + hired.getDate()
-        return date
-    }
+    //Set display Images
+    useEffect(() => {
+        images.map((img: {id: number; img: string}) =>
+            checkImage(img.img, axios, placeholder).then(data => {
+                var list = images.filter(i => i.id !== img.id)
+                setImages([...list, {id: img.id, img: data}])
+                displayImages.push({id: img.id, img: data})
+            })
+        )
+    }, [useImages])
 
     const handleClick = () => {
         history.push(`hardware/edit/server/new`)
@@ -227,9 +244,23 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }
 
     function concatenatedName(row: any[]) {
-        return (
+        return displayImages &&
+            displayImages.filter(x => x.id === row[1]) &&
+            displayImages.filter(x => x.id === row[1])[0] ? (
             <td key={row[1]} className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[6]} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                </div>
+                <div className={styles.alignLeft}>
+                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={styles.alignLeft}>{row[7]}</text>
+                </div>
+            </td>
+        ) : (
+            <td key={row[1]} className={styles.hardware}>
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text> <br />
                     <text className={styles.alignLeft}>{row[7]}</text>
@@ -242,7 +273,6 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     rows.forEach(row => {
         const transformedRow: any[] = []
-        console.log(row)
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:

@@ -8,6 +8,7 @@ import {format} from '../../../utilities/formatEmptyStrings'
 import {formatDate} from '../../../utilities/FormatDate'
 import {formatCost} from '../../../utilities/FormatCost'
 import {History} from 'history'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -39,8 +40,8 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     // state
     const [useImages, setUseImages] = useState(false)
     const [images, setImages] = useState<{name: string; img: string}[]>([])
-
     const [displayImages] = useState<{name: string; img: string}[]>([])
+
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState(listData)
     const [search, setSearch] = useState('')
@@ -61,7 +62,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             .get('/list/programs/false')
             .then((data: any) => {
                 var programs: any[] = []
-                var imgs: any[] = []
+                var imgs: {name: string; img: string}[] = []
                 var pins: {name: string; pinned: boolean}[] = []
                 data.map((i: any) => {
                     programs.push({
@@ -75,8 +76,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                         cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
                     })
                     imgs.push({name: i.programName, img: i.icon})
-                    //TODO: have someone add this to the endpoint
-                    pins.push({name: i.programName, pinned: i.pinned ? true : false})
+                    pins.push({name: i.programName, pinned: i.isPinned})
                 })
                 setListData(programs)
                 setImages(imgs)
@@ -88,7 +88,6 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             .get('list/programs/true')
             .then((data: any) => {
                 var programs: any[] = []
-                var imgs: any[] = []
                 var pins: {name: string; pinned: boolean}[] = []
                 data.map((i: any) => {
                     programs.push({
@@ -101,40 +100,23 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                         icon: placeholder,
                         cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
                     })
-                    imgs.push({name: i.programName, img: i.icon})
-                    //TODO: have someone add this to the endpoint
                     pins.push({name: i.programName, pinned: i.pinned ? true : false})
                 })
                 setArchivedData(programs)
-                setImages(imgs)
-                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
     }, [])
 
     //Set display Images
     useEffect(() => {
-        images.map((img: any) =>
-            checkImages(img).then(data => {
+        images.map((img: {name: string; img: string}) =>
+            checkImage(img.img, axios, placeholder).then(data => {
                 var list = images.filter(i => i.name !== img.name)
-                setImages([...list, data])
-                displayImages.push(data)
+                setImages([...list, {name: img.name, img: data}])
+                displayImages.push({name: img.name, img: data})
             })
         )
     }, [useImages])
-
-    //check image
-    async function checkImages(img: any) {
-        var arr: any[] = []
-        await axios
-            .get(img.img)
-            .then((data: any) => {
-                arr.push({name: img.name, img: data === '' ? placeholder : URL + img.img})
-            })
-            .catch((err: any) => console.error(err))
-
-        return arr[0]
-    }
 
     useEffect(() => {
         // Search through listData based on current value
@@ -353,8 +335,14 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     })
 
     async function handlePinChanges() {
-        //TODO: put to set pinned programs
-        //async axios.put().catch((err: any) => console.error(err))
+        var pins: string[] = []
+        pinned.forEach(pin => {
+            if (pin.pinned) {
+                pins.push(pin.name)
+            }
+        })
+
+        await axios.put('/update/programPins', pins).catch((err: any) => console.error(err))
         setCheckboxes(!checkboxes)
     }
 

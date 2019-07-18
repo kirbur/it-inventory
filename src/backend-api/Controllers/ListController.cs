@@ -445,10 +445,10 @@ namespace backend_api.Controllers
                 var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName).Count();
 
                 // calculate the cost of each distinct program if it is charged yearly 
-                var ProgCostPerYear = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramCostPerYear != null && x.IsDeleted == isDeleted).Sum(x => x.ProgramCostPerYear);
+                var ProgCostPerYear = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramCostPerYear != null && x.IsDeleted == archived).Sum(x => x.ProgramCostPerYear);
 
                 // calculate the cost of each distinct program if it is charged as a flat rate 
-                var ProgCostPerUse = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramFlatCost != null && x.IsDeleted == isDeleted).Sum(x => x.ProgramFlatCost);
+                var ProgCostPerUse = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramFlatCost != null && x.IsDeleted == archived).Sum(x => x.ProgramFlatCost);
 
                 // icon path.
                 string icon = $"/image/program/{prog.ProgramId}";
