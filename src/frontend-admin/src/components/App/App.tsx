@@ -131,42 +131,44 @@ export const App: React.FC = () => {
                         <Route exact path='/' component={Login} />
 
                         <Route path={'/departments/detail/:id'} render={props => <DepartmentDetailPage {...props} />} />
-                        <Route path={'/employees/:id'} render={props => <EmployeeDetailPage {...props} />} />
+                        <Route path={'/employees/detail/:id'} render={props => <EmployeeDetailPage {...props} />} />
                         <Route
                             path={'/hardware/detail/:type/:id'}
                             render={props => <HardwareDetailPage {...props} />}
                         />
-
                         <Route
                             path={'/programs/overview/:id/:archived'}
                             render={props => <ProgramOverviewPage {...props} />}
                         />
-                        <Route path={'/programs/details/:id'} render={props => <ProgramDetailPage {...props} />} />
-                        <Route
-                            exact
-                            path={'/editEmployee/:id'}
-                            render={props => <EmployeeDetailEditPage {...props} />}
-                        />
+                        <Route path={'/programs/detail/:id'} render={props => <ProgramDetailPage {...props} />} />
 
-                        <Route
-                            exact
-                            path={'/departments/edit/:id'}
-                            render={props => <DepartmentDetailEditPage {...props} />}
-                        />
-                        <Route
-                            exact
-                            path={'/hardware/edit/:type/:id'}
-                            render={props => <HardwareDetailEditPage {...props} />}
-                        />
+                        {loginContextVariables.isAdmin && (
+                            <Route exact path={'/employees/edit/:id'} component={EmployeeDetailEditPage} />
+                        )}
 
-                        <Route
-                            path={'/programs/edit/details/:id'}
-                            render={props => <ProgramDetailEditPage {...props} />}
-                        />
-                        <Route
-                            path={'/programs/edit/overview/:id/:archived'}
-                            render={props => <ProgramOverviewEditPage {...props} />}
-                        />
+                        {loginContextVariables.isAdmin && (
+                            <Route
+                                exact
+                                path={'/departments/edit/:id'}
+                                render={props => <DepartmentDetailEditPage {...props} />}
+                            />
+                        )}
+
+                        {loginContextVariables.isAdmin && (
+                            <Route
+                                exact
+                                path={'/hardware/edit/:type/:id'}
+                                render={props => <HardwareDetailEditPage {...props} />}
+                            />
+                        )}
+
+                        {loginContextVariables.isAdmin && (
+                            <Route path={'/programs/edit/detail/:id'} component={ProgramDetailEditPage} />
+                        )}
+
+                        {loginContextVariables.isAdmin && (
+                            <Route path={'/programs/edit/overview/:id:/archived'} component={ProgramOverviewEditPage} />
+                        )}
                     </Switch>
                 </Router>
 

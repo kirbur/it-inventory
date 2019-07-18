@@ -112,3 +112,8 @@
 .editButton {
     width: 50px;
 }
+
+.unavailable {
+    font-style: italic;
+    color: #a5a5a5;
+}

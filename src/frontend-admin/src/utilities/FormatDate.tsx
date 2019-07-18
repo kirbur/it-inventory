@@ -4,10 +4,10 @@ export const formatDate = (date: string) => {
     return date ? formatted : '-'
 }
 
-export const getDays = (hireDate: string) => {
-    const today = new Date()
-    const hired = new Date(hireDate)
-    return Math.round(Math.abs(today.getTime() - hired.getTime()))
+export const getDays = (startDate: string, endDate?: string) => {
+    const end = endDate ? new Date(endDate) : new Date()
+    const start = new Date(startDate)
+    return Math.round(Math.abs(end.getTime() - start.getTime()))
 }
 
 //does not account for leap years or variable # of days in a month
