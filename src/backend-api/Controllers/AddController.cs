@@ -500,7 +500,9 @@ namespace backend_api.Controllers
                 .Select(x => x.ProgramName)
                 .ToList()
                 .Contains(input.ProgramName)))
+            {
                 return BadRequest("No such program exists");
+            }
 
             var plugin = new Plugins()
             {
