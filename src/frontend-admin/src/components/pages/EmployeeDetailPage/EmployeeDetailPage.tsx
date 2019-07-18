@@ -132,9 +132,9 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
             .catch((err: any) => console.error(err))
     }, [])
 
-    const handleArchive = () => {
+    async function handleArchive() {
         if (window.confirm(`Are you sure you want to archive ${userData.name}?`)) {
-            //TODO: a post request to archive user w/ id match.params.id
+            await axios.put(`/archive/employee/${match.params.id}`, {}).catch((err: any) => console.error(err))
             history.push('/employees')
         }
     }
