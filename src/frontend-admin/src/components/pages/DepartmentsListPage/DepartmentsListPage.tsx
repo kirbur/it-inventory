@@ -10,6 +10,7 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import {History} from 'history'
 
 // Styles
 import styles from './DepartmentsListPage.module.css'
@@ -20,21 +21,34 @@ import {LoginContext} from '../../App/App'
 
 // Types
 interface IDepartmentsListPageProps {
-    history: any
-    match: any
+    history: History
+}
+interface IDepartmentData {
+    cost: number
+    id: number
+    name: string
+    icon: string
+    totalEmployees: number
+}
+interface IPulledData {
+    costOfPrograms: number
+    departmentId: number
+    departmentName: string
+    icon: string
+    numOfEmp: number
 }
 
 // Primary Component
 export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props => {
-    const {history, match} = props
+    const {history} = props
     const {
         loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
     const axios = new AxiosService(accessToken, refreshToken)
 
     // state
-    const [listData, setListData] = useState<any[]>([])
-    const [filteredData, setFilteredData] = useState<any[]>([])
+    const [listData, setListData] = useState<IDepartmentData[]>([])
+    const [filteredData, setFilteredData] = useState<IDepartmentData[]>([])
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Departments', value: 'name'})
 
@@ -49,15 +63,17 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     useEffect(() => {
         axios
             .get('/list/departments')
-            .then((data: any) => {
-                var depts: any[] = []
+            .then((data: IPulledData[]) => {
+                var depts: IDepartmentData[] = []
                 var imgs: {id: number; img: string}[] = []
-                data.map((i: any) => {
+                data.map((i: IPulledData) => {
                     depts.push({
                         name: format(i.departmentName),
                         id: i.departmentId,
                         totalEmployees: i.numOfEmp,
+                        //TODO: verify that this recieves a cost per year
                         cost: i.costOfPrograms,
+                        icon: format(i.icon),
                     })
                     imgs.push({id: i.departmentId, img: i.icon})
                 })
@@ -112,11 +128,11 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }
 
     const handleClick = () => {
-        history.push(`/editDepartment/new`)
+        history.push(`/departments/edit/new`)
     }
 
-    const handleRowClick = (row: any) => {
-        history.push(`${match.url}/${row[0].key}`)
+    const handleRowClick = (row: any[]) => {
+        history.push(`departments/detail/${row[0].key}`)
     }
 
     var filteredRows: any[] = []

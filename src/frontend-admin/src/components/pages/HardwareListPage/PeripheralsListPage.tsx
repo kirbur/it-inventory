@@ -10,6 +10,7 @@ import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
+import {History} from 'history'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -20,7 +21,24 @@ import placeholder from '../../../content/Images/Placeholders/peripheral-placeho
 
 // Types
 interface IPeripheralListPageProps {
-    history: any
+    history: History
+}
+interface IPeripheralData {
+    name: string
+    id: number
+    purchaseDate: string
+    assigned: string
+    //icon: string
+}
+interface IPulledData {
+    peripheralName: string
+    peripheralType: string
+    peripheralId: number
+    purchaseDate: string
+    isAssigned: boolean
+    employeeFirstName: string
+    employeeLastName: string
+    icon: string
 }
 
 // Primary Component
@@ -32,8 +50,8 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     const axios = new AxiosService(accessToken, refreshToken)
 
     // state
-    const [listData, setListData] = useState<any[]>([])
-    const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
+    const [listData, setListData] = useState<IPeripheralData[]>([])
+    const [filteredData, setFilteredData] = useState<IPeripheralData[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Make & Model', value: 'name'})
 
@@ -48,10 +66,11 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     useEffect(() => {
         axios
             .get('/list/peripherals')
-            .then((data: any) => {
-                const peripherals: any[] = []
+            .then((data: IPulledData[]) => {
+                console.log(data)
+                const peripherals: IPeripheralData[] = []
                 var imgs: {id: number; img: string}[] = []
-                data.map((i: any) => {
+                data.map((i: IPulledData) => {
                     peripherals.push({
                         name: format(i.peripheralName + ' ' + i.peripheralType),
                         id: i.peripheralId,
@@ -113,11 +132,11 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     }
 
     const handleClick = () => {
-        history.push('/hardware/peripheral/new')
+        history.push('/hardware/edit/peripheral/new')
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/peripheral/${row[0].key}`)
+        history.push(`hardware/detail/peripheral/${row[0].key}`)
     }
 
     var filteredRows: any[] = []
@@ -129,7 +148,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     useEffect(() => {
         setRows(filteredRows)
     }, [filteredData])
-
+    console.log(rows)
     //-------------- this will all be the same -------------
     const headerStates = []
     const headerStateCounts = []
@@ -227,16 +246,9 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     //this is where the individual rows are rendered
     rows.forEach(row => {
         const transformedRow: any[] = []
-        for (let i = 0; i < row.length; i++) {
-            switch (i) {
-                case 0:
-                    transformedRow[0] = concatenatedName(row)
-                case 1:
-                    transformedRow[2] = <td className={styles.alignLeft}>{formatDate(row[2])}</td>
-                case 2:
-                    transformedRow[3] = <td className={styles.alignLeft}>{row[3]}</td>
-            }
-        }
+        transformedRow.push(concatenatedName(row))
+        transformedRow.push(<td className={styles.alignLeft}>{formatDate(row[2])}</td>)
+        transformedRow.push(<td className={styles.alignLeft}>{row[3]}</td>)
 
         renderedRows.push(transformedRow)
     })
