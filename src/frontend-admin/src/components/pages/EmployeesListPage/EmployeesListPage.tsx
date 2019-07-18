@@ -74,6 +74,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             .then((data: IPulledData[]) => {
                 let employees: IEmployeeData[] = []
                 data.map((i: IPulledData) => {
+                    console.log(data)
                     employees.push({
                         name: format(i.employeeName),
                         dateHired: formatDate(i.hireDate),
@@ -85,8 +86,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         id: i.employeeId,
 
                         //for searching
-                        hardware: i.hardwareList.join(', '),
-                        programs: i.progForEmp.join(', '),
+                        hardware: i.hardwareList ? i.hardwareList.join(', ') : '',
+                        programs: i.progForEmp ? i.progForEmp.join(', ') : '',
                         daysEmployed: getDays(i.hireDate),
                     })
                 })
@@ -96,11 +97,11 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
         axios
             .get('/archivedList/employee')
-            .then((data: IPulledData[]) => {
-                let employees: IEmployeeData[] = []
-                data.map((i: IPulledData) => {
+            .then((data: any[]) => {
+                let employees: any[] = []
+                data.map((i: any) => {
                     employees.push({
-                        name: format(i.employeeName),
+                        name: format(i.firstName + ' ' + i.lastName),
                         dateHired: formatDate(i.hireDate),
                         cost: formatCost(i.hardwareCostForEmp, i.programCostForEmp),
                         hwCost: i.hardwareCostForEmp,
@@ -110,8 +111,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         id: i.employeeId,
 
                         //for searching
-                        hardware: i.hardwareList.join(', '),
-                        programs: i.progForEmp.join(', '),
+                        hardware: i.hardwareList ? i.hardwareList.join(', ') : '',
+                        programs: i.progForEmp ? i.progForEmp.join(', ') : '',
                         daysEmployed: getDays(i.hireDate),
                     })
                 })
