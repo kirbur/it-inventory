@@ -116,19 +116,11 @@ namespace backend_api.Controllers
                     .ToList()
                     .ForEach(program =>
                     {
-                        // For each property on a Program, loop through it.
-                        foreach (var propPair in WidgetUtil<Models.Program, ProgramUpdateObjectModel>.PropertyMap)
-                        {
-                            // Get the value of the property on the ObjectModel
-                            var newValue = propPair.Item2.GetValue(updatedProg, null);
-                            if (newValue != null)
-                            {
-                                // Update the value of the property on the Program.
-                                propPair.Item1.SetValue(program, newValue, null);
-                            }
-                        }
+                        // Uses the utility function to merge properties and update the values.
+                        PropertyUtil<Models.Program, ProgramUpdateObjectModel>.UpdateProperties(program, updatedProg);
                         // Update a value that needs special calculations.
-                        program.IsCostPerYear = updatedProg.MonthsPerRenewal != null && updatedProg.MonthsPerRenewal - 12 >= 0 ? true : false;
+                        program.IsCostPerYear = updatedProg.MonthsPerRenewal != null && updatedProg.MonthsPerRenewal - 12 >= 0
+                            ? true : false;
                     }
                 );
                 _context.SaveChanges();
@@ -139,6 +131,8 @@ namespace backend_api.Controllers
                 return BadRequest(error: e.Message);
             }
         }
+
+
 
         /* PUT: api/update/program/{id}
         * Will update the program identified by the id from the route
