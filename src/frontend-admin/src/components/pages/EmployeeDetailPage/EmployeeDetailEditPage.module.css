@@ -163,10 +163,17 @@ input:checked ~ .insideCheckmarkAdmin {
     display: flex;
     flex-wrap: wrap;
 }
-.deptIcon {
+
+.deptIconContainer {
+    margin: 25px;
     width: 75px;
     height: 75px;
-    margin: 25px;
+    display: flex;
+}
+.deptIcon {
+    width: 75px;
+    max-height: 75px;
+    margin: auto;
 }
 .deptName {
     color: #636363;

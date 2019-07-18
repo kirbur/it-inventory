@@ -16,10 +16,11 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import styles from './EmployeeDetailEditPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 import {Button} from '../../reusables/Button/Button'
-import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {LoginContext} from '../../App/App'
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
+import deptPlaceholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Types
 interface IDepartment {
@@ -103,6 +104,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const licenseHeaders = ['Licenses', 'Key/Username', 'Monthly Cost', 'CALs']
 
     const [deptList, setDeptList] = useState<IDepartment[]>([])
+    const [deptImages, setDeptImages] = useState<{id: number; img: string}[]>([])
+    const [useImages, setUseImages] = useState(false)
 
     //input feild states:
     const [dateInput, setDateInput] = useState<Date>(new Date())
@@ -132,6 +135,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     setEmployeeDropdown(availableEmp)
 
                     setDeptList(data[0].departments)
+                    setUseImages(true)
 
                     let uhw: any[] = []
                     data[0].unassignedHardware.map((i: any) =>
@@ -282,10 +286,38 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
             axios
                 .get(`/add/employeePrep/`)
-                .then((data: any) => setDeptList(data[0].departments))
+                .then((data: any) => {
+                    setDeptList(data[0].departments)
+
+                    setUseImages(true)
+                })
                 .catch((err: any) => console.error(err))
         }
     }, [])
+
+    //Set display Images
+    useEffect(() => {
+        deptList.map((dept: any) =>
+            checkImages(dept).then(data => {
+                var list = deptList.filter(i => i.departmentId !== dept.departmentId)
+                setDeptList([...list, {...dept, icon: data}])
+                deptImages.push({id: dept.departmentId, img: data})
+            })
+        )
+    }, [useImages])
+
+    //check image
+    async function checkImages(dept: any) {
+        var arr: any[] = []
+        await axios
+            .get(dept.icon)
+            .then((data: any) => {
+                arr.push(data === '' ? deptPlaceholder : URL + dept.icon)
+            })
+            .catch((err: any) => console.error(err))
+
+        return arr[0]
+    }
 
     //Check the current employees department, if they don't have one yet check the first
     useEffect(() => {
@@ -930,7 +962,19 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmark} />
-                                <img src={dept.icon} alt={''} className={styles.deptIcon} />
+                                <div className={styles.deptIconContainer}>
+                                    {deptImages &&
+                                    deptImages.filter(x => x.id === dept.departmentId) &&
+                                    deptImages.filter(x => x.id === dept.departmentId)[0] ? (
+                                        <img
+                                            src={deptImages.filter(x => x.id === dept.departmentId)[0].img}
+                                            alt={''}
+                                            className={styles.deptIcon}
+                                        />
+                                    ) : (
+                                        <img src={deptPlaceholder} alt={''} className={styles.deptIcon} />
+                                    )}
+                                </div>
                                 <div className={styles.deptName}>{dept.departmentName}</div>
                             </div>
                         ))}

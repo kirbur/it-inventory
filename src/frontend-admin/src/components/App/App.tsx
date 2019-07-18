@@ -144,10 +144,19 @@ export const App: React.FC = () => {
                         )}
 
                         {loginContextVariables.isAdmin && (
-                            <Route exact path={'/departments/edit/:id'} comoponent={DepartmentDetailEditPage} />
+                            <Route
+                                exact
+                                path={'/departments/edit/:id'}
+                                render={props => <DepartmentDetailEditPage {...props} />}
+                            />
                         )}
+
                         {loginContextVariables.isAdmin && (
-                            <Route exact path={'/hardware/edit/:type/:id'} comoponent={HardwareDetailEditPage} />
+                            <Route
+                                exact
+                                path={'/hardware/edit/:type/:id'}
+                                render={props => <HardwareDetailEditPage {...props} />}
+                            />
                         )}
 
                         {loginContextVariables.isAdmin && (
