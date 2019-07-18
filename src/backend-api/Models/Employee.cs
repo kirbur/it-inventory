@@ -1,9 +1,10 @@
-﻿using System;
+﻿using backend_api.Helpers;
+using System;
 using System.Collections.Generic;
 
 namespace backend_api.Models
 {
-    public partial class Employee
+    public partial class Employee: ISoftDeletable
     {
 
         public Employee() { }
