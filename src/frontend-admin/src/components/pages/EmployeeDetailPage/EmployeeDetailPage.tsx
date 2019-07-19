@@ -33,6 +33,8 @@ interface IUser {
     hireDate: string
     hwCost: number
     swCost: number
+    archiveDate: string
+    description: string
 }
 
 // Primary Component
@@ -54,6 +56,8 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         hireDate: '',
         hwCost: 0,
         swCost: 0,
+        archiveDate: '',
+        description: '',
     })
     const [hardwareRows, setHardwareRows] = useState<ITableItem[][]>([])
     const [softwareRows, setSoftwareRows] = useState<ITableItem[][]>([])
@@ -85,6 +89,8 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     hireDate: formatDate(data[0].hireDate),
                     hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
                     swCost: Math.round(data[0].totalProgramCostMonthly * 100) / 100,
+                    archiveDate: formatDate(data[0].archiveDate), //TODO: make sure these were added
+                    description: data[0].textField,
                 }
 
                 setUserData(user)
@@ -237,9 +243,19 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         <div className={styles.employeeText}>
                             {userData.department} | {userData.role}
                         </div>
+
                         <div className={styles.employeeText}>
-                            Hired: {userData.hireDate} | {calculateDaysEmployed(getDays(userData.hireDate))}
+                            Start Date: {userData.hireDate} |{' '}
+                            {userData.archiveDate !== '-'
+                                ? `End Date: ${userData.archiveDate}`
+                                : calculateDaysEmployed(getDays(userData.hireDate))}
                         </div>
+
+                        {userData.archiveDate !== '-' && (
+                            <div className={styles.employeeText}>
+                                {calculateDaysEmployed(getDays(userData.hireDate))}
+                            </div>
+                        )}
                     </div>
                     <DetailPageTable
                         headers={hardwareHeaders}
@@ -261,6 +277,11 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         setRows={setLicenseRows}
                         className={styles.table}
                     />
+
+                    <div className={styles.descriptionContainer}>
+                        <div className={styles.descriptionTitle}>Description</div>
+                        <div className={styles.descriptionBody}>{userData.description}</div>
+                    </div>
                 </div>
             </div>
         </div>
