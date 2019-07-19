@@ -4,6 +4,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -14,6 +15,7 @@ import {History} from 'history'
 
 // Styles
 import styles from './DepartmentsListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Context
 import {LoginContext} from '../../App/App'
@@ -51,27 +53,54 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Departments', value: 'name'})
 
+    const [archivedData, setArchivedData] = useState<IDepartmentData[]>([])
+    const [isArchive, setIsArchive] = useState(false)
+
     const columns = ['name', 'totalEmployees', 'cost']
     const headerList = ['Departments', 'Total Employees', 'Programs Cost']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
+
+    const [useImages, setUseImages] = useState(false)
+    const [images, setImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages] = useState<{id: number; img: string}[]>([])
 
     useEffect(() => {
         axios
             .get('/list/departments')
             .then((data: IPulledData[]) => {
-                console.log(data)
+                var depts: IDepartmentData[] = []
+                var imgs: {id: number; img: string}[] = []
+                data.map((i: IPulledData) => {
+                    depts.push({
+                        name: format(i.departmentName),
+                        id: i.departmentId,
+                        totalEmployees: i.numOfEmp,
+                        cost: i.costOfPrograms,
+                        icon: URL + format(i.icon),
+                    })
+                    imgs.push({id: i.departmentId, img: i.icon})
+                })
+                setListData(depts)
+
+                setImages(imgs)
+                setUseImages(true)
+            })
+            .catch((err: any) => console.error(err))
+
+        axios
+            .get(`/archivedList/department`)
+            .then((data: any) => {
                 var depts: IDepartmentData[] = []
                 data.map((i: IPulledData) =>
                     depts.push({
                         name: format(i.departmentName),
                         id: i.departmentId,
-                        totalEmployees: i.numOfEmp,
-                        //TODO: verify that this recieves a cost per year
-                        cost: i.costOfPrograms,
-                        icon: format(i.icon),
+                        totalEmployees: 0,
+                        cost: 0,
+                        icon: placeholder,
                     })
                 )
-                setListData(depts)
+                setArchivedData(depts)
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -83,16 +112,39 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        var filteredTableInput = listData.filter((row: any) => {
-            return !row[selected.value]
-                ? false
-                : row[selected.value]
-                      .toString()
-                      .toLowerCase()
-                      .search(search.toLowerCase()) !== -1
-        })
-        setFilteredData(filteredTableInput)
-    }, [search, selected, listData])
+        if (isArchive) {
+            var filteredTableInput = archivedData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        } else {
+            var filteredTableInput = listData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        }
+    }, [search, selected, listData, isArchive])
+
+    //Set display Images
+    useEffect(() => {
+        images.map((img: {id: number; img: string}) =>
+            checkImage(img.img, axios, placeholder).then(data => {
+                var list = images.filter(i => i.id !== img.id)
+                setImages([...list, {id: img.id, img: data}])
+                displayImages.push({id: img.id, img: data})
+            })
+        )
+    }, [useImages])
 
     const handleClick = () => {
         history.push(`/departments/edit/new`)
@@ -184,9 +236,22 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }
 
     function concatenatedDept(row: any[]) {
-        return (
-            <td className={styles.departments} key={row[1]}>
-                <img className={styles.icon} src={URL + row[4]} alt={''} />
+        return displayImages &&
+            displayImages.filter(x => x.id === row[1]) &&
+            displayImages.filter(x => x.id === row[1])[0] ? (
+            <td key={row[1]} className={styles.departments}>
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                </div>
+                <div className={styles.alignLeft}>
+                    <text className={styles.departmentName}>{row[0]}</text>
+                </div>
+            </td>
+        ) : (
+            <td key={row[1]} className={styles.departments}>
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <div className={styles.departmentName}>{row[0]}</div>
                 </div>
@@ -223,8 +288,14 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     return (
         <div className={styles.departmentsListMain}>
             <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
-
+                <div className={styles.buttonContainer}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
+                    <Button
+                        text={isArchive ? 'View Active' : 'View Archives'}
+                        onClick={() => setIsArchive(!isArchive)}
+                        className={styles.archiveButton}
+                    />
+                </div>
                 <FilteredSearch
                     search={search}
                     setSearch={setSearch}

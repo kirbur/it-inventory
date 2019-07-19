@@ -25,6 +25,8 @@
 .linkedTitle {
     color: #009eff;
     cursor: pointer;
+    font-family: cqlRegularFont;
+    font-size: 22px;
 }
 .linkedTitle:hover {
     text-decoration: underline;

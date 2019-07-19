@@ -52,15 +52,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
-    const isAdmin = true //TODO: remove
 
     const axios = new AxiosService(accessToken, refreshToken)
 
     //default
-    const [employeeList, setEmployeeList] = useState([])
-
     const [firstSectionHeaders, setFirstSectionHeaders] = useState<string[]>(['yeah something went wrong'])
     const [secondSectionHeaders, setSecondSectionHeaders] = useState<string[]>(['yeah something went wrong'])
     const [thirdSectionHeaders, setThirdSectionHeaders] = useState<string[]>(['yeah something went wrong'])
@@ -97,7 +94,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
     useEffect(() => {
         axios.get(`add/hardwarePrep`).then((data: any) => {
-            console.log(data)
             const employees: {name: string; id: number}[] = []
             data.map((i: {employeeName: string; employeeId: number}) =>
                 employees.push({
@@ -126,7 +122,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setFirstSectionData([
                         data[0].server.make,
                         data[0].server.model,
@@ -176,7 +171,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data[0].computerHistory)
                     setFirstSectionData([
                         data[0].computer.make,
                         data[0].computer.model,
@@ -219,7 +213,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setFirstSectionData([
                         data[0].monitor.make,
                         data[0].monitor.model,
@@ -255,7 +248,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setFirstSectionData([
                         data[0].peripheral.peripheralName,
                         data[0].peripheral.peripheralType,
@@ -304,7 +296,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         }
 
         //check to make sure cost properly filled out
-        console.log(hasFlatCost)
         if (hasRecurringCost) {
             if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
                 window.alert('Recurring cost and months must have values!')
