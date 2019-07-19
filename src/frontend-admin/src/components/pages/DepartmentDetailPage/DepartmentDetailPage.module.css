@@ -1,5 +1,5 @@
 .detailMain {
-    margin: 50px 85px;
+    margin: 0 50px;
 }
 
 .archivebutton {
@@ -18,17 +18,15 @@
     padding: 50px;
 }
 
-.backButton {
-    margin-bottom: 30px;
-}
-
 .secondColumn {
-    min-width: 700px;
-    padding: 25px;
-    margin-left: 50px;
-    flex-grow: 1;
+    padding: 50px;
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
+}
+
+.backButton {
+    margin-bottom: 30px;
 }
 
 .paddingRight {
@@ -79,8 +77,8 @@
 
 .titleText {
     text-align: left;
-    margin-bottom: 50px;
-    padding-top: 25px;
+    padding-top: 50px;
+    min-height: 300px;
 }
 
 .deptName {
@@ -168,6 +166,9 @@
 }
 
 /* tables */
+.tableMargin {
+    margin-bottom: 50px;
+}
 .tableRow {
     display: flex;
     flex-direction: row;

@@ -1,5 +1,5 @@
 .detailMain {
-    margin: 50px 85px;
+    margin: 0px 50px;
 }
 
 /* edit/archive styling */
@@ -18,16 +18,16 @@
     flex-wrap: wrap;
     justify-content: center;
 }
+
 .firstColumn {
     padding: 50px;
 }
+
 .secondColumn {
-    min-width: 700px;
-    padding: 25px;
-    margin-left: 50px;
-    flex-grow: 1;
+    padding: 50px;
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
 }
 
 /* image styling */
@@ -61,8 +61,8 @@
 /* title/makeModel/dates styling */
 .titleText {
     text-align: left;
-    padding-bottom: 50px;
-    padding-top: 25px;
+    padding-top: 50px;
+    min-height: 300px;
 }
 .hardwareName {
     font-size: 36px;
@@ -79,7 +79,7 @@
 /* table styling */
 .table {
     border-collapse: collapse;
-    width: 700px;
+    width: 100%;
     margin-top: 50px;
 }
 .header {
@@ -88,6 +88,8 @@
     color: #a5a5a5;
     text-align: left;
     border-bottom: 1px solid #979797;
+    display: flex;
+    padding: 16px 0;
 }
 .rowData {
     text-align: left;
@@ -97,6 +99,6 @@
 
 /* history log */
 .historyLogContainer {
-    width: 700px;
+    /* width: 700px; */
     margin-top: 50px;
 }

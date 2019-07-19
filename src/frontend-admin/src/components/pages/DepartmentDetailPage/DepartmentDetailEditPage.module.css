@@ -1,20 +1,19 @@
 .columns {
+    padding: 0 50px;
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: row;
 }
+
 .firstColumn {
-    min-width: 300px;
-    padding: 25px;
-    padding-right: 75px;
+    padding: 50px;
 }
+
 .secondColumn {
-    min-width: 700px;
-    padding: 25px;
-    padding-top: 100px;
+    padding: 150px 50px;
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
 }
 .row {
     display: flex;

@@ -231,7 +231,13 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         )}
                     </div>
 
-                    <DetailPageTable headers={progHeaders} rows={progRows} setRows={setProgRows} sort={false} />
+                    <DetailPageTable
+                        headers={progHeaders}
+                        rows={progRows}
+                        setRows={setProgRows}
+                        sort={false}
+                        hover={false}
+                    />
 
                     <div className={styles.spaceBetween} />
 

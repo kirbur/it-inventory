@@ -33,7 +33,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const hardwareHeaders = ['Hardware']
     const employeeHeaders = ['Employees', 'Date Hired', 'Cost']
     const softwareHeaders = ['Software', '#', 'Cost']
-    const licenseHeaders = ['License', 'CALs']
+    const licenseHeaders = ['Licenses', 'CALs']
 
     const [deptData, setDeptData] = useState<any>({})
     const [employeeRows, setEmployeeRows] = useState<any[]>([])
@@ -96,12 +96,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         },
                         {
                             //all programCostForEmp is per month
-                            value:
-                                'HW: $' +
-                                format(i.hardwareCostForEmp) +
-                                ' | SW: $' +
-                                format(i.programCostForEmp) +
-                                ' /mo',
+                            value: 'HW: $' + i.hardwareCostForEmp + ' | SW: $' + i.programCostForEmp + ' /mo',
                             sortBy: i.hardwareCostForEmp,
                         },
                     ])
@@ -250,11 +245,26 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
 
                     <div className={styles.title}>Department Breakdown</div>
 
-                    <DetailPageTable headers={employeeHeaders} rows={employeeRows} setRows={setEmployeeRows} />
+                    <DetailPageTable
+                        headers={employeeHeaders}
+                        rows={employeeRows}
+                        setRows={setEmployeeRows}
+                        className={styles.tableMargin}
+                    />
 
-                    <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
+                    <DetailPageTable
+                        headers={softwareHeaders}
+                        rows={softwareRows}
+                        setRows={setSoftwareRows}
+                        className={styles.tableMargin}
+                    />
 
-                    <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
+                    <DetailPageTable
+                        headers={licenseHeaders}
+                        rows={licenseRows}
+                        setRows={setLicenseRows}
+                        className={styles.tableMargin}
+                    />
 
                     <div className={styles.line} />
                     <div className={styles.title}>Department Defaults</div>

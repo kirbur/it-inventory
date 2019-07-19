@@ -216,10 +216,16 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
 
             <div className={styles.firstColumn}>
                 <Button
-                    text='All Departments'
+                    text={
+                        match.params.id === 'new'
+                            ? 'All Departments'
+                            : deptData.departmentName
+                            ? deptData.departmentName
+                            : ''
+                    }
                     icon='back'
                     onClick={() => {
-                        history.push('/departments')
+                        history.push(`/departments${match.params.id === 'new' ? `` : `/detail/${match.params.id}`}`)
                     }}
                     className={styles.backButton}
                     textClassName={styles.backButtonText}

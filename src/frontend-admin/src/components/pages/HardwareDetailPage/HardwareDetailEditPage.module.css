@@ -10,23 +10,21 @@
 
 /* main column styling */
 .columns {
+    padding: 0 50px;
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: row;
 }
+
 .firstColumn {
-    min-width: 300px;
-    margin: 50px;
-    /* padding-right: 50px; */
-    /* flex-grow: 1; */
+    padding: 50px;
 }
+
 .secondColumn {
-    width: 900px;
-    margin: 50px;
-    /* flex-grow: 2; */
+    padding: 150px 50px;
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
 }
 
 /* image styling */
