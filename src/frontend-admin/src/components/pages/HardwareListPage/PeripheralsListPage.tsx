@@ -2,10 +2,11 @@ import React, {useState, useEffect, useContext} from 'react'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {formatDate} from '../../../utilities/FormatDate'
 import {checkImage} from '../../../utilities/CheckImage'
+import {searchFilter} from '../../../utilities/SearchFilter'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -106,30 +107,8 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     }, [])
 
     useEffect(() => {
-        // Search through listData based on current value
-        // of search bar and save results in filtered
-        if (isArchive) {
-            var filteredTableInput = archivedData.filter((row: any) => {
-                return !row[selected.value]
-                    ? false
-                    : row[selected.value]
-                          .toString()
-                          .toLowerCase()
-                          .search(search.toLowerCase()) !== -1
-            })
-            setFilteredData(filteredTableInput)
-        } else {
-            var filteredTableInput = listData.filter((row: any) => {
-                return !row[selected.value]
-                    ? false
-                    : row[selected.value]
-                          .toString()
-                          .toLowerCase()
-                          .search(search.toLowerCase()) !== -1
-            })
-            setFilteredData(filteredTableInput)
-        }
-    }, [search, selected, listData, isArchive])
+        setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
+    }, [search, selected, listData, archivedData, isArchive])
 
     //Set display Images
     useEffect(() => {
