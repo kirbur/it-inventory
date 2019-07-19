@@ -76,8 +76,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const [commentText, setCommentText] = useState('')
 
     const [historyLogEntries, setHistoryLogEntries] = useState<IHistoryLogArray[]>([])
-    const [addHistoryLog, setAddHistoryLog] = useState<any[]>([])
-    const [removeHistoryLog, setRemoveHistoryLog] = useState<any[]>([])
+    const [addHistoryLog, setAddHistoryLog] = useState<IHistoryLogArray[]>([])
+    const [removeHistoryLog, setRemoveHistoryLog] = useState<(number | undefined)[]>([])
     const [eventInput, setEventInput] = useState<'Broken' | 'Repaired'>()
     const [historyLogBool, setHistoryLogBool] = useState(false)
     const [dateInput, setDateInput] = useState<Date>(new Date())
@@ -490,7 +490,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     DeleteHistory: removeHistoryLog,
                 })
             } else if (match.params.type === 'laptop') {
-                console.log('check')
                 await axios.put(`update/computer`, {
                     Entity: {
                         ComputerId: match.params.id,
@@ -525,7 +524,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     DeleteHistory: removeHistoryLog,
                 })
             } else if (match.params.type === 'peripheral') {
-                console.log(costSection)
                 await axios.put(`update/peripheral`, {
                     Entity: {
                         PeripheralId: match.params.id,
@@ -792,8 +790,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             //remove from addHistoryLog
             let tempAddHistoryLog = cloneDeep(addHistoryLog)
             console.log(tempAddHistoryLog)
-            // console.log(historyLogEntries[index].key)
-            // tempAddHistoryLog = tempAddHistoryLog.filter(log => log.key != historyLogEntries[index].key)
+            tempAddHistoryLog = tempAddHistoryLog.filter(log => log.key != historyLogEntries[index].key)
             console.log(tempAddHistoryLog)
             setAddHistoryLog(tempAddHistoryLog)
         }
