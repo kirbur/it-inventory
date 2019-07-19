@@ -1,14 +1,11 @@
-﻿using backend_api.Helpers;
 using System;
-using System.Collections.Generic;
+using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public class Program: ISoftDeletable
+    public class Program : IPurcahseRenewal, ISoftDeletable
     {
-        public Program()
-        {
-        }
+        public Program() { }
 
         public int ProgramId { get; set; }
         public string ProgramName { get; set; }
@@ -26,5 +23,9 @@ namespace backend_api.Models
         public DateTime? RenewalDate { get; set; }
         public int? MonthsPerRenewal { get; set; }
         public bool IsPinned { get; set; }
+
+        public decimal? GetCostPerYear() { return ProgramCostPerYear; }
+        public decimal? GetFlatCost() { return ProgramFlatCost; }
+        public DateTime? GetPurchaseDate() { return DateBought; }
     }
 }

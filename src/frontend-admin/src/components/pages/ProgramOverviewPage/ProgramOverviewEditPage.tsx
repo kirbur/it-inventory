@@ -295,7 +295,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 var updateProgram = {
                     Program: {
                         OldProgramName: match.params.id,
-                        NewProgramName: overviewInputs.name.changed ? overviewInputs.name.value : null,
+                        ProgramName: overviewInputs.name.changed ? overviewInputs.name.value : null,
                         ProgramCostPerYear: programUpdateInput.cost.changed
                             ? programUpdateInput.cost.value * (12 / programUpdateInput.monthsPerRenewal.value)
                             : null,

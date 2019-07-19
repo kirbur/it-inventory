@@ -32,6 +32,10 @@ namespace backend_api.Models
 
         public int GetId() { return ServerId; }
 
+        public decimal? GetCostPerYear() { return CostPerYear; }
+        public decimal? GetFlatCost() { return FlatCost; }
+        public DateTime? GetPurchaseDate() { return PurchaseDate; }
+
         // public Employee Employee { get; set; }
     }
 }
