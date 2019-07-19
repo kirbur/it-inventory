@@ -51,8 +51,9 @@ namespace backend_api.Controllers
 
         }
 
-        /* GET: api/detail/ProgramOverview/{program}
-         * Function returns the program overview information     
+        /* GET: api/detail/ProgramOverview/{program}/{archived}
+         * Function returns the program overview information   
+         * If archived is true then the overview is for programs where isDeleted is true
          * Returns:{
          *          ProgramOverview:{
          *              icon: string,
@@ -86,8 +87,8 @@ namespace backend_api.Controllers
          *                          
          */
         [HttpGet]
-        [Route("ProgramOverview/{program}")]
-        public IActionResult GetProgramOverview([FromRoute] string program)
+        [Route("ProgramOverview/{program}/{archived}")]
+        public IActionResult GetProgramOverview([FromRoute] bool archived, [FromRoute] string program)
         {
             // Holds the license key of the program overview if they are all the same.
             string ProgramLicenseKey = null;
@@ -105,7 +106,7 @@ namespace backend_api.Controllers
                 string icon = $"/image/program/{id}";
 
                 // list of all programs that are not deleted
-                var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == false && x.ProgramName == program);
+                var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == archived && x.ProgramName == program);
 
                 // calculate the count of programs under this specific distinct program name that are in use
                 var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == program && x.EmployeeId != null && x.IsDeleted == false).Count();
@@ -257,7 +258,7 @@ namespace backend_api.Controllers
 
             // Find the requested employee
             var emp = _context.Employee.Find(id);
-            if (emp == null || emp.IsDeleted == true)
+            if (emp == null)
             {
                 return NotFound();
             }
@@ -577,7 +578,7 @@ namespace backend_api.Controllers
             //finding the program
             var prog = _context.Program.Find(id);
             // checking if the program actually exists and isn't deleted
-            if (prog == null || prog.IsDeleted == true)
+            if (prog == null )
             {
                 return NotFound();
             }
@@ -713,7 +714,7 @@ namespace backend_api.Controllers
             //finding the department
             var dep = _context.Department.Find(DepId);
             // checking if the department actually exists and isn't deleted
-            if (dep == null || dep.IsDeleted == true)
+            if (dep == null )
             {
                 return NotFound();
             }
@@ -947,7 +948,7 @@ namespace backend_api.Controllers
         {
             // Find the requested server
             var sv = _context.Server.Find(serverID);
-            if (sv == null || sv.IsDeleted == true)
+            if (sv == null )
             {
                 return NotFound();
             }
@@ -1076,7 +1077,7 @@ namespace backend_api.Controllers
         {
             // Find the requested server
             var comp = _context.Computer.Find(ComputerID);
-            if (comp == null || comp.IsDeleted == true)
+            if (comp == null )
             {
                 return NotFound();
             }
@@ -1178,7 +1179,7 @@ namespace backend_api.Controllers
         {
             // Find the requested monitor
             var mn = _context.Monitor.Find(monitorID);
-            if (mn == null || mn.IsDeleted == true)
+            if (mn == null )
             {
                 return NotFound();
             }
@@ -1279,7 +1280,7 @@ namespace backend_api.Controllers
         {
             // Find the requested peripheral
             var pr = _context.Peripheral.Find(peripheralID);
-            if (pr == null || pr.IsDeleted == true)
+            if (pr == null )
             {
                 return NotFound();
             }

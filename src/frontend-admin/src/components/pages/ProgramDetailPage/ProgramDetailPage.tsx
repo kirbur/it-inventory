@@ -91,7 +91,15 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     ],
                 ])
 
-                setHistoryList(data[0].entries)
+                setHistoryList([
+                    ...data[0].entries.map((entry: any) => {
+                        return {
+                            eventDate: entry.eventDate,
+                            eventType: entry.eventType,
+                            employeeName: entry.employeeNameHistory,
+                        }
+                    }),
+                ])
             })
             .catch((err: any) => console.error(err))
     }, [match.params.id])
@@ -124,7 +132,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     .catch((err: any) => console.error(err))
 
                 //after submitting go back to overview
-                history.push(`/programs/overview/${progData.name}`)
+                history.push(`/programs/overview/${progData.name}/inventory`)
             }
         }
     }
@@ -138,7 +146,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         text={progData.name}
                         icon='back'
                         onClick={() => {
-                            history.push(`/programs/overview/${progData.name}`)
+                            history.push(`/programs/overview/${progData.name}/inventory`)
                         }}
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
@@ -180,7 +188,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                 text='Edit'
                                 icon='edit'
                                 onClick={() => {
-                                    history.push('/programs/edit/details/' + match.params.id)
+                                    history.push('/programs/edit/detail/' + match.params.id)
                                 }}
                                 className={styles.editbutton}
                             />
@@ -206,7 +214,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                 Assigned to{' '}
                                 <div
                                     className={styles.empName}
-                                    onClick={() => history.push(`/employees/${progData.employeeId}`)}
+                                    onClick={() => history.push(`/employees/detail/${progData.employeeId}`)}
                                 >
                                     {progData.employee}
                                 </div>

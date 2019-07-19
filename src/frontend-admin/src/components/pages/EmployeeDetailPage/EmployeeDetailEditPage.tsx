@@ -3,25 +3,25 @@ import {History} from 'history'
 import {match} from 'react-router-dom'
 
 // Components
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
-import {GoCloudUpload} from 'react-icons/go'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {FaUserShield, FaUser} from 'react-icons/fa'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import DatePicker from 'react-datepicker'
-
-import 'react-datepicker/dist/react-datepicker.css'
+import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Styles
 import styles from './EmployeeDetailEditPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 import {Button} from '../../reusables/Button/Button'
-import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {LoginContext} from '../../App/App'
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
+import deptPlaceholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Types
 interface IDepartment {
@@ -35,7 +35,7 @@ interface IDepartment {
 
 interface IEmployeeDetailEditPageProps {
     match: match<{id: string}>
-    history: any
+    history: History
 }
 
 interface IEmployee {
@@ -72,17 +72,29 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         hwCost: 0,
         swCost: 0,
     })
-    const [hardwareRows, setHardwareRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+    const [hardwareRows, setHardwareRows] = useState<{
+        assigned: ITableItem[][]
+        added: ITableItem[][]
+        removed: ITableItem[][]
+    }>({
         assigned: [],
         added: [],
         removed: [],
     })
-    const [softwareRows, setSoftwareRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+    const [softwareRows, setSoftwareRows] = useState<{
+        assigned: ITableItem[][]
+        added: ITableItem[][]
+        removed: ITableItem[][]
+    }>({
         assigned: [],
         added: [],
         removed: [],
     })
-    const [licenseRows, setLicenseRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+    const [licenseRows, setLicenseRows] = useState<{
+        assigned: ITableItem[][]
+        added: ITableItem[][]
+        removed: ITableItem[][]
+    }>({
         assigned: [],
         added: [],
         removed: [],
@@ -93,6 +105,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const licenseHeaders = ['Licenses', 'Key/Username', 'Monthly Cost', 'CALs']
 
     const [deptList, setDeptList] = useState<IDepartment[]>([])
+    const [deptImages, setDeptImages] = useState<{id: number; img: string}[]>([])
+    const [useImages, setUseImages] = useState(false)
 
     //input feild states:
     const [dateInput, setDateInput] = useState<Date>(new Date())
@@ -100,12 +114,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const [adminInput, setAdminInput] = useState<boolean>()
     const [imgInput, setImgInput] = useState<File>()
     const [roleInput, setRoleInput] = useState<string>('')
+    const [changed, setChanged] = useState(false)
 
     const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([])
     const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([])
     const [licenseDropdown, setLicenseDropdown] = useState<any[]>([])
 
-    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'Select An Employee', id: -1}])
+    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'Select A New Employee', id: -1}])
     const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>(employeeDropdown[0])
 
     useEffect(() => {
@@ -113,8 +128,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             axios
                 .get(`/add/employeePrep/`)
                 .then((data: any) => {
-                    //console.log(data)
-
                     var availableEmp: any[] = []
                     data[0].myDomainUsers
                         .sort()
@@ -123,6 +136,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     setEmployeeDropdown(availableEmp)
 
                     setDeptList(data[0].departments)
+                    setUseImages(true)
 
                     let uhw: any[] = []
                     data[0].unassignedHardware.map((i: any) =>
@@ -158,7 +172,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 })
                 .catch((err: any) => console.error(err))
         } else {
-            axios //TODO: get from edit endpoint
+            axios
                 .get(`/detail/employee/${match.params.id}`)
                 .then((data: any) => {
                     setUserData({
@@ -224,15 +238,15 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 sortBy: i.name,
                             },
                             {
-                                value: format(i.licenseKey),
+                                value: format(i.licensesKey),
                                 id: format(i.id),
-                                sortBy: format(i.licenseKey),
+                                sortBy: format(i.licensesKey),
                             },
                             {
                                 value: '$' + Math.round(i.costPerMonth * 100) / 100,
                                 sortBy: i.costPerMonth,
                             },
-                            {value: format(i.cals), id: format(i.id), sortBy: i.cals},
+                            {value: format(i.licensesCount), id: format(i.id), sortBy: i.licensesCount},
                         ])
                     )
                     setLicenseRows({...licenseRows, assigned: [...l]})
@@ -273,10 +287,25 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
             axios
                 .get(`/add/employeePrep/`)
-                .then((data: any) => setDeptList(data[0].departments))
+                .then((data: any) => {
+                    setDeptList(data[0].departments)
+
+                    setUseImages(true)
+                })
                 .catch((err: any) => console.error(err))
         }
     }, [])
+
+    //Set display Images
+    useEffect(() => {
+        deptList.map((dept: any) =>
+            checkImage(dept.icon, axios, deptPlaceholder).then(data => {
+                var list = deptList.filter(i => i.departmentId !== dept.departmentId)
+                setDeptList([...list, {...dept, icon: data}])
+                deptImages.push({id: dept.departmentId, img: data})
+            })
+        )
+    }, [useImages])
 
     //Check the current employees department, if they don't have one yet check the first
     useEffect(() => {
@@ -293,6 +322,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 setHardwareRows({...hardwareRows, added: []})
 
                 var toBeAdded: any[] = []
+                var unavailable: any[] = []
 
                 deptInput.defaultHardware.forEach(need => {
                     var needFulfilled = false
@@ -310,13 +340,21 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                             toBeAdded.push(arr)
                             needFulfilled = true
-                            return
                         }
+                        return
                     })
+                    if (!needFulfilled) {
+                        unavailable.push([
+                            {value: need + ' is unavailable', id: -1, sortBy: need, unavailable: true},
+                            {value: '', id: -1, sortBy: -1},
+                            {value: '', id: -1, sortBy: -1},
+                            {value: '', id: -1, sortBy: -1},
+                        ])
+                    }
                 })
 
                 //add the hardware defaults
-                setHardwareRows({...hardwareRows, added: [...toBeAdded]})
+                setHardwareRows({...hardwareRows, added: [...toBeAdded], assigned: [...unavailable]})
 
                 //remove the defaults from the dropdown
                 toBeAdded.map(added =>
@@ -329,6 +367,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 //clear out added
                 setSoftwareRows({...softwareRows, added: []})
                 toBeAdded = []
+                unavailable = []
 
                 deptInput.defaultSoftware.forEach(need => {
                     var needFulfilled = false
@@ -342,13 +381,20 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                             toBeAdded.push(arr)
                             needFulfilled = true
-                            return
                         }
+                        return
                     })
+                    if (!needFulfilled) {
+                        unavailable.push([
+                            {value: need + ' is unavailable', id: -1, sortBy: need, unavailable: true},
+                            {value: '', id: -1, sortBy: -1},
+                            {value: '', id: -1, sortBy: -1},
+                        ])
+                    }
                 })
 
                 //add the software defaults
-                setSoftwareRows({...softwareRows, added: [...toBeAdded]})
+                setSoftwareRows({...softwareRows, added: [...toBeAdded], assigned: [...unavailable]})
 
                 //remove the defaults from the dropdown
                 toBeAdded.map(added =>
@@ -361,6 +407,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 //clear out added
                 setLicenseRows({...licenseRows, added: []})
                 toBeAdded = []
+                unavailable = []
 
                 deptInput.defaultLicenses.forEach(need => {
                     var needFulfilled = false
@@ -375,13 +422,21 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                             toBeAdded.push(arr)
                             needFulfilled = true
-                            return
                         }
+                        return
                     })
+                    if (!needFulfilled) {
+                        unavailable.push([
+                            {value: need + ' is unavailable', id: -1, sortBy: need, unavailable: true},
+                            {value: '', id: -1, sortBy: -1},
+                            {value: '', id: -1, sortBy: -1},
+                            {value: '', id: -1, sortBy: -1},
+                        ])
+                    }
                 })
 
                 //add the license defaults
-                setLicenseRows({...licenseRows, added: [...toBeAdded]})
+                setLicenseRows({...licenseRows, added: [...toBeAdded], assigned: [...unavailable]})
 
                 //remove the defaults from the dropdown
                 toBeAdded.map(added =>
@@ -392,6 +447,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleAddHardware = (newRow: any) => {
+        setChanged(true)
         //first add to displayed table
         var arr = [
             [
@@ -418,6 +474,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleRemoveHardware = (row: any) => {
+        setChanged(true)
         //if its in added then remove it
         var arr = hardwareRows.added.filter((add: any) => add[0].id !== row[0].id)
 
@@ -430,6 +487,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleAddSoftware = (newRow: any) => {
+        setChanged(true)
         var arr = [
             [
                 {value: newRow.name, id: newRow.id, sortBy: newRow.name},
@@ -452,6 +510,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         setSoftwareDropdown([...drop])
     }
     const handleRemoveSoftware = (row: any) => {
+        setChanged(true)
         //if its in added then remove it
         var arr = softwareRows.added.filter((add: any) => add[0].id !== row[0].id)
 
@@ -464,6 +523,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleAddLicense = (newRow: any) => {
+        setChanged(true)
         var arr = [
             [
                 {value: newRow.name, id: newRow.id, sortBy: newRow.name},
@@ -488,6 +548,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleRemoveLicence = (row: any) => {
+        setChanged(true)
         //if its in added then remove it
         var arr = licenseRows.added.filter((add: any) => add[0].id !== row[0].id)
 
@@ -499,9 +560,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         setLicenseDropdown([...licenseDropdown, drop])
     }
 
-    const handleSubmit = () => {
-        /*ADD NEW EMPLOYEE */
+    async function handleSubmit() {
+        var name = ['first', 'last']
+        var msg = ''
 
+        /*ADD NEW EMPLOYEE */
         if (
             //make sure no inputs are null/undefined/empty
             match.params.id === 'new' &&
@@ -509,11 +572,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             selectedEmployee.name !== 'Select An Employee' &&
             roleInput !== ''
         ) {
-            var name = selectedEmployee.name.split(' ')
+            name = selectedEmployee.name.split(' ')
             var postEmployee = {
                 Employee: {
-                    FirstName: name[0],
-                    LastName: name[1],
+                    FirstName: name.shift(),
+                    LastName: name.join(''),
                     HireDate: dateInput.toISOString(),
                     Role: roleInput,
                     DepartmentID: deptInput.departmentId,
@@ -521,7 +584,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 },
                 HardwareAssigned: [
                     ...hardwareRows.added.map(i => {
-                        var hw = i[0].id.split('/')
+                        var hw = i[0].id ? i[0].id.toString().split('/') : [null, null]
                         return {Type: hw[0], ID: hw[1]}
                     }),
                 ],
@@ -535,7 +598,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 ],
             }
 
-            axios
+            await axios
                 .post('/add/Employee', postEmployee)
                 .then((response: any) => {
                     if (response && response.status === 201) {
@@ -546,32 +609,32 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     window.alert(`Something went wrong`)
                     console.error(err)
                 })
+
+            history.push(`/employees`)
         } else if (match.params.id === 'new') {
             //one or maore of the inputs was null/undefined/empty
-            var msg = 'Failed because:\n'
+            msg = 'Failed because:\n'
             msg += selectedEmployee.name === 'Select An Employee' ? 'No employee was selected,\n' : ''
             msg += roleInput === '' ? 'No role was given,' : ''
 
             window.alert(msg)
         }
 
-        //TODO: post request
-        //everything in every removed array needs to be unassigned
-        //everything in every added array needs to be assigned
-
         /*UPDATE EMPLOYEE */
         if (
             //make sure no inputs are null/undefined/empty
-
+            match.params.id !== 'new' &&
             deptInput &&
             selectedEmployee.name &&
-            roleInput
+            roleInput &&
+            changed
         ) {
-            var name = selectedEmployee.name.split(' ')
+            name = selectedEmployee.name.split(' ')
             var updateEmployee = {
                 Employee: {
-                    FirstName: name[0],
-                    LastName: name[1],
+                    EmployeeId: match.params.id,
+                    FirstName: name.shift(),
+                    LastName: name.join(''),
                     HireDate: dateInput.toISOString(),
                     Role: roleInput,
                     DepartmentID: deptInput.departmentId,
@@ -579,7 +642,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 },
                 HardwareAssigned: [
                     ...hardwareRows.added.map(i => {
-                        var hw = i[0].id.split('/')
+                        var hw = i[0].id ? i[0].id.toString().split('/') : [null, null]
                         return {Type: hw[0], ID: hw[1]}
                     }),
                 ],
@@ -592,13 +655,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     }),
                 ],
 
-                HardwareRemoved: [
+                HardwareUnassigned: [
                     ...hardwareRows.removed.map(i => {
-                        var hw = i[0].id.split('/')
+                        var hw = i[0].id ? i[0].id.toString().split('/') : [null, null]
                         return {Type: hw[0], ID: hw[1]}
                     }),
                 ],
-                ProgramRemoved: [
+                ProgramUnassigned: [
                     ...softwareRows.removed.map(i => {
                         return {ID: i[0].id}
                     }),
@@ -608,21 +671,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 ],
             }
 
-            //TODO: verify this endpoint is right, and that updateEmployee is formatted correctly
-            // axios
-            //     .put(`/update/Employee/${match.params.id}`, updateEmployee)
-            //     .then((response: any) => {
-            //         if (response && response.status === 201) {
-            //             window.alert(`${selectedEmployee.name} was successfully updated!`)
-            //         }
-            //     })
-            //     .catch((err: any) => {
-            //         window.alert(`Something went wrong`)
-            //         console.error(err)
-            //     })
-        } else {
+            await axios.put(`/update/Employee`, updateEmployee).catch((err: any) => console.error(err))
+
+            history.push(`/employees/detail/${match.params.id}`)
+        } else if (match.params.id !== 'new' && changed) {
             //one or maore of the inputs was null/undefined/empty
-            var msg = 'Failed because:\n'
+            msg = 'Failed because:\n'
 
             msg += selectedEmployee.name === ('' || ' ') ? 'Name feild is empty,' : ''
             msg += roleInput === '' ? 'Role feild is empty,' : ''
@@ -635,11 +689,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             var formData = new FormData()
             formData.append('file', imgInput)
 
-            axios
+            await axios
                 .put(userData.photo, formData, {
                     headers: {'Content-Type': 'multipart/form-data'},
                 })
-                .then(data => console.log(data))
                 .catch(err => console.error(err))
         }
     }
@@ -667,7 +720,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         rows.added.map((add: any) => {
             if (type === 'hw' || type === 'l') {
                 arr.push([
-                    {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy},
+                    {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy, unavailable: add[0].unavailable},
                     {value: add[1].value, id: add[1].id, sortBy: add[1].sortBy},
                     {value: add[2].value, id: add[2].id, sortBy: add[2].sortBy},
                     {value: add[3].value, id: add[3].id, sortBy: add[3].sortBy},
@@ -675,7 +728,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             }
             if (type === 'sw') {
                 arr.push([
-                    {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy},
+                    {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy, unavailable: add[0].unavailable},
                     {value: add[1].value, id: add[1].id, sortBy: add[1].sortBy},
                     {value: add[2].value, id: add[2].id, sortBy: add[2].sortBy},
                 ])
@@ -705,28 +758,14 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         text={userData.name}
                         icon='back'
                         onClick={() => {
-                            history.push(`/employees/${match.params.id}`)
+                            history.push(`/employees/detail/${match.params.id}`)
                         }}
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
                     />
                 )}
-                <div className={styles.imgPadding}>
-                    {/* <ImageInput /> */}
-                    <GoCloudUpload size={300} className={styles.cloudIcon} onClick={() => {}} />
-                    <input
-                        className={styles.imgInput}
-                        type='file'
-                        accept='image/*'
-                        onClick={event => {
-                            //console.log(event)
-                        }}
-                        onChange={e => {
-                            var files = e.target.files
-                            files && files[0] && setImgInput(files[0])
-                        }}
-                    />
-                </div>
+
+                <PictureInput setImage={setImgInput} image={imgInput} />
             </div>
             {/* column 2 */}
             <div className={styles.secondColumn}>
@@ -744,7 +783,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     name='admin'
                                     className={styles.checkmark}
                                     checked={adminInput}
-                                    onChange={() => setAdminInput(true)}
+                                    onChange={() => {
+                                        setAdminInput(true)
+                                        setChanged(true)
+                                    }}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmarkAdmin} />
@@ -766,7 +808,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 name='admin'
                                 className={styles.checkmark}
                                 checked={!adminInput}
-                                onChange={() => setAdminInput(false)}
+                                onChange={() => {
+                                    setAdminInput(false)
+                                    setChanged(true)
+                                }}
                             />
                             <div className={styles.checkmark} />
                             <div className={styles.insideCheckmarkAdmin} />
@@ -839,9 +884,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                         type='text'
                                         className={styles.input}
                                         value={selectedEmployee.name}
-                                        onChange={e =>
+                                        onChange={e => {
                                             setSelectedEmployee({name: e.target.value, id: parseInt(match.params.id)})
-                                        }
+                                            setChanged(true)
+                                        }}
                                     />
                                 )
                             )}
@@ -851,7 +897,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 type='text'
                                 className={styles.input}
                                 value={roleInput}
-                                onChange={e => setRoleInput(e.target.value)}
+                                onChange={e => {
+                                    setRoleInput(e.target.value)
+                                    setChanged(true)
+                                }}
                             />
                         </div>
                     </div>
@@ -861,7 +910,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             dateFormat='MM/dd/yyyy'
                             placeholderText={userData.hireDate}
                             selected={dateInput}
-                            onChange={e => e && setDateInput(e)}
+                            onChange={e => {
+                                e && setDateInput(e)
+                                setChanged(true)
+                            }}
                             className={styles.input}
                         />
                     </div>
@@ -883,11 +935,24 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     onChange={() => {
                                         setDeptInput(dept)
                                         applyDefaults()
+                                        setChanged(true)
                                     }}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmark} />
-                                <img src={dept.icon} alt={''} className={styles.deptIcon} />
+                                <div className={styles.deptIconContainer}>
+                                    {deptImages &&
+                                    deptImages.filter(x => x.id === dept.departmentId) &&
+                                    deptImages.filter(x => x.id === dept.departmentId)[0] ? (
+                                        <img
+                                            src={deptImages.filter(x => x.id === dept.departmentId)[0].img}
+                                            alt={''}
+                                            className={styles.deptIcon}
+                                        />
+                                    ) : (
+                                        <img src={deptPlaceholder} alt={''} className={styles.deptIcon} />
+                                    )}
+                                </div>
                                 <div className={styles.deptName}>{dept.departmentName}</div>
                             </div>
                         ))}
