@@ -405,7 +405,7 @@ namespace backend_api.Controllers
             }
         }
 
-        /* UpdateHardwareEntity<T>(hardware, isDeleted) will update the assigment of the hardware
+        /* UpdateHardwareEntity<T>(hardware, isDeleted) will update the assignment of the hardware
          *   if the EmployeeId is not null and will also update the IsDeleted field according to the
          *   parameter passed.
          */

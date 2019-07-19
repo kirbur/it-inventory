@@ -10,7 +10,9 @@ namespace backend_api.Helpers
         decimal? FlatCost { get; set; }
         DateTime? PurchaseDate { get; set; }
         int GetId();
-
+        string GetMake();
+        string GetModel();
+        
     }
 
 }

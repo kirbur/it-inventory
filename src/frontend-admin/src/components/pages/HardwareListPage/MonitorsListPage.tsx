@@ -4,6 +4,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -17,6 +18,7 @@ import {LoginContext} from '../../App/App'
 
 // Styles
 import styles from './HardwareListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/monitor-placeholder.png'
 
 // Types
 interface IMonitorsListPageProps {
@@ -54,6 +56,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
 
     // state
     const [listData, setListData] = useState<any[]>([])
+    const [archivedData, setArchivedData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'make', value: 'make'})
@@ -62,10 +65,39 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     const searchByHeaders = ['Make', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To', 'Model']
     const headerList = ['Make & Model', 'Screen Size', 'Resolution', 'Inputs', 'Assigned To']
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
+    const [isArchive, setIsArchive] = useState(false)
+
+    const [useImages, setUseImages] = useState(false)
+    const [images, setImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages] = useState<{id: number; img: string}[]>([])
 
     useEffect(() => {
         axios
             .get('/list/monitors')
+            .then((data: IPulledData[]) => {
+                const monitors: IMonitorData[] = []
+                var imgs: {id: number; img: string}[] = []
+                data.map((i: IPulledData) => {
+                    monitors.push({
+                        make: format(i.make),
+                        id: i.monitorId,
+                        screenSize: i.screenSize,
+                        resolution: i.resolution,
+                        inputs: format(i.inputs),
+                        assigned: format(i.employeeFirstName) + ' ' + i.employeeLastName,
+                        icon: i.icon,
+                        model: format(i.model),
+                    })
+                    imgs.push({id: i.monitorId, img: i.icon})
+                })
+                setListData(monitors)
+
+                setImages(imgs)
+                setUseImages(true)
+            })
+            .catch((err: any) => console.error(err))
+        axios
+            .get('/archivedList/monitor')
             .then((data: IPulledData[]) => {
                 const monitors: IMonitorData[] = []
                 data.map((i: IPulledData) => {
@@ -80,7 +112,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                         model: format(i.model),
                     })
                 })
-                setListData(monitors)
+                setArchivedData(monitors)
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -88,16 +120,39 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        var filteredTableInput = listData.filter((row: any) => {
-            return !row[selected.value]
-                ? false
-                : row[selected.value]
-                      .toString()
-                      .toLowerCase()
-                      .search(search.toLowerCase()) !== -1
-        })
-        setFilteredData(filteredTableInput)
-    }, [search, selected, listData])
+        if (isArchive) {
+            var filteredTableInput = archivedData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        } else {
+            var filteredTableInput = listData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        }
+    }, [search, selected, listData, isArchive])
+
+    //Set display Images
+    useEffect(() => {
+        images.map((img: {id: number; img: string}) =>
+            checkImage(img.img, axios, placeholder).then(data => {
+                var list = images.filter(i => i.id !== img.id)
+                setImages([...list, {id: img.id, img: data}])
+                displayImages.push({id: img.id, img: data})
+            })
+        )
+    }, [useImages])
 
     const handleClick = () => {
         history.push('/hardware/edit/monitor/new')
@@ -186,9 +241,23 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     }
 
     function concatenatedName(row: any[]) {
-        return (
+        return displayImages &&
+            displayImages.filter(x => x.id === row[1]) &&
+            displayImages.filter(x => x.id === row[1])[0] ? (
             <td key={row[1]} className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[6]} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                </div>
+                <div className={styles.alignLeft}>
+                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={styles.alignLeft}>{row[7]}</text>
+                </div>
+            </td>
+        ) : (
+            <td key={row[1]} className={styles.hardware}>
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text> <br />
                     <text className={styles.alignLeft}>{row[7]}</text>
@@ -223,7 +292,14 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     return (
         <div className={styles.listMain}>
             <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
+                <div className={styles.buttonContainer}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
+                    <Button
+                        text={isArchive ? 'View Active' : 'View Archives'}
+                        onClick={() => setIsArchive(!isArchive)}
+                        className={styles.archiveButton}
+                    />
+                </div>
 
                 <FilteredSearch
                     search={search}

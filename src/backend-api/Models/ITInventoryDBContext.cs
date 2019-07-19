@@ -38,19 +38,6 @@ namespace backend_api.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<AuthIdserver>(entity =>
-            //{
-            //      entity.HasKey(e => e.AuthorizationSimpleId);
-
-            //    entity.ToTable("AuthIDServer");
-
-            //    entity.Property(e => e.AuthorizationSimpleId).HasColumnName("AuthorizationSimpleID");
-
-            //    entity.Property(e => e.ActiveDirectoryId)
-            //        .IsRequired()
-            //        .HasColumnName("ActiveDirectoryID");
-            //});
-
             modelBuilder.Entity<Computer>(entity =>
             {
                 entity.Property(e => e.ComputerId).HasColumnName("ComputerID");
@@ -78,11 +65,6 @@ namespace backend_api.Models
                 entity.Property(e => e.ScreenSize).HasColumnType("decimal(9, 2)");
 
                 entity.Property(e => e.Ssdgb).HasColumnName("SSDGB");
-
-                //entity.HasOne(d => d.Employee)
-                //    .WithMany(p => p.Computer)
-                //    .HasForeignKey(d => d.EmployeeId)
-                //    .HasConstraintName("FK_Computer_Employee");
             });
 
             modelBuilder.Entity<Department>(entity =>
@@ -98,14 +80,6 @@ namespace backend_api.Models
                 entity.Property(e => e.DepartmentName)
                     .IsRequired()
                     .HasMaxLength(100);
-
-                // TODO: Remove the attribute that handles the navigation.
-                // This creates an endless loop.
-                //entity.HasOne(d => d.DepartmentNavigation)
-                //    .WithOne(p => p.InverseDepartmentNavigation)
-                //    .HasForeignKey<Department>(d => d.DepartmentId)
-                //    .OnDelete(DeleteBehavior.ClientSetNull)
-                //    .HasConstraintName("FK_Department_Department");
             });
 
             modelBuilder.Entity<Employee>(entity =>
@@ -137,38 +111,12 @@ namespace backend_api.Models
                     .IsRequired()
                     .HasMaxLength(50);
 
-                //entity.HasOne(d => d.Department)
-                //    .WithMany(p => p.Employee)
-                //    .HasForeignKey(d => d.DepartmentId)
-                //    .OnDelete(DeleteBehavior.ClientSetNull)
-                //    .HasConstraintName("FK_Employee_Department");
             });
 
             modelBuilder.Entity<HardwareHistory>(entity =>
             {
                 entity.Property(e => e.HardwareHistoryId).HasColumnName("HardwareHistoryID");
 
-                //entity.Property(e => e.CurrentOwnerId).HasColumnName("CurrentOwnerID");
-
-                //entity.Property(e => e.CurrentOwnerStartDate).HasColumnType("date");
-
-                //entity.Property(e => e.HardwareId).HasColumnName("HardwareID");
-
-                //entity.Property(e => e.HardwareType)
-                //    .IsRequired()
-                //    .HasMaxLength(50);
-
-                //entity.Property(e => e.PreviousOwnerId).HasColumnName("PreviousOwnerID");
-
-                //entity.HasOne(d => d.CurrentOwner)
-                //    .WithMany(p => p.HardwareHistoryCurrentOwner)
-                //    .HasForeignKey(d => d.CurrentOwnerId)
-                //    .HasConstraintName("FK_HardwareHistory_Employee");
-
-                //entity.HasOne(d => d.PreviousOwner)
-                //    .WithMany(p => p.HardwareHistoryPreviousOwner)
-                //    .HasForeignKey(d => d.PreviousOwnerId)
-                //    .HasConstraintName("FK_HardwareHistory_Employee1");
             });
 
             modelBuilder.Entity<Monitor>(entity =>
@@ -189,10 +137,6 @@ namespace backend_api.Models
 
                 entity.Property(e => e.PurchaseDate).HasColumnType("date");
 
-                //entity.HasOne(d => d.Employee)
-                //    .WithMany(p => p.Monitor)
-                //    .HasForeignKey(d => d.EmployeeId)
-                //    .HasConstraintName("FK_Monitor_Employee");
             });
 
             modelBuilder.Entity<Peripheral>(entity =>
@@ -211,17 +155,11 @@ namespace backend_api.Models
 
                 entity.Property(e => e.PurchaseDate).HasColumnType("date");
 
-                //entity.HasOne(d => d.Employee)
-                //    .WithMany(p => p.Peripheral)
-                //    .HasForeignKey(d => d.EmployeeId)
-                //    .HasConstraintName("FK_Peripheral_Employee");
             });
 
             modelBuilder.Entity<Plugins>(entity =>
             {
                 entity.HasKey(e => e.PluginId);
-
-                //entity.Property(e => e.ProgramID).HasColumnName("PluginID");
 
                 entity.Property(e => e.PluginCostPerYear).HasColumnType("money");
 
@@ -231,19 +169,10 @@ namespace backend_api.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                // entity.Property(e => e.ProgramId).HasColumnName("ProgramID");
-
-                //entity.HasOne(d => d.Program)
-                //    .WithMany(p => p.Plugins)
-                //    .HasForeignKey(d => d.ProgramId)
-                //    .HasConstraintName("FK_Plugins_Program");
             });
 
             modelBuilder.Entity<Program>(entity =>
             {
-                //entity.Property(e => e.ProgramId).HasColumnName("ProgramID");
-
-                //entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
 
                 entity.Property(e => e.ProgramFlatCost).HasColumnType("money");
 
@@ -255,39 +184,12 @@ namespace backend_api.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                //entity.HasOne(d => d.Employee)
-                //    .WithMany(p => p.Program)
-                //    .HasForeignKey(d => d.EmployeeId)
-                //    .HasConstraintName("FK_Program_Employee");
             });
 
             modelBuilder.Entity<ProgramHistory>(entity =>
             {
-                //entity.Property(e => e.ProgramHistoryId).HasColumnName("ProgramHistoryID");
-
-                //entity.Property(e => e.CurrentOwnerId).HasColumnName("CurrentOwnerID");
-
-                //entity.Property(e => e.CurrentOwnerStartDate).HasColumnType("date");
-
-                //entity.Property(e => e.PreviousOwnerId).HasColumnName("PreviousOwnerID");
-
                 entity.Property(e => e.ProgramId).HasColumnName("ProgramID");
 
-                //entity.HasOne(d => d.CurrentOwner)
-                //    .WithMany(p => p.ProgramHistoryCurrentOwner)
-                //    .HasForeignKey(d => d.CurrentOwnerId)
-                //    .HasConstraintName("FK_ProgramHistory_Employee");
-
-                //entity.HasOne(d => d.PreviousOwner)
-                //    .WithMany(p => p.ProgramHistoryPreviousOwner)
-                //    .HasForeignKey(d => d.PreviousOwnerId)
-                //    .HasConstraintName("FK_ProgramHistory_Employee1");
-
-                //entity.HasOne(d => d.Program)
-                //    .WithMany(p => p.ProgramHistory)
-                //    .HasForeignKey(d => d.ProgramId)
-                //    .OnDelete(DeleteBehavior.ClientSetNull)
-                //    .HasConstraintName("FK_ProgramHistory_Program");
             });
 
             modelBuilder.Entity<Server>(entity =>
@@ -311,11 +213,6 @@ namespace backend_api.Models
                 entity.Property(e => e.Ram).HasColumnName("RAM");
 
                 entity.Property(e => e.RenewalDate).HasColumnType("date");
-
-                //entity.HasOne(d => d.Employee)
-                //    .WithMany(p => p.Server)
-                //    .HasForeignKey(d => d.EmployeeId)
-                //    .HasConstraintName("FK_Server_Employee");
             });
         }
     }

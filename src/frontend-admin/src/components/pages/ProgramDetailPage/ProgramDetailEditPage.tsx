@@ -32,7 +32,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
@@ -126,11 +126,11 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             }
 
             await axios.put(`update/program/${match.params.id}`, updateProgram).catch((err: any) => console.error(err))
-            history.push(`/programs/details/${match.params.id}`)
+            history.push(`/programs/detail/${match.params.id}`)
         }
     }
 
-    return isAdmin ? (
+    return (
         <div className={styles.columns}>
             {/* column 1 */}
 
@@ -139,7 +139,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     text={progData.name + ' ' + match.params.id}
                     icon='back'
                     onClick={() => {
-                        history.push(`/programs/details/${match.params.id}`)
+                        history.push(`/programs/detail/${match.params.id}`)
                     }}
                     className={styles.backButton}
                     textClassName={styles.backButtonText}
@@ -209,7 +209,5 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                 </div>
             </div>
         </div>
-    ) : (
-        <div />
     )
 }
