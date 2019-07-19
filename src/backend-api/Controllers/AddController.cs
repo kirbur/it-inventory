@@ -510,7 +510,7 @@ namespace backend_api.Controllers
                 PluginFlatCost = input.PluginFlatCost,
                 ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First(),
                 TextField = input.TextField,
-                PluginCostPerYear = input.PLuginCostPerYear,
+                PluginCostPerYear = input.PluginCostPerYear,
                 IsDeleted = false,
                 ProgramName = input.ProgramName,
                 RenewalDate = input.RenewalDate,

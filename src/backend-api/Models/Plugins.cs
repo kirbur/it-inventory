@@ -17,7 +17,6 @@ namespace backend_api.Models
         public int? MonthsPerRenewal { get; set; }
         public bool IsCostPerYear { get; set; }
         public DateTime? DateBought { get; set; } 
-
         public decimal? GetCostPerYear() { return PluginCostPerYear; }
         public decimal? GetFlatCost() { return PluginFlatCost; }
         public DateTime? GetPurchaseDate() { return DateBought; }
