@@ -299,7 +299,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             })
         )
     }, [useImages])
-    console.log(deptList)
 
     //Check the current employees department, if they don't have one yet check the first
     useEffect(() => {
