@@ -136,7 +136,10 @@ export const App: React.FC = () => {
                             path={'/hardware/detail/:type/:id'}
                             render={props => <HardwareDetailPage {...props} />}
                         />
-                        <Route path={'/programs/overview/:id'} render={props => <ProgramOverviewPage {...props} />} />
+                        <Route
+                            path={'/programs/overview/:id/:archived'}
+                            render={props => <ProgramOverviewPage {...props} />}
+                        />
                         <Route path={'/programs/detail/:id'} render={props => <ProgramDetailPage {...props} />} />
 
                         {loginContextVariables.isAdmin && (
@@ -164,7 +167,7 @@ export const App: React.FC = () => {
                         )}
 
                         {loginContextVariables.isAdmin && (
-                            <Route path={'/programs/edit/overview/:id'} component={ProgramOverviewEditPage} />
+                            <Route path={'/programs/edit/overview/:id:/archived'} component={ProgramOverviewEditPage} />
                         )}
                     </Switch>
                 </Router>

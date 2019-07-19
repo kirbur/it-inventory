@@ -44,6 +44,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
+    const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState('')
     const [userData, setUserData] = useState<IUser>({
         photo: '',
@@ -87,6 +88,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 }
 
                 setUserData(user)
+                setIsDeleted(data[0].isDeleted)
 
                 let hw: ITableItem[][] = []
                 data[0].hardware.map((i: any) =>
@@ -169,9 +171,10 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     }, [userData.photo])
 
     async function handleArchive() {
-        if (window.confirm(`Are you sure you want to archive ${userData.name}?`)) {
-            await axios.put(`/archive/employee/${match.params.id}`, {}).catch((err: any) => console.error(err))
-
+        if (window.confirm(`Are you sure you want to ${isDeleted ? 'recover' : 'archive'} ${userData.name}?`)) {
+            await axios
+                .put(`/${isDeleted ? 'recover' : 'archive'}/employee/${match.params.id}`, {})
+                .catch((err: any) => console.error(err))
             history.push('/employees')
         }
     }
@@ -210,17 +213,19 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 <div className={styles.secondColumn}>
                     {isAdmin && (
                         <Group direction='row' justify='start' className={styles.group}>
-                            <Button
-                                text='Edit'
-                                icon='edit'
-                                onClick={() => {
-                                    history.push('/employees/edit/' + match.params.id)
-                                }}
-                                className={styles.editbutton}
-                            />
+                            {!isDeleted && (
+                                <Button
+                                    text='Edit'
+                                    icon='edit'
+                                    onClick={() => {
+                                        history.push('/employees/edit/' + match.params.id)
+                                    }}
+                                    className={styles.editbutton}
+                                />
+                            )}
 
                             <Button
-                                text='Archive'
+                                text={isDeleted ? 'Recover' : 'Archive'}
                                 icon='archive'
                                 onClick={handleArchive}
                                 className={styles.archivebutton}

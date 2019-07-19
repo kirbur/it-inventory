@@ -44,6 +44,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const [defaultLicenses, setDefaultLicenses] = useState<any[]>([])
     const [img, setImg] = useState()
     const [initialImg, setInitialImg] = useState()
+    const [isDeleted, setIsDeleted] = useState(false)
 
     const {
         loginContextVariables: {accessToken, refreshToken, isAdmin},
@@ -78,6 +79,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                     softwareCost: data[0].totalCostOfProgramsInDep,
                 }
                 setDeptData(dept)
+                setIsDeleted(data[0].isDeleted)
 
                 let e: any[][] = []
                 data[0].listOfEmployees.map((i: any) =>
@@ -179,8 +181,12 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         if (employeeRows.length > 0) {
             window.alert('Cannot archive department with employees in it!')
         } else {
-            if (window.confirm(`Are you sure you want to archive ${deptData.departmentName}?`)) {
-                await axios.put(`archive/department/${match.params.id}`, {})
+            if (
+                window.confirm(
+                    `Are you sure you want to ${isDeleted ? 'recover' : 'archive'} ${deptData.departmentName}?`
+                )
+            ) {
+                await axios.put(`${isDeleted ? 'recover' : 'archive'}/department/${match.params.id}`, {})
                 history.push('/departments')
             }
         }
@@ -218,18 +224,19 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 <div className={styles.secondColumn}>
                     {isAdmin && (
                         <Group direction='row' justify='start' className={styles.group}>
-                            <Button
-                                text='Edit'
-                                icon='edit'
-                                onClick={() => {
-                                    history.push('/departments/edit/' + match.params.id)
-                                    //TODO: wire to edit page in IIWA-155
-                                }}
-                                className={styles.editbutton}
-                            />
+                            {!isDeleted && (
+                                <Button
+                                    text='Edit'
+                                    icon='edit'
+                                    onClick={() => {
+                                        history.push('/departments/edit/' + match.params.id)
+                                    }}
+                                    className={styles.editbutton}
+                                />
+                            )}
 
                             <Button
-                                text='Archive'
+                                text={isDeleted ? 'Rrecover' : 'Archive'}
                                 icon='archive'
                                 onClick={handleArchive}
                                 className={styles.archivebutton}

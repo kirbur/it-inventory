@@ -176,17 +176,9 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
 
     const handleArchive = () => {
         //cant archive everything unless there are no plugins
-        if (pluginRows.length > 0) {
+        if (pluginRows.length > 0 && archived !== 'archived') {
             window.alert('Please archive the plugins before you archive this program.')
-        } else if (archived === 'archived') {
-            if (window.confirm(`Are you sure you want to recover ${id}? `)) {
-                programRows.forEach(program => {
-                    axios.put(`recover/program/${program[0].id}`, {}).catch((err: any) => console.error(err))
-                })
-                setProgramRows([])
-                history.push('/programs')
-            }
-        } else {
+        } else if (archived !== 'archived') {
             if (
                 window.confirm(
                     `Are you sure you want to archive all copies of ${id}? ${programData.countProgInUse} are in use.`
@@ -194,6 +186,16 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             ) {
                 programRows.forEach(program => {
                     axios.put(`archive/program/${program[0].id}`, {}).catch((err: any) => console.error(err))
+                })
+                setProgramRows([])
+                history.push('/programs')
+            }
+        }
+
+        if (archived === 'archived') {
+            if (window.confirm(`Are you sure you want to recover ${id}? `)) {
+                programRows.forEach(program => {
+                    axios.put(`recover/program/${program[0].id}`, {}).catch((err: any) => console.error(err))
                 })
                 setProgramRows([])
                 history.push('/programs')
@@ -247,14 +249,16 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 <div className={styles.secondColumn}>
                     {isAdmin && (
                         <Group direction='row' justify='start' className={styles.group}>
-                            <Button
-                                text='Edit'
-                                icon='edit'
-                                onClick={() => {
-                                    history.push(`/programs/edit/overview/${id}/${archived}`)
-                                }}
-                                className={styles.editbutton}
-                            />
+                            {archived !== 'archived' && (
+                                <Button
+                                    text='Edit'
+                                    icon='edit'
+                                    onClick={() => {
+                                        history.push(`/programs/edit/overview/${id}/${archived}`)
+                                    }}
+                                    className={styles.editbutton}
+                                />
+                            )}
 
                             <Button
                                 text={archived === 'archived' ? 'Recover' : 'Archive'}
