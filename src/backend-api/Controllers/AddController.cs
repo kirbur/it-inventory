@@ -426,7 +426,7 @@ namespace backend_api.Controllers
          *          "ProgramFlatCost" : Decimal,
          *          "ProgramLicenseKey" : string,
          *          "IsLicense" : bool,
-         *          "ProgramDescription" : string,
+         *          "Description" : string,
          *          "ProgramPurchaseLink" : string,
          *          "DateBought" : DateTime,
          *          "RenewalDate" : DateTime,
@@ -462,7 +462,7 @@ namespace backend_api.Controllers
                         ProgramLicenseKey = input.Program.ProgramLicenseKey,
                         IsLicense = input.Program.IsLicense,
                         EmployeeId = null,
-                        Description = input.Program.ProgramDescription,
+                        Description = input.Program.Description,
                         ProgramPurchaseLink = input.Program.ProgramPurchaseLink,
                         HasPlugIn = false,
                         IsDeleted = false,
@@ -532,7 +532,7 @@ namespace backend_api.Controllers
                 ProgramName = input.ProgramName,
                 RenewalDate = input.RenewalDate,
                 MonthsPerRenewal = input.MonthsPerRenewal,
-                Datebought = input.DateBought,
+                DateBought = input.DateBought,
                 IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false,
             };
             _context.Add(plugin);

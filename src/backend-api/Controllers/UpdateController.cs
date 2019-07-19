@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using backend_api.Helpers;
 using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -95,7 +94,7 @@ namespace backend_api.Controllers
         *           "ProgramFlatCost" : Decimal,
         *           "ProgramLicenseKey" : String,
         *           "IsLicense" : bool,
-        *           "ProgramDescription" : String,
+        *           "Description" : String,
         *           "ProgramPurchaseLink" : String,
         *           "DateBought" : DateTime,
         *           "RenewalDate" : DateTime,
@@ -116,9 +115,8 @@ namespace backend_api.Controllers
                     .ToList()
                     .ForEach(program =>
                     {
-                        // Uses the utility function to merge properties and update the values.
+                        // Update Program properties.
                         PropertyUtil<Models.Program, ProgramUpdateObjectModel>.UpdateProperties(program, updatedProg);
-                        // Update a value that needs special calculations.
                         program.IsCostPerYear = updatedProg.MonthsPerRenewal != null && updatedProg.MonthsPerRenewal - 12 >= 0
                             ? true : false;
                     }
@@ -132,8 +130,6 @@ namespace backend_api.Controllers
             }
         }
 
-
-
         /* PUT: api/update/program/{id}
         * Will update the program identified by the id from the route
         * Param input format:
@@ -142,7 +138,7 @@ namespace backend_api.Controllers
     	*            "ProgramCostPerYear" : Decimal,
     	*            "ProgramFlatCost" : Decimal,
     	*            "ProgramLicenseKey" : String,
-    	*            "ProgramDescription" : String,
+    	*            "Description" : String,
     	*            "ProgramPurchaseLink" : String,
     	*            "DateBought" : DateTime,
 		*            "RenewalDate" : DateTime,
@@ -158,26 +154,28 @@ namespace backend_api.Controllers
             // Get program by ID.
             var prog = _context.Program.Find(id);
 
+            // if the program does not exist then return error message
+            if (prog == null)
+            {
+                return BadRequest($"No such program exists with id: {id}");
+            }
+
             // list to hold the history entries that will be added.
             List<ProgramHistory> programHistories = new List<ProgramHistory>();
 
             // temp value to hold the old employee's id(could be null)
-            int? progEmpId = prog.EmployeeId != null ? prog.EmployeeId : null;
+            int? progEmpId = prog.EmployeeId;
+
+            // Updated program
+            ProgramObjectModel updatedProg = input.Program;
 
             if (prog != null)
             {
                 try
                 {
-                    prog.ProgramCostPerYear = input.Program.ProgramCostPerYear;
-                    prog.ProgramFlatCost = input.Program.ProgramFlatCost;
-                    prog.ProgramLicenseKey = input.Program.ProgramLicenseKey;
-                    prog.Description = input.Program.ProgramDescription;
-                    prog.ProgramPurchaseLink = input.Program.ProgramPurchaseLink;
+                    // Update the properties of the program.
+                    PropertyUtil<Models.Program, ProgramObjectModel>.UpdateProperties(prog, updatedProg);
                     prog.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
-                    prog.DateBought = input.Program.DateBought;
-                    prog.RenewalDate = input.Program.RenewalDate;
-                    prog.MonthsPerRenewal = input.Program.MonthsPerRenewal;
-                    prog.EmployeeId = input.Program.EmployeeId;
 
                     // Case 1: When an unassigned program becomes assigned
                     if (input.Program.EmployeeId != null && progEmpId == null)
@@ -223,15 +221,15 @@ namespace backend_api.Controllers
             }
         }
 
-        /* POST: api/update/Plugin
+        /* PUT: api/update/Plugin
          * Takes in as input:
          * {
          *     "PluginId" : int, 
-	     *     "ProgramName" : String,
-	     *     "PluginName" : int,
-	     *     "PluginFlatCost" : Decimal,
+	     *     "ProgramName" : string,
+	     *     "PluginName" : string,
+	     *     "PluginFlatCost" : decimal,
 	     *     "TextField" : string,
-	     *     "PluginCostPerYear" : Decimal,
+	     *     "PluginCostPerYear" : decimal,
 	     *     "RenewalDate" : DateTime,
 	     *     "MonthsPerRenewal" : int,
          *     "DateBought" : DateTime
@@ -254,32 +252,27 @@ namespace backend_api.Controllers
             {
                 return BadRequest("No such program exists");
             }
-            // try updating the various fields of our plugin
             try
             {
-                plugin.PluginName = input.PluginName;
-                plugin.PluginFlatCost = input.PluginFlatCost;
+                var updatedPlugin = input;
+
+                // Update plugin fields.
+                PropertyUtil<Plugins, EditPluginInputModel>.UpdateProperties(plugin, updatedPlugin);
                 plugin.ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First();
-                plugin.TextField = input.TextField;
-                plugin.PluginCostPerYear = input.PLuginCostPerYear;
-                plugin.IsDeleted = false;
-                plugin.ProgramName = input.ProgramName;
-                plugin.RenewalDate = input.RenewalDate;
-                plugin.MonthsPerRenewal = input.MonthsPerRenewal;
-                plugin.Datebought = input.DateBought;
                 plugin.IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false;
+                plugin.IsDeleted = false;
 
                 _context.Update(plugin);
                 _context.SaveChanges();
                 return StatusCode(202);
             }
-            catch
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(error: e.Message);
             }
         }
 
-        /* PUT: api/udpate/employee/
+        /* PUT: api/update/employee/
          * Will update the employee identified by the given employeeId from the body
          * {
          *       "Employee": {
@@ -330,16 +323,14 @@ namespace backend_api.Controllers
             {
                 try
                 {
+                    EditEmployeeObjectModel updatedEmp = input.Employee;
+
                     // updating the various fields of the current employee
-                    emp.HireDate = input.Employee.HireDate;
-                    emp.FirstName = input.Employee.FirstName;
-                    emp.LastName = input.Employee.LastName;
-                    emp.Role = input.Employee.Role;
-                    emp.DepartmentID = input.Employee.DepartmentID;
+                    PropertyUtil<Employee, EditEmployeeObjectModel>.UpdateProperties(emp, updatedEmp);
                     _context.Employee.Update(emp);
 
                     // updating the current isAdmin for the authIdServer connected to the employee
-                    authIdEmp.IsAdmin = input.Employee.IsAdmin;
+                    authIdEmp.IsAdmin = updatedEmp.IsAdmin;
                     _context.AuthIdserver.Update(authIdEmp);
 
                     _context.SaveChanges();
@@ -632,11 +623,8 @@ namespace backend_api.Controllers
             {
                 string type = GetClassName(newHardware);
 
-                // Get the table of the entity's type.
-                DbSet<T> table = _context.Set<T>();
-
                 // Get the old hardware entity from the db.
-                T oldHardware = table.Find(hardwareId);
+                T oldHardware = _context.Set<T>().Find(hardwareId);
 
                 // Make sure the id is valid for the type requested.
                 if (oldHardware == null)
@@ -662,24 +650,20 @@ namespace backend_api.Controllers
                     // Case 1: Un --> Assigned
                     if (oldEmployeeId == null && newEmployeeId != null)
                     {
-                        // Assign
                         UpdateHardwareHistory(newEmployeeId, type, hardwareId, "Assigned", DateTime.Now);
                     }
 
                     // Case 2: Assigned --> Reassigned
                     else if (oldEmployeeId != null && newEmployeeId != null && oldEmployeeId != newEmployeeId)
                     {
-                        // Unassign
                         UpdateHardwareHistory(oldEmployeeId, type, hardwareId, "Unassigned", DateTime.Now);
 
-                        // Then Assign
                         UpdateHardwareHistory(newEmployeeId, type, hardwareId, "Assigned", DateTime.Now);
                     }
 
                     // Case 3: Assigned --> Un
                     else if (oldEmployeeId != null && newEmployeeId == null)
                     {
-                        // Unassign
                         UpdateHardwareHistory(oldEmployeeId, type, hardwareId, "Unassigned", DateTime.Now);
                     }
 
