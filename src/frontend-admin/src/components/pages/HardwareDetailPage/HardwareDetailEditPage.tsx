@@ -97,7 +97,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
     useEffect(() => {
         axios.get(`add/hardwarePrep`).then((data: any) => {
-            console.log(data)
             const employees: {name: string; id: number}[] = []
             data.map((i: {employeeName: string; employeeId: number}) =>
                 employees.push({
@@ -126,7 +125,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setFirstSectionData([
                         data[0].server.make,
                         data[0].server.model,
@@ -176,7 +174,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data[0].computerHistory)
                     setFirstSectionData([
                         data[0].computer.make,
                         data[0].computer.model,
@@ -219,7 +216,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setFirstSectionData([
                         data[0].monitor.make,
                         data[0].monitor.model,
@@ -255,7 +251,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setFirstSectionData([
                         data[0].peripheral.peripheralName,
                         data[0].peripheral.peripheralType,
@@ -304,7 +299,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         }
 
         //check to make sure cost properly filled out
-        console.log(hasFlatCost)
         if (hasRecurringCost) {
             if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
                 window.alert('Recurring cost and months must have values!')
@@ -499,7 +493,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     DeleteHistory: removeHistoryLog,
                 })
             } else if (match.params.type === 'laptop') {
-                console.log('check')
                 await axios.put(`update/computer`, {
                     Entity: {
                         ComputerId: match.params.id,
@@ -534,7 +527,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     DeleteHistory: removeHistoryLog,
                 })
             } else if (match.params.type === 'peripheral') {
-                console.log(costSection)
                 await axios.put(`update/peripheral`, {
                     Entity: {
                         PeripheralId: match.params.id,
@@ -575,7 +567,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         } else if (sectionData == thirdSectionData) {
             setThirdSectionData(tempData)
         }
-        console.log(firstSectionData)
     }
 
     // make first section
@@ -800,10 +791,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         } else {
             //remove from addHistoryLog
             let tempAddHistoryLog = cloneDeep(addHistoryLog)
-            console.log(tempAddHistoryLog)
-            console.log(historyLogEntries[index].key)
             tempAddHistoryLog = tempAddHistoryLog.filter(log => log.key != historyLogEntries[index].key)
-            console.log(tempAddHistoryLog)
+
             setAddHistoryLog(tempAddHistoryLog)
         }
 
