@@ -475,7 +475,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             text={id}
                             icon='back'
                             onClick={() => {
-                                history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
+                                history.push(`/programs/overview/${id}/${archived}`)
                             }}
                             className={styles.backButton}
                             textClassName={styles.backButtonText}

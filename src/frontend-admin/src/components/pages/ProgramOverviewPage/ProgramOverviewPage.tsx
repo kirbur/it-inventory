@@ -198,7 +198,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     axios.put(`recover/program/${program[0].id}`, {}).catch((err: any) => console.error(err))
                 })
                 setProgramRows([])
-                history.push('/programs')
+                history.push(`/programs/edit/overview/${id}/inventory`)
             }
         }
     }

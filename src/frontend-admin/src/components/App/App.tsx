@@ -167,7 +167,7 @@ export const App: React.FC = () => {
                         )}
 
                         {loginContextVariables.isAdmin && (
-                            <Route path={'/programs/edit/overview/:id:/archived'} component={ProgramOverviewEditPage} />
+                            <Route path={'/programs/edit/overview/:id/:archived'} component={ProgramOverviewEditPage} />
                         )}
                     </Switch>
                 </Router>
