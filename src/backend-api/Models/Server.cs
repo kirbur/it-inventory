@@ -29,9 +29,9 @@ namespace backend_api.Models
         public string Location { get; set; }
         public string SerialNumber { get; set; }
         public int? MonthsPerRenewal { get; set; }
-
         public int GetId() { return ServerId; }
+        public string GetMake() { return Make; }
+        public string GetModel() { return Model; }
 
-        // public Employee Employee { get; set; }
     }
 }
