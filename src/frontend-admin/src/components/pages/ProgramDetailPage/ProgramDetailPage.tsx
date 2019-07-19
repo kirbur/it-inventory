@@ -85,7 +85,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     costPerYear: data[0].programCostPerYear,
                     hasPlugin: data[0].hasPlugIn,
                 })
-                console.log(data)
+
                 setIsDeleted(data[0].isDeleted)
                 setProgRows([
                     [
