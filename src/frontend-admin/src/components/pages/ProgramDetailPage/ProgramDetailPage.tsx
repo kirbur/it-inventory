@@ -137,8 +137,9 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     .put(`${isDeleted ? 'recover' : 'archive'}/program/${match.params.id}`, {})
                     .catch((err: any) => console.error(err))
 
-                //after submitting go back to overview
-                history.push(`/programs/overview/${progData.name}/inventory`)
+                history.push(
+                    `/programs${isDeleted ? '/edit/detail/' + match.params.id : '/overview/' + progData.name}/inventory`
+                )
             }
         }
     }

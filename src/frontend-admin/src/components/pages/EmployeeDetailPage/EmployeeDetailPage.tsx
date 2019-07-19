@@ -175,7 +175,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
             await axios
                 .put(`/${isDeleted ? 'recover' : 'archive'}/employee/${match.params.id}`, {})
                 .catch((err: any) => console.error(err))
-            history.push('/employees')
+            history.push(`/employees${isDeleted ? '/edit/' + match.params.id : ''}`)
         }
     }
 

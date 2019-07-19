@@ -220,7 +220,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             window.confirm(`Are you sure you want to ${isDeleted ? 'recover' : 'archive'} this ${match.params.type}?`)
         ) {
             await axios.put(`${isDeleted ? 'recover' : 'archive'}/${match.params.type}/${match.params.id}`, {})
-            history.push('/hardware')
+            history.push(`/hardware${isDeleted ? `/edit/${match.params.type}/${match.params.id}` : ''}`)
         }
     }
 

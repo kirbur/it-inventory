@@ -187,7 +187,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 )
             ) {
                 await axios.put(`${isDeleted ? 'recover' : 'archive'}/department/${match.params.id}`, {})
-                history.push('/departments')
+                history.push(`/departments${isDeleted ? `/edit/${match.params.id}` : ''}`)
             }
         }
     }
