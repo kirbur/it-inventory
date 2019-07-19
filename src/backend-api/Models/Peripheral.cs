@@ -20,9 +20,9 @@ namespace backend_api.Models
         public DateTime? RenewalDate { get; set; }
         public string SerialNumber { get; set; }
         public int? MonthsPerRenewal { get; set; }
-
         public int GetId() { return PeripheralId; }
+        public string GetMake() { return PeripheralName; }
+        public string GetModel() { return PeripheralType; }
 
-        //public Employee Employee { get; set; }
     }
 }
