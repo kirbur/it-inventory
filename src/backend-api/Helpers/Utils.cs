@@ -25,20 +25,17 @@ public static class PropertyUtil<T1, T2>
             .ToArray();
     }
 
-    /* UpdateProperties(item, updatedItem) will updat all the overlapping properties of two objects
+    /* UpdateProperties(item, updatedItem) will update all the overlapping properties of two objects
      *   when the new property value is not null.
      */
     public static void UpdateProperties(T1 item, T2 updatedItem)
     {
-        // For each property on a Program, loop through it.
-        foreach (var propPair in PropertyMap)
+        foreach (var overlappingProperty in PropertyMap)
         {
-            // Get the value of the property on the ObjectModel
-            var newValue = propPair.Item2.GetValue(updatedItem, null);
+            var newValue = overlappingProperty.Item2.GetValue(updatedItem, null);
             if (newValue != null)
             {
-                // Update the value of the property on the Program.
-                propPair.Item1.SetValue(item, newValue, null);
+                overlappingProperty.Item1.SetValue(item, newValue, null);
             }
         }
     }
