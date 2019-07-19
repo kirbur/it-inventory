@@ -201,8 +201,8 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                         data: [],
                     },
                 ]
-                data[0].data &&
-                    data[0].data.map((i: any) =>
+                data[0].dataForPrograms &&
+                    data[0].dataForPrograms.map((i: any) =>
                         x[0].data.push({
                             name: i.departmentName,
                             value: i.costOfPrograms !== null ? i.costOfPrograms : 0,
@@ -210,8 +210,8 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                         })
                     )
 
-                data[1].data2 &&
-                    data[1].data2.map((i: any) =>
+                data[1].dataForHardware &&
+                    data[1].dataForHardware.map((i: any) =>
                         x[1].data.push({
                             name: i.departmentName,
                             value: i.costOfHardware !== null ? i.costOfHardware : 0,
