@@ -35,6 +35,7 @@ interface IUser {
     swCost: number
     archiveDate: string
     description: string
+    email: string
 }
 
 // Primary Component
@@ -58,6 +59,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         swCost: 0,
         archiveDate: '',
         description: '',
+        email: '',
     })
     const [hardwareRows, setHardwareRows] = useState<ITableItem[][]>([])
     const [softwareRows, setSoftwareRows] = useState<ITableItem[][]>([])
@@ -91,6 +93,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     swCost: Math.round(data[0].totalProgramCostMonthly * 100) / 100,
                     archiveDate: formatDate(data[0].archiveDate), //TODO: make sure these were added
                     description: data[0].textField,
+                    email: format(data[0].email),
                 }
 
                 setUserData(user)
@@ -240,6 +243,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     )}
                     <div className={styles.titleText}>
                         <div className={styles.employeeName}>{userData.name}</div>
+                        <div className={styles.employeeText}>{userData.email}</div>
                         <div className={styles.employeeText}>
                             {userData.department} | {userData.role}
                         </div>
