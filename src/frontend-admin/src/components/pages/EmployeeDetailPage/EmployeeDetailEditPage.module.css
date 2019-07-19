@@ -285,3 +285,17 @@ input:checked ~ .insideCheckmarkAdmin {
 .dropdown3 {
     z-index: 3;
 }
+
+.descriptionContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.description {
+    justify-self: flex-start;
+    width: 98%;
+    height: 100px;
+    font-family: cqlRegularFont;
+    resize: none;
+}

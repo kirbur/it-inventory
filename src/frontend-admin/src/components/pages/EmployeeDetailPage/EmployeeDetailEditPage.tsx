@@ -115,6 +115,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const [imgInput, setImgInput] = useState<File>()
     const [roleInput, setRoleInput] = useState<string>('')
     const [changed, setChanged] = useState(false)
+    const [descriptionInput, setDescriptionInput] = useState('')
 
     const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([])
     const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([])
@@ -191,6 +192,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     setAdminInput(data[0].admin)
                     setDateInput(new Date(formatDate(data[0].hireDate)))
                     setRoleInput(data[0].role)
+                    setDescriptionInput(data[0].textField)
                     setSelectedEmployee({
                         name: data[0].firstName + ' ' + data[0].lastName,
                         id: parseInt(match.params.id),
@@ -581,6 +583,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     Role: roleInput,
                     DepartmentID: deptInput.departmentId,
                     IsAdmin: adminInput,
+                    TextField: descriptionInput,
                 },
                 HardwareAssigned: [
                     ...hardwareRows.added.map(i => {
@@ -639,6 +642,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     Role: roleInput,
                     DepartmentID: deptInput.departmentId,
                     IsAdmin: adminInput,
+                    TextField: descriptionInput,
                 },
                 HardwareAssigned: [
                     ...hardwareRows.added.map(i => {
@@ -1105,6 +1109,18 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         </div>
                     </Button>
                 )}
+
+                <div className={s(styles.inputContainer, styles.descriptionContainer)}>
+                    <div className={styles.text}>Description</div>
+                    <textarea
+                        className={s(styles.input, styles.description)}
+                        value={descriptionInput}
+                        onChange={e => {
+                            setChanged(true)
+                            setDescriptionInput(e.target.value)
+                        }}
+                    />
+                </div>
 
                 <div className={styles.submitContainer}>
                     <Button text='Submit' icon='submit' onClick={handleSubmit} className={styles.submitbutton} />
