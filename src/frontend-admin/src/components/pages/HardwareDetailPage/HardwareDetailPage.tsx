@@ -188,6 +188,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setFlatCost(data[0].peripheral.flatCost)
                     setCommentText(data[0].peripheral.textField)
                     setHistoryLogEntries(data[0].peripheralHistory)
+                    console.log(data)
                 })
                 .catch((err: any) => console.error(err))
         }

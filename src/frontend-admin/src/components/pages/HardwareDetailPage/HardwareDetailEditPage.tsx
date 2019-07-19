@@ -3,7 +3,7 @@ import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
 import {Button} from '../../reusables/Button/Button'
-import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
+import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
 import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {Checkbox} from '../../reusables/Checkbox/Checkbox'
@@ -75,7 +75,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
     const [commentText, setCommentText] = useState('')
 
-    const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([])
+    const [historyLogEntries, setHistoryLogEntries] = useState<IHistoryLogArray[]>([])
     const [addHistoryLog, setAddHistoryLog] = useState<any[]>([])
     const [removeHistoryLog, setRemoveHistoryLog] = useState<any[]>([])
     const [eventInput, setEventInput] = useState<'Broken' | 'Repaired'>()
@@ -792,8 +792,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             //remove from addHistoryLog
             let tempAddHistoryLog = cloneDeep(addHistoryLog)
             console.log(tempAddHistoryLog)
-            console.log(historyLogEntries[index].key)
-            tempAddHistoryLog = tempAddHistoryLog.filter(log => log.key != historyLogEntries[index].key)
+            // console.log(historyLogEntries[index].key)
+            // tempAddHistoryLog = tempAddHistoryLog.filter(log => log.key != historyLogEntries[index].key)
             console.log(tempAddHistoryLog)
             setAddHistoryLog(tempAddHistoryLog)
         }
