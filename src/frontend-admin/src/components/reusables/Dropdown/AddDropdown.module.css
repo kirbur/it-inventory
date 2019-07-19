@@ -1,0 +1,16 @@
+.addDropdownMain {
+    z-index: 2;
+}
+
+.dropdownTitle {
+    margin-top: -3px;
+    font-family: cqlmedium;
+    text-transform: none;
+    color: #009eff;
+    font-size: 20px;
+}
+
+.dropdownList {
+    max-height: 200px;
+    overflow-y: scroll;
+}

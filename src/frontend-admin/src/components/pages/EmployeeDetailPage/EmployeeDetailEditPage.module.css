@@ -276,14 +276,20 @@ input:checked ~ .insideCheckmarkAdmin {
 
 .dropdown1 {
     z-index: 1;
+    align-self: flex-end;
+    margin: 15px 0;
 }
 
 .dropdown2 {
     z-index: 2;
+    align-self: flex-end;
+    margin: 15px 0;
 }
 
 .dropdown3 {
     z-index: 3;
+    align-self: flex-end;
+    margin: 15px 0;
 }
 
 .descriptionContainer {

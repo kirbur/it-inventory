@@ -8,6 +8,7 @@ import {FaUserShield, FaUser} from 'react-icons/fa'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
+import {AddDropdown} from '../../reusables/Dropdown/AddDropdown'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -142,12 +143,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     let uhw: any[] = []
                     data[0].unassignedHardware.map((i: any) =>
                         uhw.push({
-                            name: i.monitorName ? i.monitorName : i.compName ? i.compName : i.periphName,
-                            id: i.monitorId
-                                ? i.type.toLowerCase() + '/' + i.monitorId
-                                : i.computerId
-                                ? i.type.toLowerCase() + '/' + i.computerId
-                                : i.type.toLowerCase() + '/' + i.peripheralId,
+                            name: i.hardwareName,
+                            id: i.type + '/' + i.hardwareId,
                         })
                     )
 
@@ -256,12 +253,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     let uhw: any[] = []
                     data[0].unassignedHardware.map((i: any) =>
                         uhw.push({
-                            name: i.monitorName ? i.monitorName : i.compName ? i.compName : i.periphName,
-                            id: i.monitorId
-                                ? i.type.toLowerCase() + '/' + i.monitorId
-                                : i.computerId
-                                ? i.type.toLowerCase() + '/' + i.computerId
-                                : i.type.toLowerCase() + '/' + i.peripheralId,
+                            name: i.hardwareName,
+                            id: i.type + '/' + i.hardwareId,
                         })
                     )
 
@@ -698,6 +691,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     headers: {'Content-Type': 'multipart/form-data'},
                 })
                 .catch(err => console.error(err))
+            history.push(`/employees/detail/${match.params.id}`)
         }
     }
 
@@ -978,40 +972,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     />
                 </div>
                 {hardwareDropdown && (
-                    <Button
-                        className={s(styles.addContainer, styles.dropdown3)}
-                        icon='add'
-                        onClick={() => {}}
-                        textInside={false}
-                    >
-                        <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                            <DropdownList
-                                triggerElement={({isOpen, toggle}) => (
-                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                        <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                            Assign new hardware
-                                        </div>
-                                    </button>
-                                )}
-                                choicesList={() => (
-                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
-                                        {hardwareDropdown.map(i => (
-                                            <li
-                                                className={dropdownStyles.dropdownListItem}
-                                                key={i.id}
-                                                onClick={() => handleAddHardware(i)}
-                                            >
-                                                <button className={dropdownStyles.dropdownListItemButton}>
-                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            />
-                            <div />
-                        </div>
-                    </Button>
+                    <AddDropdown
+                        title={'Assign new hardware'}
+                        content={hardwareDropdown}
+                        onSelect={handleAddHardware}
+                        className={styles.dropdown3}
+                    />
                 )}
 
                 <div className={styles.paddingTop}>
@@ -1025,41 +991,14 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         // sorting={false}
                     />
                 </div>
+
                 {softwareDropdown && (
-                    <Button
-                        className={s(styles.addContainer, styles.dropdown2)}
-                        icon='add'
-                        onClick={() => {}}
-                        textInside={false}
-                    >
-                        <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                            <DropdownList
-                                triggerElement={({isOpen, toggle}) => (
-                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                        <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                            Assign new software
-                                        </div>
-                                    </button>
-                                )}
-                                choicesList={() => (
-                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
-                                        {softwareDropdown.map(i => (
-                                            <li
-                                                className={dropdownStyles.dropdownListItem}
-                                                key={i.id}
-                                                onClick={() => handleAddSoftware(i)}
-                                            >
-                                                <button className={dropdownStyles.dropdownListItemButton}>
-                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            />
-                            <div />
-                        </div>
-                    </Button>
+                    <AddDropdown
+                        title={'Assign new software'}
+                        content={softwareDropdown}
+                        onSelect={handleAddSoftware}
+                        className={styles.dropdown2}
+                    />
                 )}
 
                 <div className={styles.paddingTop}>
@@ -1070,44 +1009,16 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         style={styles.newRowThing}
                         edit={true}
                         remove={handleRemoveLicence}
-                        // sorting={false}
                     />
                 </div>
+
                 {licenseDropdown && (
-                    <Button
-                        className={s(styles.addContainer, styles.dropdown1)}
-                        icon='add'
-                        onClick={() => {}}
-                        textInside={false}
-                    >
-                        <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                            <DropdownList
-                                triggerElement={({isOpen, toggle}) => (
-                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                        <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                            Assign new license
-                                        </div>
-                                    </button>
-                                )}
-                                choicesList={() => (
-                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
-                                        {licenseDropdown.map(i => (
-                                            <li
-                                                className={dropdownStyles.dropdownListItem}
-                                                key={i.id}
-                                                onClick={() => handleAddLicense(i)}
-                                            >
-                                                <button className={dropdownStyles.dropdownListItemButton}>
-                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            />
-                            <div />
-                        </div>
-                    </Button>
+                    <AddDropdown
+                        title={'Assign new license'}
+                        content={licenseDropdown}
+                        onSelect={handleAddLicense}
+                        className={styles.dropdown1}
+                    />
                 )}
 
                 <div className={s(styles.inputContainer, styles.descriptionContainer)}>

@@ -192,3 +192,7 @@
     margin: 5px 0 15px;
     align-self: flex-end;
 }
+
+.zIndex3 {
+    z-index: 3;
+}
