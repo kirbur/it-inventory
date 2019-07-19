@@ -236,7 +236,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                             )}
 
                             <Button
-                                text={isDeleted ? 'Rrecover' : 'Archive'}
+                                text={isDeleted ? 'Recover' : 'Archive'}
                                 icon='archive'
                                 onClick={handleArchive}
                                 className={styles.archivebutton}

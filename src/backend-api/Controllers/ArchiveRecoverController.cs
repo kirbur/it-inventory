@@ -131,12 +131,9 @@ namespace backend_api.Controllers
                 UpdateHardwareAssigning<Server>(emp.EmployeeId);
                 UpdateHardwareAssigning<Computer>(emp.EmployeeId);
                 UpdateHardwareAssigning<Peripheral>(emp.EmployeeId);
-
-                _context.SaveChanges();
             }
 
             _context.SaveChanges();
-
 
             return Ok($"{(isDeleted ? "archive" : "recover")} completed");
 
