@@ -44,7 +44,7 @@ interface IPulledData {
 export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props => {
     const {history} = props
     const {
-        loginContextVariables: {accessToken, refreshToken},
+        loginContextVariables: {accessToken, refreshToken, isAdmin},
     } = useContext(LoginContext)
     const axios = new AxiosService(accessToken, refreshToken)
 
@@ -262,7 +262,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         <div className={styles.departmentsListMain}>
             <Group direction='row' justify='between' className={styles.group}>
                 <div className={styles.buttonContainer}>
-                    <Button text='Add' icon='add' onClick={handleClick} />
+                    {isAdmin && <Button text='Add' icon='add' onClick={handleClick} className={styles.addButton} />}
                     <Button
                         text={isArchive ? 'View Active' : 'View Archives'}
                         onClick={() => setIsArchive(!isArchive)}
