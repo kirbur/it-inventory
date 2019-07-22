@@ -65,6 +65,7 @@ namespace backend_api.Controllers
          * Return 200 if an email was send. 400 otherwise.
          * Note: Made this a patch because it is conflicting with the costBreakdown endpoint from the Dashboard we are inheriting.
          */
+        [AllowAnonymous]
         [HttpPatch]
         [Route("{job}")]
         public IActionResult SendCostBreakdownEmail([FromRoute] ValidJob job, [FromHeader] string token)
