@@ -129,10 +129,7 @@ namespace backend_api.Controllers
                     {
                         dep.DepartmentName,
                         dep.DepartmentId,
-                        icon,
-                        DefaultHardware = new string[] { },
-                        DefaultLicenses = new string[] { },
-                        DefaultSoftware = new string[] { },
+                        icon
                     });
 
                 }
