@@ -825,8 +825,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 <div className={styles.hardwareHeader}>{match.params.type} Information</div>
-                {/* virtualize checkbox */}
-                <div></div>
                 {/* first section */}
                 {firstSectionHeaders.length > 0 && renderSection(firstSectionHeaders, firstSectionData)}
                 {firstSectionHeaders.length > 0 && <div className={styles.line} />}

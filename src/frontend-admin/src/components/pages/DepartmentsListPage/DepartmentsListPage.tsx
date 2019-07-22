@@ -89,7 +89,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
 
         axios
             .get(`/archivedList/department`)
-            .then((data: any) => {
+            .then((data: IPulledData[]) => {
                 var depts: IDepartmentData[] = []
                 data.map((i: IPulledData) =>
                     depts.push({
@@ -269,13 +269,13 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                     transformedRow[0] = concatenatedDept(row)
                 case 2:
                     transformedRow[2] = (
-                        <td className={styles.alignLeft} key={row[i]}>
+                        <td className={styles.alignLeft} key={i}>
                             {row[2] === 1 ? row[2] + ' employee' : row[2] + ' employees'}
                         </td>
                     )
                 case 3:
                     transformedRow[3] = (
-                        <td className={styles.alignLeft} key={row[i]}>
+                        <td className={styles.alignLeft} key={i}>
                             {formatCost(row[3])}
                         </td>
                     )

@@ -39,6 +39,8 @@ interface IEmployeeData {
     daysEmployed: number
 }
 interface IPulledData {
+    firstName?: string
+    lastName?: string
     employeeName: string
     hireDate: string
     hardwareCostForEmp: number
@@ -108,9 +110,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
         axios
             .get('/archivedList/employee')
-            .then((data: any[]) => {
-                let employees: any[] = []
-                data.map((i: any) => {
+            .then((data: IPulledData[]) => {
+                let employees: IEmployeeData[] = []
+                data.map((i: IPulledData) => {
                     employees.push({
                         name: format(i.firstName + ' ' + i.lastName),
                         dateHired: formatDate(i.hireDate),
