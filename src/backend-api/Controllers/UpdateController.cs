@@ -282,7 +282,8 @@ namespace backend_api.Controllers
          *           "HireDate": DateTime,
          *           "Role": String,
          *           "DepartmentID": int,
-         *           "IsAdmin" : bool
+         *           "IsAdmin" : bool,
+         *           "TextField" : string
          *       },
          *       "HardwareAssigned": [
          *            {

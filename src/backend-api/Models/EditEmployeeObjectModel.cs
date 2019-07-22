@@ -11,6 +11,8 @@ namespace backend_api.Models
         public string Role { get; set; }
         public int DepartmentID { get; set; }
         public bool IsAdmin { get; set; }
+        public string TextField { get; set; }
+        public DateTime? ArchiveDate { get; set; }
 
     }
 }
