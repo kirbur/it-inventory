@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UpdateController : ContextController
