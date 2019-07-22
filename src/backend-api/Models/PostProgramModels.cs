@@ -1,11 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace backend_api.Models
 {
+    // Object to get input from the request body.
+    public class PostProgramInputModel
+    {
+        public ProgramObjectModel Program { get; set; }
+    }
+
+    // Program object from the input
     public class ProgramObjectModel
     {
         public ProgramObjectModel() { }
@@ -15,7 +18,7 @@ namespace backend_api.Models
         public decimal ProgramFlatCost { get; set; }
         public string ProgramLicenseKey { get; set; }
         public bool IsLicense { get; set; }
-        public string ProgramDescription { get; set; }
+        public string Description { get; set; }
         public string ProgramPurchaseLink { get; set; }
         public DateTime DateBought { get; set; }
         public DateTime? RenewalDate { get; set; }

@@ -198,8 +198,10 @@ namespace backend_api.Controllers
                     .Select(x => new
                     {
                         // Find the previous renewal date, and also select vars needed in future.
+                        // In order to perform the date comparisons below, if the RenewalDate or MonthsPerRenewal is null,
+                        //   then a super old date is passed to give the same effect as null.
                         PreviousRenewal = x.RenewalDate != null ?
-                        x.RenewalDate.Value.AddMonths(x.MonthsPerRenewal != null ? -x.MonthsPerRenewal.Value : -999) : new DateTime(1800),
+                            x.RenewalDate.Value.AddMonths(x.MonthsPerRenewal != null ? -x.MonthsPerRenewal.Value : -999) : new DateTime(1800),
                         PurcahseDate = x.GetPurchaseDate(),
                         CostPerYear = x.GetCostPerYear() ?? 0.0m,
                         FlatCost = x.GetFlatCost() ?? 0.0m,
