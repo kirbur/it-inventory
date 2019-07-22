@@ -222,7 +222,9 @@ namespace backend_api.Controllers
          *      department: string,
          *      role: string,
          *      hireDate: date (as string),
-         *      isAdmin : bool
+         *      archiveDate: Date (as string),
+         *      isAdmin : bool,
+         *      TextField: string,
          *      hardware: [ {
          *          id: int,
          *          type: string,
