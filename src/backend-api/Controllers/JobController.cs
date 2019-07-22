@@ -156,9 +156,8 @@ namespace backend_api.Controllers
 
                 // Replace the text-tags on the email with formatted data and html.
                 bodyBuilder.HtmlBody = bodyBuilder.HtmlBody.Replace("<<sections>>", SectionHtml(emailBodySections));
-
-                // TODO: add <<note>>
-                // TODO: add <<year>>
+                bodyBuilder.HtmlBody = bodyBuilder.HtmlBody.Replace("<<year>>", $"{DateTime.Now.Year}");
+                bodyBuilder.HtmlBody = bodyBuilder.HtmlBody.Replace("<<note>>", NotePicker());
 
                 // TODO: update this?
                 bodyBuilder.TextBody = "This is some plain text";
@@ -321,6 +320,50 @@ namespace backend_api.Controllers
                     </td>
                 </tr>
             ";
+        }
+
+        /* NotePicker() picks a random note to preface the email.
+         * Return: a random string from the list.
+         */
+        private string NotePicker()
+        {
+            string[] notes = {
+                "Don't forget to smile!",
+                "To my favorite CQLite.",
+                "I'm just the messenger.",
+                "\"Not another one!\"",
+                "\"That'll do.\"",
+                "Osaka, Japan has 40 municipal mascots.",
+                "It's sunny somewhere!",
+                "Greetings and salutations.",
+                "Howdy partner.",
+                "Sent with love.",
+                "Hope your day is as great as Mike's laugh.",
+                "Just the facts.",
+                "From your favorite NextGens.",
+                "Blue skies aren't that far away.",
+                "Chess Query Language.",
+                "Citizens For Quality Of Life.",
+                "Can Quack Loudly.",
+                "Cabbage Quiz League.",
+                "Don't let this sour your day.",
+                ":)",
+                "\"Hello, it's me.\"",
+                "One step closer to Friday.",
+                "Let's crunch those numbers.",
+                "*excited fist pump*",
+                "Yoo-hoo!",
+                "Nothing but business.",
+                "Give someone a high-five.",
+                "Sailed the high tides and the seven CQLs.",
+                "CQL you later, alligato.r",
+                "As far as the eye can CQL.",
+                "Long time, no SeeQL.",
+            };
+
+            Random rand = new Random();
+            int index = rand.Next(notes.Length);
+            return notes[index];
         }
 
         /* WeeklyCostCalculator() calculates the cost of any entity that was purchased or renewed 
