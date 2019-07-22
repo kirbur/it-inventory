@@ -24,11 +24,37 @@
 
 .header {
     position: relative;
-    left: 160px;
+    left: 150px;
     top: 40px;
-    padding-right: 320px;
+    padding-right: 300px;
 }
 
 .pieContainer {
     margin-top: -60px;
+}
+
+.headingText {
+    color: grey;
+    font-size: 12px;
+}
+
+/* when pie data is empty */
+.circleContainer {
+    width: 380px;
+    height: 300px;
+}
+.emptyCircle {
+    background-color: rgba(97, 97, 97, 0.185);
+    border-radius: 50%;
+    width: 230px;
+    height: 230px;
+    position: relative;
+    top: 40px;
+    left: 70px;
+}
+.emptyDataText {
+    color: black;
+    font-size: 18px;
+    position: relative;
+    bottom: 85px;
 }

@@ -46,7 +46,7 @@
 .rowData {
     text-align: left;
     color: #4a4a4a;
-    min-width: 100px;
+    min-width: 150px;
 }
 .notSorted {
     border-left: 8px solid #636363;

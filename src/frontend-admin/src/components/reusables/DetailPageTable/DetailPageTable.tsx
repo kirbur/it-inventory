@@ -175,7 +175,7 @@ export const DetailPageTable = (props: ITableProps) => {
 
             <tbody>
                 {renderedRows.map((row, i) => (
-                    <tr className={s(style, styles.tr, hover ? styles.hover : '')}>{row}</tr>
+                    <tr className={s(styles.tr, hover ? styles.hover : '')}>{row}</tr>
                 ))}
             </tbody>
         </table>

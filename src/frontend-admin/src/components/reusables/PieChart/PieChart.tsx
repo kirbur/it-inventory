@@ -24,6 +24,9 @@ interface IRechartPieProps {
 export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props => {
     const {pieChartData, initialColors, onSliceClick} = props
 
+    if (pieChartData.length === 0) {
+    }
+
     const [colors, setColors] = useState(initialColors)
     //colors off of invision: ['#009EFF', '#FF9340', '#3D4599', '#1425CC', '#CC4A14']
 
@@ -33,67 +36,80 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
         setColors(updatedColors) // Set new color array
     }
 
-    const onMouseOut = (data: IRechartPieDatum[], index: number) => {
+    const onMouseOut = () => {
         setColors(initialColors)
     }
 
-    //axios stuff for dashboard
-    // const axios = new AxiosService("access token", "refresh token");
-    // let x: {
-    //   pieChartData: IDataProps[];
-    // } = {
-    //   pieChartData: [{ headingName: "", data: [{ name: "", value: 0, id: "" }] }]
-    // };
-    // const [val, setVal] = useState(x);
-    // useEffect(() => {
-    //   axios.get("dashboard/CostPieChart", setVal);
-    // }, [setVal]);
-    // console.log(val);
+    console.log(pieChartData)
+    function hasData(i: number) {
+        for (let j = 0; j < pieChartData[i].data.length; j++) {
+            if (pieChartData[i].data[j].value > 0) {
+                return true
+            }
+        }
+        return false
+    }
+
+    // function emptyPies() {
+    //     for (let i = 0; i < pieChartData.length; i++) {
+    //         if (!hasData(i)) {
+    //             return <div className={styles.emptyDataText}>No data to display</div>
+    //         }
+    //     }
+    // }
 
     return (
         <div className={styles.pieContainer}>
             {/* Headers */}
-            <div className={styles.inline} style={{}}>
+            <div className={styles.inline}>
                 {pieChartData.map(datum => (
                     <h3 key={datum.headingName} className={styles.header}>
                         {datum.headingName}
+                        {datum.headingName === 'Hardware' && <div className={styles.headingText}>*last 30 days</div>}
                     </h3>
                 ))}
             </div>
 
             {/* Pie Charts */}
             <div className={styles.inline}>
-                <PieChart width={380 * pieChartData.length} height={300}>
-                    {pieChartData.map((datum, i) => (
-                        <Pie
-                            key={datum.headingName}
-                            data={datum.data}
-                            cx={190 + 380 * i}
-                            cy={150}
-                            dataKey='value'
-                            fill='#8884d8'
-                            labelLine={false}
-                            label={<CustomLabel data={datum.data} />}
-                            isAnimationActive={false}
-                            onMouseOver={onMouseOver}
-                            onMouseOut={onMouseOut}
-                        >
-                            {datum.data.map((entry, index) => (
-                                <Cell
-                                    key={`cell-${index}`}
-                                    fill={colors[index]}
-                                    onClick={
-                                        onSliceClick
-                                            ? () => {
-                                                  onSliceClick(entry.id)
-                                              }
-                                            : undefined
-                                    }
-                                />
-                            ))}
-                        </Pie>
-                    ))}
-                </PieChart>
+                {pieChartData.map((datum, i) =>
+                    hasData(i) ? (
+                        <PieChart width={380} height={300}>
+                            <Pie
+                                key={datum.headingName}
+                                data={datum.data}
+                                cx={190 + 380 * i}
+                                cy={150}
+                                dataKey='value'
+                                fill='#8884d8'
+                                labelLine={false}
+                                label={<CustomLabel data={datum.data} />}
+                                isAnimationActive={false}
+                                onMouseOver={onMouseOver}
+                                onMouseOut={onMouseOut}
+                            >
+                                {datum.data.map((entry, index) => (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={colors[index]}
+                                        onClick={
+                                            onSliceClick
+                                                ? () => {
+                                                      onSliceClick(entry.id)
+                                                  }
+                                                : undefined
+                                        }
+                                    />
+                                ))}
+                            </Pie>
+                        </PieChart>
+                    ) : (
+                        <div className={styles.circleContainer}>
+                            <div className={styles.emptyCircle} />
+                            <div className={styles.emptyDataText}>No data to display</div>
+                        </div>
+                    )
+                )}
             </div>
 
             {/* Legend */}
