@@ -29,6 +29,9 @@ namespace backend_api.Models
         public string SerialNumber { get; set; }
         public int? MonthsPerRenewal { get; set; }
         public int GetId() { return ComputerId; }
+        public decimal? GetCostPerYear() { return CostPerYear; }
+        public decimal? GetFlatCost() { return FlatCost; }
+        public DateTime? GetPurchaseDate() { return PurchaseDate; }
         public string GetMake() { return Make; }
         public string GetModel() { return Model; }
 

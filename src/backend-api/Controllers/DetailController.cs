@@ -178,7 +178,7 @@ namespace backend_api.Controllers
                             plugin.PluginId,
                             plugin.TextField,
                             plugin.MonthsPerRenewal,
-                            plugin.Datebought,
+                            plugin.DateBought,
                             plugin.PluginName,
                             plugin.RenewalDate,
                             plugin.PluginFlatCost,

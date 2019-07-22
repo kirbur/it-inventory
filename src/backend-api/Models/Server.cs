@@ -32,6 +32,8 @@ namespace backend_api.Models
         public int GetId() { return ServerId; }
         public string GetMake() { return Make; }
         public string GetModel() { return Model; }
-
+        public decimal? GetCostPerYear() { return CostPerYear; }
+        public decimal? GetFlatCost() { return FlatCost; }
+        public DateTime? GetPurchaseDate() { return PurchaseDate; }
     }
 }
