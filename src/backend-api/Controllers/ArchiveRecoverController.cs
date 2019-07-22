@@ -96,7 +96,7 @@ namespace backend_api.Controllers
 
 
         /* TryUpdateEmployee(isDeleted, emp) will try to update the IsDeleted field on the 
-         *   employee row.
+         *   employee row as well as updating the archive date on the employee row.
          */
         private IActionResult TryUpdateEmployee(bool isDeleted, Employee emp)
         {
@@ -109,6 +109,8 @@ namespace backend_api.Controllers
             // if the employee given is to be archived
             if (isDeleted)
             {
+                // set archive date to now as we are now archiving this employee
+                emp.ArchiveDate = DateTime.Now;
                 // find the programs that belong to this employee and unassign them and update the program history accordingly
                 // using the helper method
                 foreach (var prog in _context.Program.Where(x => x.EmployeeId == emp.EmployeeId))
@@ -131,12 +133,9 @@ namespace backend_api.Controllers
                 UpdateHardwareAssigning<Server>(emp.EmployeeId);
                 UpdateHardwareAssigning<Computer>(emp.EmployeeId);
                 UpdateHardwareAssigning<Peripheral>(emp.EmployeeId);
-
-                _context.SaveChanges();
             }
 
             _context.SaveChanges();
-
 
             return Ok($"{(isDeleted ? "archive" : "recover")} completed");
 

@@ -112,7 +112,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     //input feild states:
     const [dateInput, setDateInput] = useState<Date>(new Date())
     const [deptInput, setDeptInput] = useState<IDepartment>()
-    const [adminInput, setAdminInput] = useState<boolean>()
+    const [adminInput, setAdminInput] = useState<boolean>(false)
     const [imgInput, setImgInput] = useState<File>()
     const [roleInput, setRoleInput] = useState<string>('')
     const [changed, setChanged] = useState(false)
@@ -141,10 +141,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 data[0].unassignedHardware.map((i: any) =>
                     uhw.push({
                         name: i.hardwareName,
-                        id: i.type + '/' + i.hardwareId,
+                        id: i.type.toLowerCase() + '/' + i.hardwareId,
                     })
                 )
-
                 setHardwareDropdown(uhw)
 
                 let usw: any[] = []
@@ -246,34 +245,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         ])
                     )
                     setLicenseRows({...licenseRows, assigned: [...l]})
-
-                    // let uhw: any[] = []
-                    // data[0].unassignedHardware.map((i: any) =>
-                    //     uhw.push({
-                    //         name: i.hardwareName,
-                    //         id: i.type + '/' + i.hardwareId,
-                    //     })
-                    // )
-
-                    // setHardwareDropdown(uhw)
-
-                    // let usw: any[] = []
-                    // data[0].unassignedSoftware.map((i: any) =>
-                    //     usw.push({
-                    //         name: i.programName,
-                    //         id: i.programId,
-                    //     })
-                    // )
-                    // setSoftwareDropdown(usw)
-
-                    // let ul: any[] = []
-                    // data[0].unassignedLicenses.map((i: any) =>
-                    //     ul.push({
-                    //         name: i.programName,
-                    //         id: i.programId,
-                    //     })
-                    // )
-                    // setLicenseDropdown(ul)
                 })
                 .catch((err: any) => console.error(err))
 
@@ -303,20 +274,29 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     useEffect(() => {
         var d = deptList.filter((i: any) => i.departmentName === userData.department)
         d[0] ? setDeptInput({...d[0]}) : setDeptInput({...deptList[0]})
+        d[0] ? applyDefaults({...d[0]}) : applyDefaults({...deptList[0]})
     }, [deptList, userData.department])
 
     //If the employee is new add the default hardware and programs to their tables to be assigned to them
-    const applyDefaults = () => {
-        if (match.params.id === 'new' && deptInput) {
+    const applyDefaults = (dept: IDepartment) => {
+        if (match.params.id === 'new' && dept) {
             /*APPLY HARDWARE DEFAULTS */
-            if (deptInput.defaultHardware) {
+            if (dept.defaultHardware) {
                 //clear out added
+                hardwareRows.added.map(add => {
+                    if (!hardwareDropdown.filter(item => item.id === add[0].id).length) {
+                        hardwareDropdown.push({
+                            name: add[0].value.toString(),
+                            id: add[0].id ? add[0].id.toString() : '',
+                        })
+                    }
+                })
                 setHardwareRows({...hardwareRows, added: []})
 
                 var toBeAdded: any[] = []
                 var unavailable: any[] = []
 
-                deptInput.defaultHardware.forEach(need => {
+                dept.defaultHardware.forEach(need => {
                     var needFulfilled = false
                     hardwareDropdown.map(available => {
                         if (
@@ -350,18 +330,26 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 //remove the defaults from the dropdown
                 toBeAdded.map(added =>
-                    setHardwareDropdown([...hardwareDropdown.filter((option: any) => option.name === added[0].value)])
+                    setHardwareDropdown([...hardwareDropdown.filter((option: any) => option.name !== added[0].value)])
                 )
             }
 
-            if (deptInput.defaultSoftware) {
+            if (dept.defaultSoftware) {
                 /*APPLY SOFTWARE DEFAULTS */
                 //clear out added
+                softwareRows.added.map(add => {
+                    if (!softwareDropdown.filter(item => item.id === add[0].id).length) {
+                        softwareDropdown.push({
+                            name: add[0].value.toString(),
+                            id: add[0].id ? add[0].id.toString() : '',
+                        })
+                    }
+                })
                 setSoftwareRows({...softwareRows, added: []})
                 toBeAdded = []
                 unavailable = []
 
-                deptInput.defaultSoftware.forEach(need => {
+                dept.defaultSoftware.forEach(need => {
                     var needFulfilled = false
                     softwareDropdown.map(available => {
                         if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
@@ -390,18 +378,26 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 //remove the defaults from the dropdown
                 toBeAdded.map(added =>
-                    setSoftwareDropdown([...softwareDropdown.filter((option: any) => option.name === added[0].value)])
+                    setSoftwareDropdown([...softwareDropdown.filter((option: any) => option.name !== added[0].value)])
                 )
             }
 
-            if (deptInput.defaultLicenses) {
+            if (dept.defaultLicenses) {
                 /*APPLY LICENSE DEFAULTS */
                 //clear out added
+                licenseRows.added.map(add => {
+                    if (!licenseDropdown.filter(item => item.id === add[0].id).length) {
+                        licenseDropdown.push({
+                            name: add[0].value.toString(),
+                            id: add[0].id ? add[0].id.toString() : '',
+                        })
+                    }
+                })
                 setLicenseRows({...licenseRows, added: []})
                 toBeAdded = []
                 unavailable = []
 
-                deptInput.defaultLicenses.forEach(need => {
+                dept.defaultLicenses.forEach(need => {
                     var needFulfilled = false
                     licenseDropdown.map(available => {
                         if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
@@ -432,7 +428,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 //remove the defaults from the dropdown
                 toBeAdded.map(added =>
-                    setLicenseDropdown([...licenseDropdown.filter((option: any) => option.name === added[0].value)])
+                    setLicenseDropdown([...licenseDropdown.filter((option: any) => option.name !== added[0].value)])
                 )
             }
         }
@@ -561,8 +557,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             //make sure no inputs are null/undefined/empty
             match.params.id === 'new' &&
             deptInput &&
-            selectedEmployee.name !== 'Select An Employee' &&
-            roleInput !== ''
+            selectedEmployee.name !== 'Select A New Employee'
         ) {
             name = selectedEmployee.name.split(' ')
             var postEmployee = {
@@ -570,7 +565,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     FirstName: name.shift(),
                     LastName: name.join(''),
                     HireDate: dateInput.toISOString(),
-                    Role: roleInput,
+                    Role: roleInput ? roleInput : deptInput.departmentName,
                     DepartmentID: deptInput.departmentId,
                     IsAdmin: adminInput,
                     TextField: descriptionInput,
@@ -598,19 +593,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         window.alert(`${selectedEmployee.name} was successfully added!`)
                     }
                 })
-                .catch((err: any) => {
-                    window.alert(`Something went wrong`)
-                    console.error(err)
-                })
+                .catch((err: any) => console.error(err))
 
             history.push(`/employees`)
         } else if (match.params.id === 'new') {
-            //one or maore of the inputs was null/undefined/empty
-            msg = 'Failed because:\n'
-            msg += selectedEmployee.name === 'Select An Employee' ? 'No employee was selected,\n' : ''
-            msg += roleInput === '' ? 'No role was given,' : ''
-
-            window.alert(msg)
+            selectedEmployee.name === 'Select A New Employee' && window.alert('No employee was selected')
         }
 
         /*UPDATE EMPLOYEE */
@@ -929,7 +916,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     checked={dept.departmentId === deptInput.departmentId}
                                     onChange={() => {
                                         setDeptInput(dept)
-                                        applyDefaults()
+                                        applyDefaults(dept)
                                         setChanged(true)
                                     }}
                                 />
