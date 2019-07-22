@@ -104,7 +104,9 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     hw.push([
                         {
                             value: format(i.make + ' ' + i.model),
-                            id: format(i.type.toLowerCase() + '/' + i.id),
+                            id: format(
+                                (i.type.toLowerCase() === 'computer' ? 'laptop' : i.type.toLowerCase()) + '/' + i.id
+                            ),
                             tooltip: i.tooltip.cpu ? formatToolTip(i.tooltip) : '',
                             onClick: handleHardwareClick,
                             sortBy: i.make + ' ' + i.model,
