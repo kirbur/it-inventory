@@ -564,7 +564,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         } else if (sectionData == thirdSectionData) {
             setThirdSectionData(tempData)
         }
-        console.log(firstSectionData)
     }
 
     // make first section
@@ -789,9 +788,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         } else {
             //remove from addHistoryLog
             let tempAddHistoryLog = cloneDeep(addHistoryLog)
-            console.log(tempAddHistoryLog)
             tempAddHistoryLog = tempAddHistoryLog.filter(log => log.key != historyLogEntries[index].key)
-            console.log(tempAddHistoryLog)
+
             setAddHistoryLog(tempAddHistoryLog)
         }
 

@@ -327,9 +327,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
                 //after submitting go back to detail
                 history.push(
-                    `/programs/overview/${overviewInputs.name.changed ? overviewInputs.name.value : id}/${
-                        archived ? 'archived' : 'inventory'
-                    }`
+                    `/programs/overview/${overviewInputs.name.changed ? overviewInputs.name.value : id}/inventory`
                 )
             }
 
@@ -357,12 +355,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         await axios.post('/add/plugin', postPlugin).catch((err: any) => console.error(err))
 
                         //after submitting go back to detail
-                        history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
+                        history.push(`/programs/overview/${id}/inventory`)
                     } else {
                         await axios.put('/update/plugin', postPlugin).catch((err: any) => console.error(err))
 
                         //after submitting go back to detail
-                        history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
+                        history.push(`/programs/overview/${id}/inventory`)
                     }
                 } else {
                     msg = 'Failed to Add Plugin Because: \n'
@@ -374,14 +372,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
             if (removedPluginRows.length > 0) {
                 removedPluginRows.forEach(remove =>
-                    axios
-                        .put(`archive/plugin/${remove[0].id}`, {})
-                        .then((response: any) => console.log(response))
-                        .catch((err: any) => console.error(err))
+                    axios.put(`archive/plugin/${remove[0].id}`, {}).catch((err: any) => console.error(err))
                 )
                 setRemovedPluginRows([])
                 //after submitting go back to detail
-                history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
+                history.push(`/programs/overview/${id}/inventory`)
             }
 
             if (removedProgramRows.length > 0) {
@@ -394,7 +389,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     })
                     setRemovedProgramRows([])
                     //after submitting go back to detail
-                    history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
+                    history.push(`/programs/overview/${id}/inventory`)
                 }
             }
         }
@@ -480,7 +475,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             text={id}
                             icon='back'
                             onClick={() => {
-                                history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
+                                history.push(`/programs/overview/${id}/${archived}`)
                             }}
                             className={styles.backButton}
                             textClassName={styles.backButtonText}
