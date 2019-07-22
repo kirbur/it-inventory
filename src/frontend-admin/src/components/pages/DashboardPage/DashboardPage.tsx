@@ -117,7 +117,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     }
 
     const onSliceClick = (id: string) => {
-        history.push(`/departments/${id}`)
+        history.push(`/departments/detail/${id}`)
     }
 
     const getDeptTables = () => {
