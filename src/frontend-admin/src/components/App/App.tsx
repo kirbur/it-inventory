@@ -171,8 +171,6 @@ export const App: React.FC = () => {
                         )}
                     </Switch>
                 </Router>
-
-                <footer className={styles.appFooter} />
             </div>
         </LoginContext.Provider>
     )
