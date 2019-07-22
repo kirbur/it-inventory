@@ -3,7 +3,7 @@ using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public partial class Plugins : IPurcahseRenewal, ISoftDeletable
+    public partial class Plugins : IPurchaseRenewal, ISoftDeletable
     {
         public string PluginName { get; set; }
         public int PluginId { get; set; }

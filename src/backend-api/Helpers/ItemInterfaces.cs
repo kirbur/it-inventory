@@ -16,7 +16,7 @@ namespace backend_api.Helpers
     }
 
     // Interface for renewal dates and costs
-    public interface IPurcahseRenewal
+    public interface IPurchaseRenewal
     {
         DateTime? RenewalDate { get; set; }
         int? MonthsPerRenewal { get; set; }

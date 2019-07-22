@@ -188,7 +188,7 @@ namespace backend_api.Controllers
          * Returns: deciaml? which is the past week's cost of the item.
          */
         private decimal? weeklyCostOfItem<T>()
-            where T : class, IPurcahseRenewal, ISoftDeletable
+            where T : class, IPurchaseRenewal, ISoftDeletable
         {
             DateTime today = DateTime.Today;
             DateTime lastWeek = today.AddDays(-7);

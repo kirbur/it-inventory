@@ -4,7 +4,7 @@ namespace backend_api.Helpers
 {
 
     // Interface of attributes shared among hardware types.
-    public interface IHardwareBase : IAssignable, ISoftDeletable, IPurcahseRenewal
+    public interface IHardwareBase : IAssignable, ISoftDeletable, IPurchaseRenewal
     {
         decimal? CostPerYear { get; set; }
         decimal? FlatCost { get; set; }

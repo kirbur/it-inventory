@@ -3,7 +3,7 @@ using backend_api.Helpers;
 
 namespace backend_api.Models
 {
-    public class Program : IPurcahseRenewal, ISoftDeletable
+    public class Program : IPurchaseRenewal, ISoftDeletable
     {
         public Program() { }
 
