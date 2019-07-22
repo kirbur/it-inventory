@@ -213,7 +213,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 ProgramFlatCost: Number.isNaN(programInput.flatCost.value) ? 0 : programInput.flatCost.value,
                 ProgramLicenseKey: programInput.licenseKey.value,
                 IsLicense: overviewInputs.isLicense.value,
-                ProgramDescription: programInput.description.value,
+                Description: programInput.description.value,
                 ProgramPurchaseLink: programInput.purchaseLink.value,
                 DateBought: programInput.purchaseDate
                     ? programInput.purchaseDate.value.toISOString()
@@ -308,7 +308,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             ? programUpdateInput.licenseKey.value
                             : null,
                         IsLicense: overviewInputs.isLicense.changed ? overviewInputs.isLicense.value : null,
-                        ProgramDescription: programUpdateInput.description.changed
+                        Description: programUpdateInput.description.changed
                             ? programUpdateInput.description.value
                             : null,
                         ProgramPurchaseLink: programUpdateInput.purchaseLink.changed
