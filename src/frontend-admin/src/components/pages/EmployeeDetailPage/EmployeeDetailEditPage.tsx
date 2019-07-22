@@ -126,50 +126,47 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>(employeeDropdown[0])
 
     useEffect(() => {
-        if (match.params.id === 'new') {
-            axios
-                .get(`/add/employeePrep/`)
-                .then((data: any) => {
-                    var availableEmp: any[] = []
-                    data[0].myDomainUsers
-                        .sort()
-                        .map((emp: any, index: number) => availableEmp.push({name: emp, id: index}))
+        axios
+            .get(`/add/employeePrep/`)
+            .then((data: any) => {
+                var availableEmp: any[] = []
+                data[0].myDomainUsers.sort().map((emp: any, index: number) => availableEmp.push({name: emp, id: index}))
 
-                    setEmployeeDropdown(availableEmp)
+                setEmployeeDropdown(availableEmp)
 
-                    setDeptList(data[0].departments)
-                    setUseImages(true)
+                setDeptList(data[0].departments)
+                setUseImages(true)
 
-                    let uhw: any[] = []
-                    data[0].unassignedHardware.map((i: any) =>
-                        uhw.push({
-                            name: i.hardwareName,
-                            id: i.type + '/' + i.hardwareId,
-                        })
-                    )
+                let uhw: any[] = []
+                data[0].unassignedHardware.map((i: any) =>
+                    uhw.push({
+                        name: i.hardwareName,
+                        id: i.type + '/' + i.hardwareId,
+                    })
+                )
 
-                    setHardwareDropdown(uhw)
+                setHardwareDropdown(uhw)
 
-                    let usw: any[] = []
-                    data[0].unassignedSoftware.map((i: any) =>
-                        usw.push({
-                            name: i.programName,
-                            id: i.programId,
-                        })
-                    )
-                    setSoftwareDropdown(usw)
+                let usw: any[] = []
+                data[0].unassignedSoftware.map((i: any) =>
+                    usw.push({
+                        name: i.programName,
+                        id: i.programId,
+                    })
+                )
+                setSoftwareDropdown(usw)
 
-                    let ul: any[] = []
-                    data[0].unassignedLicenses.map((i: any) =>
-                        ul.push({
-                            name: i.programName,
-                            id: i.programId,
-                        })
-                    )
-                    setLicenseDropdown(ul)
-                })
-                .catch((err: any) => console.error(err))
-        } else {
+                let ul: any[] = []
+                data[0].unassignedLicenses.map((i: any) =>
+                    ul.push({
+                        name: i.programName,
+                        id: i.programId,
+                    })
+                )
+                setLicenseDropdown(ul)
+            })
+            .catch((err: any) => console.error(err))
+        if (match.params.id !== 'new') {
             axios
                 .get(`/detail/employee/${match.params.id}`)
                 .then((data: any) => {
@@ -250,33 +247,33 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     )
                     setLicenseRows({...licenseRows, assigned: [...l]})
 
-                    let uhw: any[] = []
-                    data[0].unassignedHardware.map((i: any) =>
-                        uhw.push({
-                            name: i.hardwareName,
-                            id: i.type + '/' + i.hardwareId,
-                        })
-                    )
+                    // let uhw: any[] = []
+                    // data[0].unassignedHardware.map((i: any) =>
+                    //     uhw.push({
+                    //         name: i.hardwareName,
+                    //         id: i.type + '/' + i.hardwareId,
+                    //     })
+                    // )
 
-                    setHardwareDropdown(uhw)
+                    // setHardwareDropdown(uhw)
 
-                    let usw: any[] = []
-                    data[0].unassignedSoftware.map((i: any) =>
-                        usw.push({
-                            name: i.programName,
-                            id: i.programId,
-                        })
-                    )
-                    setSoftwareDropdown(usw)
+                    // let usw: any[] = []
+                    // data[0].unassignedSoftware.map((i: any) =>
+                    //     usw.push({
+                    //         name: i.programName,
+                    //         id: i.programId,
+                    //     })
+                    // )
+                    // setSoftwareDropdown(usw)
 
-                    let ul: any[] = []
-                    data[0].unassignedLicenses.map((i: any) =>
-                        ul.push({
-                            name: i.programName,
-                            id: i.programId,
-                        })
-                    )
-                    setLicenseDropdown(ul)
+                    // let ul: any[] = []
+                    // data[0].unassignedLicenses.map((i: any) =>
+                    //     ul.push({
+                    //         name: i.programName,
+                    //         id: i.programId,
+                    //     })
+                    // )
+                    // setLicenseDropdown(ul)
                 })
                 .catch((err: any) => console.error(err))
 

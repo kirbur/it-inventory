@@ -14,3 +14,9 @@
     max-height: 200px;
     overflow-y: scroll;
 }
+
+.dropdownButton {
+    white-space: nowrap;
+    left: -33px;
+    padding-left: 33px;
+}

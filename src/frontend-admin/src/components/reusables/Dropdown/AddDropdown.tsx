@@ -33,7 +33,7 @@ export const AddDropdown: React.SFC<IAddDropdownProps> = props => {
             <div className={dropdownStyles.dropdownContainer}>
                 <DropdownList
                     triggerElement={({toggle}) => (
-                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                        <button onClick={toggle} className={s(dropdownStyles.dropdownButton, styles.dropdownButton)}>
                             <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>{title}</div>
                         </button>
                     )}
