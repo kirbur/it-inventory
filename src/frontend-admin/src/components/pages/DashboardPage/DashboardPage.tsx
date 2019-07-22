@@ -316,7 +316,6 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                 <Card
                     title={'Departments'}
                     titleClassName={styles.linkedTitle}
-                    className={styles.pieCard}
                     titleOnClick={() => {
                         history.push('/departments')
                     }}

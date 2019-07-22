@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {PieChart, Pie, Cell} from 'recharts'
 import {CustomLabel} from './CustomLabel/CustomLabel'
 import styles from './PieChart.module.css'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Types
 export interface IRechartPieDatum {
@@ -50,13 +51,7 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
         return false
     }
 
-    // function emptyPies() {
-    //     for (let i = 0; i < pieChartData.length; i++) {
-    //         if (!hasData(i)) {
-    //             return <div className={styles.emptyDataText}>No data to display</div>
-    //         }
-    //     }
-    // }
+    console.log(pieChartData)
 
     return (
         <div className={styles.pieContainer}>
@@ -72,44 +67,37 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
 
             {/* Pie Charts */}
             <div className={styles.inline}>
-                {pieChartData.map((datum, i) =>
-                    hasData(i) ? (
-                        <PieChart width={380} height={300}>
-                            <Pie
-                                key={datum.headingName}
-                                data={datum.data}
-                                cx={190 + 380 * i}
-                                cy={150}
-                                dataKey='value'
-                                fill='#8884d8'
-                                labelLine={false}
-                                label={<CustomLabel data={datum.data} />}
-                                isAnimationActive={false}
-                                onMouseOver={onMouseOver}
-                                onMouseOut={onMouseOut}
-                            >
-                                {datum.data.map((entry, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={colors[index]}
-                                        onClick={
-                                            onSliceClick
-                                                ? () => {
-                                                      onSliceClick(entry.id)
-                                                  }
-                                                : undefined
-                                        }
-                                    />
-                                ))}
-                            </Pie>
-                        </PieChart>
-                    ) : (
-                        <div className={styles.circleContainer}>
-                            <div className={styles.emptyCircle} />
-                            <div className={styles.emptyDataText}>No data to display</div>
-                        </div>
-                    )
-                )}
+                <PieChart width={380 * pieChartData.length} height={300}>
+                    {pieChartData.map((datum, j) => (
+                        <Pie
+                            key={datum.headingName}
+                            data={datum.data}
+                            cx={190 + 380 * j}
+                            cy={150}
+                            dataKey='value'
+                            fill='#8884d8'
+                            labelLine={false}
+                            label={<CustomLabel data={datum.data} />}
+                            isAnimationActive={false}
+                            onMouseOver={onMouseOver}
+                            onMouseOut={onMouseOut}
+                        >
+                            {datum.data.map((entry, index) => (
+                                <Cell
+                                    key={`cell-${index}`}
+                                    fill={colors[index]}
+                                    onClick={
+                                        onSliceClick
+                                            ? () => {
+                                                  onSliceClick(entry.id)
+                                              }
+                                            : undefined
+                                    }
+                                />
+                            ))}
+                        </Pie>
+                    ))}
+                </PieChart>
             </div>
 
             {/* Legend */}
@@ -131,6 +119,18 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                     </div>
                 ))}
             </div>
+
+            {/* empty pies */}
+            {pieChartData.map((datum, i) =>
+                hasData(i) ? (
+                    <div />
+                ) : (
+                    <div className={s(styles.circleContainer)} style={{position: 'relative', left: 10 + 380 * i}}>
+                        <div className={styles.emptyCircle} />
+                        <div className={styles.emptyDataText}>No data to display</div>
+                    </div>
+                )
+            )}
         </div>
     )
 }
