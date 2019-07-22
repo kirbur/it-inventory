@@ -316,6 +316,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                             setRows={() => {}}
                             sort={false}
                             hover={false}
+                            className={styles.detailTable}
                         />
                     )}
                     {/* second table */}
@@ -330,6 +331,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                             setRows={() => {}}
                             sort={false}
                             hover={false}
+                            className={styles.detailTable}
                         />
                     )}
                     {/* third table */}
@@ -344,6 +346,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                             setRows={() => {}}
                             sort={false}
                             hover={false}
+                            className={styles.detailTable}
                         />
                     )}
                     {/* </div> */}
