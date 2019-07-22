@@ -19,6 +19,8 @@ namespace backend_api.Models
         public string Email { get; set; }
         public string Role { get; set; }
         public Guid Adguid { get; set; }
+        public string TextField { get; set; }
+        public DateTime? ArchiveDate { get; set; }
 
     }
 }
