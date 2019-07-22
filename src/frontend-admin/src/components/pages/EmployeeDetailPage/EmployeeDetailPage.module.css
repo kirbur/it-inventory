@@ -80,3 +80,22 @@
 .table {
     margin-bottom: 50px;
 }
+
+.descriptionContainer {
+    width: 100%;
+    text-align: left;
+}
+
+.descriptionTitle {
+    border-bottom: 1px solid #979797;
+    color: #a5a5a5;
+    font-size: 24px;
+    padding: 16px 0;
+    margin-bottom: 20px;
+}
+
+.descriptionBody {
+    color: #4a4a4a;
+    font-size: 20px;
+    line-height: 27px;
+}
