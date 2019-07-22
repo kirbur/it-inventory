@@ -111,7 +111,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     //input feild states:
     const [dateInput, setDateInput] = useState<Date>(new Date())
     const [deptInput, setDeptInput] = useState<IDepartment>()
-    const [adminInput, setAdminInput] = useState<boolean>()
+    const [adminInput, setAdminInput] = useState<boolean>(false)
     const [imgInput, setImgInput] = useState<File>()
     const [roleInput, setRoleInput] = useState<string>('')
     const [changed, setChanged] = useState(false)
@@ -587,8 +587,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             //make sure no inputs are null/undefined/empty
             match.params.id === 'new' &&
             deptInput &&
-            selectedEmployee.name !== 'Select An Employee' &&
-            roleInput !== ''
+            selectedEmployee.name !== 'Select A New Employee'
         ) {
             name = selectedEmployee.name.split(' ')
             var postEmployee = {
@@ -596,7 +595,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     FirstName: name.shift(),
                     LastName: name.join(''),
                     HireDate: dateInput.toISOString(),
-                    Role: roleInput,
+                    Role: roleInput ? roleInput : deptInput.departmentName,
                     DepartmentID: deptInput.departmentId,
                     IsAdmin: adminInput,
                     TextField: descriptionInput,
@@ -624,19 +623,11 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         window.alert(`${selectedEmployee.name} was successfully added!`)
                     }
                 })
-                .catch((err: any) => {
-                    window.alert(`Something went wrong`)
-                    console.error(err)
-                })
+                .catch((err: any) => console.error(err))
 
             history.push(`/employees`)
         } else if (match.params.id === 'new') {
-            //one or maore of the inputs was null/undefined/empty
-            msg = 'Failed because:\n'
-            msg += selectedEmployee.name === 'Select An Employee' ? 'No employee was selected,\n' : ''
-            msg += roleInput === '' ? 'No role was given,' : ''
-
-            window.alert(msg)
+            selectedEmployee.name === 'Select A New Employee' && window.alert('No employee was selected')
         }
 
         /*UPDATE EMPLOYEE */
