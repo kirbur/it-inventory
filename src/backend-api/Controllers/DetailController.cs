@@ -213,6 +213,7 @@ namespace backend_api.Controllers
          * Function returns the employee detail information.
          * Returns: [ {
          *      isDeleted: boolean,
+         *      email: string,
          *      picture: partial URL (as string),
          *      totalProgramCostPerMonth: decimal,
          *      totalHardwareCost: decimal,
@@ -522,6 +523,7 @@ namespace backend_api.Controllers
                 object employeeDetail = new
                 {
                     emp.IsDeleted,
+                    emp.Email,
                     picture,
                     totalProgramCostMonthly = Math.Round(totalProgramCostPerMonth, 2, MidpointRounding.ToEven),
                     totalHardwareCost,
