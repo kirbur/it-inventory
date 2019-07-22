@@ -282,6 +282,64 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         }
     }
 
+    //checks for incorrectly filled out form
+    //returns true if it is a bad form
+    //returns false if it passes every check
+    function badForm() {
+        let alertMssg = ''
+        //checks for every form
+        if (hasRecurringCost) {
+            if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
+                alertMssg += '\n Recurring cost and months must have values!'
+            }
+        }
+        if (hasFlatCost) {
+            if (costSection[0] == 0 || costSection[0] == null) {
+                alertMssg += '\n Initial cost must have a value!'
+            }
+        }
+
+        //checks for server form
+        if (match.params.type === 'server') {
+            if (isNaN(Number(firstSectionData[3]))) {
+                alertMssg += '\n RAM must be a number!'
+            }
+            if (isNaN(Number(firstSectionData[5]))) {
+                alertMssg += '\n # of cores must be a number! '
+            }
+        }
+
+        if (alertMssg.length > 0) {
+            window.alert(alertMssg)
+            return true
+        }
+
+        //check for laptop form
+        if (match.params.type === 'laptop') {
+            if (isNaN(Number(firstSectionData[3]))) {
+                alertMssg += '\n RAM must be a number!'
+            }
+            if (isNaN(Number(firstSectionData[4]))) {
+                alertMssg += '\n SSD must be a number!'
+            }
+            if (isNaN(Number(firstSectionData[5]))) {
+                alertMssg += '\n Screen size must be a number! '
+            }
+        }
+
+        //check for monitor form
+        if (match.params.type === 'monitor') {
+            if (isNaN(Number(firstSectionData[2]))) {
+                alertMssg += '\n Screen size must be a number!'
+            }
+            if (isNaN(Number(firstSectionData[3]))) {
+                alertMssg += '\n Resolution must be a number!'
+            }
+        }
+
+        return false
+    }
+
     async function handleSubmit() {
         //update image
         if (imgInput) {
@@ -295,18 +353,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 .catch(err => console.error(err))
         }
 
-        //check to make sure cost properly filled out
-        if (hasRecurringCost) {
-            if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
-                window.alert('Recurring cost and months must have values!')
-                return
-            }
-        }
-        if (hasFlatCost) {
-            if (costSection[0] == 0 || costSection[0] == null) {
-                window.alert('Initial cost must have a value!')
-                return
-            }
+        if (badForm()) {
+            return
         }
 
         if (match.params.id === 'new') {
@@ -369,23 +417,25 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     },
                 })
             } else if (match.params.type === 'laptop') {
+                console.log(firstSectionData)
                 await axios.post(`add/laptop`, {
                     Entity: {
                         Make: firstSectionData[0],
                         Model: firstSectionData[1],
                         Cpu: firstSectionData[2],
-                        Ssdgb: firstSectionData[3],
-                        ScreenSize: firstSectionData[4],
-                        MonitorOutput: firstSectionData[5],
-                        MFG: firstSectionData[6],
+                        Ramgb: firstSectionData[3],
+                        Ssdgb: firstSectionData[4],
+                        ScreenSize: firstSectionData[5],
+                        MonitorOutput: firstSectionData[6],
                         SerialNumber: firstSectionData[7],
-                        Fqdn: firstSectionData[10],
+                        MFG: firstSectionData[8],
+                        Fqdn: firstSectionData[9],
 
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
                         EndOfLife: endOfLifeInput,
 
-                        Location: thirdSectionData[2],
+                        Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
                         FlatCost: hasFlatCost ? costSection[0] : null,
@@ -551,7 +601,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 })
             }
         }
-        history.push(`/hardware/detail/${match.params.type}/${match.params.id}`)
+        history.push(`/hardware`)
     }
 
     function handleInputChange(index: number, sectionData: any[], value: string | number) {
@@ -772,7 +822,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             key = key + 1
             setAddHistoryLog(tempHistoryLog)
         } else {
-            window.alert('Need to choose an event!')
+            window.alert('History log must have an event!')
         }
     }
 
