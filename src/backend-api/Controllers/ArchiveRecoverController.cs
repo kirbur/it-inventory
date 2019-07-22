@@ -9,7 +9,6 @@ using System.Collections.Generic;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [ApiController]
     public class ArchiveRecoverController : ContextController
     {

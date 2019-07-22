@@ -11,17 +11,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class ListController : ControllerBase
+    public class ListController : ContextController
     {
-        private readonly ITInventoryDBContext _context;
-
-        public ListController(ITInventoryDBContext context)
-        {
-            _context = context;
-        }
+        public ListController(ITInventoryDBContext context) : base(context) { }
 
         /* GET: api/List/Employees
         * Returns [ {
