@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UpdateController : ContextController
@@ -64,24 +63,6 @@ namespace backend_api.Controllers
                 return BadRequest("Department does not exist or failed to supply ID");
             }
         }
-        /* PUT: api/udpate/programall
-        * Will update all the rows of programs that have the given name
-        * Param input format:
-        * {     "Program" : {
-        *           "OldProgramName" : String,
-        *           "NewProgramName" : String,
-        *           "ProgramCostPerYear" : Decimal,
-        *           "ProgramFlatCost" : Decimal,
-        *           "ProgramLicenseKey" : String,
-        *           "IsLicense" : bool,
-        *           "ProgramDescription" : String,
-        *           "ProgramPurchaseLink" : String,
-        *           "DateBought" : DateTime,
-        *           "RenewalDate" : DateTime,
-        *           "MonthsPerRenewal" : int
-        *       }
-        * }
-        */
 
         /* PUT: api/udpate/programPins
         * Will update all the rows of programs to only pin the given programs and unpin everything else
@@ -95,57 +76,50 @@ namespace backend_api.Controllers
         {
             // This line loops through every program and updates its IsPinned field depending on whether
             // the program is in the given input
-            _context.Program.ToList().ForEach(prog => prog.IsPinned = input.Contains(prog.ProgramName) ? true : false);
+            _context.Program
+                .ToList()
+                .ForEach(prog => prog.IsPinned = input.Contains(prog.ProgramName) ? true : false);
             _context.SaveChanges();
             return Ok();
         }
 
+        /* PUT: api/udpate/programall
+        * Will update all the rows of programs that have the given name
+        * Param input format:
+        * {     "Program" : {
+        *           "OldProgramName" : String,
+        *           "ProgramName" : String,
+        *           "ProgramCostPerYear" : Decimal,
+        *           "ProgramFlatCost" : Decimal,
+        *           "ProgramLicenseKey" : String,
+        *           "IsLicense" : bool,
+        *           "Description" : String,
+        *           "ProgramPurchaseLink" : String,
+        *           "DateBought" : DateTime,
+        *           "RenewalDate" : DateTime,
+        *           "MonthsPerRenewal" : int
+        *       }
+        * }
+        */
         [HttpPut]
         [Route("ProgramAll")]
         public IActionResult EditPrograms([FromBody] UpdateProgramInputModel input)
         {
+            var updatedProg = input.Program;
             try
             {
-                foreach (var program in _context.Program.Where(x => x.ProgramName == input.Program.OldProgramName))
-                {
-                    if (input.Program.NewProgramName != null)
+                _context.Program
+                    // Find where the program name matches.
+                    .Where(x => x.ProgramName == updatedProg.OldProgramName)
+                    .ToList()
+                    .ForEach(program =>
                     {
-                        program.ProgramName = input.Program.NewProgramName;
+                        // Update Program properties.
+                        PropertyUtil<Models.Program, ProgramUpdateObjectModel>.UpdateProperties(program, updatedProg);
+                        program.IsCostPerYear = updatedProg.MonthsPerRenewal != null && updatedProg.MonthsPerRenewal - 12 >= 0
+                            ? true : false;
                     }
-                    if (input.Program.ProgramCostPerYear != null)
-                    {
-                        program.ProgramCostPerYear = input.Program.ProgramCostPerYear;
-                    }
-                    if (input.Program.ProgramFlatCost != null)
-                    {
-                        program.ProgramFlatCost = input.Program.ProgramFlatCost;
-                    }
-                    if (input.Program.ProgramLicenseKey != null)
-                    {
-                        program.ProgramLicenseKey = input.Program.ProgramLicenseKey;
-                    }
-                    if (input.Program.IsLicense != null)
-                    {
-                        program.IsLicense = input.Program.IsLicense.Value;
-                    }
-                    if (input.Program.ProgramDescription != null)
-                    {
-                        program.Description = input.Program.ProgramDescription;
-                    }
-                    if (input.Program.ProgramPurchaseLink != null)
-                    {
-                        program.ProgramPurchaseLink = input.Program.ProgramPurchaseLink;
-                    }
-                    if (input.Program.MonthsPerRenewal != null)
-                    {
-                        program.MonthsPerRenewal = input.Program.MonthsPerRenewal;
-                        program.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
-                    }
-                    if (input.Program.RenewalDate != null)
-                    {
-                        program.RenewalDate = input.Program.RenewalDate;
-                    }
-                }
+                );
                 _context.SaveChanges();
                 return StatusCode(202);
             }
@@ -153,9 +127,8 @@ namespace backend_api.Controllers
             {
                 return BadRequest(error: e.Message);
             }
-
-
         }
+
         /* PUT: api/update/program/{id}
         * Will update the program identified by the id from the route
         * Param input format:
@@ -164,7 +137,7 @@ namespace backend_api.Controllers
     	*            "ProgramCostPerYear" : Decimal,
     	*            "ProgramFlatCost" : Decimal,
     	*            "ProgramLicenseKey" : String,
-    	*            "ProgramDescription" : String,
+    	*            "Description" : String,
     	*            "ProgramPurchaseLink" : String,
     	*            "DateBought" : DateTime,
 		*            "RenewalDate" : DateTime,
@@ -173,7 +146,6 @@ namespace backend_api.Controllers
         *      }
         * }
         */
-
         [HttpPut]
         [Route("Program/{id}")]
         public IActionResult EditProgram([FromBody] PostProgramInputModel input, [FromRoute] int id)
@@ -181,26 +153,28 @@ namespace backend_api.Controllers
             // Get program by ID.
             var prog = _context.Program.Find(id);
 
+            // if the program does not exist then return error message
+            if (prog == null)
+            {
+                return BadRequest($"No such program exists with id: {id}");
+            }
+
             // list to hold the history entries that will be added.
             List<ProgramHistory> programHistories = new List<ProgramHistory>();
 
             // temp value to hold the old employee's id(could be null)
-            int? progEmpId = prog.EmployeeId != null ? prog.EmployeeId : null;
+            int? progEmpId = prog.EmployeeId;
+
+            // Updated program
+            ProgramObjectModel updatedProg = input.Program;
 
             if (prog != null)
             {
                 try
                 {
-                    prog.ProgramCostPerYear = input.Program.ProgramCostPerYear;
-                    prog.ProgramFlatCost = input.Program.ProgramFlatCost;
-                    prog.ProgramLicenseKey = input.Program.ProgramLicenseKey;
-                    prog.Description = input.Program.ProgramDescription;
-                    prog.ProgramPurchaseLink = input.Program.ProgramPurchaseLink;
+                    // Update the properties of the program.
+                    PropertyUtil<Models.Program, ProgramObjectModel>.UpdateProperties(prog, updatedProg);
                     prog.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
-                    prog.DateBought = input.Program.DateBought;
-                    prog.RenewalDate = input.Program.RenewalDate;
-                    prog.MonthsPerRenewal = input.Program.MonthsPerRenewal;
-                    prog.EmployeeId = input.Program.EmployeeId;
 
                     // Case 1: When an unassigned program becomes assigned
                     if (input.Program.EmployeeId != null && progEmpId == null)
@@ -246,28 +220,27 @@ namespace backend_api.Controllers
             }
         }
 
-        /* POST: api/update/Plugin
+        /* PUT: api/update/Plugin
          * Takes in as input:
          * {
          *     "PluginId" : int, 
-	     *     "ProgramName" : String,
-	     *     "PluginName" : int,
-	     *     "PluginFlatCost" : Decimal,
+	     *     "ProgramName" : string,
+	     *     "PluginName" : string,
+	     *     "PluginFlatCost" : decimal,
 	     *     "TextField" : string,
-	     *     "PluginCostPerYear" : Decimal,
+	     *     "PluginCostPerYear" : decimal,
 	     *     "RenewalDate" : DateTime,
 	     *     "MonthsPerRenewal" : int,
          *     "DateBought" : DateTime
          * }
          */
-
         [HttpPut]
         [Route("Plugin")]
         public IActionResult PostPlugin([FromBody] EditPluginInputModel input)
         {
             // finding the plugin by the given id
             var plugin = _context.Plugins.Find(input.PluginId);
-            
+
             // if the plugin does not exist then return error message
             if (plugin == null)
             {
@@ -278,32 +251,27 @@ namespace backend_api.Controllers
             {
                 return BadRequest("No such program exists");
             }
-            // try updating the various fields of our plugin
             try
             {
-                plugin.PluginName = input.PluginName;
-                plugin.PluginFlatCost = input.PluginFlatCost;
+                var updatedPlugin = input;
+
+                // Update plugin fields.
+                PropertyUtil<Plugins, EditPluginInputModel>.UpdateProperties(plugin, updatedPlugin);
                 plugin.ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First();
-                plugin.TextField = input.TextField;
-                plugin.PluginCostPerYear = input.PLuginCostPerYear;
-                plugin.IsDeleted = false;
-                plugin.ProgramName = input.ProgramName;
-                plugin.RenewalDate = input.RenewalDate;
-                plugin.MonthsPerRenewal = input.MonthsPerRenewal;
-                plugin.Datebought = input.DateBought;
                 plugin.IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false;
+                plugin.IsDeleted = false;
 
                 _context.Update(plugin);
                 _context.SaveChanges();
                 return StatusCode(202);
             }
-            catch
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(error: e.Message);
             }
         }
 
-        /* PUT: api/udpate/employee/
+        /* PUT: api/update/employee/
          * Will update the employee identified by the given employeeId from the body
          * {
          *       "Employee": {
@@ -340,7 +308,6 @@ namespace backend_api.Controllers
          *       ] for all the programs unassigned (this arraylist)
          *   }
          */
-
         [HttpPut]
         [Route("Employee")]
         public IActionResult EditEmployee([FromBody] EditEmployeeInputModel input)
@@ -352,21 +319,18 @@ namespace backend_api.Controllers
             var authIdEmp = _context.AuthIdserver.Where(x => x.ActiveDirectoryId == emp.Adguid).FirstOrDefault();
 
             // making sure that neither of these are null. These are both created when an employee is created
-            if (emp != null && authIdEmp !=null)
+            if (emp != null && authIdEmp != null)
             {
                 try
                 {
+                    EditEmployeeObjectModel updatedEmp = input.Employee;
+
                     // updating the various fields of the current employee
-                    emp.HireDate = input.Employee.HireDate;
-                    emp.FirstName = input.Employee.FirstName;
-                    emp.LastName = input.Employee.LastName;
-                    emp.Role = input.Employee.Role;
-                    emp.DepartmentID = input.Employee.DepartmentID;
-                    emp.TextField = input.Employee.TextField;
+                    PropertyUtil<Employee, EditEmployeeObjectModel>.UpdateProperties(emp, updatedEmp);
                     _context.Employee.Update(emp);
 
                     // updating the current isAdmin for the authIdServer connected to the employee
-                    authIdEmp.IsAdmin = input.Employee.IsAdmin;
+                    authIdEmp.IsAdmin = updatedEmp.IsAdmin;
                     _context.AuthIdserver.Update(authIdEmp);
 
                     _context.SaveChanges();
@@ -463,7 +427,7 @@ namespace backend_api.Controllers
                 return BadRequest("Employee does not exist");
             }
         }
-        
+
 
         /* PUT: api/update/server
          * Input param format:
@@ -659,11 +623,8 @@ namespace backend_api.Controllers
             {
                 string type = GetClassName(newHardware);
 
-                // Get the table of the entity's type.
-                DbSet<T> table = _context.Set<T>();
-
                 // Get the old hardware entity from the db.
-                T oldHardware = table.Find(hardwareId);
+                T oldHardware = _context.Set<T>().Find(hardwareId);
 
                 // Make sure the id is valid for the type requested.
                 if (oldHardware == null)
@@ -689,24 +650,20 @@ namespace backend_api.Controllers
                     // Case 1: Un --> Assigned
                     if (oldEmployeeId == null && newEmployeeId != null)
                     {
-                        // Assign
                         UpdateHardwareHistory(newEmployeeId, type, hardwareId, "Assigned", DateTime.Now);
                     }
 
                     // Case 2: Assigned --> Reassigned
                     else if (oldEmployeeId != null && newEmployeeId != null && oldEmployeeId != newEmployeeId)
                     {
-                        // Unassign
                         UpdateHardwareHistory(oldEmployeeId, type, hardwareId, "Unassigned", DateTime.Now);
 
-                        // Then Assign
                         UpdateHardwareHistory(newEmployeeId, type, hardwareId, "Assigned", DateTime.Now);
                     }
 
                     // Case 3: Assigned --> Un
                     else if (oldEmployeeId != null && newEmployeeId == null)
                     {
-                        // Unassign
                         UpdateHardwareHistory(oldEmployeeId, type, hardwareId, "Unassigned", DateTime.Now);
                     }
 

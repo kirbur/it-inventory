@@ -1,6 +1,5 @@
 ﻿using backend_api.Helpers;
 using System;
-using System.Collections.Generic;
 
 namespace backend_api.Models
 {
@@ -8,7 +7,6 @@ namespace backend_api.Models
     {
 
         public Employee() { }
-    
 
         public int EmployeeId { get; set; }
         public DateTime HireDate { get; set; }

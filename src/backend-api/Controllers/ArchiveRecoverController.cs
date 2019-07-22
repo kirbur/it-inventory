@@ -9,7 +9,6 @@ using System.Collections.Generic;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [ApiController]
     public class ArchiveRecoverController : ContextController
     {
@@ -435,39 +434,40 @@ namespace backend_api.Controllers
 
         }
 
-
+        /* GET: api/archivedlist/{type}
+         * Endpoint will return a list of all archived entity's of the requested type. 
+         */
         [HttpGet]
         [Route("archivedList/{type}")]
         public IActionResult GetActionResult([FromRoute] string type)
         {
             switch (type.ToLower()) {
                 case "employee":
-                    return archivedList<Employee>();
+                    return ArchivedList<Employee>();
                 case "program":
-                    return archivedList<Models.Program>();
+                    return ArchivedList<Models.Program>();
                 case "monitor":
-                    return archivedList<Monitor>();
+                    return ArchivedList<Monitor>();
                 case "computer":
                 case "laptop":
-                    return archivedList<Computer>();
+                    return ArchivedList<Computer>();
                 case "department":
-                    return archivedList<Department>();
+                    return ArchivedList<Department>();
                 case "peripheral":
-                    return archivedList<Peripheral>();
+                    return ArchivedList<Peripheral>();
                 case "server":
-                    return archivedList<Server>();
+                    return ArchivedList<Server>();
                 default:
-                    return BadRequest();
+                    return BadRequest($"Invalid type: {type}");
             }
-
         }
 
-        public IActionResult archivedList<T>()
+        /* ArchivedList<T>() returns a list of all archived items on a table.
+         */
+        public IActionResult ArchivedList<T>()
             where T : class, ISoftDeletable
-        {
-            var table = _context.Set<T>();
-            var list = table.Where(x => x.IsDeleted);
-            return Ok(list);
+        {   
+            return Ok(_context.Set<T>().Where(x => x.IsDeleted));
         }
 
     }

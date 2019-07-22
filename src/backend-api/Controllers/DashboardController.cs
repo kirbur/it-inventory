@@ -11,17 +11,11 @@ using System.Threading.Tasks;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class DashboardController : ControllerBase
+    public class DashboardController : ContextController
     {
-        public readonly ITInventoryDBContext _context;
-
-        public DashboardController(ITInventoryDBContext context)
-        {
-            _context = context;
-        }
+        public DashboardController(ITInventoryDBContext context) : base(context) { }
 
         // A helper class that is a cost breakdown object.
         public class CostBreakDown

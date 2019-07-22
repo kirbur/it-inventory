@@ -47,6 +47,17 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
         *         }
         */
 
+        /* Get: api/login
+         * Returns 'default' for IIS starter app
+         */
+
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult<string> Get()
+        {
+            return "Default";
+        }
+
         [AllowAnonymous]
         [HttpPost]
 

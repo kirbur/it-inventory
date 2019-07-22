@@ -12,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AddController : ContextController
@@ -406,7 +405,7 @@ namespace backend_api.Controllers
          *          "ProgramFlatCost" : Decimal,
          *          "ProgramLicenseKey" : string,
          *          "IsLicense" : bool,
-         *          "ProgramDescription" : string,
+         *          "Description" : string,
          *          "ProgramPurchaseLink" : string,
          *          "DateBought" : DateTime,
          *          "RenewalDate" : DateTime,
@@ -442,7 +441,7 @@ namespace backend_api.Controllers
                         ProgramLicenseKey = input.Program.ProgramLicenseKey,
                         IsLicense = input.Program.IsLicense,
                         EmployeeId = null,
-                        Description = input.Program.ProgramDescription,
+                        Description = input.Program.Description,
                         ProgramPurchaseLink = input.Program.ProgramPurchaseLink,
                         HasPlugIn = false,
                         IsDeleted = false,
@@ -513,12 +512,12 @@ namespace backend_api.Controllers
                 PluginFlatCost = input.PluginFlatCost,
                 ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First(),
                 TextField = input.TextField,
-                PluginCostPerYear = input.PLuginCostPerYear,
+                PluginCostPerYear = input.PluginCostPerYear,
                 IsDeleted = false,
                 ProgramName = input.ProgramName,
                 RenewalDate = input.RenewalDate,
                 MonthsPerRenewal = input.MonthsPerRenewal,
-                Datebought = input.DateBought,
+                DateBought = input.DateBought,
                 IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false,
             };
             _context.Add(plugin);
