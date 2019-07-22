@@ -29,7 +29,7 @@ export const PictureInput: React.SFC<IPictureInputProps> = props => {
         <div className={styles.pictureInputMain}>
             <div className={styles.imgContainer}>
                 {image ? (
-                    <img src={getImg()} className={styles.selectedImage} />
+                    <img src={getImg()} alt={''} className={styles.selectedImage} />
                 ) : (
                     <GoCloudUpload size={300} className={styles.cloudIcon} onClick={() => {}} />
                 )}

@@ -310,7 +310,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                             headers={firstTableHeaders}
                             rows={[
                                 firstTableData.map((datum: string | number) => {
-                                    return {value: datum.valueOf(), sortBy: datum.valueOf()}
+                                    return {value: datum, sortBy: datum}
                                 }),
                             ]}
                             setRows={() => {}}
@@ -324,7 +324,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                             headers={secondTableHeaders}
                             rows={[
                                 secondTableData.map((datum: string | number) => {
-                                    return {value: datum.valueOf(), sortBy: datum.valueOf()}
+                                    return {value: datum, sortBy: datum}
                                 }),
                             ]}
                             setRows={() => {}}
@@ -338,7 +338,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                             headers={thirdTableHeaders}
                             rows={[
                                 thirdTableData.map((datum: string | number) => {
-                                    return {value: datum.valueOf(), sortBy: datum.valueOf()}
+                                    return {value: datum, sortBy: datum}
                                 }),
                             ]}
                             setRows={() => {}}
