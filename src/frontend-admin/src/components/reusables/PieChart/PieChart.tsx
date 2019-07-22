@@ -41,7 +41,6 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
         setColors(initialColors)
     }
 
-    console.log(pieChartData)
     function hasData(i: number) {
         for (let j = 0; j < pieChartData[i].data.length; j++) {
             if (pieChartData[i].data[j].value > 0) {
@@ -50,8 +49,6 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
         }
         return false
     }
-
-    console.log(pieChartData)
 
     return (
         <div className={styles.pieContainer}>

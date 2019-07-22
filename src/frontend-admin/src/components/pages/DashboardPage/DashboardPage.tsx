@@ -191,6 +191,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
         axios
             .get('/dashboard/CostPieCharts')
             .then((data: any) => {
+                console.log(data)
                 let x: IPieDataProps[] = [
                     {
                         headingName: data[0].headingName,

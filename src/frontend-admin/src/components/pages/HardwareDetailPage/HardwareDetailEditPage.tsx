@@ -377,9 +377,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
-                        Mfg: null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
+                        Mfg: 0,
                         TextField: commentText,
                     },
                 })
@@ -407,11 +407,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -438,11 +438,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -460,11 +460,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -491,11 +491,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
                         Mfg: null,
                         TextField: commentText,
                     },
@@ -528,11 +528,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -562,11 +562,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -588,11 +588,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
