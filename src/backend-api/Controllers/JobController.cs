@@ -356,7 +356,7 @@ namespace backend_api.Controllers
                 "Nothing but business.",
                 "Give someone a high-five.",
                 "Sailed the high tides and the seven CQLs.",
-                "CQL you later, alligato.r",
+                "CQL you later, alligator.",
                 "As far as the eye can CQL.",
                 "Long time, no SeeQL.",
             };
