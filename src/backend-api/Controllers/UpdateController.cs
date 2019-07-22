@@ -313,7 +313,8 @@ namespace backend_api.Controllers
          *           "HireDate": DateTime,
          *           "Role": String,
          *           "DepartmentID": int,
-         *           "IsAdmin" : bool
+         *           "IsAdmin" : bool,
+         *           "TextField" : string
          *       },
          *       "HardwareAssigned": [
          *            {
@@ -361,6 +362,7 @@ namespace backend_api.Controllers
                     emp.LastName = input.Employee.LastName;
                     emp.Role = input.Employee.Role;
                     emp.DepartmentID = input.Employee.DepartmentID;
+                    emp.TextField = input.Employee.TextField;
                     _context.Employee.Update(emp);
 
                     // updating the current isAdmin for the authIdServer connected to the employee

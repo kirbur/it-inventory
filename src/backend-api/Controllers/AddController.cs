@@ -201,7 +201,9 @@ namespace backend_api.Controllers
          *           "LastName": String,
          *           "HireDate": String,
          *           "Role": String,
-         *           "DepartmentID": int
+         *           "DepartmentID": int,
+         *           "IsAdmin" : bool,
+         *           "TextField" : string
          *       },
          *       "HardwareAssigned": [
          *           {
@@ -242,7 +244,8 @@ namespace backend_api.Controllers
                     LastName = input.Employee.LastName,
                     Email = "",
                     Role = input.Employee.Role,
-                    Adguid = user.Guid.Value
+                    Adguid = user.Guid.Value,
+                    TextField = input.Employee.TextField
                 };
                 _context.Employee.Add(emp);
 
