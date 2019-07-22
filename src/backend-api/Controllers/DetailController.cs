@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DetailController : ContextController
@@ -222,7 +221,9 @@ namespace backend_api.Controllers
          *      department: string,
          *      role: string,
          *      hireDate: date (as string),
-         *      isAdmin : bool
+         *      archiveDate: Date (as string),
+         *      isAdmin : bool,
+         *      TextField: string,
          *      hardware: [ {
          *          id: int,
          *          type: string,
