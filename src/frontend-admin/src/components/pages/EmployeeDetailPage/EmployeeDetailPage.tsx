@@ -43,10 +43,11 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
     const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState('')
     const [userData, setUserData] = useState<IUser>({
@@ -204,8 +205,10 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
                     />
-                    <div className={styles.imgPadding}>
-                        <img className={styles.img} src={img} alt={''} />
+                    <div className={styles.imgContainer}>
+                        <div className={styles.imgPadding}>
+                            <img className={styles.img} src={img} alt={''} />
+                        </div>
                     </div>
                     <div className={styles.costText}>
                         <Group>

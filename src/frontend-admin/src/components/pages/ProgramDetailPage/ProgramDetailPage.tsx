@@ -32,10 +32,11 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
 
-    var axios = new AxiosService(accessToken, refreshToken)
+    var axios = new AxiosService(loginContextVariables)
 
     const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState('')
@@ -158,8 +159,10 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
                     />
-                    <div className={styles.imgPadding}>
-                        <img className={styles.img} src={img} alt={''} />
+                    <div className={styles.imgContainer}>
+                        <div className={styles.imgPadding}>
+                            <img className={styles.img} src={img} alt={''} />
+                        </div>
                     </div>
 
                     <div className={styles.costText}>
@@ -231,7 +234,13 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         )}
                     </div>
 
-                    <DetailPageTable headers={progHeaders} rows={progRows} setRows={setProgRows} sort={false} />
+                    <DetailPageTable
+                        headers={progHeaders}
+                        rows={progRows}
+                        setRows={setProgRows}
+                        sort={false}
+                        hover={false}
+                    />
 
                     <div className={styles.spaceBetween} />
 

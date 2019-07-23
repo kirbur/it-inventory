@@ -67,10 +67,11 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     } = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
     const [img, setImg] = useState('')
     const [programData, setProgramData] = useState<ExpectedProgramOverview>({
         countProgInUse: 0,
@@ -217,8 +218,10 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
                     />
-                    <div className={styles.imgPadding}>
-                        <img className={styles.img} src={img} alt={''} />
+                    <div className={styles.imgContainer}>
+                        <div className={styles.imgPadding}>
+                            <img className={styles.img} src={img} alt={''} />
+                        </div>
                     </div>
                     <div className={styles.costText}>
                         {programData.progFlatCost > 0 && (

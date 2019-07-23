@@ -51,11 +51,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             params: {id, archived},
         },
     } = props
-    const {
-        loginContextVariables: {accessToken, refreshToken},
-    } = useContext(LoginContext)
+    const {loginContextVariables} = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
 
     const [programRows, setProgramRows] = useState<ITableItem[][]>([])
     const [removedProgramRows, setRemovedProgramRows] = useState<ITableItem[][]>([])
@@ -481,7 +479,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             textClassName={styles.backButtonText}
                         />
                     )}
-                    <PictureInput setImage={setImgInput} image={imgInput} />
+                    <div className={styles.imgContainer}>
+                        <PictureInput setImage={setImgInput} image={imgInput} />
+                    </div>
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>

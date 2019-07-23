@@ -9,7 +9,6 @@ import styles from './PictureInput.module.css'
 interface IPictureInputProps {
     setImage: any
     image: any
-    className?: string
 }
 
 // Helpers
@@ -17,7 +16,6 @@ interface IPictureInputProps {
 // Primary Component
 export const PictureInput: React.SFC<IPictureInputProps> = props => {
     const {setImage, image} = props
-    //const [selected, setSelected] = <>()
     const getImg = () => {
         if (image) {
             return URL.createObjectURL(image)
@@ -29,9 +27,9 @@ export const PictureInput: React.SFC<IPictureInputProps> = props => {
         <div className={styles.pictureInputMain}>
             <div className={styles.imgContainer}>
                 {image ? (
-                    <img src={getImg()} className={styles.selectedImage} />
+                    <img src={getImg()} alt={''} className={styles.selectedImage} />
                 ) : (
-                    <GoCloudUpload size={300} className={styles.cloudIcon} onClick={() => {}} />
+                    <GoCloudUpload size={300} className={styles.selectedImage} onClick={() => {}} />
                 )}
             </div>
             <input
