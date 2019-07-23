@@ -1,24 +1,38 @@
 .columns {
-    padding: 0 50px;
+    margin: 0 50px;
     display: flex;
-    flex-wrap: wrap;
     flex-direction: row;
+    justify-content: center;
 }
 
 .firstColumn {
     padding: 50px;
-}
-
-.secondColumn {
-    padding: 150px 50px;
-    display: flex;
-    flex-direction: column;
+    min-width: 160px;
+    max-width: 300px;
     flex-grow: 1;
 }
 
-/*first column*/
+.secondColumn {
+    padding: 50px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/*First Column*/
 .backButton {
     margin-bottom: 30px;
+}
+
+.imgContainer {
+    position: relative;
+    width: 100%;
+}
+
+.imgContainer:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
 }
 
 /*second column*/
