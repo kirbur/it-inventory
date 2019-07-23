@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace backend_api.Controllers
 {
@@ -117,7 +119,7 @@ namespace backend_api.Controllers
                     int count = lowResources.Count();
                     if (count > 0)
                     {
-                        // TODO: Add acutal emails.
+                        // TODO: Add actual emails.
                         receiverEmails.Add(new MailboxAddress("Charles Kornoelje", "charles.kornoelje@cqlcorp.com"));
 
                         // Format the email subject.
@@ -150,10 +152,7 @@ namespace backend_api.Controllers
                 var bodyBuilder = new BodyBuilder();
 
                 // Import the email template.
-                using (StreamReader SourceReader = System.IO.File.OpenText(".\\helpers\\email-template-add-parts.html"))
-                {
-                    bodyBuilder.HtmlBody = SourceReader.ReadToEnd();
-                }
+                bodyBuilder.HtmlBody = GetResourceAsString("backend-api.Helpers.email-template-add-parts.html");
 
                 // Replace the text-tags on the email with formatted data and html.
                 bodyBuilder.HtmlBody = bodyBuilder.HtmlBody.Replace("<<sections>>", SectionHtml(emailBodySections));
@@ -182,6 +181,21 @@ namespace backend_api.Controllers
                     client.Disconnect(true);
                 }
                 return Ok("Email sent");
+            }
+        }
+
+        /* GetResourceAsString(rez) accesses and returns an embedded resource
+         *   encoded in UTF8.
+         */
+        private string GetResourceAsString(string rez)
+        {
+            var assembly = Assembly.GetEntryAssembly();
+            using (var resourceStream = assembly.GetManifestResourceStream(rez))
+            {
+                using (var reader = new StreamReader(resourceStream, Encoding.UTF8))
+                {
+                    return reader.ReadToEnd();
+                }
             }
         }
 
