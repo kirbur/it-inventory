@@ -746,8 +746,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         textClassName={styles.backButtonText}
                     />
                 )}
-
-                <PictureInput setImage={setImgInput} image={imgInput} />
+                <div className={styles.imgContainer}>
+                    <PictureInput setImage={setImgInput} image={imgInput} />
+                </div>
             </div>
             {/* column 2 */}
             <div className={styles.secondColumn}>

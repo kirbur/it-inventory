@@ -1,8 +1,8 @@
 .dashMain {
     display: flex;
-    position: absolute;
-    padding: 20px;
-    width: 96vw;
+    /* position: absolute; */
+    /* padding: 20px; */
+    /* width: 96vw; */
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -10,7 +10,7 @@
 .dashColumn {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    /* flex-grow: 1; */
     flex-basis: 50%;
 
     max-width: 740px;

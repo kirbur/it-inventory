@@ -1,17 +1,28 @@
 .pictureInputMain {
-    padding: 25px;
+    color: #009eff;
+    height: 100%;
     background-color: #f4f4f4;
     border-radius: 10px;
-    width: 300px;
-    height: 300px;
-    color: #009eff;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .imgInput {
-    position: relative;
-    top: -300px;
-    width: 300px;
-    height: 300px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    width: 100%;
+    height: 100%;
+    max-width: 300px;
+    max-height: 300px;
     opacity: 0;
     cursor: pointer;
 }
@@ -23,7 +34,8 @@
 }
 
 .selectedImage {
-    width: 300px;
-    max-height: 300px;
+    width: 85%;
+    max-width: 250px;
+    max-height: 250px;
     margin: auto;
 }
