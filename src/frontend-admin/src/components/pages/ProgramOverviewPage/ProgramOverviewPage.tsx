@@ -67,10 +67,11 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     } = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
     const [img, setImg] = useState('')
     const [programData, setProgramData] = useState<ExpectedProgramOverview>({
         countProgInUse: 0,

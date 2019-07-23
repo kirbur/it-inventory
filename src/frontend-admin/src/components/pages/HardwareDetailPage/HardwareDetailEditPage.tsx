@@ -52,11 +52,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        //loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
     const isAdmin = true //TODO: remove
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
 
     //default
     const [employeeList, setEmployeeList] = useState([])
