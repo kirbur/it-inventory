@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 
 // Packages
 import DatePicker from 'react-datepicker'
@@ -9,6 +9,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './ProgramForm.module.css'
+import {Checkbox} from '../Checkbox/Checkbox'
 
 // Types
 export interface IProgramFormInputs {
@@ -16,7 +17,9 @@ export interface IProgramFormInputs {
     programName: {value: string; changed: boolean}
     description: {value: string; changed: boolean}
     cost: {value: number; changed: boolean}
+    hasRecurringCost: boolean
     flatCost: {value: number; changed: boolean}
+    hasFlatCost: boolean
     renewalDate: {value: Date; changed: boolean}
     monthsPerRenewal: {value: number; changed: boolean}
     purchaseDate?: {value: Date; changed: boolean}
@@ -58,53 +61,76 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                 </div>
             </Group>
 
-            <Group direction={'row'} justify={'between'}>
-                {/* Cost Group */}
-                <div className={styles.row2Input}>
-                    <div className={styles.inputText}>Flat Cost</div>
-                    <input
-                        className={s(styles.input, styles.costInput)}
-                        type='number'
-                        step='0.01'
-                        value={state.flatCost.value}
-                        onChange={cost =>
-                            setState({
-                                ...state,
-                                flatCost: {value: parseFloat(cost.target.value), changed: true},
-                            })
-                        }
-                    />
+            {/* Cost Group */}
+            <div className={styles.radioSection}>
+                <div className={styles.radioContainer}>
+                    <div className={styles.radio}>
+                        <Checkbox
+                            className={styles.checkBoxContainerOne}
+                            checked={state.hasFlatCost}
+                            onClick={() => setState({...state, hasFlatCost: !state.hasFlatCost})}
+                        />
+                    </div>
+                    <div>
+                        <div className={styles.inputText}>Initial Cost</div>
+                        <input
+                            className={styles.radioInput}
+                            type='number'
+                            step='0.01'
+                            value={state.flatCost.value}
+                            onChange={cost => {
+                                if (state.hasFlatCost) {
+                                    setState({
+                                        ...state,
+                                        flatCost: {value: parseFloat(cost.target.value), changed: true},
+                                    })
+                                }
+                            }}
+                        />
+                    </div>
                 </div>
-                <div className={styles.row2Input}>
-                    <div className={styles.inputText}>Recurring Cost</div>
-                    <input
-                        className={s(styles.input, styles.costInput)}
-                        type='number'
-                        step='0.01'
-                        value={state.cost.value}
-                        onChange={cost =>
-                            setState({
-                                ...state,
-                                cost: {value: parseFloat(cost.target.value), changed: true},
-                            })
-                        }
+                <div className={styles.radioContainer}>
+                    <Checkbox
+                        className={styles.checkBoxContainerTwo}
+                        checked={state.hasRecurringCost}
+                        onClick={() => setState({...state, hasRecurringCost: !state.hasRecurringCost})}
                     />
+                    <div>
+                        <div className={styles.inputText}>Recurring Cost</div>
+                        <input
+                            className={styles.radioInput}
+                            type='number'
+                            step='0.01'
+                            value={state.cost.value}
+                            onChange={cost => {
+                                if (state.hasRecurringCost) {
+                                    setState({
+                                        ...state,
+                                        cost: {value: parseFloat(cost.target.value), changed: true},
+                                    })
+                                }
+                            }}
+                        />
+                    </div>
+                    {state.hasRecurringCost && (
+                        <div className={styles.marginLeft}>
+                            <div className={styles.inputText}>Months per Renewal</div>
+                            <input
+                                className={styles.monthsInput}
+                                type='number'
+                                step='1'
+                                value={state.monthsPerRenewal.value}
+                                onChange={e =>
+                                    setState({
+                                        ...state,
+                                        monthsPerRenewal: {value: parseInt(e.target.value), changed: true},
+                                    })
+                                }
+                            />
+                        </div>
+                    )}
                 </div>
-                <div className={styles.row2Input}>
-                    <div className={styles.inputText}># of Months per Renewal</div>
-                    <input
-                        type='number'
-                        className={styles.input}
-                        value={state.monthsPerRenewal.value}
-                        onChange={e =>
-                            setState({
-                                ...state,
-                                monthsPerRenewal: {value: parseInt(e.target.value), changed: true},
-                            })
-                        }
-                    />
-                </div>
-            </Group>
+            </div>
             <div className={styles.line} />
 
             <Group direction={'row'} justify={'between'}>

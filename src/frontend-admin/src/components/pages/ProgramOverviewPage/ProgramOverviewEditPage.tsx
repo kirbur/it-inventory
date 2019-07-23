@@ -103,7 +103,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         purchaseLink: {value: '', changed: false},
         licenseKey: {value: '', changed: false},
         cost: {value: 0, changed: false},
+        hasRecurringCost: false,
         flatCost: {value: 0, changed: false},
+        hasFlatCost: false,
         monthsPerRenewal: {value: 0, changed: false},
     })
 
@@ -115,7 +117,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         purchaseLink: {value: '', changed: false},
         licenseKey: {value: '', changed: false},
         cost: {value: 0, changed: false},
+        hasRecurringCost: false,
         flatCost: {value: 0, changed: false},
+        hasFlatCost: false,
         monthsPerRenewal: {value: 0, changed: false},
     })
 

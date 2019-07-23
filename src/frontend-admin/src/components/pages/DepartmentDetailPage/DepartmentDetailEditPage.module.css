@@ -109,9 +109,9 @@
 .addDefaultContainer {
     padding-top: 25px;
     display: flex;
-    justify-content: start;
-    /* position: relative;
-    left: 50px; */
+    justify-content: end;
+    position: relative;
+    left: 50px;
 }
 .addIconBorder:hover {
     background-color: #009eff;

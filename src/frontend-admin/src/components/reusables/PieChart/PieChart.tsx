@@ -2,7 +2,6 @@ import React, {useState} from 'react'
 import {PieChart, Pie, Cell} from 'recharts'
 import {CustomLabel} from './CustomLabel/CustomLabel'
 import styles from './PieChart.module.css'
-import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Types
 export interface IRechartPieDatum {
@@ -122,7 +121,7 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                 hasData(i) ? (
                     <div />
                 ) : (
-                    <div className={s(styles.circleContainer)} style={{position: 'relative', left: 10 + 380 * i}}>
+                    <div className={styles.circleContainer} style={{position: 'relative', left: 10 + 380 * i}}>
                         <div className={styles.emptyCircle} />
                         <div className={styles.emptyDataText}>No data to display</div>
                     </div>
