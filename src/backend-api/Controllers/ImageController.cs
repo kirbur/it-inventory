@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend_api.Models;
 using System.IO;
-using Microsoft.AspNetCore.Authorization;
 using backend_api.Helpers;
 using Microsoft.Extensions.Options;
 
@@ -15,12 +13,14 @@ namespace backend_api.Controllers
     [ApiController]
     public class ImageController : ContextController
     {
-        public ImageController(ITInventoryDBContext context, IOptions<UploadOptions> uploadOptions) : base(context)
+        public ImageController(ITInventoryDBContext context, IOptions<UploadOptions> uploadOptions, IOptions<ImageSettings> imageSettings) : base(context)
         {
             this.UploadOptions = uploadOptions;
+            this.ImageSettings = imageSettings;
         }
 
         public IOptions<UploadOptions> UploadOptions { get; }
+        public IOptions<ImageSettings> ImageSettings { get; }
 
         private string[] models = new string[] { "employee", "department", "program", "server", "computer", "server", "monitor", "peripheral" };
 
@@ -88,7 +88,7 @@ namespace backend_api.Controllers
             var file = payload.File;
             model = VerbatimMatch(model);
 
-            const int maxBytes = 25000;
+            long maxBytes = ImageSettings.Value.MaxImageSizeInBytes;
             long fileSizeInBytes = file.Length;
 
             // Check that the model is valid and there is content in the file.
@@ -108,7 +108,7 @@ namespace backend_api.Controllers
                     if (Directory.Exists(modelPath))
                     {
                         // Create a fileStream used to store.
-                        using (var fs = new FileStream(modelPath + $"\\{id}", FileMode.Create))
+                        using (var fs = new FileStream(Path.Combine(modelPath, id.ToString()), FileMode.Create))
                         {
                             // Copy the file to the local hard drive.
                             await file.CopyToAsync(fs);
