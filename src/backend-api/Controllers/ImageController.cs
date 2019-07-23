@@ -108,7 +108,7 @@ namespace backend_api.Controllers
                     if (Directory.Exists(modelPath))
                     {
                         // Create a fileStream used to store.
-                        using (var fs = new FileStream(modelPath + $"\\{id}", FileMode.Create))
+                        using (var fs = new FileStream(Path.Combine(modelPath, id.ToString()), FileMode.Create))
                         {
                             // Copy the file to the local hard drive.
                             await file.CopyToAsync(fs);
