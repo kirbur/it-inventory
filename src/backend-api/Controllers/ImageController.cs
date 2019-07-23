@@ -88,32 +88,43 @@ namespace backend_api.Controllers
             var file = payload.File;
             model = VerbatimMatch(model);
 
+            const int maxBytes = 25000;
+            long fileSizeInBytes = file.Length;
+
             // Check that the model is valid and there is content in the file.
-            if (ValidModel(model) && file != null && file.Length > 0)
+            if (ValidModel(model) && file != null && fileSizeInBytes > 0)
             {
-                // Create the images folder if not already there.
-                string imagesPath = Path.Combine(UploadOptions.Value.UploadedFileRootPath, "images");
-                Directory.CreateDirectory(imagesPath);
-
-                // Create model folder if not already there
-                string modelPath = Path.Combine(imagesPath, model);
-                Directory.CreateDirectory(modelPath);
-
-                // Check that the directory exists. Write permissions could influence the creation.
-                if (Directory.Exists(modelPath))
+                if (fileSizeInBytes < maxBytes)
                 {
-                    // Create a fileStream used to store.
-                    using (var fs = new FileStream(modelPath + $"\\{id}", FileMode.Create))
+                    // Create the images folder if not already there.
+                    string imagesPath = Path.Combine(UploadOptions.Value.UploadedFileRootPath, "images");
+                    Directory.CreateDirectory(imagesPath);
+
+                    // Create model folder if not already there
+                    string modelPath = Path.Combine(imagesPath, model);
+                    Directory.CreateDirectory(modelPath);
+
+                    // Check that the directory exists. Write permissions could influence the creation.
+                    if (Directory.Exists(modelPath))
                     {
-                        // Copy the file to the local hard drive.
-                        await file.CopyToAsync(fs);
+                        // Create a fileStream used to store.
+                        using (var fs = new FileStream(modelPath + $"\\{id}", FileMode.Create))
+                        {
+                            // Copy the file to the local hard drive.
+                            await file.CopyToAsync(fs);
+                        }
+                        return Ok();
                     }
-                    return Ok();
+                    else
+                    {
+                        return BadRequest("Model folder not found.");
+                    }
                 }
                 else
                 {
-                    return BadRequest("Model folder not found.");
+                    return BadRequest($"File is too large. {fileSizeInBytes} bytes when the max is {maxBytes} bytes");
                 }
+                
             }
             else
             {
