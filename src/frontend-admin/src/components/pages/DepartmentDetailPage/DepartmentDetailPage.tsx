@@ -201,8 +201,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
                     />
-                    <div className={styles.imgPadding}>
-                        <img className={styles.img} src={img} alt={''} />
+                    <div className={styles.imgContainer}>
+                        <div className={styles.imgPadding}>
+                            <img className={styles.img} src={img} alt={''} />
+                        </div>
                     </div>
                     <Group>
                         <p>Software</p>
