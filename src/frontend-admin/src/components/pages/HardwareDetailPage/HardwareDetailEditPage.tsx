@@ -429,7 +429,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     },
                 })
             } else if (match.params.type === 'laptop') {
-                console.log(firstSectionData)
                 await axios.post(`add/laptop`, {
                     Entity: {
                         Make: firstSectionData[0],
