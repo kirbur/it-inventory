@@ -830,7 +830,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     className={styles.backButton}
                     textClassName={styles.backButtonText}
                 />
-                <PictureInput setImage={setImgInput} image={imgInput} />
+                <div className={styles.imgContainer}>
+                    <PictureInput setImage={setImgInput} image={imgInput} />
+                </div>
             </div>
 
             {/* column 2 */}

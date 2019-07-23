@@ -15,36 +15,57 @@
 .columns {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: center;
 }
 
 .firstColumn {
     padding: 50px;
+    min-width: 160px;
+    max-width: 300px;
+    flex-grow: 1;
 }
 
 .secondColumn {
     padding: 50px;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
 }
 
 /* image styling */
+.imgContainer {
+    position: relative;
+    width: 100%;
+}
+
+.imgContainer:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
+}
+
 .imgPadding {
-    padding: 25px;
+    height: 100%;
     background-color: #f4f4f4;
     border-radius: 10px;
-    width: 300px;
-    height: 300px;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .img {
-    width: 300px;
-    max-height: 300px;
+    width: 85%;
+    max-width: 250px;
+    max-height: 250px;
     margin: auto;
 }
+
 .costText {
     text-align: left;
     color: #979797;
