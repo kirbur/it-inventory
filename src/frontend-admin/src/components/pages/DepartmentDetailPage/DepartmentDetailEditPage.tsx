@@ -47,11 +47,9 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
         }
     }
 
-    const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
-    } = useContext(LoginContext)
+    const {loginContextVariables} = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
     const [deptData, setDeptData] = useState<any>({})
     const [hardwareRows, setHardwareRows] = useState<any[]>([])
     const [softwareRows, setSoftwareRows] = useState<any[]>([])

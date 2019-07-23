@@ -54,9 +54,10 @@ interface IPulledData {
 export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const {history} = props
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
 
     // state
     const [listData, setListData] = useState<IEmployeeData[]>([])
