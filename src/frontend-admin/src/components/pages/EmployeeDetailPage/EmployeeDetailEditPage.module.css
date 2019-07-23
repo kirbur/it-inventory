@@ -195,8 +195,8 @@ input:checked ~ .insideCheckmarkAdmin {
 .addContainer {
     display: flex;
     justify-content: start;
-    /* position: relative;
-    left: 50px; */
+    position: relative;
+    left: 50px;
 }
 .addIconBorder:hover {
     background-color: #009eff;
