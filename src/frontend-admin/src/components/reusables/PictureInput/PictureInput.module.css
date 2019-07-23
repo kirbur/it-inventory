@@ -28,13 +28,14 @@
 }
 
 .imgContainer {
-    width: 300px;
-    height: 300px;
+    width: 100%;
+    height: auto;
     display: flex;
 }
 
 .selectedImage {
     width: 85%;
+    height: auto;
     max-width: 250px;
     max-height: 250px;
     margin: auto;
