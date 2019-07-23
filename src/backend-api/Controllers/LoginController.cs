@@ -199,11 +199,11 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                        signingCredentials: creds);
 
             // returning access token with its expire date
-            return Ok(new
+            return Ok(new List<object> {new
             {
                 Accesstoken = new JwtSecurityTokenHandler().WriteToken(accessToken),
                 accessToken.ValidTo
-            });
+            } });
         }
     }
 

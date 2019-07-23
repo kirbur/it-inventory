@@ -32,10 +32,11 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
 
-    var axios = new AxiosService(accessToken, refreshToken)
+    var axios = new AxiosService(loginContextVariables)
 
     const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState('')

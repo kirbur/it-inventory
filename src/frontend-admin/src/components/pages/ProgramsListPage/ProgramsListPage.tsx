@@ -33,9 +33,10 @@ interface IProgramsListPageProps {
 export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const {history} = props
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
 
     // state
     const [useImages, setUseImages] = useState(false)
