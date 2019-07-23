@@ -86,19 +86,12 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const [pieData, setPieData] = useState(initPieData)
 
     //Department Tables State
-    const [deptList, setDeptList] = useState<{DepartmentName: string; DepartmentId: number}[]>([])
     const [deptTableData, setDeptTableData] = useState<{id: number; name: string; tableData: IDashboardTableDatum[]}[]>(
-        [
-            {
-                //TODO: in order for dropdown to have default this needs to be hardcoded with a dept that always exists
-                id: -1,
-                name: 'Select A Department',
-                tableData: [],
-            },
-        ]
+        []
     )
     const [dropdownContent, setDropdownContent] = useState<IDropdownItem[]>([])
-    const [selectedDeptTable, setSelectedDeptTable] = useState<IDropdownItem>({...deptTableData[0]})
+    const [selectedDept, setSelectedDept] = useState<IDropdownItem>({id: -1, name: 'Select A Department'})
+    const [selectedDeptTable, setSelectedDeptTable] = useState<IDashboardTableDatum[]>([])
 
     //Click Handling
     const onRowClick = (datum: IDashboardTableDatum) => {
@@ -116,42 +109,6 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
     const onSliceClick = (id: string) => {
         history.push(`/departments/${id}`)
-    }
-
-    const getDeptTables = () => {
-        initDeptTable = []
-        deptList &&
-            deptList.map(i =>
-                axios
-                    .get(`/dashboard/departmentTable/${i.DepartmentId}`)
-                    .then((data: any[]) => {
-                        let y: IDashboardTableDatum[] = []
-                        data &&
-                            data.map((datum: any) =>
-                                y.push({
-                                    name: datum.programName,
-                                    numberOf: datum.programCount,
-                                    costPerMonth: datum.programCostPerYear / 12,
-                                    projected: datum.programIsCostPerYear ? '' : '*',
-                                })
-                            )
-                        initDeptTable.push({id: i.DepartmentId, name: i.DepartmentName, tableData: y})
-                    })
-                    .catch((err: any) => console.error(err))
-            )
-        setDeptTableData(initDeptTable)
-    }
-
-    const updateDropdownContent = () => {
-        let x: any[] = []
-
-        deptTableData.map((i: any) =>
-            x.push({
-                id: i.id,
-                name: i.name,
-            })
-        )
-        setDropdownContent(x)
     }
 
     useEffect(() => {
@@ -223,32 +180,51 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
         axios
             .get('/dashboard/departmentTable?$select=departmentName,departmentID')
             .then((data: any) => {
-                setDeptList(data)
+                setDropdownContent([
+                    ...data.map((datum: any) => {
+                        return {id: datum.DepartmentId, name: datum.DepartmentName}
+                    }),
+                ])
+
                 data &&
                     data[0] &&
                     data[0].DepartmentName &&
-                    setSelectedDeptTable({name: data[0].DepartmentName, id: data[0].DepartmentId})
+                    setSelectedDept({name: data[0].DepartmentName, id: data[0].DepartmentId})
             })
             .catch((err: any) => console.error(err))
     }, [])
 
-    useEffect(getDeptTables, [deptList])
-    useEffect(updateDropdownContent, [deptTableData, getDeptTables, dropdownContent])
+    async function getDeptTables() {
+        var deptTables: any[] = []
+        await dropdownContent.map(i => {
+            axios
+                .get(`/dashboard/departmentTable/${i.id}`)
+                .then((data: any[]) => {
+                    let y: IDashboardTableDatum[] = []
+                    data &&
+                        data.map((datum: any) =>
+                            y.push({
+                                name: datum.programName,
+                                numberOf: datum.programCount,
+                                costPerMonth: datum.programCostPerYear / 12,
+                                projected: datum.programIsCostPerYear ? '' : '*',
+                            })
+                        )
+                    deptTables.push({id: i.id, name: i.name, tableData: y})
 
-    const displayDeptTable = () => {
-        const table = deptTableData.filter(i => i.id === selectedDeptTable.id)
+                    if (i.id === selectedDept.id) {
+                        setSelectedDeptTable(y)
+                    }
+                })
+                .catch((err: any) => console.error(err))
+        })
 
-        return table.length > 0 ? (
-            <div className={styles.software}>
-                <DashboardTable data={table[0].tableData} onRowClick={onRowClick} />
-                <div className={styles.softwareKey}>
-                    <div>Cost Per Year* = Projected</div>
-                </div>
-            </div>
-        ) : (
-            <div></div>
-        )
+        setDeptTableData(deptTables)
     }
+
+    useEffect(() => {
+        getDeptTables()
+    }, [dropdownContent, selectedDept])
 
     return (
         <div className={styles.dashMain}>
@@ -302,11 +278,21 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                         <Dropdown
                             content={dropdownContent}
                             titleClassName={styles.linkedTitle}
-                            selected={selectedDeptTable}
-                            setSelected={setSelectedDeptTable}
+                            selected={selectedDept}
+                            setSelected={(i: IDropdownItem) => {
+                                setSelectedDept(i)
+                                var table = deptTableData.filter(i => i.id === selectedDept.id)
+                                table[0] && setSelectedDeptTable(table[0].tableData)
+                            }}
                         />
                     )}
-                    {deptTableData[0] && displayDeptTable()}
+
+                    <div className={styles.software}>
+                        <DashboardTable data={selectedDeptTable} onRowClick={onRowClick} />
+                        <div className={styles.softwareKey}>
+                            <div>Cost Per Year* = Projected</div>
+                        </div>
+                    </div>
                 </Card>
             </div>
 
