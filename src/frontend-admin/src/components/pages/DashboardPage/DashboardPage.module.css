@@ -1,8 +1,5 @@
 .dashMain {
     display: flex;
-    /* position: absolute; */
-    /* padding: 20px; */
-    /* width: 96vw; */
     flex-wrap: wrap;
     justify-content: center;
 }
