@@ -119,40 +119,42 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             ])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
             setThirdSectionHeaders(['Employee Assigned', 'Location'])
-            axios
-                .get(`/detail/server/${match.params.id}`)
-                .then((data: any) => {
-                    setFirstSectionData([
-                        data[0].server.make,
-                        data[0].server.model,
-                        data[0].server.operatingSystem,
-                        data[0].server.ram,
-                        data[0].server.localHHD,
-                        data[0].server.numberOfCores,
-                        data[0].server.mfg,
-                        data[0].server.serialNumber,
-                        data[0].server.ipAddress,
-                        data[0].server.san,
-                        data[0].server.fqdn,
-                    ])
-                    setSecondSectionData([])
-                    setPurchaseDateInput(data[0].server.purchaseDate)
-                    setRenewalDateInput(data[0].server.renewalDate)
-                    setEndOfLifeInput(data[0].server.endOfLife)
-                    setThirdSectionData([data[0].employeeAssignedName, data[0].server.location])
-                    setIsVirtualized(data[0].server.virtualize)
-                    setCostSection([
-                        data[0].server.flatCost,
-                        data[0].server.costPerYear,
-                        data[0].server.monthsPerRenewal,
-                    ])
-                    checkCostStates(data[0].server.flatCost, data[0].server.costPerYear)
-                    setCommentText(data[0].server.textField)
-                    setHistoryLogEntries(data[0].serverHistory)
-                    setHistoryLogEntries(data[0].serverHistory)
-                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].server.employeeId})
-                })
-                .catch((err: any) => console.error(err))
+            if (match.params.id !== 'new') {
+                axios
+                    .get(`/detail/server/${match.params.id}`)
+                    .then((data: any) => {
+                        setFirstSectionData([
+                            data[0].server.make,
+                            data[0].server.model,
+                            data[0].server.operatingSystem,
+                            data[0].server.ram,
+                            data[0].server.localHHD,
+                            data[0].server.numberOfCores,
+                            data[0].server.mfg,
+                            data[0].server.serialNumber,
+                            data[0].server.ipAddress,
+                            data[0].server.san,
+                            data[0].server.fqdn,
+                        ])
+                        setSecondSectionData([])
+                        setPurchaseDateInput(data[0].server.purchaseDate)
+                        setRenewalDateInput(data[0].server.renewalDate)
+                        setEndOfLifeInput(data[0].server.endOfLife)
+                        setThirdSectionData([data[0].employeeAssignedName, data[0].server.location])
+                        setIsVirtualized(data[0].server.virtualize)
+                        setCostSection([
+                            data[0].server.flatCost,
+                            data[0].server.costPerYear,
+                            data[0].server.monthsPerRenewal,
+                        ])
+                        checkCostStates(data[0].server.flatCost, data[0].server.costPerYear)
+                        setCommentText(data[0].server.textField)
+                        setHistoryLogEntries(data[0].serverHistory)
+                        setHistoryLogEntries(data[0].serverHistory)
+                        setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].server.employeeId})
+                    })
+                    .catch((err: any) => console.error(err))
+            }
         } else if (match.params.type === ('laptop' || 'computer')) {
             setFirstSectionHeaders([
                 'Make',
@@ -168,107 +170,113 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             ])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
             setThirdSectionHeaders(['Employee Assigned', 'Location'])
-            axios
-                .get(`/detail/computer/${match.params.id}`)
-                .then((data: any) => {
-                    setFirstSectionData([
-                        data[0].computer.make,
-                        data[0].computer.model,
-                        data[0].computer.cpu,
-                        data[0].computer.ramgb,
-                        data[0].computer.ssdgb,
-                        data[0].computer.screenSize,
-                        data[0].computer.monitorOutput,
-                        data[0].computer.serialNumber,
-                        data[0].computer.mfg,
-                        data[0].computer.fqdn,
-                    ])
+            if (match.params.id !== 'new') {
+                axios
+                    .get(`/detail/computer/${match.params.id}`)
+                    .then((data: any) => {
+                        setFirstSectionData([
+                            data[0].computer.make,
+                            data[0].computer.model,
+                            data[0].computer.cpu,
+                            data[0].computer.ramgb,
+                            data[0].computer.ssdgb,
+                            data[0].computer.screenSize,
+                            data[0].computer.monitorOutput,
+                            data[0].computer.serialNumber,
+                            data[0].computer.mfg,
+                            data[0].computer.fqdn,
+                        ])
 
-                    setSecondSectionData([])
-                    setCostSection([
-                        data[0].computer.flatCost,
-                        data[0].computer.costPerYear,
-                        data[0].computer.monthsPerRenewal,
-                    ])
-                    checkCostStates(data[0].computer.flatCost, data[0].computer.costPerYear)
-                    setPurchaseDateInput(data[0].computer.purchaseDate)
-                    setRenewalDateInput(data[0].computer.renewalDate)
-                    setHistoryLogEntries(data[0].computerHistory)
-                    setEndOfLifeInput(data[0].computer.endOfLife)
+                        setSecondSectionData([])
+                        setCostSection([
+                            data[0].computer.flatCost,
+                            data[0].computer.costPerYear,
+                            data[0].computer.monthsPerRenewal,
+                        ])
+                        checkCostStates(data[0].computer.flatCost, data[0].computer.costPerYear)
+                        setPurchaseDateInput(data[0].computer.purchaseDate)
+                        setRenewalDateInput(data[0].computer.renewalDate)
+                        setHistoryLogEntries(data[0].computerHistory)
+                        setEndOfLifeInput(data[0].computer.endOfLife)
 
-                    setThirdSectionData([
-                        data[0].employeeAssignedName,
-                        data[0].computer.location,
-                        data[0].computer.employeeId,
-                    ])
-                    setCommentText(data[0].computer.textField)
-                    setHistoryLogEntries(data[0].computerHistory)
-                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].computer.employeeId})
-                })
-                .catch((err: any) => console.error(err))
+                        setThirdSectionData([
+                            data[0].employeeAssignedName,
+                            data[0].computer.location,
+                            data[0].computer.employeeId,
+                        ])
+                        setCommentText(data[0].computer.textField)
+                        setHistoryLogEntries(data[0].computerHistory)
+                        setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].computer.employeeId})
+                    })
+                    .catch((err: any) => console.error(err))
+            }
         } else if (match.params.type === 'monitor') {
             setFirstSectionHeaders(['Make', 'Model', 'Screen Size', 'Resolution', 'Inputs', 'Serial #'])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date'])
             setThirdSectionHeaders(['Employee Assigned', 'Location'])
-            axios
-                .get(`/detail/monitor/${match.params.id}`)
-                .then((data: any) => {
-                    setFirstSectionData([
-                        data[0].monitor.make,
-                        data[0].monitor.model,
-                        data[0].monitor.screenSize,
-                        data[0].monitor.resolution,
-                        data[0].monitor.inputs,
-                        data[0].monitor.serialNumber,
-                    ])
-                    setSecondSectionData([])
-                    setPurchaseDateInput(data[0].monitor.purchaseDate)
-                    setRenewalDateInput(data[0].monitor.renewalDate)
+            if (match.params.id !== 'new') {
+                axios
+                    .get(`/detail/monitor/${match.params.id}`)
+                    .then((data: any) => {
+                        setFirstSectionData([
+                            data[0].monitor.make,
+                            data[0].monitor.model,
+                            data[0].monitor.screenSize,
+                            data[0].monitor.resolution,
+                            data[0].monitor.inputs,
+                            data[0].monitor.serialNumber,
+                        ])
+                        setSecondSectionData([])
+                        setPurchaseDateInput(data[0].monitor.purchaseDate)
+                        setRenewalDateInput(data[0].monitor.renewalDate)
 
-                    setThirdSectionData([
-                        data[0].employeeAssignedName,
-                        data[0].monitor.location,
-                        data[0].monitor.employeeId,
-                    ])
-                    setCostSection([
-                        data[0].monitor.flatCost,
-                        data[0].monitor.costPerYear,
-                        data[0].monitor.monthsPerRenewal,
-                    ])
-                    checkCostStates(data[0].monitor.flatCost, data[0].monitor.costPerYear)
-                    setCommentText(data[0].monitor.textField)
-                    setHistoryLogEntries(data[0].monitorHistory)
-                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].monitor.employeeId})
-                })
-                .catch((err: any) => console.error(err))
+                        setThirdSectionData([
+                            data[0].employeeAssignedName,
+                            data[0].monitor.location,
+                            data[0].monitor.employeeId,
+                        ])
+                        setCostSection([
+                            data[0].monitor.flatCost,
+                            data[0].monitor.costPerYear,
+                            data[0].monitor.monthsPerRenewal,
+                        ])
+                        checkCostStates(data[0].monitor.flatCost, data[0].monitor.costPerYear)
+                        setCommentText(data[0].monitor.textField)
+                        setHistoryLogEntries(data[0].monitorHistory)
+                        setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].monitor.employeeId})
+                    })
+                    .catch((err: any) => console.error(err))
+            }
         } else if (match.params.type === 'peripheral') {
             setFirstSectionHeaders(['Name', 'Type', 'Serial #', ''])
             setSecondSectionHeaders(['Purchase Date'])
             setThirdSectionHeaders(['Employee Assigned'])
-            axios
-                .get(`/detail/peripheral/${match.params.id}`)
-                .then((data: any) => {
-                    setFirstSectionData([
-                        data[0].peripheral.peripheralName,
-                        data[0].peripheral.peripheralType,
-                        data[0].peripheral.serialNumber,
-                    ])
-                    setPurchaseDateInput(data[0].peripheral.purchaseDate)
+            if (match.params.id !== 'new') {
+                axios
+                    .get(`/detail/peripheral/${match.params.id}`)
+                    .then((data: any) => {
+                        setFirstSectionData([
+                            data[0].peripheral.peripheralName,
+                            data[0].peripheral.peripheralType,
+                            data[0].peripheral.serialNumber,
+                        ])
+                        setPurchaseDateInput(data[0].peripheral.purchaseDate)
 
-                    setSecondSectionData([])
-                    setThirdSectionData([])
-                    setCostSection([
-                        data[0].peripheral.flatCost,
-                        data[0].peripheral.costPerYear,
-                        data[0].peripheral.monthsPerRenewal,
-                    ])
-                    checkCostStates(data[0].peripheral.flatCost, data[0].peripheral.costPerYear)
+                        setSecondSectionData([])
+                        setThirdSectionData([])
+                        setCostSection([
+                            data[0].peripheral.flatCost,
+                            data[0].peripheral.costPerYear,
+                            data[0].peripheral.monthsPerRenewal,
+                        ])
+                        checkCostStates(data[0].peripheral.flatCost, data[0].peripheral.costPerYear)
 
-                    setCommentText(data[0].peripheral.textField)
-                    setHistoryLogEntries(data[0].peripheralHistory)
-                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].peripheral.employeeId})
-                })
-                .catch((err: any) => console.error(err))
+                        setCommentText(data[0].peripheral.textField)
+                        setHistoryLogEntries(data[0].peripheralHistory)
+                        setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].peripheral.employeeId})
+                    })
+                    .catch((err: any) => console.error(err))
+            }
         }
         // checkCostStates()
     }, [])
@@ -297,6 +305,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             if (costSection[0] == 0 || costSection[0] == null) {
                 alertMssg += '\n Initial cost must have a value!'
             }
+        }
+        //everything must be filled out - sorting doesnt work with null values
+        //this will only do something when creating a new piece of hardware
+        if (firstSectionData.length !== firstSectionHeaders.length) {
+            alertMssg += '\n All hardware info fields must be filled out!'
         }
 
         //checks for server form
