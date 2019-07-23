@@ -31,11 +31,9 @@ interface IProgramDetailEditPageProps {
 export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = props => {
     const {history, match} = props
 
-    const {
-        loginContextVariables: {accessToken, refreshToken},
-    } = useContext(LoginContext)
+    const {loginContextVariables} = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
     const [progData, setProgData] = useState<{name: string; employee: string; dateBought: string}>({
         name: '',
         employee: '',

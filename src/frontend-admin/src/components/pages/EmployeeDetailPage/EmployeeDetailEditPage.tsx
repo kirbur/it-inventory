@@ -55,11 +55,9 @@ interface IEmployee {
 export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = props => {
     const {history, match} = props
 
-    const {
-        loginContextVariables: {accessToken, refreshToken},
-    } = useContext(LoginContext)
+    const {loginContextVariables} = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
     const [userData, setUserData] = useState<IEmployee>({
         isAdmin: false,
         photo: '',

@@ -52,10 +52,8 @@ interface IPulledData {
 // Primary Component
 export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     const {history} = props
-    const {
-        loginContextVariables: {accessToken, refreshToken},
-    } = useContext(LoginContext)
-    const axios = new AxiosService(accessToken, refreshToken)
+    const {loginContextVariables} = useContext(LoginContext)
+    const axios = new AxiosService(loginContextVariables)
 
     // state
     const [listData, setListData] = useState<any[]>([])

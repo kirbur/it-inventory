@@ -50,9 +50,10 @@ interface IPulledData {
 export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     const {history} = props
     const {
-        loginContextVariables: {accessToken, refreshToken},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
 
     // state
     const [listData, setListData] = useState<any[]>([])

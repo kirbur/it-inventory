@@ -43,10 +43,11 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
     const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState('')
     const [userData, setUserData] = useState<IUser>({

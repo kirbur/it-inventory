@@ -47,7 +47,8 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const [isDeleted, setIsDeleted] = useState(false)
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
 
     const handleEmployeeClick = (id: number | string) => {
@@ -64,7 +65,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         }
     }
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
 
     useEffect(() => {
         axios
