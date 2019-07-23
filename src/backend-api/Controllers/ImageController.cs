@@ -81,7 +81,6 @@ namespace backend_api.Controllers
          *      Return 200 if image was saved to file system.
          *      Return 400 if the file was not anything or if the model is wrong
          */
-         [AllowAnonymous]
         [HttpPut]
         [Route("{model}/{id}")]
         public async Task<IActionResult> Upload([FromForm] PicturePayload payload, [FromRoute] string model, int id)
