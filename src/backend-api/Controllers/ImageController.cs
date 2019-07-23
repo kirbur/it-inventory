@@ -6,20 +6,16 @@ using System.Threading.Tasks;
 using backend_api.Models;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Http;
 using backend_api.Helpers;
 using Microsoft.Extensions.Options;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/image")]
     [ApiController]
-    public class UploadController : ControllerBase
+    public class ImageController : ContextController
     {
-        // UploadController constructor.
-        public UploadController(IOptions<UploadOptions> uploadOptions)
+        public ImageController(ITInventoryDBContext context, IOptions<UploadOptions> uploadOptions) : base(context)
         {
             this.UploadOptions = uploadOptions;
         }
@@ -44,14 +40,6 @@ namespace backend_api.Controllers
             }
         }
 
-        /* Change the front end to match the back end verbatim. 
-         * Return: "computer" if "laptop" is matched.
-         * Else: return the same string.
-         */
-        private string VerbatimMatch(string routeModel)
-        {
-            return routeModel.ToLower() == "laptop" ? "computer" : routeModel;
-        }
 
         /* GET: api/image/{model}/{id}
          *      Return: The requested image of the model with the ID

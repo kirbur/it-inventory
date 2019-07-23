@@ -17,7 +17,7 @@ namespace backend_api.Models
 
         public string TextField { get; set; }
 
-        public decimal PLuginCostPerYear { get; set; }
+        public decimal PluginCostPerYear { get; set; }
 
         public DateTime? RenewalDate { get; set; }
 

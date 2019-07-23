@@ -114,7 +114,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                             : programInput.cost.value * (12 / programInput.monthsPerRenewal.value),
                     ProgramFlatCost: Number.isNaN(programInput.flatCost.value) ? 0 : programInput.flatCost.value,
                     ProgramLicenseKey: programInput.licenseKey.value,
-                    ProgramDescription: programInput.description.value,
+                    Description: programInput.description.value,
                     ProgramPurchaseLink: programInput.purchaseLink.value,
                     DateBought: programInput.purchaseDate
                         ? programInput.purchaseDate.value.toISOString()

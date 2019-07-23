@@ -5,6 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Helpers\email-template-add-parts.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Helpers\email-template-add-parts.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="StartupHelpers\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
