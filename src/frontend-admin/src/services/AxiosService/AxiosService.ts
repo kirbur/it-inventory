@@ -75,8 +75,8 @@ export class AxiosService {
             .put(url, data, {
                 headers: {
                     Authorization: `Bearer ${this.user.accessToken}`,
+                    ...headers,
                 },
-                ...headers,
             })
             .then(response => {
                 this.checkTokenExpired(url, 'put', data)
