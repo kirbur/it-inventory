@@ -5,6 +5,7 @@ import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
+import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -61,7 +62,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         if (match.params.type === 'server') {
             setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
             setSecondTableHeaders(['MFG Tag', 'Serial #', 'SAN', 'Local HHD'])
-            setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
+            setThirdTableHeaders(['Employee Assigned', 'Department', 'Location'])
             // make model purchaseDate renewalDate endOfLife virtualized
             setHeadingInfo(['the name', 'another name'])
             axios
@@ -262,8 +263,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
                     />
-                    <div className={styles.imgPadding}>
-                        <img className={styles.img} src={img} alt={''} />
+                    <div className={styles.imgContainer}>
+                        <div className={styles.imgPadding}>
+                            <img className={styles.img} src={img} alt={''} />
+                        </div>
                     </div>
                     <div className={styles.costText}>
                         {renderFlatCost()}
@@ -303,48 +306,53 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         ))}
                     </div>
 
-                    {/* tables? */}
-                    <div className={styles.tableContainer}>
-                        {/* first table */}
-                        <table className={styles.table}>
-                            <tr>
-                                {firstTableHeaders.map((header: string) => (
-                                    <td className={styles.header}>{header}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                {firstTableData.map((datum: string | number) => (
-                                    <td className={styles.rowData}>{datum}</td>
-                                ))}
-                            </tr>
-                        </table>
-                        {/* second table */}
-                        <table className={styles.table}>
-                            <tr>
-                                {secondTableHeaders.map((header: string) => (
-                                    <td className={styles.header}>{header}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                {secondTableData.map((datum: string | number) => (
-                                    <td className={styles.rowData}>{datum}</td>
-                                ))}
-                            </tr>
-                        </table>
-                        {/* third table */}
-                        <table className={styles.table}>
-                            <tr>
-                                {thirdTableHeaders.map((header: string) => (
-                                    <td className={styles.header}>{header}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                {thirdTableData.map((datum: string | number) => (
-                                    <td className={styles.rowData}>{datum}</td>
-                                ))}
-                            </tr>
-                        </table>
-                    </div>
+                    {/* <div className={styles.tableContainer}> */}
+                    {/* first table */}
+                    {firstTableData && firstTableData[0] && (
+                        <DetailPageTable
+                            headers={firstTableHeaders}
+                            rows={[
+                                firstTableData.map((datum: string | number) => {
+                                    return {value: datum, sortBy: datum}
+                                }),
+                            ]}
+                            setRows={() => {}}
+                            sort={false}
+                            hover={false}
+                            className={styles.detailTable}
+                        />
+                    )}
+                    {/* second table */}
+                    {secondTableData && secondTableData[0] && (
+                        <DetailPageTable
+                            headers={secondTableHeaders}
+                            rows={[
+                                secondTableData.map((datum: string | number) => {
+                                    return {value: datum, sortBy: datum}
+                                }),
+                            ]}
+                            setRows={() => {}}
+                            sort={false}
+                            hover={false}
+                            className={styles.detailTable}
+                        />
+                    )}
+                    {/* third table */}
+                    {thirdTableData && thirdTableData[0] && (
+                        <DetailPageTable
+                            headers={thirdTableHeaders}
+                            rows={[
+                                thirdTableData.map((datum: string | number) => {
+                                    return {value: datum, sortBy: datum}
+                                }),
+                            ]}
+                            setRows={() => {}}
+                            sort={false}
+                            hover={false}
+                            className={styles.detailTable}
+                        />
+                    )}
+                    {/* </div> */}
 
                     {/* history log */}
                     <div className={styles.historyLogContainer}>

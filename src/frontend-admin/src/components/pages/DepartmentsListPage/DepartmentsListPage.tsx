@@ -5,6 +5,7 @@ import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {checkImage} from '../../../utilities/CheckImage'
+import {searchFilter} from '../../../utilities/SearchFilter'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -42,7 +43,10 @@ interface IPulledData {
 // Primary Component
 export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props => {
     const {history} = props
-    const {loginContextVariables} = useContext(LoginContext)
+    const {
+        loginContextVariables,
+        loginContextVariables: {isAdmin},
+    } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
 
     // state
@@ -108,30 +112,8 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }
 
     useEffect(() => {
-        // Search through listData based on current value
-        // of search bar and save results in filtered
-        if (isArchive) {
-            var filteredTableInput = archivedData.filter((row: any) => {
-                return !row[selected.value]
-                    ? false
-                    : row[selected.value]
-                          .toString()
-                          .toLowerCase()
-                          .search(search.toLowerCase()) !== -1
-            })
-            setFilteredData(filteredTableInput)
-        } else {
-            var filteredTableInput = listData.filter((row: any) => {
-                return !row[selected.value]
-                    ? false
-                    : row[selected.value]
-                          .toString()
-                          .toLowerCase()
-                          .search(search.toLowerCase()) !== -1
-            })
-            setFilteredData(filteredTableInput)
-        }
-    }, [search, selected, listData, isArchive])
+        setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
+    }, [search, selected, listData, archivedData, isArchive])
 
     //Set display Images
     useEffect(() => {
@@ -281,7 +263,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         <div className={styles.departmentsListMain}>
             <Group direction='row' justify='between' className={styles.group}>
                 <div className={styles.buttonContainer}>
-                    <Button text='Add' icon='add' onClick={handleClick} />
+                    {isAdmin && <Button text='Add' icon='add' onClick={handleClick} className={styles.addButton} />}
                     <Button
                         text={isArchive ? 'View Active' : 'View Archives'}
                         onClick={() => setIsArchive(!isArchive)}

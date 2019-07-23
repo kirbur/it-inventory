@@ -813,15 +813,27 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             {/* column 1 */}
             <div className={styles.firstColumn}>
                 <Button
-                    text='All Hardware'
+                    text={
+                        match.params.id === 'new'
+                            ? 'All Hardware'
+                            : firstSectionData[0]
+                            ? firstSectionData[0] + ' ' + firstSectionData[1]
+                            : ''
+                    }
                     icon='back'
                     onClick={() => {
-                        history.push('/hardware')
+                        history.push(
+                            `/hardware${
+                                match.params.id === 'new' ? '' : `/detail/${match.params.type}/${match.params.id}`
+                            }`
+                        )
                     }}
                     className={styles.backButton}
                     textClassName={styles.backButtonText}
                 />
-                <PictureInput setImage={setImgInput} image={imgInput} />
+                <div className={styles.imgContainer}>
+                    <PictureInput setImage={setImgInput} image={imgInput} />
+                </div>
             </div>
 
             {/* column 2 */}

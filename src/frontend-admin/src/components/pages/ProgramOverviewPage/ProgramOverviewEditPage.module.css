@@ -1,28 +1,40 @@
 .progOverviewEditMain {
     margin: 0 50px;
 }
-
 .columns {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: center;
 }
 
 .firstColumn {
     padding: 50px;
-}
-
-.secondColumn {
-    padding: 125px 50px;
-    display: flex;
-    flex-direction: column;
+    min-width: 160px;
+    max-width: 300px;
     flex-grow: 1;
 }
 
-/*first col*/
+.secondColumn {
+    padding: 50px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/*First Column*/
 .backButton {
     margin-bottom: 30px;
+}
+
+.imgContainer {
+    position: relative;
+    width: 100%;
+}
+
+.imgContainer:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
 }
 
 /*second col*/

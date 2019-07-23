@@ -142,7 +142,9 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     className={styles.backButton}
                     textClassName={styles.backButtonText}
                 />
-                <PictureInput setImage={setImgInput} image={imgInput} />
+                <div className={styles.imgContainer}>
+                    <PictureInput setImage={setImgInput} image={imgInput} />
+                </div>
             </div>
             {/* column 2 */}
             <div className={styles.secondColumn}>
