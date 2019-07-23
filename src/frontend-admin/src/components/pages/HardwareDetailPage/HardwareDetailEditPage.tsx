@@ -248,7 +248,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     .catch((err: any) => console.error(err))
             }
         } else if (match.params.type === 'peripheral') {
-            setFirstSectionHeaders(['Name', 'Type', 'Serial #', ''])
+            setFirstSectionHeaders(['Name', 'Type', 'Serial #'])
             setSecondSectionHeaders(['Purchase Date'])
             setThirdSectionHeaders(['Employee Assigned'])
             if (match.params.id !== 'new') {
