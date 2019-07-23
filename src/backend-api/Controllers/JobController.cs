@@ -40,6 +40,11 @@ namespace backend_api.Controllers
         {
             public string Name { get; set; }
             public decimal Cost { get; set; }
+            public CalculatedCost(string name, decimal cost)
+            {
+                Name = name;
+                Cost = cost;
+            }
         }
 
         // Helper for creating sections in the email body.
@@ -154,7 +159,7 @@ namespace backend_api.Controllers
                 // Import the email template.
                 bodyBuilder.HtmlBody = GetResourceAsString("backend-api.Helpers.email-template-add-parts.html");
 
-                // Replace the text-tags on the email with formatted data and html.
+                // Replace the text-tags on the email with formatted data and HTML.
                 bodyBuilder.HtmlBody = bodyBuilder.HtmlBody.Replace("<<sections>>", SectionHtml(emailBodySections));
                 bodyBuilder.HtmlBody = bodyBuilder.HtmlBody.Replace("<<year>>", $"{DateTime.Now.Year}");
                 bodyBuilder.HtmlBody = bodyBuilder.HtmlBody.Replace("<<note>>", NotePicker());
@@ -227,21 +232,9 @@ namespace backend_api.Controllers
 
             var calculatedCostItems = new CalculatedCost[]
             {
-                new CalculatedCost()
-                {
-                    Name = "Total cost",
-                    Cost = totalCost,
-                },
-                new CalculatedCost()
-                {
-                    Name = "Program cost",
-                    Cost = programCost,
-                },
-                new CalculatedCost()
-                {
-                    Name = "Plugin cost",
-                    Cost = pluginCost,
-                },
+                new CalculatedCost("Total cost", totalCost),
+                new CalculatedCost("Program cost", programCost),
+                new CalculatedCost("Plugin cost", pluginCost),
             };
 
             // Format the data in HTML.
@@ -287,14 +280,14 @@ namespace backend_api.Controllers
             return nameString;
         }
 
-        /* SectionHtml(emailSecitons) creates a section in the body of the email
+        /* SectionHtml(emailSections) creates a section in the body of the email
          *   to separate different groupings of data.
          * Return: A string with the sections formatted in HTML.  
          */
-        private string SectionHtml(EmailBodySection[] emailSecitons)
+        private string SectionHtml(EmailBodySection[] emailSections)
         {
             string sectionHtml = "";
-            for (int i = 0; i < emailSecitons.Count(); i++)
+            for (int i = 0; i < emailSections.Count(); i++)
             {
                 sectionHtml += $@"
                     <tr>
@@ -302,16 +295,16 @@ namespace backend_api.Controllers
 					        <table align=""center"" width=""100%"" border=""0"" cellspacing=""0"" cellpadding=""0"">
 						        <tr>
 							        <td align=""left"" valign=""top"" style=""font-size:18px; line-height:30px; color:#{(i % 2 == 0 ? "ffae70" : "2eafff")};"">
-								        {emailSecitons[i].Name}:
+								        {emailSections[i].Name}:
 							        </td>
 						        </tr>
 						        <tr>
 							        <td height=""15"" style=""font-size:0px; line-height:0px; height:15px;"">&nbsp;</td>
 						        </tr>
-						        {emailSecitons[i].Data}
+						        {emailSections[i].Data}
                                 <tr>
                                     <td align=""left"" valign=""top"" style=""font-size:12px; line-height:22px; color:#a6a6a6; padding-bottom:12px;"">
-                                        {emailSecitons[i].Note}
+                                        {emailSections[i].Note}
                                     </td>
                                 </tr>
 					        </table>
@@ -389,53 +382,26 @@ namespace backend_api.Controllers
         private List<CalculatedCost> WeeklyCostCalculator()
         {
             // Entities paid for in the last week. 
-            decimal? lastWeekProgramCost = weeklyCostOfItem<Models.Program>();
-            decimal? lastWeekPluginsCost = weeklyCostOfItem<Plugins>();
-            decimal? lastWeekServerCost = weeklyCostOfItem<Server>();
-            decimal? lastWeekComputerCost = weeklyCostOfItem<Computer>();
-            decimal? lastWeekMonitorCost = weeklyCostOfItem<Monitor>();
-            decimal? lastWeekPeripheralCost = weeklyCostOfItem<Peripheral>();
-            decimal lastWeekTotalCost = (decimal)(lastWeekProgramCost + lastWeekPluginsCost +
-                lastWeekServerCost + lastWeekComputerCost + lastWeekMonitorCost + lastWeekPeripheralCost);
+            decimal lastWeekProgramCost = weeklyCostOfItem<Models.Program>() ?? 0.0m;
+            decimal lastWeekPluginsCost = weeklyCostOfItem<Plugins>() ?? 0.0m;
+            decimal lastWeekServerCost = weeklyCostOfItem<Server>() ?? 0.0m;
+            decimal lastWeekComputerCost = weeklyCostOfItem<Computer>() ?? 0.0m;
+            decimal lastWeekMonitorCost = weeklyCostOfItem<Monitor>() ?? 0.0m;
+            decimal lastWeekPeripheralCost = weeklyCostOfItem<Peripheral>() ?? 0.0m;
+            decimal lastWeekTotalCost = lastWeekProgramCost + lastWeekPluginsCost +
+                lastWeekServerCost + lastWeekComputerCost + lastWeekMonitorCost + lastWeekPeripheralCost;
 
             // Add all to the list.
-            var weeklyCostList = new List<CalculatedCost>();
-            weeklyCostList.Add(new CalculatedCost()
+            var weeklyCostList = new List<CalculatedCost>()
             {
-                Name = "total",
-                Cost = (decimal)lastWeekTotalCost,
-            });
-            weeklyCostList.Add(new CalculatedCost()
-            {
-                Name = "program",
-                Cost = (decimal)lastWeekProgramCost,
-            });
-            weeklyCostList.Add(new CalculatedCost()
-            {
-                Name = "plugins",
-                Cost = (decimal)lastWeekPluginsCost,
-            });
-            weeklyCostList.Add(new CalculatedCost()
-            {
-                Name = "server",
-                Cost = (decimal)lastWeekServerCost,
-            });
-            weeklyCostList.Add(new CalculatedCost()
-            {
-                Name = "computer",
-                Cost = (decimal)lastWeekComputerCost,
-            });
-            weeklyCostList.Add(new CalculatedCost()
-            {
-                Name = "monitor",
-                Cost = (decimal)lastWeekMonitorCost,
-            });
-            weeklyCostList.Add(new CalculatedCost()
-            {
-                Name = "peripheral",
-                Cost = (decimal)lastWeekPeripheralCost,
-            });
-
+                new CalculatedCost("total", lastWeekTotalCost),
+                new CalculatedCost("program", lastWeekProgramCost),
+                new CalculatedCost("plugins", lastWeekPluginsCost),
+                new CalculatedCost("server", lastWeekServerCost),
+                new CalculatedCost("computer", lastWeekComputerCost),
+                new CalculatedCost("monitor", lastWeekMonitorCost),
+                new CalculatedCost("peripheral", lastWeekPeripheralCost),
+            };
             return weeklyCostList;
         }
 
@@ -455,30 +421,30 @@ namespace backend_api.Controllers
                     // Don't add any costs of deleted things.
                     .Where(x => !x.IsDeleted)
                     .Select(x => new
+                        {
+                            // Find the previous renewal date, and also select vars needed in future.
+                            // In order to perform the date comparisons below, if the RenewalDate or MonthsPerRenewal is null,
+                            //   then a super old date is passed to give the same effect as null.
+                            PreviousRenewal = x.RenewalDate != null ?
+                                x.RenewalDate.Value.AddMonths(x.MonthsPerRenewal != null ? -x.MonthsPerRenewal.Value : -999) : new DateTime(1800),
+                            PurcahseDate = x.GetPurchaseDate(),
+                            CostPerYear = x.GetCostPerYear() ?? 0.0m,
+                            FlatCost = x.GetFlatCost() ?? 0.0m,
+                            MonthsPerRenewal = x.MonthsPerRenewal != null ? x.MonthsPerRenewal.Value : 0,
+                        })
+                    .Where(x =>
+                        // See if the item was recently purchased or renewed within the last week.
+                        ((lastWeek < x.PurcahseDate && x.PurcahseDate < today) ||
+                        (lastWeek < x.PreviousRenewal && x.PreviousRenewal < today))
+                    )
+                    .Select(x => new
                     {
-                        // Find the previous renewal date, and also select vars needed in future.
-                        // In order to perform the date comparisons below, if the RenewalDate or MonthsPerRenewal is null,
-                        //   then a super old date is passed to give the same effect as null.
-                        PreviousRenewal = x.RenewalDate != null ?
-                            x.RenewalDate.Value.AddMonths(x.MonthsPerRenewal != null ? -x.MonthsPerRenewal.Value : -999) : new DateTime(1800),
-                        PurcahseDate = x.GetPurchaseDate(),
-                        CostPerYear = x.GetCostPerYear() ?? 0.0m,
-                        FlatCost = x.GetFlatCost() ?? 0.0m,
-                        MonthsPerRenewal = x.MonthsPerRenewal != null ? x.MonthsPerRenewal.Value : 0,
+                        // Calculate the cost.
+                        recurringCost = (x.MonthsPerRenewal != 0) ? x.CostPerYear / (12.0m / x.MonthsPerRenewal) : 0.0m,
+                        initialCost = ((lastWeek < x.PurcahseDate && x.PurcahseDate < today) ? x.FlatCost : 0.0m),
                     })
-                .Where(x =>
-                    // See if the item was recently purchased or renewed within the last week.
-                    ((lastWeek < x.PurcahseDate && x.PurcahseDate < today) ||
-                    (lastWeek < x.PreviousRenewal && x.PreviousRenewal < today))
-                )
-                .Select(x => new
-                {
-                    // Calculate the cost.
-                    recurringCost = (x.MonthsPerRenewal != 0) ? x.CostPerYear / (12.0m / x.MonthsPerRenewal) : 0.0m,
-                    initialCost = ((lastWeek < x.PurcahseDate && x.PurcahseDate < today) ? x.FlatCost : 0.0m),
-                })
-                .Select(x => x.recurringCost + x.initialCost)
-                .Sum();
+                    .Select(x => x.recurringCost + x.initialCost)
+                    .Sum();
 
             return costPrograms;
         }
