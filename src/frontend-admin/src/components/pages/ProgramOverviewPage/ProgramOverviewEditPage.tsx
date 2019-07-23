@@ -75,7 +75,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         name: {value: id === 'new' ? '' : id, changed: false},
         isLicense: {value: false, changed: false},
     })
-    const [numCopies, setNumCopies] = useState(1)
 
     const defaultPluginInfo = {
         id: -1,
@@ -103,6 +102,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         cost: {value: 0, changed: false},
         flatCost: {value: 0, changed: false},
         monthsPerRenewal: {value: 0, changed: false},
+        numCopies: {value: 1, changed: false},
     })
 
     const [programUpdateInput, setProgramUpdateInput] = useState<IProgramFormInputs>({
@@ -123,7 +123,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 .get(`/detail/ProgramOverview/${id}/${archived === 'archived' ? true : false}`)
                 .then((data: any) => {
                     setImgLocation(data[0].programOverview.icon)
-                    setNumCopies(data[0].programOverview.countProgOverall)
 
                     let prog: ITableItem[][] = []
                     data[0].inDivPrograms.map((i: ExpectedProgramType) =>
@@ -202,7 +201,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     async function handleSubmit() {
         var postProgram = {
             Program: {
-                numberOfPrograms: Number.isNaN(numCopies) ? 0 : numCopies,
+                numberOfPrograms: programInput.numCopies
+                    ? Number.isNaN(programInput.numCopies.value)
+                        ? 1
+                        : programInput.numCopies.value
+                    : 1,
                 ProgramName: overviewInputs.name.value,
                 ProgramCostPerYear:
                     Number.isNaN(programInput.cost.value) || programInput.cost.value <= 0
@@ -238,7 +241,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     .post('/add/program', postProgram)
                     .then((response: any) => {
                         if (response.status === 201) {
-                            msg = numCopies + ' copies of ' + overviewInputs.name.value + ' were added to inventory!'
+                            msg = programInput.numCopies
+                                ? programInput.numCopies.value +
+                                  ' copies of ' +
+                                  overviewInputs.name.value +
+                                  ' were added to inventory!'
+                                : ''
                             window.alert(msg)
                         }
                         return
@@ -270,8 +278,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         .post('/add/program', postProgram)
                         .then((response: any) => {
                             if (response.status === 201) {
-                                msg =
-                                    numCopies + ' copies of ' + overviewInputs.name.value + ' were added to inventory!'
+                                msg = programInput.numCopies
+                                    ? programInput.numCopies.value +
+                                      ' copies of ' +
+                                      overviewInputs.name.value +
+                                      ' were added to inventory!'
+                                    : ''
                                 window.alert(msg)
                             }
                             return
@@ -512,16 +524,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             }
                         />
 
-                        <div className={styles.numCopies}>
-                            <div className={styles.inputText}># of Copies</div>
-                            <input
-                                type='number'
-                                className={styles.input}
-                                value={numCopies}
-                                onChange={e => setNumCopies(parseInt(e.target.value))}
-                            />
-                        </div>
-
                         {id !== 'new' && (
                             <Button
                                 className={styles.editButton}
@@ -558,7 +560,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                     setProgramForm({edit: false, add: !programForm.add})
                                 }}
                                 textInside={false}
-                                text={`Add ${numCopies} Copy(s)`}
+                                text={`Add Copy(s)`}
                             />
                             {programForm.add && (
                                 <div className={styles.programForm}>

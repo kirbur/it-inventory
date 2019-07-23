@@ -52,7 +52,7 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
             ...provided,
             color: '#9b9b9b',
 
-            height: '22px',
+            height: '23px',
         }),
     }
 

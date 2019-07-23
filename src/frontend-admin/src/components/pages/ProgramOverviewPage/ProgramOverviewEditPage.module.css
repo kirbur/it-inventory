@@ -143,16 +143,13 @@
 .checkBoxContainer {
     width: 10%;
 }
-.numCopies {
-    width: 15%;
-    white-space: nowrap;
-}
+
 .nameInputWithEdit {
-    width: 65%;
+    width: 85%;
 }
 
 .nameInput {
-    width: 40%;
+    width: 60%;
 }
 .editButton {
     margin-top: 30px;
