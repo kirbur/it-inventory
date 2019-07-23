@@ -26,9 +26,13 @@
 
 .header {
     position: relative;
-    left: 150px;
     top: 40px;
-    padding-right: 300px;
+    padding-right: 270px;
+    padding-bottom: 25px;
+}
+.lastHeader {
+    position: relative;
+    top: 40px;
     padding-bottom: 25px;
 }
 
@@ -47,7 +51,7 @@
 .circleContainer {
     position: relative;
     bottom: 380px;
-    width: 380px;
+    width: 340px;
     height: 0px;
 }
 .emptyCircle {
@@ -56,12 +60,13 @@
     width: 230px;
     height: 230px;
     position: relative;
-    top: 40px;
-    left: 70px;
+    top: 80px;
+    left: 50px;
 }
 .emptyDataText {
     color: black;
     font-size: 18px;
     position: relative;
-    bottom: 85px;
+    bottom: 45px;
+    right: 10px;
 }

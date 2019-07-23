@@ -24,9 +24,6 @@ interface IRechartPieProps {
 export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props => {
     const {pieChartData, initialColors, onSliceClick} = props
 
-    if (pieChartData.length === 0) {
-    }
-
     const [colors, setColors] = useState(initialColors)
     //colors off of invision: ['#009EFF', '#FF9340', '#3D4599', '#1425CC', '#CC4A14']
 
@@ -53,8 +50,11 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
         <div className={styles.pieContainer}>
             {/* Headers */}
             <div className={styles.inline}>
-                {pieChartData.map(datum => (
-                    <h3 key={datum.headingName} className={styles.header}>
+                {pieChartData.map((datum, i) => (
+                    <h3
+                        key={datum.headingName}
+                        className={i === pieChartData.length - 1 ? styles.lastHeader : styles.header}
+                    >
                         {datum.headingName}
                         {datum.headingName === 'Hardware' && <div className={styles.headingText}>*last 30 days</div>}
                     </h3>
@@ -63,12 +63,12 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
 
             {/* Pie Charts */}
             <div className={styles.inline}>
-                <PieChart width={380 * pieChartData.length} height={300}>
+                <PieChart width={340 * pieChartData.length} height={300}>
                     {pieChartData.map((datum, j) => (
                         <Pie
                             key={datum.headingName}
                             data={datum.data}
-                            cx={190 + 380 * j}
+                            cx={170 + 340 * j}
                             cy={150}
                             dataKey='value'
                             fill='#8884d8'
@@ -121,7 +121,7 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                 hasData(i) ? (
                     <div />
                 ) : (
-                    <div className={styles.circleContainer} style={{position: 'relative', left: 10 + 380 * i}}>
+                    <div className={styles.circleContainer} style={{position: 'relative', left: 10 + 340 * i}}>
                         <div className={styles.emptyCircle} />
                         <div className={styles.emptyDataText}>No data to display</div>
                     </div>
