@@ -31,6 +31,9 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
         const updatedColors = [...initialColors] // Create clone of initial colors array
         updatedColors[index] = initialColors[index] + 95 // Change particular index in our cloned array
         setColors(updatedColors) // Set new color array
+
+        // TRYING TO ADD CURSOR TO PIES
+        // document.getElementById("c").style.cursor = "pointer";
     }
 
     const onMouseOut = () => {
@@ -62,7 +65,7 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
             </div>
 
             {/* Pie Charts */}
-            <div className={styles.inline}>
+            <div className={styles.inline} id={'c'}>
                 <PieChart width={340 * pieChartData.length} height={300}>
                     {pieChartData.map((datum, j) => (
                         <Pie
