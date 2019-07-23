@@ -322,11 +322,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             }
         }
 
-        if (alertMssg.length > 0) {
-            window.alert(alertMssg)
-            return true
-        }
-
         //check for laptop form
         if (match.params.type === 'laptop') {
             if (isNaN(Number(firstSectionData[3]))) {
@@ -350,6 +345,10 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             }
         }
 
+        if (alertMssg.length > 0) {
+            window.alert(alertMssg)
+            return true
+        }
         return false
     }
 
