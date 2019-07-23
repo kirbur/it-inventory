@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using backend_api.Models;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Http;
 using backend_api.Helpers;
 using Microsoft.Extensions.Options;
 
@@ -17,8 +15,6 @@ namespace backend_api.Controllers
     [ApiController]
     public class ImageController : ContextController
     {
-        // UploadController constructor.
-
         public ImageController(ITInventoryDBContext context, IOptions<UploadOptions> uploadOptions) : base(context)
         {
             this.UploadOptions = uploadOptions;
