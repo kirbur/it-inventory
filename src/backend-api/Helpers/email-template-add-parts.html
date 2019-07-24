@@ -1,52 +1,55 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <!-- Adapted from EmailMonks HTML email tutorial: https://emailmonks.com/blog/email-coding/step-step-guide-create-html-email/ -->
 
 <head>
-	<title>CQL It Inventory Notifier</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0 " />
-	<style>
-		body {
-			font-family: 'Calibri', Arial, sans-serif !important;
-		}
-		@media only screen and (min-width:481px) and (max-width:699px) {
-			.em_main_table {
-				width: 100% !important;
-			}
+    <title>CQL It Inventory Notifier</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 " />
+    <style>
+        body {
+            font-family: 'Calibri', Arial, sans-serif !important;
+        }
 
-			.em_h20 {
-				height: 20px !important;
-			}
+        @media only screen and (min-width:481px) and (max-width:699px) {
+            .em_main_table {
+                width: 100% !important;
+            }
 
-			.em_padd {
-				padding: 20px 10px !important;
-			}
-		}
+            .em_h20 {
+                height: 20px !important;
+            }
 
-		@media screen and (max-width: 480px) {
-			.em_main_table {
-				width: 100% !important;
-			}
+            .em_padd {
+                padding: 20px 10px !important;
+                background-color: white !important;
+            }
+        }
 
-			.em_h20 {
-				height: 20px !important;
-			}
+        @media screen and (max-width: 480px) {
+            .em_main_table {
+                width: 100% !important;
+            }
 
-			.em_h1 {
-				height: 1px !important;
-			}
+            .em_h20 {
+                height: 20px !important;
+            }
 
-			.em_padd {
-				padding: 20px 10px !important;
-			}
+            .em_h1 {
+                height: 1px !important;
+            }
 
-			u+.em_body .em_full_wrap {
-				width: 100% !important;
-				width: 100vw !important;
-			}
-		}
-	</style>
+            .em_padd {
+                padding: 20px 10px !important;
+                background-color: white !important;
+            }
+
+            u+.em_body .em_full_wrap {
+                width: 100% !important;
+                width: 100vw !important;
+            }
+        }
+    </style>
 </head>
 
 <body class="em_body" style="margin:0px; padding:0px;" bgcolor="#F4F4F4">
@@ -72,13 +75,15 @@
 				</td>
 			</tr>
 			<tr>
-				<td valign="top" align="center" bgcolor="#FFF" style="padding:35px 70px 30px;" class="em_padd">
-					<table align="center" width="100%" border="0" cellspacing="0" cellpadding="0">
+				<td valign="top" align="center" bgcolor="#FFF" style="background-color: #FFF; padding:35px 70px 30px;" class="em_padd">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
 						<tr>
-							<td align="left" valign="top" style="font-size:16px; line-height:30px; color:#000;">
-								<img border=0 width=75 id="logo" src="https://s3.amazonaws.com/ss-usa/companies/MzawMDEztTQ3AwA/uploads/Test_Template/CQL-Logo-Color.png">
-							</td>
-							<td align="right" valign="top" style="font-size:16px; line-height:30px; color:#000;">
+                            <p align="left" style="display: inline">
+							    <td align="left" valign="top">
+								    <img class="em_image" border=0 width=75 id="logo" src="data:image/png;base64,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">
+							    </td>
+                            </p>
+							<td align="right" valign="top" style="font-size:16px; color:#000;">
 								CQL IT Inventory Notifier
 							</td>
 						</tr>
@@ -87,12 +92,12 @@
 			</tr>
 			<<sections>>
 			<tr>
-				<td valign="top" align="center" bgcolor="#FFF" style="padding:30px 30px;" class="em_padd">
+				<td valign="top" align="center" bgcolor="white" style="background-color: white; padding:30px 30px;" class="em_padd">
 					<table align="center" width="100%" border="0" cellspacing="0" cellpadding="0">
 						<tr>
 							<td align="center" valign="top" style="font-size:11px; line-height:18px; color:#999999;">
 								&copy; <<year>> CQL, Corp. All Rights Reserved.<br />
-								To change your email notificatin settings, please contact the employee in charge of the inventory management system.</td>
+								To change your email notification settings, please contact the employee in charge of the inventory management system.</td>
 						</tr>
 					</table>
 				</td>
