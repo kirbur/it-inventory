@@ -2,7 +2,7 @@
     display: flex;
     position: absolute;
     padding: 20px;
-    width: 96vw;
+    width: fill;
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -72,4 +72,8 @@
 
 .dashMainDark {
     background-color: #282c29;
+}
+
+.linkedTitleDark {
+    color: #5ec2ff;
 }

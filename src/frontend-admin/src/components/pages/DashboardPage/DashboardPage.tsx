@@ -74,9 +74,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const {history} = props
     const {loginContextVariables} = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
-    const {
-        isDarkMode
-    } = useContext(ThemeContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
 
     // const [darkMode, setDarkMode] = useState(false);
@@ -264,7 +262,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
                 <Card
                     title={'licenses'}
-                    titleClassName={styles.linkedTitle}
+                    titleClassName={s(styles.linkedTitle, isDarkMode ? styles.linkedTitleDark : {})}
                     titleOnClick={() => {
                         history.push('/programs')
                     }}
@@ -310,7 +308,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                     {dropdownContent && (
                         <Dropdown
                             content={dropdownContent}
-                            titleClassName={styles.linkedTitle}
+                            titleClassName={s(styles.linkedTitle, isDarkMode ? styles.linkedTitleDark : {})}
                             selected={selectedDeptTable}
                             setSelected={setSelectedDeptTable}
                         />
@@ -322,7 +320,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
             <div className={styles.dashColumn}>
                 <Card
                     title={'Departments'}
-                    titleClassName={styles.linkedTitle}
+                    titleClassName={s(styles.linkedTitle, isDarkMode ? styles.linkedTitleDark : {})}
                     titleOnClick={() => {
                         history.push('/departments')
                     }}
@@ -347,7 +345,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                 </Card>
                 <Card
                     title={'software'}
-                    titleClassName={styles.linkedTitle}
+                    titleClassName={s(styles.linkedTitle, isDarkMode ? styles.linkedTitleDark : {})}
                     titleOnClick={() => {
                         history.push('/programs')
                     }}

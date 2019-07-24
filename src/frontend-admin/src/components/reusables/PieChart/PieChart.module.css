@@ -72,5 +72,5 @@
 }
 
 .dark {
-    color: white;
+    color: white !important;
 }

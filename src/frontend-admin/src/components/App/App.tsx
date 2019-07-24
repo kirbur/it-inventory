@@ -80,7 +80,7 @@ export const App: React.FC = () => {
               }
     )
 
-    const [isDarkMode, setIsDarkMode] = useState();
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     var contextValue = {
         loginContextVariables: loginContextVariables,
@@ -121,8 +121,8 @@ export const App: React.FC = () => {
                                 />
                                 }
                                 </NavLink>
-                                <div className={styles.navEllipse} />
-                                <div className={styles.navRectangle} />
+                                <div className={s(styles.navEllipse, isDarkMode ? styles.ellipseDark : {})} />
+                                <div className={s(styles.navRectangle, isDarkMode ? styles.navDark : {})} />
 
                                 <div className={styles.linkContainer}>
                                     <NavLink

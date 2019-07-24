@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import s from 'classnames'
 
 import styles from './DashboardTable.module.css'
+
+import { concatStyles } from '../../../utilities/mikesConcat'
+import { ThemeContext } from '../../App';
 
 //types
 export interface IDashboardTableDatum {
@@ -22,6 +25,7 @@ interface IDashboardTableProps {
 export const DashboardTable = (props: IDashboardTableProps) => {
     const {data, onRowClick} = props
     const isClickable = Boolean(onRowClick)
+    const {isDarkMode} = useContext(ThemeContext)
 
     return (
         <table className={s(styles.table, {[styles.clickable]: isClickable})}>
@@ -29,7 +33,7 @@ export const DashboardTable = (props: IDashboardTableProps) => {
                 {data.map(datum => (
                     <tr
                         key={datum.name}
-                        className={s(styles.tr, {[styles.row]: isClickable})}
+                        className={s(styles.tr, {[styles.row]: isClickable}, isDarkMode ? styles.trDark : {})}
                         onClick={
                             onRowClick
                                 ? e => {
@@ -38,7 +42,7 @@ export const DashboardTable = (props: IDashboardTableProps) => {
                                 : undefined
                         }
                     >
-                        <td className={styles.name}>{datum.name}</td>
+                        <td className={concatStyles(styles.name, isDarkMode ? styles.dark : {})}>{datum.name}</td>
                         <td className={styles.numberOf}>{datum.numberOf} users</td>
                         <td className={styles.cost}>
                             ${Math.round(datum.costPerMonth * 100) / 100}/month | $

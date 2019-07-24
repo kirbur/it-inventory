@@ -119,7 +119,9 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                         }
                     >
                         <div className={styles.circle} style={{backgroundColor: colors[index]}} />
-                        {datum.name}
+                        <div className={s(isDarkMode ? styles.dark : {})}>
+                            {datum.name}
+                        </div>
                     </div>
                 ))}
             </div>
