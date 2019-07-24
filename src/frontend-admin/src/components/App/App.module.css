@@ -2,9 +2,11 @@
     text-align: center;
 }
 
-.navBarLogo {
+.logoContainer {
     align-self: flex-start;
     margin: auto;
+}
+.navBarLogo {
     width: 100px;
 }
 
