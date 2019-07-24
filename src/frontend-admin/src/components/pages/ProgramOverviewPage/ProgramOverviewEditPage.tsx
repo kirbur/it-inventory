@@ -518,6 +518,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
                         <Checkbox
                             className={styles.checkBoxContainer}
+                            boxClassName={styles.checkBox}
                             checked={overviewInputs.isLicense.value}
                             title={'License'}
                             onClick={() =>
