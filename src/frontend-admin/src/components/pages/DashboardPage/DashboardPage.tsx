@@ -117,7 +117,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     }
 
     const onSliceClick = (id: string) => {
-        history.push(`/departments/${id}`)
+        history.push(`/departments/detail/${id}`)
     }
 
     const getDeptTables = () => {
@@ -316,7 +316,6 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                 <Card
                     title={'Departments'}
                     titleClassName={styles.linkedTitle}
-                    className={styles.pieCard}
                     titleOnClick={() => {
                         history.push('/departments')
                     }}

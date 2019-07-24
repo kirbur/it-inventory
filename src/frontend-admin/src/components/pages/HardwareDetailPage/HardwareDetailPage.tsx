@@ -4,7 +4,7 @@ import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 // Components
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
-import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
+import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -46,7 +46,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     const [secondTableData, setSecondTableData] = useState<(string | number)[]>([])
     const [thirdTableData, setThirdTableData] = useState<(string | number)[]>([])
 
-    const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([])
+    const [historyLogEntries, setHistoryLogEntries] = useState<IHistoryLogArray[]>([])
     const [commentText, setCommentText] = useState('')
 
     const [costPerYear, setCostPerYear] = useState(0)
@@ -139,8 +139,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             setFirstTableHeaders(['Screen Size', 'Resolution', 'Inputs', 'Serial #'])
             setSecondTableHeaders([])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
-            // make model
-            setHeadingInfo(['the name', 'another name'])
             axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
@@ -150,7 +148,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         'Model: ' + data[0].monitor.model,
                         'Purchase Date: ' + formatDate(data[0].monitor.purchaseDate),
                         'Renewal Date: ' + formatDate(data[0].monitor.renewalDate),
-                        // 'End of Life: ' + formatDate(data[0].monitor.endOfLife),
                     ])
                     setFirstTableData([
                         data[0].monitor.screenSize,

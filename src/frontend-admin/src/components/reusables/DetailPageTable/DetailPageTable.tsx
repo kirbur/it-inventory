@@ -170,12 +170,12 @@ export const DetailPageTable = (props: ITableProps) => {
     return (
         <table className={s(styles.table, className)}>
             <thead>
-                <tr className={styles.header}>{renderedHeaders.map(header => header)}</tr>
+                <tr>{renderedHeaders.map(header => header)}</tr>
             </thead>
 
             <tbody>
                 {renderedRows.map((row, i) => (
-                    <tr className={s(style, styles.tr, hover ? styles.hover : '')}>{row}</tr>
+                    <tr className={s(styles.tr, hover ? styles.hover : '')}>{row}</tr>
                 ))}
             </tbody>
         </table>

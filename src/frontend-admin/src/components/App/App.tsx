@@ -82,7 +82,14 @@ export const App: React.FC = () => {
                         <div className={styles.navContainer}>
                             <HelloUser name={loginContextVariables.givenName} className={styles.helloMesssage} />
                             <nav className={styles.navBar}>
-                                <img className={styles.navBarLogo} src={logo} alt={'CQL'} />
+                                <NavLink className={styles.logoContainer} to='/dashboard'>
+                                    <img
+                                        className={styles.navBarLogo}
+                                        src={logo}
+                                        alt={'CQL'}
+                                        // onClick={() => <Redirect to='/dashboard' />}
+                                    />
+                                </NavLink>
                                 <div className={styles.navEllipse} />
                                 <div className={styles.navRectangle} />
 
@@ -171,8 +178,6 @@ export const App: React.FC = () => {
                         )}
                     </Switch>
                 </Router>
-
-                <footer className={styles.appFooter} />
             </div>
         </LoginContext.Provider>
     )

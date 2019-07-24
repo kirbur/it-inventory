@@ -10,6 +10,7 @@ export interface IHistoryLogArray {
     eventType: eventType
     employeeName: string
     historyId?: number
+    key?: number
 }
 
 interface IHistoryLogProps {

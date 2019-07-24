@@ -5,6 +5,60 @@
 }
 
 /* styling for radio buttons */
+.checkBoxContainerOne {
+    width: 50px;
+    margin-right: 10px;
+    position: relative;
+    top: 5px;
+    cursor: pointer;
+}
+.checkBoxContainerTwo {
+    width: 50px;
+    margin-right: 10px;
+    margin-left: 25px;
+    position: relative;
+    top: 29px;
+    cursor: pointer;
+}
+.radioSection {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 50px;
+}
+.radioContainer {
+    display: flex;
+    flex-direction: row;
+    margin-top: 6px;
+}
+.radio input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+.radio {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 20px;
+}
+.radioInput {
+    height: 44px;
+    border: 1.5px solid #a5a5a5;
+    border-radius: 3px;
+    font-size: 18px;
+    padding-left: 12px;
+}
+.monthsInput {
+    height: 44px;
+    border: 1.5px solid #a5a5a5;
+    border-radius: 3px;
+    font-size: 18px;
+    padding-left: 12px;
+}
+.marginLeft {
+    margin-left: 30px;
+}
 .container input {
     position: absolute;
     opacity: 0;
