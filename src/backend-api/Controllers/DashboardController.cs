@@ -1,4 +1,5 @@
-﻿using backend_api.Models;
+﻿using backend_api.Helpers;
+using backend_api.Models;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -119,7 +120,9 @@ namespace backend_api.Controllers
 
             // Removing the Utilities department from the list of the departments
             //looping through each department and finding program and hardware cost per department 
-            foreach (var Department in _context.Department.Where(x => x.DepartmentName != "Utilities" && x.IsDeleted == false))
+            foreach (var Department in _context.Department
+                .Where(x => x.DepartmentName != "Utilities" &&
+                x.DepartmentName != "Unassigned" && x.IsDeleted == false))
             {
                 //Cost of Programs per department value
                 decimal? CostOfPrograms = 0;
@@ -172,57 +175,28 @@ namespace backend_api.Controllers
 
                 }
                 // Adding to the data list with the appropriate data to be returned in this list
-                dataForPrograms.Add(new { Department.DepartmentName, CostOfPrograms, Department.DepartmentId });
+                dataForPrograms.Add(
+                    new
+                    {
+                        Department.DepartmentName,
+                        CostOfPrograms,
+                        Department.DepartmentId
+                    });
 
                 //Calculating data for Hardware pie chart
 
-                foreach (var mon in _context.Monitor.Where(x => x.EmployeeId != null))
-                {
-                    if (employeeIDsInDepartment.Contains(mon.EmployeeId.Value))
-                    {
-                        //adding 30 days to the date bought and then checking if we are now past those 30 days
-                        //if we are not, add cost of monitor to Cost total
-                        DateTime? startDate = mon.PurchaseDate;
-                        DateTime? relevantDate = startDate.Value.AddDays(30);
-                        if (DateTime.Now <= relevantDate && DateTime.Now >= mon.PurchaseDate)
-                        {
-                            CostOfHardware += mon.FlatCost;
-                        }
-                    }
-                }
-
-                foreach (var Comp in _context.Computer.Where(x => x.EmployeeId != null))
-                {
-                    if (employeeIDsInDepartment.Contains(Comp.EmployeeId.Value))
-                    {
-                        //adding 30 days to the date bought and then checking if we are now past those 30 days
-                        //if we are not, add cost of Computer to Cost total
-                        DateTime? startDate = Comp.PurchaseDate;
-                        DateTime? relevantDate = startDate.Value.AddDays(30);
-                        if (DateTime.Now <= relevantDate && DateTime.Now >= Comp.PurchaseDate)
-                        {
-                            CostOfHardware += Comp.FlatCost;
-                        }
-                    }
-                }
-
-                foreach (var peripheral in _context.Peripheral.Where(x => x.EmployeeId != null))
-                {
-                    if (employeeIDsInDepartment.Contains(peripheral.EmployeeId.Value))
-                    {
-                        //adding 30 days to the date bought and then checking if we are now past those 30 days
-                        //if we are not, add cost of peripheral to Cost total
-                        DateTime? startDate = peripheral.PurchaseDate;
-                        DateTime? relevantDate = startDate.Value.AddDays(30);
-                        if (DateTime.Now <= relevantDate && DateTime.Now >= peripheral.PurchaseDate)
-                        {
-                            CostOfHardware += peripheral.FlatCost;
-                        }
-                    }
-                }
+                CostOfHardware += CalculatedHardwareCost<Monitor>(employeeIDsInDepartment);
+                CostOfHardware += CalculatedHardwareCost<Peripheral>(employeeIDsInDepartment);
+                CostOfHardware += CalculatedHardwareCost<Computer>(employeeIDsInDepartment);
 
                 // Adding to the data2 list with the appropriate data to be returned in this list
-                dataForHardware.Add(new { Department.DepartmentName, CostOfHardware, Department.DepartmentId });
+                dataForHardware.Add(
+                    new
+                    {
+                        Department.DepartmentName,
+                        CostOfHardware,
+                        Department.DepartmentId
+                    });
             }
             //formatting data for front end
             string headingName = "Software";
@@ -528,5 +502,35 @@ namespace backend_api.Controllers
             return Ok(listOfTableSoftware);
 
         }
+
+        /* Helper method for calculating the costs of hardware in department
+         * Params: List<int> : Holds the employee Ids of the employees in the current department
+         * Returns: Decimal : Total cost of the hardware in the current department 
+         */
+        private decimal? CalculatedHardwareCost<T>(List<int> employeeIDsInDepartment)
+            where T : class, IHardwareBase
+        {
+            // Get the table of the entity's type.
+            DbSet<T> table = _context.Set<T>();
+
+            var CostOfHardware = 0.0m;
+            foreach (var hardware in table
+                .Where(x => x.EmployeeId != null && x.IsAssigned == true && x.FlatCost != null))
+            {
+                if (employeeIDsInDepartment.Contains(hardware.EmployeeId.Value))
+                {
+                    //adding 30 days to the date bought and then checking if we are now past those 30 days
+                    //if we are not, add cost of monitor to Cost total
+                    DateTime? startDate = hardware.PurchaseDate;
+                    DateTime? relevantDate = startDate.Value.AddDays(30);
+                    if (DateTime.Now <= relevantDate && DateTime.Now >= hardware.PurchaseDate)
+                    {
+                        CostOfHardware += hardware.FlatCost.Value;
+                    }
+                }
+            }
+            return CostOfHardware;
+        }
+
     }
 }
