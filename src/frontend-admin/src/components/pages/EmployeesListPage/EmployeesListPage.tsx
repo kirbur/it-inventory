@@ -36,10 +36,13 @@ interface IEmployeeData {
     id: number
     hardware: string
     programs: string
-    daysEmployed: number
+    daysEmployed: number | string
 }
 interface IPulledData {
+    firstName?: string
+    lastName?: string
     employeeName: string
+    archiveDate: string
     hireDate: string
     hardwareCostForEmp: number
     programCostForEmp: number
@@ -54,9 +57,10 @@ interface IPulledData {
 export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const {history} = props
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
 
     // state
     const [listData, setListData] = useState<IEmployeeData[]>([])
@@ -109,22 +113,22 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
         axios
             .get('/archivedList/employee')
-            .then((data: any[]) => {
+            .then((data: IPulledData[]) => {
                 let employees: any[] = []
-                data.map((i: any) => {
+                data.map((i: IPulledData) => {
                     employees.push({
                         name: format(i.firstName + ' ' + i.lastName),
                         dateHired: formatDate(i.hireDate),
                         daysEmployed: calculateDaysEmployed(getDays(i.hireDate, i.archiveDate)),
-                        space4: 0,
                         space: 0,
+                        space4: 0,
                         role: format(i.role),
                         icon: format(i.photo),
                         id: i.employeeId,
                         space1: 0,
 
                         space2: 0,
-                        dateArchived: formatDate(i.archiveDate), //TODO: make sure this is added to
+                        dateArchived: formatDate(i.archiveDate),
                     })
                 })
                 setArchivedData(employees)

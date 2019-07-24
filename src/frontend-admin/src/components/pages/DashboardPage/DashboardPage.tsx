@@ -72,13 +72,11 @@ let initDeptTable: {id: number; name: string; tableData: IDashboardTableDatum[]}
 // Primary Component
 export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const {history} = props
-    const {
-        loginContextVariables: {accessToken, refreshToken},
-    } = useContext(LoginContext)
+    const {loginContextVariables} = useContext(LoginContext)
+    const axios = new AxiosService(loginContextVariables)
     const {
         isDarkMode
     } = useContext(ThemeContext)
-    const axios = new AxiosService(accessToken, refreshToken)
 
 
     // const [darkMode, setDarkMode] = useState(false);
@@ -125,7 +123,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     }
 
     const onSliceClick = (id: string) => {
-        history.push(`/departments/${id}`)
+        history.push(`/departments/detail/${id}`)
     }
 
     const getDeptTables = () => {
@@ -325,7 +323,6 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                 <Card
                     title={'Departments'}
                     titleClassName={styles.linkedTitle}
-                    className={styles.pieCard}
                     titleOnClick={() => {
                         history.push('/departments')
                     }}

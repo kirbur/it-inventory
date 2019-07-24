@@ -3,7 +3,7 @@ import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
 import {Button} from '../../reusables/Button/Button'
-import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
+import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
 import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {Checkbox} from '../../reusables/Checkbox/Checkbox'
@@ -52,15 +52,13 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken /*, isAdmin*/},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
-    const isAdmin = true //TODO: remove
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
 
     //default
-    const [employeeList, setEmployeeList] = useState([])
-
     const [firstSectionHeaders, setFirstSectionHeaders] = useState<string[]>(['yeah something went wrong'])
     const [secondSectionHeaders, setSecondSectionHeaders] = useState<string[]>(['yeah something went wrong'])
     const [thirdSectionHeaders, setThirdSectionHeaders] = useState<string[]>(['yeah something went wrong'])
@@ -78,9 +76,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
     const [commentText, setCommentText] = useState('')
 
-    const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([])
-    const [addHistoryLog, setAddHistoryLog] = useState<any[]>([])
-    const [removeHistoryLog, setRemoveHistoryLog] = useState<any[]>([])
+    const [historyLogEntries, setHistoryLogEntries] = useState<IHistoryLogArray[]>([])
+    const [addHistoryLog, setAddHistoryLog] = useState<IHistoryLogArray[]>([])
+    const [removeHistoryLog, setRemoveHistoryLog] = useState<(number | undefined)[]>([])
     const [eventInput, setEventInput] = useState<'Broken' | 'Repaired'>()
     const [historyLogBool, setHistoryLogBool] = useState(false)
     const [dateInput, setDateInput] = useState<Date>(new Date())
@@ -122,40 +120,42 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             ])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
             setThirdSectionHeaders(['Employee Assigned', 'Location'])
-            axios
-                .get(`/detail/server/${match.params.id}`)
-                .then((data: any) => {
-                    setFirstSectionData([
-                        data[0].server.make,
-                        data[0].server.model,
-                        data[0].server.operatingSystem,
-                        data[0].server.ram,
-                        data[0].server.localHHD,
-                        data[0].server.numberOfCores,
-                        data[0].server.mfg,
-                        data[0].server.serialNumber,
-                        data[0].server.ipAddress,
-                        data[0].server.san,
-                        data[0].server.fqdn,
-                    ])
-                    setSecondSectionData([])
-                    setPurchaseDateInput(data[0].server.purchaseDate)
-                    setRenewalDateInput(data[0].server.renewalDate)
-                    setEndOfLifeInput(data[0].server.endOfLife)
-                    setThirdSectionData([data[0].employeeAssignedName, data[0].server.location])
-                    setIsVirtualized(data[0].server.virtualize)
-                    setCostSection([
-                        data[0].server.flatCost,
-                        data[0].server.costPerYear,
-                        data[0].server.monthsPerRenewal,
-                    ])
-                    checkCostStates(data[0].server.flatCost, data[0].server.costPerYear)
-                    setCommentText(data[0].server.textField)
-                    setHistoryLogEntries(data[0].serverHistory)
-                    setHistoryLogEntries(data[0].serverHistory)
-                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].server.employeeId})
-                })
-                .catch((err: any) => console.error(err))
+            if (match.params.id !== 'new') {
+                axios
+                    .get(`/detail/server/${match.params.id}`)
+                    .then((data: any) => {
+                        setFirstSectionData([
+                            data[0].server.make,
+                            data[0].server.model,
+                            data[0].server.operatingSystem,
+                            data[0].server.ram,
+                            data[0].server.localHHD,
+                            data[0].server.numberOfCores,
+                            data[0].server.mfg,
+                            data[0].server.serialNumber,
+                            data[0].server.ipAddress,
+                            data[0].server.san,
+                            data[0].server.fqdn,
+                        ])
+                        setSecondSectionData([])
+                        setPurchaseDateInput(data[0].server.purchaseDate)
+                        setRenewalDateInput(data[0].server.renewalDate)
+                        setEndOfLifeInput(data[0].server.endOfLife)
+                        setThirdSectionData([data[0].employeeAssignedName, data[0].server.location])
+                        setIsVirtualized(data[0].server.virtualize)
+                        setCostSection([
+                            data[0].server.flatCost,
+                            data[0].server.costPerYear,
+                            data[0].server.monthsPerRenewal,
+                        ])
+                        checkCostStates(data[0].server.flatCost, data[0].server.costPerYear)
+                        setCommentText(data[0].server.textField)
+                        setHistoryLogEntries(data[0].serverHistory)
+                        setHistoryLogEntries(data[0].serverHistory)
+                        setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].server.employeeId})
+                    })
+                    .catch((err: any) => console.error(err))
+            }
         } else if (match.params.type === ('laptop' || 'computer')) {
             setFirstSectionHeaders([
                 'Make',
@@ -171,107 +171,113 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             ])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date', 'End of Life'])
             setThirdSectionHeaders(['Employee Assigned', 'Location'])
-            axios
-                .get(`/detail/computer/${match.params.id}`)
-                .then((data: any) => {
-                    setFirstSectionData([
-                        data[0].computer.make,
-                        data[0].computer.model,
-                        data[0].computer.cpu,
-                        data[0].computer.ramgb,
-                        data[0].computer.ssdgb,
-                        data[0].computer.screenSize,
-                        data[0].computer.monitorOutput,
-                        data[0].computer.serialNumber,
-                        data[0].computer.mfg,
-                        data[0].computer.fqdn,
-                    ])
+            if (match.params.id !== 'new') {
+                axios
+                    .get(`/detail/computer/${match.params.id}`)
+                    .then((data: any) => {
+                        setFirstSectionData([
+                            data[0].computer.make,
+                            data[0].computer.model,
+                            data[0].computer.cpu,
+                            data[0].computer.ramgb,
+                            data[0].computer.ssdgb,
+                            data[0].computer.screenSize,
+                            data[0].computer.monitorOutput,
+                            data[0].computer.serialNumber,
+                            data[0].computer.mfg,
+                            data[0].computer.fqdn,
+                        ])
 
-                    setSecondSectionData([])
-                    setCostSection([
-                        data[0].computer.flatCost,
-                        data[0].computer.costPerYear,
-                        data[0].computer.monthsPerRenewal,
-                    ])
-                    checkCostStates(data[0].computer.flatCost, data[0].computer.costPerYear)
-                    setPurchaseDateInput(data[0].computer.purchaseDate)
-                    setRenewalDateInput(data[0].computer.renewalDate)
-                    setHistoryLogEntries(data[0].computerHistory)
-                    setEndOfLifeInput(data[0].computer.endOfLife)
+                        setSecondSectionData([])
+                        setCostSection([
+                            data[0].computer.flatCost,
+                            data[0].computer.costPerYear,
+                            data[0].computer.monthsPerRenewal,
+                        ])
+                        checkCostStates(data[0].computer.flatCost, data[0].computer.costPerYear)
+                        setPurchaseDateInput(data[0].computer.purchaseDate)
+                        setRenewalDateInput(data[0].computer.renewalDate)
+                        setHistoryLogEntries(data[0].computerHistory)
+                        setEndOfLifeInput(data[0].computer.endOfLife)
 
-                    setThirdSectionData([
-                        data[0].employeeAssignedName,
-                        data[0].computer.location,
-                        data[0].computer.employeeId,
-                    ])
-                    setCommentText(data[0].computer.textField)
-                    setHistoryLogEntries(data[0].computerHistory)
-                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].computer.employeeId})
-                })
-                .catch((err: any) => console.error(err))
+                        setThirdSectionData([
+                            data[0].employeeAssignedName,
+                            data[0].computer.location,
+                            data[0].computer.employeeId,
+                        ])
+                        setCommentText(data[0].computer.textField)
+                        setHistoryLogEntries(data[0].computerHistory)
+                        setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].computer.employeeId})
+                    })
+                    .catch((err: any) => console.error(err))
+            }
         } else if (match.params.type === 'monitor') {
             setFirstSectionHeaders(['Make', 'Model', 'Screen Size', 'Resolution', 'Inputs', 'Serial #'])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date'])
             setThirdSectionHeaders(['Employee Assigned', 'Location'])
-            axios
-                .get(`/detail/monitor/${match.params.id}`)
-                .then((data: any) => {
-                    setFirstSectionData([
-                        data[0].monitor.make,
-                        data[0].monitor.model,
-                        data[0].monitor.screenSize,
-                        data[0].monitor.resolution,
-                        data[0].monitor.inputs,
-                        data[0].monitor.serialNumber,
-                    ])
-                    setSecondSectionData([])
-                    setPurchaseDateInput(data[0].monitor.purchaseDate)
-                    setRenewalDateInput(data[0].monitor.renewalDate)
+            if (match.params.id !== 'new') {
+                axios
+                    .get(`/detail/monitor/${match.params.id}`)
+                    .then((data: any) => {
+                        setFirstSectionData([
+                            data[0].monitor.make,
+                            data[0].monitor.model,
+                            data[0].monitor.screenSize,
+                            data[0].monitor.resolution,
+                            data[0].monitor.inputs,
+                            data[0].monitor.serialNumber,
+                        ])
+                        setSecondSectionData([])
+                        setPurchaseDateInput(data[0].monitor.purchaseDate)
+                        setRenewalDateInput(data[0].monitor.renewalDate)
 
-                    setThirdSectionData([
-                        data[0].employeeAssignedName,
-                        data[0].monitor.location,
-                        data[0].monitor.employeeId,
-                    ])
-                    setCostSection([
-                        data[0].monitor.flatCost,
-                        data[0].monitor.costPerYear,
-                        data[0].monitor.monthsPerRenewal,
-                    ])
-                    checkCostStates(data[0].monitor.flatCost, data[0].monitor.costPerYear)
-                    setCommentText(data[0].monitor.textField)
-                    setHistoryLogEntries(data[0].monitorHistory)
-                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].monitor.employeeId})
-                })
-                .catch((err: any) => console.error(err))
+                        setThirdSectionData([
+                            data[0].employeeAssignedName,
+                            data[0].monitor.location,
+                            data[0].monitor.employeeId,
+                        ])
+                        setCostSection([
+                            data[0].monitor.flatCost,
+                            data[0].monitor.costPerYear,
+                            data[0].monitor.monthsPerRenewal,
+                        ])
+                        checkCostStates(data[0].monitor.flatCost, data[0].monitor.costPerYear)
+                        setCommentText(data[0].monitor.textField)
+                        setHistoryLogEntries(data[0].monitorHistory)
+                        setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].monitor.employeeId})
+                    })
+                    .catch((err: any) => console.error(err))
+            }
         } else if (match.params.type === 'peripheral') {
-            setFirstSectionHeaders(['Name', 'Type', 'Serial #', ''])
+            setFirstSectionHeaders(['Name', 'Type', 'Serial #'])
             setSecondSectionHeaders(['Purchase Date'])
             setThirdSectionHeaders(['Employee Assigned'])
-            axios
-                .get(`/detail/peripheral/${match.params.id}`)
-                .then((data: any) => {
-                    setFirstSectionData([
-                        data[0].peripheral.peripheralName,
-                        data[0].peripheral.peripheralType,
-                        data[0].peripheral.serialNumber,
-                    ])
-                    setPurchaseDateInput(data[0].peripheral.purchaseDate)
+            if (match.params.id !== 'new') {
+                axios
+                    .get(`/detail/peripheral/${match.params.id}`)
+                    .then((data: any) => {
+                        setFirstSectionData([
+                            data[0].peripheral.peripheralName,
+                            data[0].peripheral.peripheralType,
+                            data[0].peripheral.serialNumber,
+                        ])
+                        setPurchaseDateInput(data[0].peripheral.purchaseDate)
 
-                    setSecondSectionData([])
-                    setThirdSectionData([])
-                    setCostSection([
-                        data[0].peripheral.flatCost,
-                        data[0].peripheral.costPerYear,
-                        data[0].peripheral.monthsPerRenewal,
-                    ])
-                    checkCostStates(data[0].peripheral.flatCost, data[0].peripheral.costPerYear)
+                        setSecondSectionData([])
+                        setThirdSectionData([])
+                        setCostSection([
+                            data[0].peripheral.flatCost,
+                            data[0].peripheral.costPerYear,
+                            data[0].peripheral.monthsPerRenewal,
+                        ])
+                        checkCostStates(data[0].peripheral.flatCost, data[0].peripheral.costPerYear)
 
-                    setCommentText(data[0].peripheral.textField)
-                    setHistoryLogEntries(data[0].peripheralHistory)
-                    setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].peripheral.employeeId})
-                })
-                .catch((err: any) => console.error(err))
+                        setCommentText(data[0].peripheral.textField)
+                        setHistoryLogEntries(data[0].peripheralHistory)
+                        setSelectedEmployee({name: data[0].employeeAssignedName, id: data[0].peripheral.employeeId})
+                    })
+                    .catch((err: any) => console.error(err))
+            }
         }
         // checkCostStates()
     }, [])
@@ -283,6 +289,68 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         if (recurringCost != null && recurringCost > 0) {
             setHasRecurringCost(true)
         }
+    }
+
+    //checks for incorrectly filled out form
+    //returns true if it is a bad form
+    //returns false if it passes every check
+    function badForm() {
+        let alertMssg = ''
+        //checks for every form
+        if (hasRecurringCost) {
+            if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
+                alertMssg += '\n Recurring cost and months must have values!'
+            }
+        }
+        if (hasFlatCost) {
+            if (costSection[0] == 0 || costSection[0] == null) {
+                alertMssg += '\n Initial cost must have a value!'
+            }
+        }
+        //everything must be filled out - sorting doesnt work with null values
+        //this will only do something when creating a new piece of hardware
+        if (firstSectionData.length !== firstSectionHeaders.length) {
+            alertMssg += '\n All hardware info fields must be filled out!'
+        }
+
+        //checks for server form
+        if (match.params.type === 'server') {
+            if (isNaN(Number(firstSectionData[3]))) {
+                alertMssg += '\n RAM must be a number!'
+            }
+            if (isNaN(Number(firstSectionData[5]))) {
+                alertMssg += '\n # of cores must be a number! '
+            }
+        }
+
+        //check for laptop form
+        if (match.params.type === 'laptop') {
+            if (isNaN(Number(firstSectionData[3]))) {
+                alertMssg += '\n RAM must be a number!'
+            }
+            if (isNaN(Number(firstSectionData[4]))) {
+                alertMssg += '\n SSD must be a number!'
+            }
+            if (isNaN(Number(firstSectionData[5]))) {
+                alertMssg += '\n Screen size must be a number! '
+            }
+        }
+
+        //check for monitor form
+        if (match.params.type === 'monitor') {
+            if (isNaN(Number(firstSectionData[2]))) {
+                alertMssg += '\n Screen size must be a number!'
+            }
+            if (isNaN(Number(firstSectionData[3]))) {
+                alertMssg += '\n Resolution must be a number!'
+            }
+        }
+
+        if (alertMssg.length > 0) {
+            window.alert(alertMssg)
+            return true
+        }
+        return false
     }
 
     async function handleSubmit() {
@@ -298,18 +366,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 .catch(err => console.error(err))
         }
 
-        //check to make sure cost properly filled out
-        if (hasRecurringCost) {
-            if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
-                window.alert('Recurring cost and months must have values!')
-                return
-            }
-        }
-        if (hasFlatCost) {
-            if (costSection[0] == 0 || costSection[0] == null) {
-                window.alert('Initial cost must have a value!')
-                return
-            }
+        if (badForm()) {
+            return
         }
 
         if (match.params.id === 'new') {
@@ -332,9 +390,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         FlatCost: hasFlatCost ? costSection[0] : null,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
-                        Mfg: null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
+                        Mfg: 0,
                         TextField: commentText,
                     },
                 })
@@ -362,11 +420,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -377,25 +435,26 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Make: firstSectionData[0],
                         Model: firstSectionData[1],
                         Cpu: firstSectionData[2],
-                        Ssdgb: firstSectionData[3],
-                        ScreenSize: firstSectionData[4],
-                        MonitorOutput: firstSectionData[5],
-                        MFG: firstSectionData[6],
+                        Ramgb: firstSectionData[3],
+                        Ssdgb: firstSectionData[4],
+                        ScreenSize: firstSectionData[5],
+                        MonitorOutput: firstSectionData[6],
                         SerialNumber: firstSectionData[7],
-                        Fqdn: firstSectionData[10],
+                        MFG: firstSectionData[8],
+                        Fqdn: firstSectionData[9],
 
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
                         EndOfLife: endOfLifeInput,
 
-                        Location: thirdSectionData[2],
+                        Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -413,11 +472,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -444,11 +503,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         RenewalDate: renewalDateInput,
                         PurchaseDate: purchaseDateInput,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
                         Mfg: null,
                         TextField: commentText,
                     },
@@ -481,11 +540,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -515,11 +574,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -541,11 +600,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Location: thirdSectionData[1],
                         EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
+                        FlatCost: hasFlatCost ? costSection[0] : 0,
                         CostPerYear: hasRecurringCost
                             ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : null,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : null,
+                            : 0,
+                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
                         TextField: commentText,
                     },
@@ -554,7 +613,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 })
             }
         }
-        history.push(`/hardware/detail/${match.params.type}/${match.params.id}`)
+        history.push(`/hardware`)
     }
 
     function handleInputChange(index: number, sectionData: any[], value: string | number) {
@@ -775,7 +834,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             key = key + 1
             setAddHistoryLog(tempHistoryLog)
         } else {
-            window.alert('Need to choose an event!')
+            window.alert('History log must have an event!')
         }
     }
 
@@ -826,8 +885,6 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 <div className={styles.hardwareHeader}>{match.params.type} Information</div>
-                {/* virtualize checkbox */}
-                <div></div>
                 {/* first section */}
                 {firstSectionHeaders.length > 0 && renderSection(firstSectionHeaders, firstSectionData)}
                 {firstSectionHeaders.length > 0 && <div className={styles.line} />}

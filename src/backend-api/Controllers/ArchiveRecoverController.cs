@@ -108,6 +108,12 @@ namespace backend_api.Controllers
             // if the employee given is to be archived
             if (isDeleted)
             {
+                var UnassignedDepID = _context.Department
+                    .Where(x => x.DepartmentName == "Unassigned")
+                    .Select(x => x.DepartmentId)
+                    .First();
+
+                emp.DepartmentID = UnassignedDepID;
                 // set archive date to now as we are now archiving this employee
                 emp.ArchiveDate = DateTime.Now;
                 // find the programs that belong to this employee and unassign them and update the program history accordingly
@@ -202,28 +208,18 @@ namespace backend_api.Controllers
          */
         private IActionResult ArchiveRecoverDepartment(bool isDeleted, int id)
         {
-            // Find if any employees are still assigned to the department.
-            int count = _context.Employee.Where(emp => emp.DepartmentID == id).ToList().Count();
+            // Get department by ID.
+            Department dep = _context.Department.Find(id);
 
-            // Cannot archive if there are still employees assigned to the department.
-            if (count > 0 && isDeleted)
+            if (dep != null)
             {
-                return BadRequest($"Cannot archive department. {count} employee{(count > 1 ? "s" : "")} assigned to department");
+                return TryUpdateDepartment(isDeleted, dep);
             }
             else
             {
-                // Get department by ID.
-                Department dep = _context.Department.Find(id);
-
-                if (dep != null)
-                {
-                    return TryUpdateDepartment(isDeleted, dep);
-                }
-                else
-                {
-                    return BadRequest("Department does not exist or failed to supply ID");
-                }
+                return BadRequest("Department does not exist or failed to supply ID");
             }
+
         }
 
         /* TryUpdateDepartment(isDeleted, dep) will try to update the IsDeleted field on the 
@@ -232,18 +228,23 @@ namespace backend_api.Controllers
          */
         private IActionResult TryUpdateDepartment(bool isDeleted, Department dep)
         {
-            try
+            dep.IsDeleted = isDeleted;
+            if (isDeleted)
             {
-                dep.IsDeleted = isDeleted;
-                _context.Department.Update(dep);
-                _context.SaveChanges();
+                var UnassignedDepID = _context.Department
+                    .Where(x => x.DepartmentName == "Unassigned")
+                    .Select(x => x.DepartmentId)
+                    .First();
+                _context.Employee
+                    .Where(x => x.DepartmentID == dep.DepartmentId)
+                    .ToList()
+                    .ForEach(x => x.DepartmentID = UnassignedDepID);
+            }
 
-                return Ok($"{(isDeleted ? "archive" : "recover")} completed");
-            }
-            catch (Exception e)
-            {
-                return BadRequest(error: e.Message);
-            }
+            _context.Department.Update(dep);
+            _context.SaveChanges();
+
+            return Ok($"{(isDeleted ? "archive" : "recover")} completed");
         }
 
         /* PUT: api/{operation}/plugin/{id}

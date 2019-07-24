@@ -108,16 +108,23 @@ export const App: React.FC = () => {
                                 </button>
                             </div>
                             <nav className={s(styles.navBar, isDarkMode ? styles.navDark : {})}>
+                                <NavLink className={styles.logoContainer} to='/dashboard'>
+
                                 { isDarkMode
                                 ? <img className={styles.navBarLogo} src={require('../../content/Images/CQL-Logo-White.png')} alt={'CQL'} />
-                                : <img className={styles.navBarLogo} src={logo} alt={'CQL'} />
+                                :                                     
+                                <img
+                                    className={styles.navBarLogo}
+                                    src={logo}
+                                    alt={'CQL'}
+                                    // onClick={() => <Redirect to='/dashboard' />}
+                                />
                                 }
-                                {/* TODO:  */}
-                                {/* <img className={styles.navBarLogo} src={logo} alt={'CQL'} /> */}
-                                <div className={s(styles.navEllipse, isDarkMode ? styles.ellipseDark : {})} />
-                                <div className={s(styles.navRectangle, isDarkMode ? styles.navDark : {})} />
+                                </NavLink>
+                                <div className={styles.navEllipse} />
+                                <div className={styles.navRectangle} />
 
-                                <div className={s(styles.linkContainer)}>
+                                <div className={styles.linkContainer}>
                                     <NavLink
                                         className={s(styles.navTab, isDarkMode ? styles.navTabDark : {})}
                                         activeClassName={styles.active}
@@ -202,8 +209,6 @@ export const App: React.FC = () => {
                         )}
                     </Switch>
                 </Router>
-
-                <footer className={styles.appFooter} />
             </div>
             </ThemeContext.Provider>
         </LoginContext.Provider>

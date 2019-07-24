@@ -86,6 +86,10 @@ namespace backend_api
             IConfigurationSection jobSettingsSection = Configuration.GetSection("JobSettings");
             services.Configure<JobSettings>(jobSettingsSection);
 
+            // Add DI for the image settings.
+            IConfigurationSection imageSettingsSection = Configuration.GetSection("ImageSettings");
+            services.Configure<ImageSettings>(imageSettingsSection);
+
             // Creates a connection to the db in order to make ITInventoryDBContext available to MVC Controllers.
             services.AddDbContext<ITInventoryDBContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ITInventoryDb")));
             // Allows OData for powerful querying.

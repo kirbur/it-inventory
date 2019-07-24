@@ -51,11 +51,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             params: {id, archived},
         },
     } = props
-    const {
-        loginContextVariables: {accessToken, refreshToken},
-    } = useContext(LoginContext)
+    const {loginContextVariables} = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
 
     const [programRows, setProgramRows] = useState<ITableItem[][]>([])
     const [removedProgramRows, setRemovedProgramRows] = useState<ITableItem[][]>([])
@@ -103,7 +101,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         purchaseLink: {value: '', changed: false},
         licenseKey: {value: '', changed: false},
         cost: {value: 0, changed: false},
+        hasRecurringCost: false,
         flatCost: {value: 0, changed: false},
+        hasFlatCost: false,
         monthsPerRenewal: {value: 0, changed: false},
     })
 
@@ -115,7 +115,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         purchaseLink: {value: '', changed: false},
         licenseKey: {value: '', changed: false},
         cost: {value: 0, changed: false},
+        hasRecurringCost: false,
         flatCost: {value: 0, changed: false},
+        hasFlatCost: false,
         monthsPerRenewal: {value: 0, changed: false},
     })
 

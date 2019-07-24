@@ -31,11 +31,9 @@ interface IProgramDetailEditPageProps {
 export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = props => {
     const {history, match} = props
 
-    const {
-        loginContextVariables: {accessToken, refreshToken},
-    } = useContext(LoginContext)
+    const {loginContextVariables} = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
     const [progData, setProgData] = useState<{name: string; employee: string; dateBought: string}>({
         name: '',
         employee: '',
@@ -73,6 +71,8 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                         value: data[0].monthsPerRenewal,
                         changed: false,
                     },
+                    hasFlatCost: data[0].programFlatCost > 0 ? true : false,
+                    hasRecurringCost: data[0].programCostPerYear > 0 ? true : false,
                 })
 
                 const employees: {name: string; id: number}[] = []

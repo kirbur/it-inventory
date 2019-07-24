@@ -3,6 +3,8 @@ import React from 'react'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import styles from './Table.module.css'
 
+
+
 interface ITableProps {
     headers: JSX.Element[]
     rows: Element[][]

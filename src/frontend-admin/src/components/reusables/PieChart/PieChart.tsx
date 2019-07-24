@@ -33,47 +33,50 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
         const updatedColors = [...initialColors] // Create clone of initial colors array
         updatedColors[index] = initialColors[index] + 95 // Change particular index in our cloned array
         setColors(updatedColors) // Set new color array
+
+        // TRYING TO ADD CURSOR TO PIES
+        // document.getElementById("c").style.cursor = "pointer";
     }
 
-    const onMouseOut = (data: IRechartPieDatum[], index: number) => {
+    const onMouseOut = () => {
         setColors(initialColors)
     }
     const {
         isDarkMode
     } = useContext(ThemeContext)
 
-    //axios stuff for dashboard
-    // const axios = new AxiosService("access token", "refresh token");
-    // let x: {
-    //   pieChartData: IDataProps[];
-    // } = {
-    //   pieChartData: [{ headingName: "", data: [{ name: "", value: 0, id: "" }] }]
-    // };
-    // const [val, setVal] = useState(x);
-    // useEffect(() => {
-    //   axios.get("dashboard/CostPieChart", setVal);
-    // }, [setVal]);
-    // console.log(val);
+    function hasData(i: number) {
+        for (let j = 0; j < pieChartData[i].data.length; j++) {
+            if (pieChartData[i].data[j].value > 0) {
+                return true
+            }
+        }
+        return false
+    }
 
     return (
         <div className={styles.pieContainer}>
             {/* Headers */}
-            <div className={styles.inline} style={{}}>
-                {pieChartData.map(datum => (
-                    <h3 key={datum.headingName} className={s(styles.header, isDarkMode ? styles.dark : {})}>
+            <div className={styles.inline}>
+                {pieChartData.map((datum, i) => (
+                    <h3
+                        key={datum.headingName}
+                        className={s(i === pieChartData.length - 1 ? styles.lastHeader : styles.header, isDarkMode ? styles.dark : {})}
+                    >
                         {datum.headingName}
+                        {datum.headingName === 'Hardware' && <div className={styles.headingText}>*last 30 days</div>}
                     </h3>
                 ))}
             </div>
 
             {/* Pie Charts */}
-            <div className={styles.inline}>
-                <PieChart width={380 * pieChartData.length} height={300}>
-                    {pieChartData.map((datum, i) => (
+            <div className={styles.inline} id={'c'}>
+                <PieChart width={340 * pieChartData.length} height={300}>
+                    {pieChartData.map((datum, j) => (
                         <Pie
                             key={datum.headingName}
                             data={datum.data}
-                            cx={190 + 380 * i}
+                            cx={170 + 340 * j}
                             cy={150}
                             dataKey='value'
                             fill='#8884d8'
@@ -120,6 +123,18 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                     </div>
                 ))}
             </div>
+
+            {/* empty pies */}
+            {pieChartData.map((datum, i) =>
+                hasData(i) ? (
+                    <div />
+                ) : (
+                    <div className={styles.circleContainer} style={{position: 'relative', left: 10 + 340 * i}}>
+                        <div className={styles.emptyCircle} />
+                        <div className={styles.emptyDataText}>No data to display</div>
+                    </div>
+                )
+            )}
         </div>
     )
 }
