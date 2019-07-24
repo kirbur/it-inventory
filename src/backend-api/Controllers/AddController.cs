@@ -42,6 +42,9 @@ namespace backend_api.Controllers
          *                      "Id" : int,
          *                      "type" : string,
          *                      "name" : string,
+         *                      "serialNumner" : string,
+         *                      "mfg" : string,
+         *                      "PurchaseDate" : date,
          *                      ] for all the unassigned hardware
          *                  }
          *                  "unassigned software" : [
@@ -49,6 +52,9 @@ namespace backend_api.Controllers
          *                      "Id" : int,
          *                      "type" : string,
          *                      "name" : string,
+         *                      "programLicenseKey : string,
+         *                      "monthlyCost" : Decimal,
+         *                      "cals" : 1
          *                      ] for all the unassigned software
          *                  }
          *                  "unassigned licenses" : [
@@ -56,6 +62,8 @@ namespace backend_api.Controllers
          *                      "Id" : int,
          *                      "type" : string,
          *                      "name" : string,
+         *                      "programLicenseKey : string,
+         *                      "monthlyCost" : Decimal,
          *                      } for all the unassigned licenses
          *                  ]
          *            }
@@ -161,7 +169,10 @@ namespace backend_api.Controllers
                     {
                         prog.ProgramName,
                         prog.ProgramId,
-                        type = nameof(Program)
+                        type = nameof(Program),
+                        prog.ProgramLicenseKey,
+                        MonthlyCost = prog.ProgramCostPerYear !=null ? Math.Round(prog.ProgramCostPerYear.Value / 12, 2) : 0,
+                        CALS = 1
                     };
                     UnassignedSoftware.Add(SW);
                 }
@@ -172,7 +183,9 @@ namespace backend_api.Controllers
                     {
                         prog.ProgramName,
                         prog.ProgramId,
-                        type = nameof(Program)
+                        type = nameof(Program),
+                        prog.ProgramLicenseKey,
+                        MonthlyCost = prog.ProgramCostPerYear != null ? Math.Round(prog.ProgramCostPerYear.Value / 12, 2) : 0
                     };
                     UnassignedLicenses.Add(license);
                 }
@@ -770,7 +783,11 @@ namespace backend_api.Controllers
                 {
                     hardwareId = hardware.GetId(),
                     type = table.GetType().GetGenericArguments().Single().Name,
-                    hardwareName
+                    hardwareName,
+                    hardware.SerialNumber,
+                    hardware.MFG,
+                    hardware.PurchaseDate,
+
                 };
                 UnassignedHardware.Add(HW);
             }
