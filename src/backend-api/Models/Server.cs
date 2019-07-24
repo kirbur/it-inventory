@@ -20,7 +20,7 @@ namespace backend_api.Models
         public string TextField { get; set; }
         public decimal? CostPerYear { get; set; }
         public bool IsDeleted { get; set; }
-        public string Mfg { get; set; }
+        public string MFG { get; set; }
         public string Make { get; set; }
         public string Model { get; set; }
         public string IPAddress { get; set; }

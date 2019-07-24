@@ -12,6 +12,9 @@ namespace backend_api.Helpers
         int GetId();
         string GetMake();
         string GetModel();
+        string MFG { get; set; }
+        string SerialNumber { get; set; }
+
         
     }
 
