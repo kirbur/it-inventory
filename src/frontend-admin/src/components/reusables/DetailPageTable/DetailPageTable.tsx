@@ -170,7 +170,7 @@ export const DetailPageTable = (props: ITableProps) => {
     return (
         <table className={s(styles.table, className)}>
             <thead>
-                <tr className={styles.header}>{renderedHeaders.map(header => header)}</tr>
+                <tr>{renderedHeaders.map(header => header)}</tr>
             </thead>
 
             <tbody>

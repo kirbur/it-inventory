@@ -6,7 +6,8 @@
 }
 
 .firstColumn {
-    padding: 50px;
+    padding: 25px;
+    padding-right: 100px;
     min-width: 160px;
     max-width: 300px;
     flex-grow: 1;
@@ -96,6 +97,8 @@
     align-items: start;
     justify-content: left;
     width: 700px;
+    position: relative;
+    right: 50px;
 }
 .firstTableColumn {
     margin-top: 25px;
@@ -120,8 +123,10 @@
 }
 .addDefaultContainer {
     padding-top: 25px;
+    display: flex;
+    justify-content: end;
     position: relative;
-    right: 8px;
+    left: 50px;
 }
 .addIconBorder:hover {
     background-color: #009eff;

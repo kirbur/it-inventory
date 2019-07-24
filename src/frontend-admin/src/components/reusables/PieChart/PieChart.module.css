@@ -11,7 +11,9 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: center;
+    width: 600px;
+    position: relative;
+    left: 75px;
 }
 
 .circle {
@@ -24,11 +26,47 @@
 
 .header {
     position: relative;
-    left: 160px;
     top: 40px;
-    padding-right: 320px;
+    padding-right: 270px;
+    padding-bottom: 25px;
+}
+.lastHeader {
+    position: relative;
+    top: 40px;
+    padding-bottom: 25px;
 }
 
 .pieContainer {
     margin-top: -60px;
+    display: flex;
+    flex-direction: column;
+}
+
+.headingText {
+    color: grey;
+    font-size: 12px;
+}
+
+/* when pie data is empty */
+.circleContainer {
+    position: relative;
+    bottom: 380px;
+    width: 340px;
+    height: 0px;
+}
+.emptyCircle {
+    background-color: rgba(97, 97, 97, 0.185);
+    border-radius: 50%;
+    width: 230px;
+    height: 230px;
+    position: relative;
+    top: 80px;
+    left: 50px;
+}
+.emptyDataText {
+    color: black;
+    font-size: 18px;
+    position: relative;
+    bottom: 45px;
+    right: 10px;
 }
