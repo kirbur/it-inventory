@@ -1,7 +1,6 @@
 import React from 'react'
 import Select, {components} from 'react-select'
 import {MdSearch} from 'react-icons/md'
-import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './FilteredSearch.module.css'
@@ -13,12 +12,11 @@ export interface IFilteredSearchProps {
     options: {label: string; value: string}[]
     selected: any
     setSelected: any
-    iconPosition?: string
 }
 
 // Primary Component
 export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
-    const {search, setSearch, options, setSelected, iconPosition = ''} = props
+    const {search, setSearch, options, setSelected} = props
 
     const customStyles = {
         container: (provided: any, state: any) => ({
@@ -31,11 +29,12 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
         control: (provided: any, state: any) => ({
             ...provided,
             color: '#9b9b9b',
-            height: '45px',
+            height: '40px',
             border: '0px ',
             borderRadius: '4px',
             boxShadow: '0',
             cursor: 'pointer',
+            margin: '5px',
         }),
         menu: (provided: any, state: any) => ({
             ...provided,
@@ -57,7 +56,7 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
         singleValue: (provided: any) => ({
             ...provided,
             color: '#9b9b9b',
-            height: '23px',
+            height: '25px',
         }),
     }
 
@@ -82,9 +81,7 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
                         setSearch(e.target.value)
                     }}
                 />
-                <div className={s(styles.searchIconContainer, iconPosition)}>
-                    <MdSearch className={styles.searchIcon} size={30} />
-                </div>
+
                 <div className={styles.filterBy}>By</div>
                 <Select
                     defaultValue={options[0]}
@@ -105,6 +102,9 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
                     isSearchable={false}
                 />
             </form>
+            <div className={styles.searchIconContainer}>
+                <MdSearch className={styles.searchIcon} size={30} />
+            </div>
         </div>
     )
 }

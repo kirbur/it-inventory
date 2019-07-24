@@ -19,11 +19,6 @@
     align-self: flex-end;
 }
 
-.searchIcon {
-    position: absolute;
-    right: 260px;
-}
-
 .buttonContainer {
     display: flex;
     flex: column;

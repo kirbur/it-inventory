@@ -295,7 +295,6 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
                     options={options}
                     selected={selected}
                     setSelected={setSelected}
-                    iconPosition={styles.searchIcon}
                 />
             </Group>
             <div className={styles.table}>

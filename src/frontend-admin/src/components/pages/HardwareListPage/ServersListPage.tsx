@@ -286,7 +286,6 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                     options={options}
                     selected={selected}
                     setSelected={setSelected}
-                    iconPosition={styles.searchIcon}
                 />
             </Group>
             <div className={styles.table}>
