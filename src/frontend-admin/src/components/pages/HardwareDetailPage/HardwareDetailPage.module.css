@@ -88,11 +88,13 @@
     color: #a5a5a5;
     text-align: left;
     border-bottom: 1px solid #979797;
+    padding-bottom: 8px;
 }
 .rowData {
     text-align: left;
     color: #4a4a4a;
     font-size: 20px;
+    height: 100px;
 }
 
 /* history log */

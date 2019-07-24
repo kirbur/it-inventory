@@ -32,7 +32,8 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
         updatedColors[index] = initialColors[index] + 95 // Change particular index in our cloned array
         setColors(updatedColors) // Set new color array
 
-        // document.getElementById("c").style.cursor = "pointer";
+        // const d: HTMLElement = document.getElementById('c')
+        // d.style.cursor = 'pointer'
     }
 
     const onMouseOut = () => {
