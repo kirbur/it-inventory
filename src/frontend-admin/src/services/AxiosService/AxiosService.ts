@@ -121,7 +121,10 @@ export class AxiosService {
                         case 'put':
                             return this.put(args.url, args.data, args.headers)
                     }
-                } else if (response.status === 401) {
+                }
+            })
+            .catch(err => {
+                if (err.response.status === 401) {
                     this.user = {
                         refreshToken: '',
                         accessToken: '',

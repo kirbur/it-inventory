@@ -732,7 +732,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 {/* name and date */}
-                <div className={styles.title}>Employee Information</div>
+                <div className={s(styles.title, styles.paddingTop)}>Employee Information</div>
 
                 {/* Admin/nonadmin radio cards */}
                 <div className={styles.adminCardContainer}>
