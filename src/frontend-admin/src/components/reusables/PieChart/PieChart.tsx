@@ -1,7 +1,9 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 import {PieChart, Pie, Cell} from 'recharts'
 import {CustomLabel} from './CustomLabel/CustomLabel'
 import styles from './PieChart.module.css'
+import {ThemeContext} from '../../App/App'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Types
 export interface IRechartPieDatum {
@@ -36,6 +38,9 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
     const onMouseOut = (data: IRechartPieDatum[], index: number) => {
         setColors(initialColors)
     }
+    const {
+        isDarkMode
+    } = useContext(ThemeContext)
 
     //axios stuff for dashboard
     // const axios = new AxiosService("access token", "refresh token");
@@ -55,7 +60,7 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
             {/* Headers */}
             <div className={styles.inline} style={{}}>
                 {pieChartData.map(datum => (
-                    <h3 key={datum.headingName} className={styles.header}>
+                    <h3 key={datum.headingName} className={s(styles.header, isDarkMode ? styles.dark : {})}>
                         {datum.headingName}
                     </h3>
                 ))}

@@ -17,7 +17,9 @@ import {CostCard} from '../Dashboard/CostCard/CostCard'
 import {History} from 'history'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
+
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Types
 interface IDashboardPageProps {
@@ -73,7 +75,13 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const {
         loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
+    const {
+        isDarkMode
+    } = useContext(ThemeContext)
     const axios = new AxiosService(accessToken, refreshToken)
+
+
+    // const [darkMode, setDarkMode] = useState(false);
 
     //Liscence Bar Chart State
     const [licenses, setLicenses] = useState(initLicenses)
@@ -253,8 +261,9 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     }
 
     return (
-        <div className={styles.dashMain}>
+        <div className={s(styles.dashMain, isDarkMode ? styles.dashMainDark : {})}>
             <div className={styles.dashColumn}>
+
                 <Card
                     title={'licenses'}
                     titleClassName={styles.linkedTitle}

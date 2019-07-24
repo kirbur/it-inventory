@@ -116,11 +116,11 @@
 }
 
 .active {
-    background: #009eff;
+    background: #009eff !important;
 }
 
 .active .navTabRectangle {
-    background: #009eff;
+    background: #009eff !important;
 }
 
 .appFooter {
@@ -133,4 +133,20 @@
 .helloMesssage {
     position: absolute;
     z-index: 99 !important;
+}
+
+.dark {
+    background-color: #282c29;
+}
+
+.navDark {
+    background-color: #635f5f !important;
+}
+
+.ellipseDark {
+    background-color: #0e0e0e;
+}
+
+.navTabDark {
+    background-color: #0e0e0e;
 }
