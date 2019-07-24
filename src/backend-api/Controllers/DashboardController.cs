@@ -11,17 +11,11 @@ using System.Threading.Tasks;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class DashboardController : ControllerBase
+    public class DashboardController : ContextController
     {
-        public readonly ITInventoryDBContext _context;
-
-        public DashboardController(ITInventoryDBContext context)
-        {
-            _context = context;
-        }
+        public DashboardController(ITInventoryDBContext context) : base(context) { }
 
         // A helper class that is a cost breakdown object.
         public class CostBreakDown
@@ -54,43 +48,30 @@ namespace backend_api.Controllers
          */
         public CostBreakDown DashboardCostBreakDown()
         {
-            //Array that will be returned with Programs cost and plugins cost
-            decimal?[] ReturningArray = new decimal?[2];
+            decimal? CostOfPluginsPerYear = 0;
+            decimal? CostOfProgramsPerYear = 0;
 
             //Getting cost from the program table
 
-            var ProgramsList = _context.Program.ToList();
-
-            decimal? CostOfProgramsPerYear = 0;
             // looping through programs table and finding programs that are not "deleted" 
             // and that are not null. Adding up the cost of those programs
-            foreach (var Program in ProgramsList)
-            {
-                if (Program.IsDeleted == false && Program.ProgramCostPerYear != null)
-                {
-                    CostOfProgramsPerYear += Program.ProgramCostPerYear;
-                }
-            }
+            _context.Program.Where(x => x.IsDeleted == false && x.ProgramCostPerYear != null).ToList().ForEach(x => CostOfProgramsPerYear += x.ProgramCostPerYear);
 
             //getting cost from plugin table
 
-            decimal? CostOfPluginsPerYear = 0;
-            var PluginsList = _context.Plugins.ToList();
             //Selecting distinct programs by name so that they match up with the plugin table
 
-            var DistinctProgramsList = ProgramsList.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
+            var DistinctProgramsList = _context.Program.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
             //looping through those distinct programs and if they have plugins, calculating the cost of these plugins
             foreach (var Program in DistinctProgramsList)
             {
                 if (Program.HasPlugIn == true)
                 {
                     //creating a list of plugins for that program which are not deleted
-                    var PluginsForThatProgram = PluginsList.Where(x => x.ProgramId == Program.ProgramId && x.IsDeleted == false);
-                    foreach (var PluginForThatProgram in PluginsForThatProgram)
-                    {
-                        CostOfPluginsPerYear += PluginForThatProgram.PluginCostPerYear;
-
-                    }
+                    _context.Plugins
+                        .Where(x => x.ProgramId == Program.ProgramId && x.IsDeleted == false)
+                        .ToList()
+                        .ForEach(x => CostOfPluginsPerYear += x.PluginCostPerYear);
                 }
             }
             return new CostBreakDown
@@ -98,7 +79,7 @@ namespace backend_api.Controllers
                 CostOfProgramsPerYear = CostOfProgramsPerYear,
                 CostOfPluginsPerYear = CostOfPluginsPerYear
             };
-            
+
         }
 
         /* GET: api/dashboard/CostPieCharts
@@ -127,56 +108,46 @@ namespace backend_api.Controllers
         [Route("CostPieCharts")]
         [HttpGet]
         [EnableQuery()]
-        public async Task<ActionResult<object>> GetDashboardPieCharts()
+        public IActionResult GetDashboardPieCharts()
         {
-            // Removing the Utilities department from the list of the departments
-            var Departments = _context.Department.Where(x => x.DepartmentName != "Utilities" && x.IsDeleted == false);
 
             // Instantiating the Pie charts list with the two data lists which will be used to return the data
             // in the correct format
             var PieChartsList = new List<object>();
-            List<object> data = new List<object>();
-            List<object> data2 = new List<object>();
+            List<object> dataForPrograms = new List<object>();
+            List<object> dataForHardware = new List<object>();
 
+            // Removing the Utilities department from the list of the departments
             //looping through each department and finding program and hardware cost per department 
-            foreach (var Department in Departments)
+            foreach (var Department in _context.Department.Where(x => x.DepartmentName != "Utilities" && x.IsDeleted == false))
             {
                 //Cost of Programs per department value
                 decimal? CostOfPrograms = 0;
                 decimal? CostOfHardware = 0;
 
                 // Get the Employees table and make a list to hold each EmployeeID. 
-                var allEmployees = await _context.Employee.ToListAsync();
-                List<int?> employeeIDsInDepartment = new List<int?>();
+                List<int> employeeIDsInDepartment = new List<int>();
 
                 // Gets the employees that are in the department requested. 
-                foreach (Employee emp in allEmployees)
-                {
-                    if (emp.DepartmentID == Department.DepartmentId)
-                    {
-                        // Adds the IDs of each of the employees.
-                        employeeIDsInDepartment.Add(emp.EmployeeId);
-                    }
-                }
+                _context.Employee
+                     .Where(x => x.DepartmentID == Department.DepartmentId)
+                     .Where(x => x.IsDeleted == false)
+                     .ToList()
+                     .ForEach(x => employeeIDsInDepartment.Add(x.EmployeeId));
+
 
                 // Need to qualify Program with Models
                 // so it does not conflict with Program.cs that runs the program.
                 List<Models.Program> programsOfEmpsInDepartment = new List<Models.Program>();
 
-                //Calculating data for Programs pie chart
-
-                foreach (var prog in _context.Program)
-                {
-                    // Make sure the program is not deleted.
-                    if (prog.IsDeleted == false)
-                    {
-                        // Checks to see if the program employee ID is in the department.
-                        if (employeeIDsInDepartment.Contains(prog.EmployeeId))
-                        {
-                            programsOfEmpsInDepartment.Add(prog);
-                        }
-                    }
-                }
+                // Calculating data for Programs pie chart
+                // Make sure the program is not deleted.
+                // Checks to see if the program employee ID is in the department.
+                _context.Program
+                    .Where(x => x.IsDeleted == false && x.EmployeeId != null)
+                    .Where(x => employeeIDsInDepartment.Contains(x.EmployeeId.Value))
+                    .ToList()
+                    .ForEach(x => programsOfEmpsInDepartment.Add(x));
 
                 // Calculating the costs of the all the programs that the current department is using
                 foreach (var prog in programsOfEmpsInDepartment)
@@ -193,7 +164,7 @@ namespace backend_api.Controllers
                         //if we are not then add the cost of the recent software purchase
                         DateTime? startDate = prog.DateBought;
                         DateTime? relevantDate = startDate.Value.AddDays(30);
-                        if (!(DateTime.Now > relevantDate))
+                        if (DateTime.Now <= relevantDate && DateTime.Now >= prog.DateBought)
                         {
                             CostOfPrograms += prog.ProgramFlatCost;
                         }
@@ -201,49 +172,49 @@ namespace backend_api.Controllers
 
                 }
                 // Adding to the data list with the appropriate data to be returned in this list
-                data.Add(new { Department.DepartmentName, CostOfPrograms, Department.DepartmentId });
+                dataForPrograms.Add(new { Department.DepartmentName, CostOfPrograms, Department.DepartmentId });
 
                 //Calculating data for Hardware pie chart
 
-                foreach (var mon in _context.Monitor)
+                foreach (var mon in _context.Monitor.Where(x => x.EmployeeId != null))
                 {
-                    if (employeeIDsInDepartment.Contains(mon.EmployeeId))
+                    if (employeeIDsInDepartment.Contains(mon.EmployeeId.Value))
                     {
                         //adding 30 days to the date bought and then checking if we are now past those 30 days
                         //if we are not, add cost of monitor to Cost total
                         DateTime? startDate = mon.PurchaseDate;
                         DateTime? relevantDate = startDate.Value.AddDays(30);
-                        if (!(DateTime.Now > relevantDate))
+                        if (DateTime.Now <= relevantDate && DateTime.Now >= mon.PurchaseDate)
                         {
                             CostOfHardware += mon.FlatCost;
                         }
                     }
                 }
 
-                foreach (var Comp in _context.Computer)
+                foreach (var Comp in _context.Computer.Where(x => x.EmployeeId != null))
                 {
-                    if (employeeIDsInDepartment.Contains(Comp.EmployeeId))
+                    if (employeeIDsInDepartment.Contains(Comp.EmployeeId.Value))
                     {
                         //adding 30 days to the date bought and then checking if we are now past those 30 days
                         //if we are not, add cost of Computer to Cost total
                         DateTime? startDate = Comp.PurchaseDate;
                         DateTime? relevantDate = startDate.Value.AddDays(30);
-                        if (!(DateTime.Now > relevantDate))
+                        if (DateTime.Now <= relevantDate && DateTime.Now >= Comp.PurchaseDate)
                         {
                             CostOfHardware += Comp.FlatCost;
                         }
                     }
                 }
 
-                foreach (var peripheral in _context.Peripheral)
+                foreach (var peripheral in _context.Peripheral.Where(x => x.EmployeeId != null))
                 {
-                    if (employeeIDsInDepartment.Contains(peripheral.EmployeeId))
+                    if (employeeIDsInDepartment.Contains(peripheral.EmployeeId.Value))
                     {
                         //adding 30 days to the date bought and then checking if we are now past those 30 days
                         //if we are not, add cost of peripheral to Cost total
                         DateTime? startDate = peripheral.PurchaseDate;
                         DateTime? relevantDate = startDate.Value.AddDays(30);
-                        if (!(DateTime.Now > relevantDate))
+                        if (DateTime.Now <= relevantDate && DateTime.Now >= peripheral.PurchaseDate)
                         {
                             CostOfHardware += peripheral.FlatCost;
                         }
@@ -251,13 +222,13 @@ namespace backend_api.Controllers
                 }
 
                 // Adding to the data2 list with the appropriate data to be returned in this list
-                data2.Add(new { Department.DepartmentName, CostOfHardware, Department.DepartmentId });
+                dataForHardware.Add(new { Department.DepartmentName, CostOfHardware, Department.DepartmentId });
             }
             //formatting data for front end
             string headingName = "Software";
-            PieChartsList.Add(new { headingName, data });
+            PieChartsList.Add(new { headingName, dataForPrograms });
             headingName = "Hardware";
-            PieChartsList.Add(new { headingName, data2 });
+            PieChartsList.Add(new { headingName, dataForHardware });
 
             return Ok(PieChartsList);
         }
@@ -271,7 +242,9 @@ namespace backend_api.Controllers
         [EnableQuery()]
         public IActionResult GetDepartment()
         {
-            return Ok(_context.Department.Where(x => x.IsDeleted == false).ToList());
+            return Ok(_context.Department
+                .Where(x => x.IsDeleted == false)
+                .ToList());
         }
 
         /* GET: api/dashboard/departmentTable/{departmentID}
@@ -292,50 +265,39 @@ namespace backend_api.Controllers
         {
 
             // Get the Employees table and make a list to hold each EmployeeID. 
-            var allEmployees = _context.Employee;
-            List<int?> employeeIDsInDepartment = new List<int?>();
+            List<int> employeeIDsInDepartment = new List<int>();
 
             // Gets the employees that are in the department requested. 
-            foreach (Employee emp in allEmployees)
-            {
-                if (emp.DepartmentID == departmentID)
-                {
-                    // Adds the IDs of each of the employees.
-                    employeeIDsInDepartment.Add(emp.EmployeeId);
-                }
-            }
+            _context.Employee
+                .Where(x => x.DepartmentID == departmentID && x.IsDeleted == false)
+                .ToList()
+                .ForEach(x => employeeIDsInDepartment.Add(x.EmployeeId));
 
-            var allPrograms = _context.Program;
             // Need to qualify Program with Models
             // so it does not conflict with Program.cs that runs the program.
             List<Models.Program> programsOfEmpsInDepartment = new List<Models.Program>();
 
             // For each program, add to the list of department programs if an employee in the 
             // department owns that program.
-            foreach (Models.Program prog in allPrograms)
-            {
-                // Make sure the program is not deleted.
-                if (prog.IsDeleted == false)
-                {
-                    // Checks to see if the program employee ID is in the department.
-                    if (employeeIDsInDepartment.Contains(prog.EmployeeId))
-                    {
-                        programsOfEmpsInDepartment.Add(prog);
-                    }
-                }
-            }
+            _context.Program
+                .Where(x => x.IsDeleted == false)
+                .Where(x => employeeIDsInDepartment.Contains(x.EmployeeId.Value))
+                .ToList()
+                .ForEach(x => programsOfEmpsInDepartment.Add(x));
+
 
             // Make a list of the distinct programs of the employees
             // in the department.
-            var distinctPrograms = programsOfEmpsInDepartment.GroupBy(prog => prog.ProgramName).Select(name => name.FirstOrDefault()).Select(program => program.ProgramName);
+            var distinctPrograms = programsOfEmpsInDepartment
+                .GroupBy(prog => prog.ProgramName)
+                .Select(name => name.FirstOrDefault())
+                .Select(program => program.ProgramName);
 
             // Create a list with name, count, costPerYear containing the unique programs in the department
             List<DepartmentTableProgram> listOfTablePrograms = new List<DepartmentTableProgram>();
-            foreach (var name in distinctPrograms)
-            {
-                // Construct a new object to be added to the list.
-                listOfTablePrograms.Add(new DepartmentTableProgram(name, 0, 0.0m, true));
-            }
+            distinctPrograms
+                .ToList()
+                .ForEach(name => listOfTablePrograms.Add(new DepartmentTableProgram(name, 0, 0.0m, true)));
 
             // Aggregate the programs in the department that are the same name.
             // Count the programs and add the cost.
@@ -383,13 +345,18 @@ namespace backend_api.Controllers
                 return BadRequest("No employees");
             }
 
-            var UsefulProgramsList = _context.Program.Where(x => x.IsPinned == true && x.IsLicense == true && x.IsDeleted == false);
+            var UsefulProgramsList = _context.Program
+                .Where(x => x.IsPinned == true)
+                .Where(x => x.IsLicense == true)
+                .Where(x => x.IsDeleted == false);
 
             //temp list to hold the list with the difference field
             List<LicenseBarGraph> ThrowAwayList = new List<LicenseBarGraph>();
 
             //This List takes the usefulPrograms list and makes it distinct
-            var DistinctUsefulPrograms = UsefulProgramsList.GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
+            var DistinctUsefulPrograms = UsefulProgramsList
+                .GroupBy(x => x.ProgramName)
+                .Select(x => x.FirstOrDefault());
 
 
             //Loop through every program in the distinct programs list
@@ -397,28 +364,43 @@ namespace backend_api.Controllers
             {
                 //First lambda counts all the programs in the useful program list where the name is the same as the 
                 //name in the distinct programs list
-                var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName).Count();
+                var CountProgOverall = UsefulProgramsList
+                    .Where(x => x.ProgramName == prog.ProgramName)
+                    .Count();
+
                 //Second lambda counts all the programs in the useful program list where the name is the same as the 
                 //name in the distinct programs list and where the license is being used
-                var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId != null).Count();
+                var CountProgInUse = UsefulProgramsList
+                    .Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId != null)
+                    .Count();
+
                 //adding all the necessary returnables(is that a word?)
                 int difference = CountProgOverall - CountProgInUse;
-                ThrowAwayList.Add(new LicenseBarGraph(prog.ProgramName, CountProgInUse, CountProgOverall, difference));
+                ThrowAwayList.Add(new LicenseBarGraph
+                    (prog.ProgramName,
+                    CountProgInUse,
+                    CountProgOverall,
+                    difference
+                    ));
             }
             //List which sorts programs by how many they have left which are not in use;
             //Ordered with having the license with least left at the top
             var SortedList = ThrowAwayList.OrderBy(x => x.Difference);
 
-            //removing the difference field from the List which was needed to utilise Linq's order by
+            //removing the difference field from the List which was needed to utilize Linq's order by
+            // we does this by creating the same object but this time without the differences field
             var RemovedDifferenceList = new List<object>();
             foreach (var prog in SortedList)
             {
-                RemovedDifferenceList.Add(new { prog.ProgramName, prog.CountProgInUse, prog.CountProgOverall });
+                RemovedDifferenceList.Add(new
+                {
+                    prog.ProgramName,
+                    prog.CountProgInUse,
+                    prog.CountProgOverall
+                });
             }
             return Ok(RemovedDifferenceList);
 
-            // TODO: Should this function only display what the user settings want,
-            // or should it also auto fill with the licenses closest to running out?
         }
 
         /* GET: api/dashboard/softwareTable
@@ -446,54 +428,63 @@ namespace backend_api.Controllers
             }
 
             // making list of string of the software that is to be pinned
-            var list = _context.Program.Where(x=>x.IsPinned == true && x.IsLicense == false && x.IsDeleted == false).GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault()).Select(x=>x.ProgramName).ToList();
+            var list = _context.Program
+                .Where(x => x.IsPinned == true)
+                .Where(x => x.IsLicense == false)
+                .Where(x => x.IsDeleted == false)
+                .GroupBy(x => x.ProgramName)
+                .Select(x => x.FirstOrDefault())
+                .Select(x => x.ProgramName)
+                .ToList();
 
-            // Only software, not licenses. Nothing deleted. Only ones in use.
-            var software = _context.Program.Where(program => program.IsLicense == false && program.IsDeleted == false && program.EmployeeId != null);
+            // Only software, not licenses. Nothing deleted. Only ones in use. Only recurring software
+            var software = _context.Program
+                .Where(program => program.IsLicense == false)
+                .Where(program => program.IsDeleted == false)
+                .Where(program => program.EmployeeId != null)
+                .Where(program => program.RenewalDate != null);
 
-            /* TODO: Update the programHistory model to have an event Date. Same with the start hardwareHistory.
-            *  TODO: Add the program name field to the programHistory. Would make this a lot easier.
-            *  TODO: This is a stupidly complicated way to get the
-            *  desired data.
-            */
-            // Sorts the program history with the most recent changes.
-            var programHistory = _context.ProgramHistory.ToList();
-            var sortedProgramHistory = programHistory.OrderByDescending(ph => ph.EventDate);
+            List<Models.Program> sortedPrograms = new List<Models.Program>();
+
+            // storing the software we need in a temp value
+            var savedSoftware = software;
+
+            // rolling back all the renewal dates of the softwares so we can sort them by this date
+            // this will be used to tell us which software was most recently renewed
+            software
+                .Where(x => x.RenewalDate != null)
+                .ToList()
+                .ForEach(x => x.RenewalDate = x.RenewalDate.Value.AddMonths(-(x.MonthsPerRenewal.Value)));
 
             // Create a list of programs that have the programs with the most recent changes first.
-            List<Models.Program> sortedSoftware = new List<Models.Program>();
-            List<Models.Program> noSoftwareHistory = new List<Models.Program>();
-            foreach (ProgramHistory sph in sortedProgramHistory)
-            {
-                foreach (Models.Program prog in software)
-                {
-                    // Is the history entry matches to software, add it.
-                    if (sph.ProgramId == prog.ProgramId)
-                    {
-                        sortedSoftware.Add(prog);
-                    }
-                }
-            }
+            var sortedProgramSoftware = software
+                .Where(x => x.RenewalDate != null)
+                .OrderByDescending(x => x.RenewalDate).ToList();
 
-            // If there is no history for a program, then add it.
-            foreach (Models.Program prog in software)
-            {
-                if (!sortedSoftware.Contains(prog))
-                    noSoftwareHistory.Add(prog);
-            }
+            // restoring software to its original state using temp
+            software = savedSoftware;
 
-            // Combine the lists.
-            sortedSoftware.AddRange(noSoftwareHistory);
 
             // List of distinct software
-            var distinctSortedSoftware = sortedSoftware.GroupBy(prog => prog.ProgramName).Select(name => name.FirstOrDefault());
+            var distinctSortedSoftware = sortedProgramSoftware
+                .GroupBy(prog => prog.ProgramName)
+                .Select(name => name.FirstOrDefault())
+                .OrderByDescending(x => x.RenewalDate)
+                .ToList();
 
             // All of the software names that are on the settings list.
-            var distinctPinnedSoftware = software.Where(sw => list.Contains(sw.ProgramName)).GroupBy(sw => sw.ProgramName).Select(name => name.FirstOrDefault());
+            var distinctPinnedSoftware = software
+                .Where(sw => list.Contains(sw.ProgramName))
+                .GroupBy(sw => sw.ProgramName)
+                .Select(name => name.FirstOrDefault());
+
+            // list to contain the distinct pinned software names of all the distinct software
             var distinctPinnedSoftwareNames = distinctPinnedSoftware.Select(program => program.ProgramName);
 
             // List of distinct software
-            var distinctSoftware = software.GroupBy(prog => prog.ProgramName).Select(name => name.FirstOrDefault());
+            var distinctSoftware = software
+                .GroupBy(prog => prog.ProgramName)
+                .Select(name => name.FirstOrDefault());
 
             // Create a list of the distinct software table objects to return.
             List<SoftwareTableItem> listOfTableSoftware = new List<SoftwareTableItem>();
@@ -536,8 +527,6 @@ namespace backend_api.Controllers
 
             return Ok(listOfTableSoftware);
 
-            // TODO: This includes software from the Utilities department.
-            // Do we take it out like the pie charts above?
         }
     }
 }

@@ -47,6 +47,17 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
         *         }
         */
 
+        /* Get: api/login
+         * Returns 'default' for IIS starter app
+         */
+
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult<string> Get()
+        {
+            return "Default";
+        }
+
         [AllowAnonymous]
         [HttpPost]
 
@@ -62,18 +73,10 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                 //Taking the username and finding the user who might be trying to log in
                 var user = UserPrincipal.FindByIdentity(adContext, request.username);
                 if (result)
-                {
-
+                { 
                     // boolean to store whether the user is an admin
                     bool isAdmin = false;
 
-                    // Create a list of claims that we could add to the token. 
-                    // Currently we are not embedding any claims in our tokens but we might later on
-                    //var RefreshClaims = new[]
-                    //{
-                    //    // Get the user's Name (this can be whatever claims you wish)
-                    //    //new Claim(ClaimTypes.Name, request.username)
-                    //    };
                     var AccessClaims = new[]
                     {
                         // Get the user's Name (this can be whatever claims you wish)
@@ -82,13 +85,14 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
 
                     // Read our custom key string into a a usable key object 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Secret));
+
                     // create some signing credentials using out key
                     // encoding our credentials for security using our key generated from our secret
                     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                     // create a JWT. Here we chose our Audience which determines the uses of our token.
                     // This token has refresh as its only Audience so that it can't be used as an access token
-                    // Seeing as this token is our refresh token then it is valid for 1000 minutes(subject to change)
+                    // Seeing as this token is our refresh token then it is valid for 10000 minutes(subject to change)
                     var refreshToken = new JwtSecurityToken(
                         issuer: "CQLCORP",
                         audience: "Refresh",
@@ -108,7 +112,7 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                     var Refreshtoken = new JwtSecurityTokenHandler().WriteToken(refreshToken);
                     var Accesstoken = new JwtSecurityTokenHandler().WriteToken(accessToken);
 
-                    //lambda checks if this is the user's first every login
+                    //lambda checks if this is the user's first login
                     var ExistingEmployee = _context.AuthIdserver.ToList().Any(x => x.ActiveDirectoryId == user.Guid);
 
                     //if employee has logged in before
@@ -119,11 +123,16 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                     else
                     {
                         //Update their refresh token to the new one just generated and store this in the database
-                        var empAuthId = _context.AuthIdserver.FirstOrDefault(x => x.ActiveDirectoryId == user.Guid);
+                        var empAuthId = _context.AuthIdserver
+                            .FirstOrDefault(x => x.ActiveDirectoryId == user.Guid);
                         empAuthId.RefreshToken = Refreshtoken;
                         _context.SaveChanges();
                         //checks if the employee is an admin
-                        isAdmin = _context.AuthIdserver.ToList().Where(x => x.ActiveDirectoryId == user.Guid).Select(x => x.IsAdmin).FirstOrDefault();
+                        isAdmin = _context.AuthIdserver
+                            .ToList()
+                            .Where(x => x.ActiveDirectoryId == user.Guid)
+                            .Select(x => x.IsAdmin)
+                            .FirstOrDefault();
                     }
 
                     // returning the need information about the employee logged in with their tokens
@@ -137,20 +146,11 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                         isAdmin
                     };
                     returnList.Add(returnInformation);
-                    // return Ok(new
-                    // {
-                    //     Refreshtoken,
-                    //     Accesstoken,
-                    //     accessToken.ValidTo,
-                    //     user.GivenName,
-                    //     isAdmin
-                    // });
+
                     return Ok(returnList);
                 }
 
             }
-
-
 
             // if we haven't returned by now, something went wrong and the user is not authorized
             return Unauthorized();

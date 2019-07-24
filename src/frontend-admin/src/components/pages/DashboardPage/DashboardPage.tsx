@@ -106,18 +106,18 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const onRowClick = (datum: IDashboardTableDatum) => {
         if (datum.name[datum.name.length - 1] === '*') {
             var str = datum.name.substring(0, datum.name.length - 1)
-            history.push(`/programs/overview/${str}`)
+            history.push(`/programs/overview/${str}/inventory`)
         } else {
-            history.push(`/programs/overview/${datum.name}`)
+            history.push(`/programs/overview/${datum.name}/inventory`)
         }
     }
 
     const onBarClick = (id: string) => {
-        history.push(`/programs/overview/${id}`)
+        history.push(`/programs/overview/${id}/inventory`)
     }
 
     const onSliceClick = (id: string) => {
-        history.push(`/departments/${id}`)
+        history.push(`/departments/detail/${id}`)
     }
 
     const getDeptTables = () => {
@@ -201,8 +201,8 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                         data: [],
                     },
                 ]
-                data[0].data &&
-                    data[0].data.map((i: any) =>
+                data[0].dataForPrograms &&
+                    data[0].dataForPrograms.map((i: any) =>
                         x[0].data.push({
                             name: i.departmentName,
                             value: i.costOfPrograms !== null ? i.costOfPrograms : 0,
@@ -210,8 +210,8 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                         })
                     )
 
-                data[1].data2 &&
-                    data[1].data2.map((i: any) =>
+                data[1].dataForHardware &&
+                    data[1].dataForHardware.map((i: any) =>
                         x[1].data.push({
                             name: i.departmentName,
                             value: i.costOfHardware !== null ? i.costOfHardware : 0,
@@ -316,7 +316,6 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                 <Card
                     title={'Departments'}
                     titleClassName={styles.linkedTitle}
-                    className={styles.pieCard}
                     titleOnClick={() => {
                         history.push('/departments')
                     }}

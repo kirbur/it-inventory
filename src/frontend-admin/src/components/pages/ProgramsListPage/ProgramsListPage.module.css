@@ -31,7 +31,15 @@
     max-height: 75px;
     width: 75px;
 }
-
+.buttonContainer {
+    display: flex;
+    flex: column;
+}
+.archiveButton {
+    width: 150px;
+    margin-left: 25px;
+    margin-right: 25px;
+}
 .alignLeft {
     text-align: left;
     min-width: 100px;
@@ -56,7 +64,7 @@
     text-align: left;
     color: #a5a5a5;
     font-size: 24px;
-    padding-bottom: 16px;
+    padding-bottom: 8px;
     padding-top: 16px;
     display: flex;
     cursor: pointer;
@@ -105,14 +113,9 @@
     left: 5px;
 }
 
-.buttonGroup {
-    width: 30%;
-    flex-wrap: nowrap;
-}
-
 .dashboardButton {
     min-width: 200px;
-    margin-left: 20px;
+    margin-right: 25px;
 }
 
 .checkboxRow {

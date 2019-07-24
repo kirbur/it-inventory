@@ -8,6 +8,7 @@ import {format} from '../../../utilities/formatEmptyStrings'
 import {formatDate} from '../../../utilities/FormatDate'
 import {formatCost} from '../../../utilities/FormatCost'
 import {History} from 'history'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -39,12 +40,15 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     // state
     const [useImages, setUseImages] = useState(false)
     const [images, setImages] = useState<{name: string; img: string}[]>([])
-
     const [displayImages] = useState<{name: string; img: string}[]>([])
+
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState(listData)
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'Programs', value: 'name'})
+
+    const [archivedData, setArchivedData] = useState<any[]>([])
+    const [isArchive, setIsArchive] = useState(false)
 
     const columns = ['name', 'renewalDate', 'totalUsers', 'cost']
     const headerList = ['Programs', 'Renewal Date', 'Total Users ', 'Cost']
@@ -55,10 +59,10 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
 
     useEffect(() => {
         axios
-            .get('/list/programs')
+            .get('/list/programs/false')
             .then((data: any) => {
                 var programs: any[] = []
-                var imgs: any[] = []
+                var imgs: {name: string; img: string}[] = []
                 var pins: {name: string; pinned: boolean}[] = []
                 data.map((i: any) => {
                     programs.push({
@@ -72,8 +76,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                         cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
                     })
                     imgs.push({name: i.programName, img: i.icon})
-                    //TODO: have someone add this to the endpoint
-                    pins.push({name: i.programName, pinned: i.pinned ? true : false})
+                    pins.push({name: i.programName, pinned: i.isPinned})
                 })
                 setListData(programs)
                 setImages(imgs)
@@ -81,53 +84,73 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                 setPinned(pins)
             })
             .catch((err: any) => console.error(err))
-    }, [setListData])
+        axios
+            .get('list/programs/true')
+            .then((data: any) => {
+                var programs: any[] = []
+                var pins: {name: string; pinned: boolean}[] = []
+                data.map((i: any) => {
+                    programs.push({
+                        name: format(i.programName),
+                        renewalDate: formatDate(i.renewalDate),
+                        totalUsers: 0,
+                        perYear: 0,
+                        perUse: 0,
+                        isPerYear: i.isCostPerYear,
+                        icon: placeholder,
+                        cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
+                    })
+                    pins.push({name: i.programName, pinned: i.pinned ? true : false})
+                })
+                setArchivedData(programs)
+            })
+            .catch((err: any) => console.error(err))
+    }, [])
 
     //Set display Images
     useEffect(() => {
-        images.map((img: any) =>
-            checkImages(img).then(data => {
+        images.map((img: {name: string; img: string}) =>
+            checkImage(img.img, axios, placeholder).then(data => {
                 var list = images.filter(i => i.name !== img.name)
-                setImages([...list, data])
-                displayImages.push(data)
+                setImages([...list, {name: img.name, img: data}])
+                displayImages.push({name: img.name, img: data})
             })
         )
     }, [useImages])
 
-    //check image
-    async function checkImages(img: any) {
-        var arr: any[] = []
-        await axios
-            .get(img.img)
-            .then((data: any) => {
-                arr.push({name: img.name, img: data === '' ? placeholder : URL + img.img})
-            })
-            .catch((err: any) => console.error(err))
-
-        return arr[0]
-    }
-
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        var filteredTableInput = listData.filter((row: any) => {
-            return !row[selected.value]
-                ? false
-                : row[selected.value]
-                      .toString()
-                      .toLowerCase()
-                      .search(search.toLowerCase()) !== -1
-        })
-        setFilteredData(filteredTableInput)
-    }, [search, selected, listData])
+        if (isArchive) {
+            var filteredTableInput = archivedData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        } else {
+            var filteredTableInput = listData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        }
+    }, [search, selected, listData, isArchive])
 
     const handleClick = () => {
-        history.push('/programs/edit/overview/new')
+        history.push(`/programs/edit/overview/new/inventory`)
     }
 
     const handleRowClick = (row: any) => {
         // go to prog overview
-        history.push(`/programs/overview/${row[0]}`)
+        history.push(`/programs/overview/${row[0]}/${isArchive ? 'archived' : 'inventory'}`)
     }
 
     var filteredRows: any[] = []
@@ -139,7 +162,6 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     useEffect(() => {
         setRows(filteredRows)
     }, [filteredData])
-    console.log(rows)
 
     //-------------- this will all be the same -------------
     const headerStates = []
@@ -313,8 +335,14 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     })
 
     async function handlePinChanges() {
-        //TODO: put to set pinned programs
-        //async axios.put().catch((err: any) => console.error(err))
+        var pins: string[] = []
+        pinned.forEach(pin => {
+            if (pin.pinned) {
+                pins.push(pin.name)
+            }
+        })
+
+        await axios.put('/update/programPins', pins).catch((err: any) => console.error(err))
         setCheckboxes(!checkboxes)
     }
 
@@ -325,18 +353,29 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             </Switch>
             {isAdmin ? (
                 <Group direction='row' justify='between' className={styles.group}>
-                    <Group className={styles.buttonGroup}>
+                    <div className={styles.buttonContainer}>
                         <Button text='Add' icon='add' onClick={handleClick} />
-                        {checkboxes ? (
+                        <Button
+                            text={isArchive ? 'View Active' : 'View Archives'}
+                            onClick={() => {
+                                setIsArchive(!isArchive)
+                                setCheckboxes(false)
+                            }}
+                            className={styles.archiveButton}
+                        />
+
+                        {!isArchive && checkboxes ? (
                             <Button text='Save Changes' onClick={handlePinChanges} className={styles.dashboardButton} />
                         ) : (
-                            <Button
-                                text='Pin To Dashboard'
-                                onClick={() => setCheckboxes(!checkboxes)}
-                                className={styles.dashboardButton}
-                            />
+                            !isArchive && (
+                                <Button
+                                    text='Pin To Dashboard'
+                                    onClick={() => setCheckboxes(!checkboxes)}
+                                    className={styles.dashboardButton}
+                                />
+                            )
                         )}
-                    </Group>
+                    </div>
                     <FilteredSearch
                         search={search}
                         setSearch={setSearch}

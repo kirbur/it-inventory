@@ -2,9 +2,11 @@
     text-align: center;
 }
 
-.navBarLogo {
+.logoContainer {
     align-self: flex-start;
     margin: auto;
+}
+.navBarLogo {
     width: 100px;
 }
 
@@ -34,7 +36,7 @@
 
 .navBar {
     width: 100%;
-    min-width: 1070px;
+    min-width: 1120px;
     height: 65px;
     background: #f4f4f4;
     position: relative;

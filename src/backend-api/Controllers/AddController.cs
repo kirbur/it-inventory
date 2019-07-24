@@ -12,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AddController : ContextController
@@ -84,7 +83,9 @@ namespace backend_api.Controllers
                 {
                     foreach (var domainUser in search.FindAll())
                     {
-                        if (domainUser.DisplayName != null && domainUser.Guid != null && domainUser.IsMemberOf(gp) && !ADIds.Contains(domainUser.Guid.Value))
+                        if (domainUser.DisplayName != null && domainUser.Guid != null && 
+                            domainUser.IsMemberOf(gp) && 
+                            !ADIds.Contains(domainUser.Guid.Value))
                         {
                             myDomainUsers.Add(domainUser.DisplayName);
                         }
@@ -92,12 +93,12 @@ namespace backend_api.Controllers
                 }
 
             }
-
+            // list to hold the department objects that will be returned
             List<object> departments = new List<object>();
             foreach (var dep in _context.Department.Where(x => x.IsDeleted == false))
             {
                 // if the department is any department apart from utilities does not have default programs
-                if (dep.DepartmentName != "Utilities")
+                if (dep.DepartmentName != "Utilities" && dep.DepartmentName != "Unassigned")
                 {
                     // pull stringifyed default hardware and software out into a nice JSON object :) using JSON package.
                     JObject defaultHardware = JObject.Parse(dep.DefaultHardware);
@@ -136,63 +137,22 @@ namespace backend_api.Controllers
             // list that will hold the unassigned hardware
             List<object> UnassignedHardware = new List<object>();
 
-            // loop with lambda that finds the unassigned, not deleted monitors and adds the necessary returnables of them into a list 
-            foreach (var mon in _context.Monitor.Where(x => x.EmployeeId == null && x.IsDeleted == false))
-            {
-                var monitorName = mon.Make + " " + mon.Model;
-                var monitor = new
-                {
-                    mon.MonitorId,
-                    type = nameof(Monitor),
-                    monitorName
-                };
-                UnassignedHardware.Add(monitor);
-            }
-            // loop with lambda that finds the unassigned, not deleted servers and adds the necessary returnables of them into a list 
-            foreach (var serv in _context.Server.Where(x => x.EmployeeId == null && x.IsDeleted == false))
-            {
-                var serverName = serv.Make + " " + serv.Model;
-                var server = new
-                {
-                    serv.ServerId,
-                    type = nameof(Server),
-                    serverName
-                };
-                UnassignedHardware.Add(server);
-            }
-
-            // loop with lambda that finds the unassigned, not deleted computers and adds the necessary returnables of them into a list 
-            foreach (var comp in _context.Computer.Where(x => x.EmployeeId == null && x.IsDeleted == false))
-            {
-                var compName = comp.Make + " " + comp.Model;
-                var computer = new
-                {
-                    comp.ComputerId,
-                    type = nameof(Computer),
-                    compName
-                };
-                UnassignedHardware.Add(computer);
-            }
-
-            // loop with lambda that finds the unassigned, not deleted peripherals and adds the necessary returnables of them into a list 
-            foreach (var periph in _context.Peripheral.Where(x => x.EmployeeId == null && x.IsDeleted == false))
-            {
-                var periphName = periph.PeripheralName + " " + periph.PeripheralType;
-                var peripheral = new
-                {
-                    periph.PeripheralId,
-                    type = nameof(Peripheral),
-                    periphName
-                };
-                UnassignedHardware.Add(peripheral);
-            }
+            // adding unassigned hardware to our list of unassigned using helper method
+            UnassignedHardware.AddRange(UnassignedHardwareHelper<Monitor>());
+            UnassignedHardware.AddRange(UnassignedHardwareHelper<Server>());
+            UnassignedHardware.AddRange(UnassignedHardwareHelper<Computer>());          
+            UnassignedHardware.AddRange(UnassignedHardwareHelper<Peripheral>());
 
             // Unassigned programs lists for returning purposes
             List<object> UnassignedSoftware = new List<object>();
             List<object> UnassignedLicenses = new List<object>();
 
             // loop and lambda to find all the distinct programs that have any of their individual programs unassigned and loop though them
-            foreach (var prog in _context.Program.Where(x => x.EmployeeId == null && x.IsDeleted == false).GroupBy(prog => prog.ProgramName).Select(x => x.FirstOrDefault()).ToList())
+            foreach (var prog in _context.Program
+                .Where(x => x.EmployeeId == null && x.IsDeleted == false)
+                .GroupBy(prog => prog.ProgramName)
+                .Select(x => x.FirstOrDefault())
+                .ToList())
             {
                 // for the licenses list
                 if (prog.IsLicense == false)
@@ -237,7 +197,9 @@ namespace backend_api.Controllers
          *           "LastName": String,
          *           "HireDate": String,
          *           "Role": String,
-         *           "DepartmentID": int
+         *           "DepartmentID": int,
+         *           "IsAdmin" : bool,
+         *           "TextField" : string
          *       },
          *       "HardwareAssigned": [
          *           {
@@ -278,10 +240,12 @@ namespace backend_api.Controllers
                     LastName = input.Employee.LastName,
                     Email = "",
                     Role = input.Employee.Role,
-                    Adguid = user.Guid.Value
+                    Adguid = user.Guid.Value,
+                    TextField = input.Employee.TextField
                 };
                 _context.Employee.Add(emp);
 
+                // adding a new authIDEmp for the new employee created
                 var AuthEmp = new AuthIdserver()
                 {
                     ActiveDirectoryId = user.Guid.Value,
@@ -358,12 +322,27 @@ namespace backend_api.Controllers
             List<string> hardware = new List<string> { "Server", "Laptop", "Monitor" };
 
             // Get the type of peripherals. Types are generic but more specific than "Peripheral"
-            List<string> peripherals = _context.Peripheral.Where(pr => !pr.IsDeleted).GroupBy(pr => pr.PeripheralType).Select(pr => pr.FirstOrDefault()).Select(pr => pr.PeripheralType).ToList();
+            List<string> peripherals = _context.Peripheral
+                .Where(pr => !pr.IsDeleted)
+                .GroupBy(pr => pr.PeripheralType)
+                .Select(pr => pr.FirstOrDefault())
+                .Select(pr => pr.PeripheralType)
+                .ToList();
+
             hardware.AddRange(peripherals);
 
             // Get the names of licenses and software that are not deleted
-            IQueryable<string> licenses = _context.Program.Where(prog => prog.IsLicense && !prog.IsDeleted).GroupBy(prog => prog.ProgramName).Select(prog => prog.FirstOrDefault()).Select(prog => prog.ProgramName);
-            IQueryable<string> software = _context.Program.Where(prog => !prog.IsLicense && !prog.IsDeleted).GroupBy(prog => prog.ProgramName).Select(prog => prog.FirstOrDefault()).Select(prog => prog.ProgramName);
+            IQueryable<string> licenses = _context.Program
+                .Where(prog => prog.IsLicense && !prog.IsDeleted)
+                .GroupBy(prog => prog.ProgramName)
+                .Select(prog => prog.FirstOrDefault())
+                .Select(prog => prog.ProgramName);
+
+            IQueryable<string> software = _context.Program
+                .Where(prog => !prog.IsLicense && !prog.IsDeleted)
+                .GroupBy(prog => prog.ProgramName)
+                .Select(prog => prog.FirstOrDefault())
+                .Select(prog => prog.ProgramName);
 
             // Return JSON in a list :)
             return Ok(new[] { new
@@ -426,7 +405,7 @@ namespace backend_api.Controllers
          *          "ProgramFlatCost" : Decimal,
          *          "ProgramLicenseKey" : string,
          *          "IsLicense" : bool,
-         *          "ProgramDescription" : string,
+         *          "Description" : string,
          *          "ProgramPurchaseLink" : string,
          *          "DateBought" : DateTime,
          *          "RenewalDate" : DateTime,
@@ -462,7 +441,7 @@ namespace backend_api.Controllers
                         ProgramLicenseKey = input.Program.ProgramLicenseKey,
                         IsLicense = input.Program.IsLicense,
                         EmployeeId = null,
-                        Description = input.Program.ProgramDescription,
+                        Description = input.Program.Description,
                         ProgramPurchaseLink = input.Program.ProgramPurchaseLink,
                         HasPlugIn = false,
                         IsDeleted = false,
@@ -518,8 +497,14 @@ namespace backend_api.Controllers
         [Route("Plugin")]
         public IActionResult PostPlugin([FromBody] PostPluginInputModel input)
         {
-            if (!(_context.Program.Select(x => x.ProgramName).ToList().Contains(input.ProgramName)))
+            // this is checking to see if the program exists that the input claims it's a plugin of
+            if (!(_context.Program
+                .Select(x => x.ProgramName)
+                .ToList()
+                .Contains(input.ProgramName)))
+            {
                 return BadRequest("No such program exists");
+            }
 
             var plugin = new Plugins()
             {
@@ -527,12 +512,12 @@ namespace backend_api.Controllers
                 PluginFlatCost = input.PluginFlatCost,
                 ProgramId = _context.Program.Where(x => x.ProgramName == input.ProgramName).Select(x => x.ProgramId).First(),
                 TextField = input.TextField,
-                PluginCostPerYear = input.PLuginCostPerYear,
+                PluginCostPerYear = input.PluginCostPerYear,
                 IsDeleted = false,
                 ProgramName = input.ProgramName,
                 RenewalDate = input.RenewalDate,
                 MonthsPerRenewal = input.MonthsPerRenewal,
-                Datebought = input.DateBought,
+                DateBought = input.DateBought,
                 IsCostPerYear = input.MonthsPerRenewal != null && input.MonthsPerRenewal - 12 >= 0 ? true : false,
             };
             _context.Add(plugin);
@@ -542,7 +527,10 @@ namespace backend_api.Controllers
             var programTiedToPlugin = _context.Program.Find(plugin.ProgramId);
 
             //update the program has plugin field to true
-            _context.Program.Where(x => x.ProgramName == programTiedToPlugin.ProgramName).ToList().ForEach(x => x.HasPlugIn = true);
+            _context.Program
+                .Where(x => x.ProgramName == programTiedToPlugin.ProgramName)
+                .ToList()
+                .ForEach(x => x.HasPlugIn = true);
             _context.SaveChanges();
             return StatusCode(201);
         }
@@ -756,6 +744,37 @@ namespace backend_api.Controllers
 
             // If we make it here, everything must have succeeded
             return StatusCode(201);
+        }
+
+        /* UnassignedHardwareHelper<T>() is a method to find the unassigned hardware from the given type
+        *   and return it
+        */
+        private List<object> UnassignedHardwareHelper<T>()
+             where T : class, IHardwareBase
+        {
+            // list of the unassigned hardware that will be returned
+            List<object> UnassignedHardware = new List<object>();
+
+            // finding our table from our context class
+            DbSet<T> table = _context.Set<T>();
+
+            // loop through the hardware and find unassigned and non-deleted hardware
+            foreach (var hardware in table.Where(x => x.EmployeeId == null && x.IsDeleted == false))
+            {
+                // get their make and their model so we can return this as part of our object that will be displayed.
+                /*
+                 * NOTE: GetMake() and GetModel() return name and type when the given context is peripheral
+                 */
+                var hardwareName = hardware.GetMake() + " " + hardware.GetModel() ;
+                var HW = new
+                {
+                    hardwareId = hardware.GetId(),
+                    type = table.GetType().GetGenericArguments().Single().Name,
+                    hardwareName
+                };
+                UnassignedHardware.Add(HW);
+            }
+            return UnassignedHardware;
         }
     }
 }

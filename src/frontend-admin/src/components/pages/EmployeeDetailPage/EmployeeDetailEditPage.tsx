@@ -3,25 +3,25 @@ import {History} from 'history'
 import {match} from 'react-router-dom'
 
 // Components
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
-import {GoCloudUpload} from 'react-icons/go'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {FaUserShield, FaUser} from 'react-icons/fa'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import DatePicker from 'react-datepicker'
-
-import 'react-datepicker/dist/react-datepicker.css'
+import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Styles
 import styles from './EmployeeDetailEditPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 import {Button} from '../../reusables/Button/Button'
-import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {LoginContext} from '../../App/App'
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
+import deptPlaceholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Types
 interface IDepartment {
@@ -35,7 +35,7 @@ interface IDepartment {
 
 interface IEmployeeDetailEditPageProps {
     match: match<{id: string}>
-    history: any
+    history: History
 }
 
 interface IEmployee {
@@ -72,17 +72,29 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         hwCost: 0,
         swCost: 0,
     })
-    const [hardwareRows, setHardwareRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+    const [hardwareRows, setHardwareRows] = useState<{
+        assigned: ITableItem[][]
+        added: ITableItem[][]
+        removed: ITableItem[][]
+    }>({
         assigned: [],
         added: [],
         removed: [],
     })
-    const [softwareRows, setSoftwareRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+    const [softwareRows, setSoftwareRows] = useState<{
+        assigned: ITableItem[][]
+        added: ITableItem[][]
+        removed: ITableItem[][]
+    }>({
         assigned: [],
         added: [],
         removed: [],
     })
-    const [licenseRows, setLicenseRows] = useState<{assigned: any[]; added: any[]; removed: any[]}>({
+    const [licenseRows, setLicenseRows] = useState<{
+        assigned: ITableItem[][]
+        added: ITableItem[][]
+        removed: ITableItem[][]
+    }>({
         assigned: [],
         added: [],
         removed: [],
@@ -93,72 +105,67 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const licenseHeaders = ['Licenses', 'Key/Username', 'Monthly Cost', 'CALs']
 
     const [deptList, setDeptList] = useState<IDepartment[]>([])
+    const [deptImages, setDeptImages] = useState<{id: number; img: string}[]>([])
+    const [useImages, setUseImages] = useState(false)
 
     //input feild states:
     const [dateInput, setDateInput] = useState<Date>(new Date())
     const [deptInput, setDeptInput] = useState<IDepartment>()
-    const [adminInput, setAdminInput] = useState<boolean>()
+    const [adminInput, setAdminInput] = useState<boolean>(false)
     const [imgInput, setImgInput] = useState<File>()
     const [roleInput, setRoleInput] = useState<string>('')
+    const [changed, setChanged] = useState(false)
+    const [descriptionInput, setDescriptionInput] = useState('')
 
     const [hardwareDropdown, setHardwareDropdown] = useState<any[]>([])
     const [softwareDropdown, setSoftwareDropdown] = useState<any[]>([])
     const [licenseDropdown, setLicenseDropdown] = useState<any[]>([])
 
-    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'Select An Employee', id: -1}])
+    const [employeeDropdown, setEmployeeDropdown] = useState<any[]>([{name: 'Select A New Employee', id: -1}])
     const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>(employeeDropdown[0])
 
     useEffect(() => {
-        if (match.params.id === 'new') {
+        axios
+            .get(`/add/employeePrep/`)
+            .then((data: any) => {
+                var availableEmp: any[] = []
+                data[0].myDomainUsers.sort().map((emp: any, index: number) => availableEmp.push({name: emp, id: index}))
+
+                setEmployeeDropdown(availableEmp)
+
+                setDeptList(data[0].departments)
+                setUseImages(true)
+
+                let uhw: any[] = []
+                data[0].unassignedHardware.map((i: any) =>
+                    uhw.push({
+                        name: i.hardwareName,
+                        id: i.type.toLowerCase() + '/' + i.hardwareId,
+                    })
+                )
+                setHardwareDropdown(uhw)
+
+                let usw: any[] = []
+                data[0].unassignedSoftware.map((i: any) =>
+                    usw.push({
+                        name: i.programName,
+                        id: i.programId,
+                    })
+                )
+                setSoftwareDropdown(usw)
+
+                let ul: any[] = []
+                data[0].unassignedLicenses.map((i: any) =>
+                    ul.push({
+                        name: i.programName,
+                        id: i.programId,
+                    })
+                )
+                setLicenseDropdown(ul)
+            })
+            .catch((err: any) => console.error(err))
+        if (match.params.id !== 'new') {
             axios
-                .get(`/add/employeePrep/`)
-                .then((data: any) => {
-                    //console.log(data)
-
-                    var availableEmp: any[] = []
-                    data[0].myDomainUsers
-                        .sort()
-                        .map((emp: any, index: number) => availableEmp.push({name: emp, id: index}))
-
-                    setEmployeeDropdown(availableEmp)
-
-                    setDeptList(data[0].departments)
-
-                    let uhw: any[] = []
-                    data[0].unassignedHardware.map((i: any) =>
-                        uhw.push({
-                            name: i.monitorName ? i.monitorName : i.compName ? i.compName : i.periphName,
-                            id: i.monitorId
-                                ? i.type.toLowerCase() + '/' + i.monitorId
-                                : i.computerId
-                                ? i.type.toLowerCase() + '/' + i.computerId
-                                : i.type.toLowerCase() + '/' + i.peripheralId,
-                        })
-                    )
-
-                    setHardwareDropdown(uhw)
-
-                    let usw: any[] = []
-                    data[0].unassignedSoftware.map((i: any) =>
-                        usw.push({
-                            name: i.programName,
-                            id: i.programId,
-                        })
-                    )
-                    setSoftwareDropdown(usw)
-
-                    let ul: any[] = []
-                    data[0].unassignedLicenses.map((i: any) =>
-                        ul.push({
-                            name: i.programName,
-                            id: i.programId,
-                        })
-                    )
-                    setLicenseDropdown(ul)
-                })
-                .catch((err: any) => console.error(err))
-        } else {
-            axios //TODO: get from edit endpoint
                 .get(`/detail/employee/${match.params.id}`)
                 .then((data: any) => {
                     setUserData({
@@ -177,6 +184,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     setAdminInput(data[0].admin)
                     setDateInput(new Date(formatDate(data[0].hireDate)))
                     setRoleInput(data[0].role)
+                    setDescriptionInput(data[0].textField)
                     setSelectedEmployee({
                         name: data[0].firstName + ' ' + data[0].lastName,
                         id: parseInt(match.params.id),
@@ -224,77 +232,70 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 sortBy: i.name,
                             },
                             {
-                                value: format(i.licenseKey),
+                                value: format(i.licensesKey),
                                 id: format(i.id),
-                                sortBy: format(i.licenseKey),
+                                sortBy: format(i.licensesKey),
                             },
                             {
                                 value: '$' + Math.round(i.costPerMonth * 100) / 100,
                                 sortBy: i.costPerMonth,
                             },
-                            {value: format(i.cals), id: format(i.id), sortBy: i.cals},
+                            {value: format(i.licensesCount), id: format(i.id), sortBy: i.licensesCount},
                         ])
                     )
                     setLicenseRows({...licenseRows, assigned: [...l]})
-
-                    let uhw: any[] = []
-                    data[0].unassignedHardware.map((i: any) =>
-                        uhw.push({
-                            name: i.monitorName ? i.monitorName : i.compName ? i.compName : i.periphName,
-                            id: i.monitorId
-                                ? i.type.toLowerCase() + '/' + i.monitorId
-                                : i.computerId
-                                ? i.type.toLowerCase() + '/' + i.computerId
-                                : i.type.toLowerCase() + '/' + i.peripheralId,
-                        })
-                    )
-
-                    setHardwareDropdown(uhw)
-
-                    let usw: any[] = []
-                    data[0].unassignedSoftware.map((i: any) =>
-                        usw.push({
-                            name: i.programName,
-                            id: i.programId,
-                        })
-                    )
-                    setSoftwareDropdown(usw)
-
-                    let ul: any[] = []
-                    data[0].unassignedLicenses.map((i: any) =>
-                        ul.push({
-                            name: i.programName,
-                            id: i.programId,
-                        })
-                    )
-                    setLicenseDropdown(ul)
                 })
                 .catch((err: any) => console.error(err))
 
             axios
                 .get(`/add/employeePrep/`)
-                .then((data: any) => setDeptList(data[0].departments))
+                .then((data: any) => {
+                    setDeptList(data[0].departments)
+
+                    setUseImages(true)
+                })
                 .catch((err: any) => console.error(err))
         }
     }, [])
+
+    //Set display Images
+    useEffect(() => {
+        deptList.map((dept: any) =>
+            checkImage(dept.icon, axios, deptPlaceholder).then(data => {
+                var list = deptList.filter(i => i.departmentId !== dept.departmentId)
+                setDeptList([...list, {...dept, icon: data}])
+                deptImages.push({id: dept.departmentId, img: data})
+            })
+        )
+    }, [useImages])
 
     //Check the current employees department, if they don't have one yet check the first
     useEffect(() => {
         var d = deptList.filter((i: any) => i.departmentName === userData.department)
         d[0] ? setDeptInput({...d[0]}) : setDeptInput({...deptList[0]})
+        d[0] ? applyDefaults({...d[0]}) : applyDefaults({...deptList[0]})
     }, [deptList, userData.department])
 
     //If the employee is new add the default hardware and programs to their tables to be assigned to them
-    const applyDefaults = () => {
-        if (match.params.id === 'new' && deptInput) {
+    const applyDefaults = (dept: IDepartment) => {
+        if (match.params.id === 'new' && dept) {
             /*APPLY HARDWARE DEFAULTS */
-            if (deptInput.defaultHardware) {
+            if (dept.defaultHardware) {
                 //clear out added
+                hardwareRows.added.map(add => {
+                    if (!hardwareDropdown.filter(item => item.id === add[0].id).length) {
+                        hardwareDropdown.push({
+                            name: add[0].value.toString(),
+                            id: add[0].id ? add[0].id.toString() : '',
+                        })
+                    }
+                })
                 setHardwareRows({...hardwareRows, added: []})
 
                 var toBeAdded: any[] = []
+                var unavailable: any[] = []
 
-                deptInput.defaultHardware.forEach(need => {
+                dept.defaultHardware.forEach(need => {
                     var needFulfilled = false
                     hardwareDropdown.map(available => {
                         if (
@@ -310,27 +311,44 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                             toBeAdded.push(arr)
                             needFulfilled = true
-                            return
                         }
+                        return
                     })
+                    if (!needFulfilled) {
+                        unavailable.push([
+                            {value: need + ' is unavailable', id: -1, sortBy: need, unavailable: true},
+                            {value: '', id: -1, sortBy: -1},
+                            {value: '', id: -1, sortBy: -1},
+                            {value: '', id: -1, sortBy: -1},
+                        ])
+                    }
                 })
 
                 //add the hardware defaults
-                setHardwareRows({...hardwareRows, added: [...toBeAdded]})
+                setHardwareRows({...hardwareRows, added: [...toBeAdded], assigned: [...unavailable]})
 
                 //remove the defaults from the dropdown
                 toBeAdded.map(added =>
-                    setHardwareDropdown([...hardwareDropdown.filter((option: any) => option.name === added[0].value)])
+                    setHardwareDropdown([...hardwareDropdown.filter((option: any) => option.name !== added[0].value)])
                 )
             }
 
-            if (deptInput.defaultSoftware) {
+            if (dept.defaultSoftware) {
                 /*APPLY SOFTWARE DEFAULTS */
                 //clear out added
+                softwareRows.added.map(add => {
+                    if (!softwareDropdown.filter(item => item.id === add[0].id).length) {
+                        softwareDropdown.push({
+                            name: add[0].value.toString(),
+                            id: add[0].id ? add[0].id.toString() : '',
+                        })
+                    }
+                })
                 setSoftwareRows({...softwareRows, added: []})
                 toBeAdded = []
+                unavailable = []
 
-                deptInput.defaultSoftware.forEach(need => {
+                dept.defaultSoftware.forEach(need => {
                     var needFulfilled = false
                     softwareDropdown.map(available => {
                         if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
@@ -342,27 +360,43 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                             toBeAdded.push(arr)
                             needFulfilled = true
-                            return
                         }
+                        return
                     })
+                    if (!needFulfilled) {
+                        unavailable.push([
+                            {value: need + ' is unavailable', id: -1, sortBy: need, unavailable: true},
+                            {value: '', id: -1, sortBy: -1},
+                            {value: '', id: -1, sortBy: -1},
+                        ])
+                    }
                 })
 
                 //add the software defaults
-                setSoftwareRows({...softwareRows, added: [...toBeAdded]})
+                setSoftwareRows({...softwareRows, added: [...toBeAdded], assigned: [...unavailable]})
 
                 //remove the defaults from the dropdown
                 toBeAdded.map(added =>
-                    setSoftwareDropdown([...softwareDropdown.filter((option: any) => option.name === added[0].value)])
+                    setSoftwareDropdown([...softwareDropdown.filter((option: any) => option.name !== added[0].value)])
                 )
             }
 
-            if (deptInput.defaultLicenses) {
+            if (dept.defaultLicenses) {
                 /*APPLY LICENSE DEFAULTS */
                 //clear out added
+                licenseRows.added.map(add => {
+                    if (!licenseDropdown.filter(item => item.id === add[0].id).length) {
+                        licenseDropdown.push({
+                            name: add[0].value.toString(),
+                            id: add[0].id ? add[0].id.toString() : '',
+                        })
+                    }
+                })
                 setLicenseRows({...licenseRows, added: []})
                 toBeAdded = []
+                unavailable = []
 
-                deptInput.defaultLicenses.forEach(need => {
+                dept.defaultLicenses.forEach(need => {
                     var needFulfilled = false
                     licenseDropdown.map(available => {
                         if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
@@ -375,23 +409,32 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                             toBeAdded.push(arr)
                             needFulfilled = true
-                            return
                         }
+                        return
                     })
+                    if (!needFulfilled) {
+                        unavailable.push([
+                            {value: need + ' is unavailable', id: -1, sortBy: need, unavailable: true},
+                            {value: '', id: -1, sortBy: -1},
+                            {value: '', id: -1, sortBy: -1},
+                            {value: '', id: -1, sortBy: -1},
+                        ])
+                    }
                 })
 
                 //add the license defaults
-                setLicenseRows({...licenseRows, added: [...toBeAdded]})
+                setLicenseRows({...licenseRows, added: [...toBeAdded], assigned: [...unavailable]})
 
                 //remove the defaults from the dropdown
                 toBeAdded.map(added =>
-                    setLicenseDropdown([...licenseDropdown.filter((option: any) => option.name === added[0].value)])
+                    setLicenseDropdown([...licenseDropdown.filter((option: any) => option.name !== added[0].value)])
                 )
             }
         }
     }
 
     const handleAddHardware = (newRow: any) => {
+        setChanged(true)
         //first add to displayed table
         var arr = [
             [
@@ -418,6 +461,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleRemoveHardware = (row: any) => {
+        setChanged(true)
         //if its in added then remove it
         var arr = hardwareRows.added.filter((add: any) => add[0].id !== row[0].id)
 
@@ -430,6 +474,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleAddSoftware = (newRow: any) => {
+        setChanged(true)
         var arr = [
             [
                 {value: newRow.name, id: newRow.id, sortBy: newRow.name},
@@ -452,6 +497,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         setSoftwareDropdown([...drop])
     }
     const handleRemoveSoftware = (row: any) => {
+        setChanged(true)
         //if its in added then remove it
         var arr = softwareRows.added.filter((add: any) => add[0].id !== row[0].id)
 
@@ -464,6 +510,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleAddLicense = (newRow: any) => {
+        setChanged(true)
         var arr = [
             [
                 {value: newRow.name, id: newRow.id, sortBy: newRow.name},
@@ -488,6 +535,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     const handleRemoveLicence = (row: any) => {
+        setChanged(true)
         //if its in added then remove it
         var arr = licenseRows.added.filter((add: any) => add[0].id !== row[0].id)
 
@@ -499,29 +547,31 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         setLicenseDropdown([...licenseDropdown, drop])
     }
 
-    const handleSubmit = () => {
-        /*ADD NEW EMPLOYEE */
+    async function handleSubmit() {
+        var name = ['first', 'last']
+        var msg = ''
 
+        /*ADD NEW EMPLOYEE */
         if (
             //make sure no inputs are null/undefined/empty
             match.params.id === 'new' &&
             deptInput &&
-            selectedEmployee.name !== 'Select An Employee' &&
-            roleInput !== ''
+            selectedEmployee.name !== 'Select A New Employee'
         ) {
-            var name = selectedEmployee.name.split(' ')
+            name = selectedEmployee.name.split(' ')
             var postEmployee = {
                 Employee: {
-                    FirstName: name[0],
-                    LastName: name[1],
+                    FirstName: name.shift(),
+                    LastName: name.join(''),
                     HireDate: dateInput.toISOString(),
-                    Role: roleInput,
+                    Role: roleInput ? roleInput : deptInput.departmentName,
                     DepartmentID: deptInput.departmentId,
                     IsAdmin: adminInput,
+                    TextField: descriptionInput,
                 },
                 HardwareAssigned: [
                     ...hardwareRows.added.map(i => {
-                        var hw = i[0].id.split('/')
+                        var hw = i[0].id ? i[0].id.toString().split('/') : [null, null]
                         return {Type: hw[0], ID: hw[1]}
                     }),
                 ],
@@ -535,51 +585,44 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 ],
             }
 
-            axios
+            await axios
                 .post('/add/Employee', postEmployee)
                 .then((response: any) => {
                     if (response && response.status === 201) {
                         window.alert(`${selectedEmployee.name} was successfully added!`)
                     }
                 })
-                .catch((err: any) => {
-                    window.alert(`Something went wrong`)
-                    console.error(err)
-                })
+                .catch((err: any) => console.error(err))
+
+            history.push(`/employees`)
         } else if (match.params.id === 'new') {
-            //one or maore of the inputs was null/undefined/empty
-            var msg = 'Failed because:\n'
-            msg += selectedEmployee.name === 'Select An Employee' ? 'No employee was selected,\n' : ''
-            msg += roleInput === '' ? 'No role was given,' : ''
-
-            window.alert(msg)
+            selectedEmployee.name === 'Select A New Employee' && window.alert('No employee was selected')
         }
-
-        //TODO: post request
-        //everything in every removed array needs to be unassigned
-        //everything in every added array needs to be assigned
 
         /*UPDATE EMPLOYEE */
         if (
             //make sure no inputs are null/undefined/empty
-
+            match.params.id !== 'new' &&
             deptInput &&
             selectedEmployee.name &&
-            roleInput
+            roleInput &&
+            changed
         ) {
-            var name = selectedEmployee.name.split(' ')
+            name = selectedEmployee.name.split(' ')
             var updateEmployee = {
                 Employee: {
-                    FirstName: name[0],
-                    LastName: name[1],
+                    EmployeeId: match.params.id,
+                    FirstName: name.shift(),
+                    LastName: name.join(''),
                     HireDate: dateInput.toISOString(),
                     Role: roleInput,
                     DepartmentID: deptInput.departmentId,
                     IsAdmin: adminInput,
+                    TextField: descriptionInput,
                 },
                 HardwareAssigned: [
                     ...hardwareRows.added.map(i => {
-                        var hw = i[0].id.split('/')
+                        var hw = i[0].id ? i[0].id.toString().split('/') : [null, null]
                         return {Type: hw[0], ID: hw[1]}
                     }),
                 ],
@@ -592,13 +635,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     }),
                 ],
 
-                HardwareRemoved: [
+                HardwareUnassigned: [
                     ...hardwareRows.removed.map(i => {
-                        var hw = i[0].id.split('/')
+                        var hw = i[0].id ? i[0].id.toString().split('/') : [null, null]
                         return {Type: hw[0], ID: hw[1]}
                     }),
                 ],
-                ProgramRemoved: [
+                ProgramUnassigned: [
                     ...softwareRows.removed.map(i => {
                         return {ID: i[0].id}
                     }),
@@ -608,21 +651,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 ],
             }
 
-            //TODO: verify this endpoint is right, and that updateEmployee is formatted correctly
-            // axios
-            //     .put(`/update/Employee/${match.params.id}`, updateEmployee)
-            //     .then((response: any) => {
-            //         if (response && response.status === 201) {
-            //             window.alert(`${selectedEmployee.name} was successfully updated!`)
-            //         }
-            //     })
-            //     .catch((err: any) => {
-            //         window.alert(`Something went wrong`)
-            //         console.error(err)
-            //     })
-        } else {
+            await axios.put(`/update/Employee`, updateEmployee).catch((err: any) => console.error(err))
+
+            history.push(`/employees/detail/${match.params.id}`)
+        } else if (match.params.id !== 'new' && changed) {
             //one or maore of the inputs was null/undefined/empty
-            var msg = 'Failed because:\n'
+            msg = 'Failed because:\n'
 
             msg += selectedEmployee.name === ('' || ' ') ? 'Name feild is empty,' : ''
             msg += roleInput === '' ? 'Role feild is empty,' : ''
@@ -635,11 +669,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             var formData = new FormData()
             formData.append('file', imgInput)
 
-            axios
+            await axios
                 .put(userData.photo, formData, {
                     headers: {'Content-Type': 'multipart/form-data'},
                 })
-                .then(data => console.log(data))
                 .catch(err => console.error(err))
         }
     }
@@ -667,7 +700,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         rows.added.map((add: any) => {
             if (type === 'hw' || type === 'l') {
                 arr.push([
-                    {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy},
+                    {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy, unavailable: add[0].unavailable},
                     {value: add[1].value, id: add[1].id, sortBy: add[1].sortBy},
                     {value: add[2].value, id: add[2].id, sortBy: add[2].sortBy},
                     {value: add[3].value, id: add[3].id, sortBy: add[3].sortBy},
@@ -675,7 +708,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             }
             if (type === 'sw') {
                 arr.push([
-                    {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy},
+                    {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy, unavailable: add[0].unavailable},
                     {value: add[1].value, id: add[1].id, sortBy: add[1].sortBy},
                     {value: add[2].value, id: add[2].id, sortBy: add[2].sortBy},
                 ])
@@ -705,28 +738,14 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         text={userData.name}
                         icon='back'
                         onClick={() => {
-                            history.push(`/employees/${match.params.id}`)
+                            history.push(`/employees/detail/${match.params.id}`)
                         }}
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
                     />
                 )}
-                <div className={styles.imgPadding}>
-                    {/* <ImageInput /> */}
-                    <GoCloudUpload size={300} className={styles.cloudIcon} onClick={() => {}} />
-                    <input
-                        className={styles.imgInput}
-                        type='file'
-                        accept='image/*'
-                        onClick={event => {
-                            //console.log(event)
-                        }}
-                        onChange={e => {
-                            var files = e.target.files
-                            files && files[0] && setImgInput(files[0])
-                        }}
-                    />
-                </div>
+
+                <PictureInput setImage={setImgInput} image={imgInput} />
             </div>
             {/* column 2 */}
             <div className={styles.secondColumn}>
@@ -744,7 +763,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     name='admin'
                                     className={styles.checkmark}
                                     checked={adminInput}
-                                    onChange={() => setAdminInput(true)}
+                                    onChange={() => {
+                                        setAdminInput(true)
+                                        setChanged(true)
+                                    }}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmarkAdmin} />
@@ -766,7 +788,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 name='admin'
                                 className={styles.checkmark}
                                 checked={!adminInput}
-                                onChange={() => setAdminInput(false)}
+                                onChange={() => {
+                                    setAdminInput(false)
+                                    setChanged(true)
+                                }}
                             />
                             <div className={styles.checkmark} />
                             <div className={styles.insideCheckmarkAdmin} />
@@ -839,9 +864,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                         type='text'
                                         className={styles.input}
                                         value={selectedEmployee.name}
-                                        onChange={e =>
+                                        onChange={e => {
                                             setSelectedEmployee({name: e.target.value, id: parseInt(match.params.id)})
-                                        }
+                                            setChanged(true)
+                                        }}
                                     />
                                 )
                             )}
@@ -851,7 +877,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 type='text'
                                 className={styles.input}
                                 value={roleInput}
-                                onChange={e => setRoleInput(e.target.value)}
+                                onChange={e => {
+                                    setRoleInput(e.target.value)
+                                    setChanged(true)
+                                }}
                             />
                         </div>
                     </div>
@@ -861,7 +890,10 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             dateFormat='MM/dd/yyyy'
                             placeholderText={userData.hireDate}
                             selected={dateInput}
-                            onChange={e => e && setDateInput(e)}
+                            onChange={e => {
+                                e && setDateInput(e)
+                                setChanged(true)
+                            }}
                             className={styles.input}
                         />
                     </div>
@@ -882,12 +914,25 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     checked={dept.departmentId === deptInput.departmentId}
                                     onChange={() => {
                                         setDeptInput(dept)
-                                        applyDefaults()
+                                        applyDefaults(dept)
+                                        setChanged(true)
                                     }}
                                 />
                                 <div className={styles.checkmark} />
                                 <div className={styles.insideCheckmark} />
-                                <img src={dept.icon} alt={''} className={styles.deptIcon} />
+                                <div className={styles.deptIconContainer}>
+                                    {deptImages &&
+                                    deptImages.filter(x => x.id === dept.departmentId) &&
+                                    deptImages.filter(x => x.id === dept.departmentId)[0] ? (
+                                        <img
+                                            src={deptImages.filter(x => x.id === dept.departmentId)[0].img}
+                                            alt={''}
+                                            className={styles.deptIcon}
+                                        />
+                                    ) : (
+                                        <img src={deptPlaceholder} alt={''} className={styles.deptIcon} />
+                                    )}
+                                </div>
                                 <div className={styles.deptName}>{dept.departmentName}</div>
                             </div>
                         ))}
@@ -897,149 +942,163 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 <div className={styles.line} />
 
                 {/* Tables */}
-                <div className={styles.paddingTop}>
-                    <DetailPageTable
-                        headers={hardwareHeaders}
-                        rows={displayTable(hardwareRows, 'hw')}
-                        setRows={() => {}}
-                        style={styles.newRowThing}
-                        edit={true}
-                        remove={handleRemoveHardware}
-                        // sorting={false}
-                    />
-                </div>
-                {hardwareDropdown && (
-                    <Button
-                        className={s(styles.addContainer, styles.dropdown3)}
-                        icon='add'
-                        onClick={() => {}}
-                        textInside={false}
-                    >
-                        <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                            <DropdownList
-                                triggerElement={({isOpen, toggle}) => (
-                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                        <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                            Assign new hardware
-                                        </div>
-                                    </button>
-                                )}
-                                choicesList={() => (
-                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
-                                        {hardwareDropdown.map(i => (
-                                            <li
-                                                className={dropdownStyles.dropdownListItem}
-                                                key={i.id}
-                                                onClick={() => handleAddHardware(i)}
-                                            >
-                                                <button className={dropdownStyles.dropdownListItemButton}>
-                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            />
-                            <div />
-                        </div>
-                    </Button>
-                )}
+                <div className={styles.tableContainer}>
+                    <div className={styles.paddingTop}>
+                        <DetailPageTable
+                            headers={hardwareHeaders}
+                            rows={displayTable(hardwareRows, 'hw')}
+                            setRows={() => {}}
+                            style={styles.newRowThing}
+                            edit={true}
+                            remove={handleRemoveHardware}
+                            // sorting={false}
+                        />
+                    </div>
+                    {hardwareDropdown && (
+                        <Button
+                            className={s(styles.addContainer, styles.dropdown3)}
+                            icon='add'
+                            onClick={() => {}}
+                            textInside={false}
+                        >
+                            <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                                <DropdownList
+                                    triggerElement={({isOpen, toggle}) => (
+                                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                                Assign new hardware
+                                            </div>
+                                        </button>
+                                    )}
+                                    choicesList={() => (
+                                        <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
+                                            {hardwareDropdown.map(i => (
+                                                <li
+                                                    className={dropdownStyles.dropdownListItem}
+                                                    key={i.id}
+                                                    onClick={() => handleAddHardware(i)}
+                                                >
+                                                    <button className={dropdownStyles.dropdownListItemButton}>
+                                                        <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                />
+                                <div />
+                            </div>
+                        </Button>
+                    )}
 
-                <div className={styles.paddingTop}>
-                    <DetailPageTable
-                        headers={softwareHeaders}
-                        rows={displayTable(softwareRows, 'sw')}
-                        setRows={() => {}}
-                        style={styles.newRowThing}
-                        edit={true}
-                        remove={handleRemoveSoftware}
-                        // sorting={false}
-                    />
-                </div>
-                {softwareDropdown && (
-                    <Button
-                        className={s(styles.addContainer, styles.dropdown2)}
-                        icon='add'
-                        onClick={() => {}}
-                        textInside={false}
-                    >
-                        <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                            <DropdownList
-                                triggerElement={({isOpen, toggle}) => (
-                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                        <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                            Assign new software
-                                        </div>
-                                    </button>
-                                )}
-                                choicesList={() => (
-                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
-                                        {softwareDropdown.map(i => (
-                                            <li
-                                                className={dropdownStyles.dropdownListItem}
-                                                key={i.id}
-                                                onClick={() => handleAddSoftware(i)}
-                                            >
-                                                <button className={dropdownStyles.dropdownListItemButton}>
-                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            />
-                            <div />
-                        </div>
-                    </Button>
-                )}
+                    <div className={styles.paddingTop}>
+                        <DetailPageTable
+                            headers={softwareHeaders}
+                            rows={displayTable(softwareRows, 'sw')}
+                            setRows={() => {}}
+                            style={styles.newRowThing}
+                            edit={true}
+                            remove={handleRemoveSoftware}
+                            // sorting={false}
+                        />
+                    </div>
+                    {softwareDropdown && (
+                        <Button
+                            className={s(styles.addContainer, styles.dropdown2)}
+                            icon='add'
+                            onClick={() => {}}
+                            textInside={false}
+                        >
+                            <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                                <DropdownList
+                                    triggerElement={({isOpen, toggle}) => (
+                                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                                Assign new software
+                                            </div>
+                                        </button>
+                                    )}
+                                    choicesList={() => (
+                                        <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
+                                            {softwareDropdown.map(i => (
+                                                <li
+                                                    className={dropdownStyles.dropdownListItem}
+                                                    key={i.id}
+                                                    onClick={() => handleAddSoftware(i)}
+                                                >
+                                                    <button className={dropdownStyles.dropdownListItemButton}>
+                                                        <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                />
+                                <div />
+                            </div>
+                        </Button>
+                    )}
 
-                <div className={styles.paddingTop}>
-                    <DetailPageTable
-                        headers={licenseHeaders}
-                        rows={displayTable(licenseRows, 'l')}
-                        setRows={() => {}}
-                        style={styles.newRowThing}
-                        edit={true}
-                        remove={handleRemoveLicence}
-                        // sorting={false}
+                    <div className={styles.paddingTop}>
+                        <DetailPageTable
+                            headers={licenseHeaders}
+                            rows={displayTable(licenseRows, 'l')}
+                            setRows={() => {}}
+                            style={styles.newRowThing}
+                            edit={true}
+                            remove={handleRemoveLicence}
+                            // sorting={false}
+                        />
+                    </div>
+                    {licenseDropdown && (
+                        <Button
+                            className={s(styles.addContainer, styles.dropdown1)}
+                            icon='add'
+                            onClick={() => {}}
+                            textInside={false}
+                        >
+                            <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
+                                <DropdownList
+                                    triggerElement={({isOpen, toggle}) => (
+                                        <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
+                                                Assign new license
+                                            </div>
+                                        </button>
+                                    )}
+                                    choicesList={() => (
+                                        <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
+                                            {licenseDropdown.map(i => (
+                                                <li
+                                                    className={dropdownStyles.dropdownListItem}
+                                                    key={i.id}
+                                                    onClick={() => handleAddLicense(i)}
+                                                >
+                                                    <button className={dropdownStyles.dropdownListItemButton}>
+                                                        <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                />
+                                <div />
+                            </div>
+                        </Button>
+                    )}
+                </div>
+
+                <div className={s(styles.inputContainer, styles.descriptionContainer)}>
+                    <div className={styles.text}>Description</div>
+                    <textarea
+                        className={s(styles.input, styles.description)}
+                        value={descriptionInput}
+                        onChange={e => {
+                            setChanged(true)
+                            setDescriptionInput(e.target.value)
+                        }}
                     />
                 </div>
-                {licenseDropdown && (
-                    <Button
-                        className={s(styles.addContainer, styles.dropdown1)}
-                        icon='add'
-                        onClick={() => {}}
-                        textInside={false}
-                    >
-                        <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                            <DropdownList
-                                triggerElement={({isOpen, toggle}) => (
-                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                        <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>
-                                            Assign new license
-                                        </div>
-                                    </button>
-                                )}
-                                choicesList={() => (
-                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
-                                        {licenseDropdown.map(i => (
-                                            <li
-                                                className={dropdownStyles.dropdownListItem}
-                                                key={i.id}
-                                                onClick={() => handleAddLicense(i)}
-                                            >
-                                                <button className={dropdownStyles.dropdownListItemButton}>
-                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            />
-                            <div />
-                        </div>
-                    </Button>
-                )}
 
                 <div className={styles.submitContainer}>
                     <Button text='Submit' icon='submit' onClick={handleSubmit} className={styles.submitbutton} />

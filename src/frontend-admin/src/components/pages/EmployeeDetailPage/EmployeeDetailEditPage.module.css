@@ -7,7 +7,7 @@
 }
 
 .firstColumn {
-    padding: 50px;
+    padding: 100px;
 }
 
 .secondColumn {
@@ -18,30 +18,8 @@
 }
 
 /*First Column*/
-.imgPadding {
-    padding: 25px;
-    background-color: #f4f4f4;
-    border-radius: 10px;
-    width: 300px;
-    height: 300px;
-
-    color: #009eff;
-}
-
-.imgInput {
-    position: relative;
-    top: -300px;
-    width: 300px;
-    height: 300px;
-    opacity: 0;
-    background: #636363;
-    cursor: pointer;
-}
-
-.img {
-    position: relative;
-    top: 50px;
-    transform: scale(1.5, 1.5);
+.backButton {
+    margin-bottom: 30px;
 }
 
 /*Second Column*/
@@ -101,7 +79,7 @@
     transform: scale(4.5, 4.5);
     position: relative;
     top: 40px;
-    left: 5px;
+    left: 2px;
 }
 .adminText {
     color: #a5a5a5;
@@ -185,14 +163,27 @@ input:checked ~ .insideCheckmarkAdmin {
     display: flex;
     flex-wrap: wrap;
 }
-.deptIcon {
+
+.deptIconContainer {
+    margin: 25px;
     width: 75px;
     height: 75px;
-    margin: 25px;
+    display: flex;
+}
+.deptIcon {
+    width: 75px;
+    max-height: 75px;
+    margin: auto;
 }
 .deptName {
     color: #636363;
     font-size: 22px;
+}
+
+/* table styling */
+.tableContainer {
+    position: relative;
+    right: 50px;
 }
 
 /* so the table doesnt highlight on hover */
@@ -203,8 +194,9 @@ input:checked ~ .insideCheckmarkAdmin {
 /* add to table text and icon */
 .addContainer {
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    justify-content: start;
+    position: relative;
+    left: 50px;
 }
 .addIconBorder:hover {
     background-color: #009eff;
@@ -299,4 +291,18 @@ input:checked ~ .insideCheckmarkAdmin {
 
 .dropdown3 {
     z-index: 3;
+}
+
+.descriptionContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.description {
+    justify-self: flex-start;
+    width: 98%;
+    height: 100px;
+    font-family: cqlRegularFont;
+    resize: none;
 }

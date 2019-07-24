@@ -29,8 +29,9 @@
 
 .headerContainer {
     color: #a5a5a5;
-    font-size: 24px;
-    padding-bottom: 16px;
+    font-size: 22px;
+    font-family: cqlmedium;
+    padding-bottom: 8px;
     padding-top: 16px;
     display: flex;
 }
@@ -46,7 +47,9 @@
 .rowData {
     text-align: left;
     color: #4a4a4a;
-    min-width: 100px;
+    min-width: 150px;
+    font-family: cqlmedium;
+    font-size: 22px;
 }
 .notSorted {
     border-left: 8px solid #636363;
@@ -93,22 +96,27 @@
 .delete {
     background-color: red;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
 }
 .delete:hover {
     background-color: maroon;
 }
 .whiteLine {
-    width: 18px;
+    width: 15px;
     height: 2px;
     background-color: white;
     position: relative;
-    bottom: 16px;
-    left: 6px;
+    bottom: 14px;
+    left: 5px;
 }
 
 /*Edit Row*/
 .editButton {
     width: 50px;
+}
+
+.unavailable {
+    font-style: italic;
+    color: #a5a5a5;
 }

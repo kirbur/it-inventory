@@ -32,7 +32,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {accessToken, refreshToken},
     } = useContext(LoginContext)
 
     const axios = new AxiosService(accessToken, refreshToken)
@@ -73,6 +73,8 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                         value: data[0].monthsPerRenewal,
                         changed: false,
                     },
+                    hasFlatCost: data[0].programFlatCost > 0 ? true : false,
+                    hasRecurringCost: data[0].programCostPerYear > 0 ? true : false,
                 })
 
                 const employees: {name: string; id: number}[] = []
@@ -112,7 +114,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                             : programInput.cost.value * (12 / programInput.monthsPerRenewal.value),
                     ProgramFlatCost: Number.isNaN(programInput.flatCost.value) ? 0 : programInput.flatCost.value,
                     ProgramLicenseKey: programInput.licenseKey.value,
-                    ProgramDescription: programInput.description.value,
+                    Description: programInput.description.value,
                     ProgramPurchaseLink: programInput.purchaseLink.value,
                     DateBought: programInput.purchaseDate
                         ? programInput.purchaseDate.value.toISOString()
@@ -126,11 +128,11 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             }
 
             await axios.put(`update/program/${match.params.id}`, updateProgram).catch((err: any) => console.error(err))
-            history.push(`/programs/details/${match.params.id}`)
+            history.push(`/programs/detail/${match.params.id}`)
         }
     }
 
-    return isAdmin ? (
+    return (
         <div className={styles.columns}>
             {/* column 1 */}
 
@@ -139,7 +141,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     text={progData.name + ' ' + match.params.id}
                     icon='back'
                     onClick={() => {
-                        history.push(`/programs/details/${match.params.id}`)
+                        history.push(`/programs/detail/${match.params.id}`)
                     }}
                     className={styles.backButton}
                     textClassName={styles.backButtonText}
@@ -209,7 +211,5 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                 </div>
             </div>
         </div>
-    ) : (
-        <div />
     )
 }

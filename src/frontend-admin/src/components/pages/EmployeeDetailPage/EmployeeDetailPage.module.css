@@ -33,7 +33,6 @@
 .img {
     width: 300px;
     max-height: 300px;
-    min-height: 250px;
     margin: auto;
 }
 
@@ -41,6 +40,14 @@
     text-align: left;
     color: #979797;
     font-size: 18px;
+}
+
+.costLine {
+    margin: 0 5px;
+    flex-grow: 1;
+    height: 1px;
+    align-self: center;
+    background: #979797;
 }
 
 /*Second Column*/
@@ -72,4 +79,23 @@
 
 .table {
     margin-bottom: 50px;
+}
+
+.descriptionContainer {
+    width: 100%;
+    text-align: left;
+}
+
+.descriptionTitle {
+    border-bottom: 1px solid #979797;
+    color: #a5a5a5;
+    font-size: 24px;
+    padding: 16px 0;
+    margin-bottom: 20px;
+}
+
+.descriptionBody {
+    color: #4a4a4a;
+    font-size: 20px;
+    line-height: 27px;
 }

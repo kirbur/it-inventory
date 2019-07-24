@@ -37,6 +37,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
 
     var axios = new AxiosService(accessToken, refreshToken)
 
+    const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState('')
     const [progData, setProgData] = useState<{
         name: string
@@ -84,6 +85,8 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     costPerYear: data[0].programCostPerYear,
                     hasPlugin: data[0].hasPlugIn,
                 })
+
+                setIsDeleted(data[0].isDeleted)
                 setProgRows([
                     [
                         {value: format(data[0].programLicenseKey ? data[0].programLicenseKey : '-'), sortBy: 0},
@@ -91,7 +94,15 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     ],
                 ])
 
-                setHistoryList(data[0].entries)
+                setHistoryList([
+                    ...data[0].entries.map((entry: any) => {
+                        return {
+                            eventDate: entry.eventDate,
+                            eventType: entry.eventType,
+                            employeeName: entry.employeeNameHistory,
+                        }
+                    }),
+                ])
             })
             .catch((err: any) => console.error(err))
     }, [match.params.id])
@@ -117,14 +128,18 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         if (progData.hasPlugin) {
             window.alert('Please archive the plugins before you archive this program.')
         } else {
-            if (window.confirm(`Are you sure you want to archive this copy of ${progData.name}?`)) {
+            if (
+                window.confirm(
+                    `Are you sure you want to ${isDeleted ? 'recover' : 'archive'} this copy of ${progData.name}?`
+                )
+            ) {
                 await axios
-                    .put(`archive/program/${match.params.id}`, {})
-                    .then((response: any) => console.log(response))
+                    .put(`${isDeleted ? 'recover' : 'archive'}/program/${match.params.id}`, {})
                     .catch((err: any) => console.error(err))
 
-                //after submitting go back to overview
-                history.push(`/programs/overview/${progData.name}`)
+                history.push(
+                    `/programs${isDeleted ? '/edit/detail/' + match.params.id : '/overview/' + progData.name}/inventory`
+                )
             }
         }
     }
@@ -138,7 +153,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         text={progData.name}
                         icon='back'
                         onClick={() => {
-                            history.push(`/programs/overview/${progData.name}`)
+                            history.push(`/programs/overview/${progData.name}/inventory`)
                         }}
                         className={styles.backButton}
                         textClassName={styles.backButtonText}
@@ -176,17 +191,19 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                 <div className={styles.secondColumn}>
                     {isAdmin && (
                         <Group direction='row' justify='start' className={styles.group}>
-                            <Button
-                                text='Edit'
-                                icon='edit'
-                                onClick={() => {
-                                    history.push('/programs/edit/details/' + match.params.id)
-                                }}
-                                className={styles.editbutton}
-                            />
+                            {!isDeleted && (
+                                <Button
+                                    text='Edit'
+                                    icon='edit'
+                                    onClick={() => {
+                                        history.push('/programs/edit/detail/' + match.params.id)
+                                    }}
+                                    className={styles.editbutton}
+                                />
+                            )}
 
                             <Button
-                                text='Archive'
+                                text={isDeleted ? 'Recover' : 'Archive'}
                                 icon='archive'
                                 onClick={handleArchive}
                                 className={styles.archivebutton}
@@ -206,7 +223,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                 Assigned to{' '}
                                 <div
                                     className={styles.empName}
-                                    onClick={() => history.push(`/employees/${progData.employeeId}`)}
+                                    onClick={() => history.push(`/employees/detail/${progData.employeeId}`)}
                                 >
                                     {progData.employee}
                                 </div>

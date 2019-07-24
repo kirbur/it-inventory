@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [Route("api")]
     [ApiController]
     public class ContextController : ControllerBase

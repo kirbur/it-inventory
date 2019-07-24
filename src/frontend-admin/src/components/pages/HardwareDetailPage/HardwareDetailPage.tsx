@@ -4,7 +4,7 @@ import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 // Components
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
-import {HistoryLog} from '../../reusables/HistoryLog/HistoryLog'
+import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -46,12 +46,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     const [secondTableData, setSecondTableData] = useState<(string | number)[]>([])
     const [thirdTableData, setThirdTableData] = useState<(string | number)[]>([])
 
-    const [historyLogEntries, setHistoryLogEntries] = useState<any[]>([])
+    const [historyLogEntries, setHistoryLogEntries] = useState<IHistoryLogArray[]>([])
     const [commentText, setCommentText] = useState('')
 
     const [costPerYear, setCostPerYear] = useState(0)
     const [flatCost, setFlatCost] = useState(0)
 
+    const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState()
     const [initialImg, setInitialImg] = useState()
 
@@ -65,7 +66,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
-                    console.log(data)
                     setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].server.make,
@@ -94,9 +94,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].server.location])
                     setCommentText(data[0].server.textField)
                     setHistoryLogEntries(data[0].serverHistory)
+                    setIsDeleted(data[0].isDeleted)
                 })
                 .catch((err: any) => console.error(err))
-        } else if (match.params.type === 'laptop') {
+        } else if (match.params.type === 'laptop' || match.params.type === 'computer') {
             setFirstTableHeaders(['CPU', 'RAM', 'SSD', 'FQDN'])
             setSecondTableHeaders(['Monitor Output', 'Screen Size', 'Serial #', 'MFG Tag'])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
@@ -131,14 +132,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].computer.location])
                     setCommentText(data[0].computer.textField)
                     setHistoryLogEntries(data[0].computerHistory)
+                    setIsDeleted(data[0].isDeleted)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'monitor') {
             setFirstTableHeaders(['Screen Size', 'Resolution', 'Inputs', 'Serial #'])
             setSecondTableHeaders([])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
-            // make model
-            setHeadingInfo(['the name', 'another name'])
             axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
@@ -148,7 +148,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         'Model: ' + data[0].monitor.model,
                         'Purchase Date: ' + formatDate(data[0].monitor.purchaseDate),
                         'Renewal Date: ' + formatDate(data[0].monitor.renewalDate),
-                        // 'End of Life: ' + formatDate(data[0].monitor.endOfLife),
                     ])
                     setFirstTableData([
                         data[0].monitor.screenSize,
@@ -162,6 +161,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setFlatCost(data[0].monitor.flatCost)
                     setCommentText(data[0].monitor.textField)
                     setHistoryLogEntries(data[0].monitorHistory)
+                    setIsDeleted(data[0].isDeleted)
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
@@ -188,6 +188,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setFlatCost(data[0].peripheral.flatCost)
                     setCommentText(data[0].peripheral.textField)
                     setHistoryLogEntries(data[0].peripheralHistory)
+                    setIsDeleted(data[0].isDeleted)
                 })
                 .catch((err: any) => console.error(err))
         }
@@ -212,9 +213,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     }, [initialImg])
 
     async function handleArchive() {
-        if (window.confirm(`Are you sure you want to archive this ${match.params.type}?`)) {
-            await axios.put(`archive/${match.params.type}/${match.params.id}`, {})
-            history.push('/hardware')
+        if (
+            window.confirm(`Are you sure you want to ${isDeleted ? 'recover' : 'archive'} this ${match.params.type}?`)
+        ) {
+            await axios.put(`${isDeleted ? 'recover' : 'archive'}/${match.params.type}/${match.params.id}`, {})
+            history.push(`/hardware${isDeleted ? `/edit/${match.params.type}/${match.params.id}` : ''}`)
         }
     }
 
@@ -241,7 +244,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         }
     }
 
-    console.log(img)
     return (
         <div className={styles.detailMain}>
             <div className={styles.columns}>
@@ -269,17 +271,19 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 <div className={styles.secondColumn}>
                     {isAdmin && (
                         <Group direction='row' justify='start' className={styles.group}>
-                            <Button
-                                text='Edit'
-                                icon='edit'
-                                onClick={() => {
-                                    history.push('/hardware/edit/' + match.params.type + '/' + match.params.id)
-                                }}
-                                className={styles.editbutton}
-                            />
+                            {!isDeleted && (
+                                <Button
+                                    text='Edit'
+                                    icon='edit'
+                                    onClick={() => {
+                                        history.push('/hardware/edit/' + match.params.type + '/' + match.params.id)
+                                    }}
+                                    className={styles.editbutton}
+                                />
+                            )}
 
                             <Button
-                                text='Archive'
+                                text={isDeleted ? 'Recover' : 'Archive'}
                                 icon='archive'
                                 onClick={handleArchive}
                                 className={styles.archivebutton}

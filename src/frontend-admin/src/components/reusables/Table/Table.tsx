@@ -16,7 +16,7 @@ export const Table = (props: ITableProps) => {
     return (
         <table className={s(styles.table, isClickable && styles.clickable)}>
             <thead>
-                <tr className={styles.header}>{headers.map(header => header)}</tr>
+                <tr>{headers.map(header => header)}</tr>
             </thead>
 
             <tbody>

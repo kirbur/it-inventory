@@ -4,6 +4,8 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {formatDate} from '../../../utilities/FormatDate'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -17,6 +19,7 @@ import {LoginContext} from '../../App/App'
 
 // Styles
 import styles from './HardwareListPage.module.css'
+import placeholder from '../../../content/Images/Placeholders/server-placeholder.png'
 
 // Types
 interface IServersListPageProps {
@@ -53,6 +56,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     // state
     const [listData, setListData] = useState<any[]>([])
+    const [archivedData, setArchivedData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState({label: 'make', value: 'make'})
@@ -61,12 +65,41 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const searchByHeaders = ['Make', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag', 'Model']
     const headerList = ['Make & Model', 'Number of Cores', 'RAM', 'Renewal Date', 'MFG Tag']
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
+    const [isArchive, setIsArchive] = useState(false)
+
+    const [useImages, setUseImages] = useState(false)
+    const [images, setImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages] = useState<{id: number; img: string}[]>([])
 
     useEffect(() => {
         axios
             .get('/list/servers')
             .then((data: IPulledData[]) => {
-                console.log(data)
+                const servers: IServerData[] = []
+                var imgs: {id: number; img: string}[] = []
+                data.map((i: IPulledData) => {
+                    servers.push({
+                        make: format(i.make),
+                        id: i.serverId,
+                        numberOfCores: i.numberOfCores,
+                        RAM: i.ram,
+                        renewalDate: formatDate(i.renewalDate),
+                        MFGTag: format(i.mfg),
+                        icon: i.icon,
+                        model: format(i.model),
+                    })
+                    imgs.push({id: i.serverId, img: i.icon})
+                })
+
+                setListData(servers)
+
+                setImages(imgs)
+                setUseImages(true)
+            })
+            .catch((err: any) => console.error(err))
+        axios
+            .get('/archivedList/server')
+            .then((data: IPulledData[]) => {
                 const servers: IServerData[] = []
                 data.map((i: IPulledData) => {
                     servers.push({
@@ -80,8 +113,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                         model: format(i.model),
                     })
                 })
-                console.log(servers)
-                setListData(servers)
+                setArchivedData(servers)
             })
             .catch((err: any) => console.error(err))
     }, [])
@@ -89,22 +121,39 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     useEffect(() => {
         // Search through listData based on current value
         // of search bar and save results in filtered
-        var filteredTableInput = listData.filter((row: any) => {
-            return !row[selected.value]
-                ? false
-                : row[selected.value]
-                      .toString()
-                      .toLowerCase()
-                      .search(search.toLowerCase()) !== -1
-        })
-        setFilteredData(filteredTableInput)
-    }, [search, selected, listData])
+        if (isArchive) {
+            var filteredTableInput = archivedData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        } else {
+            var filteredTableInput = listData.filter((row: any) => {
+                return !row[selected.value]
+                    ? false
+                    : row[selected.value]
+                          .toString()
+                          .toLowerCase()
+                          .search(search.toLowerCase()) !== -1
+            })
+            setFilteredData(filteredTableInput)
+        }
+    }, [search, selected, listData, isArchive])
 
-    const formatDate = (hireDate: string) => {
-        const hired = new Date(hireDate)
-        const date = hired.getFullYear() + '/' + (hired.getMonth() + 1) + '/' + hired.getDate()
-        return date
-    }
+    //Set display Images
+    useEffect(() => {
+        images.map((img: {id: number; img: string}) =>
+            checkImage(img.img, axios, placeholder).then(data => {
+                var list = images.filter(i => i.id !== img.id)
+                setImages([...list, {id: img.id, img: data}])
+                displayImages.push({id: img.id, img: data})
+            })
+        )
+    }, [useImages])
 
     const handleClick = () => {
         history.push(`hardware/edit/server/new`)
@@ -192,9 +241,23 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }
 
     function concatenatedName(row: any[]) {
-        return (
+        return displayImages &&
+            displayImages.filter(x => x.id === row[1]) &&
+            displayImages.filter(x => x.id === row[1])[0] ? (
             <td key={row[1]} className={styles.hardware}>
-                <img className={styles.icon} src={URL + row[6]} alt={''} />
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                </div>
+                <div className={styles.alignLeft}>
+                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={styles.alignLeft}>{row[7]}</text>
+                </div>
+            </td>
+        ) : (
+            <td key={row[1]} className={styles.hardware}>
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
+                </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.hardwareName}>{row[0]}</text> <br />
                     <text className={styles.alignLeft}>{row[7]}</text>
@@ -207,7 +270,6 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
 
     rows.forEach(row => {
         const transformedRow: any[] = []
-        console.log(row)
         for (let i = 0; i < row.length; i++) {
             switch (i) {
                 case 0:
@@ -229,7 +291,14 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     return (
         <div className={styles.listMain}>
             <Group direction='row' justify='between' className={styles.group}>
-                <Button text='Add' icon='add' onClick={handleClick} />
+                <div className={styles.buttonContainer}>
+                    <Button text='Add' icon='add' onClick={handleClick} />
+                    <Button
+                        text={isArchive ? 'View Active' : 'View Archives'}
+                        onClick={() => setIsArchive(!isArchive)}
+                        className={styles.archiveButton}
+                    />
+                </div>
 
                 <FilteredSearch
                     search={search}

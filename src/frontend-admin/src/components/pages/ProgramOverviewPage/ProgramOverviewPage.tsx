@@ -23,7 +23,7 @@ import {LoginContext} from '../../App/App'
 // Types
 interface IProgramOverviewPageProps {
     history: History
-    match: match<{id: string}>
+    match: match<{id: string; archived: string}>
 }
 
 interface ExpectedProgramOverview {
@@ -59,7 +59,12 @@ export interface ExpectedPluginType {
 
 // Primary Component
 export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props => {
-    const {history, match} = props
+    const {
+        history,
+        match: {
+            params: {archived, id},
+        },
+    } = props
 
     const {
         loginContextVariables: {accessToken, refreshToken, isAdmin},
@@ -80,12 +85,12 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     const [programRows, setProgramRows] = useState<ITableItem[][]>([])
     const [pluginRows, setPluginRows] = useState<ITableItem[][]>([])
 
-    const programHeaders = [`${match.params.id}`, 'Employee', 'License Key', 'Renewal Date']
+    const programHeaders = [`${id}`, 'Employee', 'License Key', 'Renewal Date']
     const pluginHeaders = ['Plugins', 'Renewal Date', 'Cost']
 
     useEffect(() => {
         axios
-            .get(`/detail/ProgramOverview/${match.params.id}`)
+            .get(`/detail/ProgramOverview/${id}/${archived === 'archived' ? true : false}`)
             .then((data: any) => {
                 setProgramData(data[0].programOverview)
                 let prog: ITableItem[][] = []
@@ -93,7 +98,12 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     prog.push(
                         i.employeeName
                             ? [
-                                  {value: i.programId, id: i.programId, sortBy: i.programId, onClick: handleCopyClick},
+                                  {
+                                      value: i.programId,
+                                      id: i.programId,
+                                      sortBy: i.programId,
+                                      onClick: handleCopyClick,
+                                  },
                                   {
                                       value: format(i.employeeName),
                                       id: i.employeeId,
@@ -104,7 +114,12 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                                   {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
                               ]
                             : [
-                                  {value: i.programId, id: i.programId, sortBy: i.programId, onClick: handleCopyClick},
+                                  {
+                                      value: i.programId,
+                                      id: i.programId,
+                                      sortBy: i.programId,
+                                      onClick: handleCopyClick,
+                                  },
                                   {
                                       value: format(i.employeeName),
                                       id: i.employeeId,
@@ -152,21 +167,21 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     }, [programData.icon])
 
     const handleEmpClick = (id: number) => {
-        history.push(`/employees/${id}`)
+        history.push(`/employees/detail/${id}`)
     }
 
     const handleCopyClick = (id: number) => {
-        history.push(`/programs/details/${id}`)
+        history.push(`/programs/detail/${id}`)
     }
 
     const handleArchive = () => {
         //cant archive everything unless there are no plugins
-        if (pluginRows.length > 0) {
+        if (pluginRows.length > 0 && archived !== 'archived') {
             window.alert('Please archive the plugins before you archive this program.')
-        } else {
+        } else if (archived !== 'archived') {
             if (
                 window.confirm(
-                    `Are you sure you want to archive all copies of ${match.params.id}? ${programData.countProgInUse} are in use.`
+                    `Are you sure you want to archive all copies of ${id}? ${programData.countProgInUse} are in use.`
                 )
             ) {
                 programRows.forEach(program => {
@@ -174,6 +189,16 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 })
                 setProgramRows([])
                 history.push('/programs')
+            }
+        }
+
+        if (archived === 'archived') {
+            if (window.confirm(`Are you sure you want to recover ${id}? `)) {
+                programRows.forEach(program => {
+                    axios.put(`recover/program/${program[0].id}`, {}).catch((err: any) => console.error(err))
+                })
+                setProgramRows([])
+                history.push(`/programs/edit/overview/${id}/inventory`)
             }
         }
     }
@@ -224,17 +249,19 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 <div className={styles.secondColumn}>
                     {isAdmin && (
                         <Group direction='row' justify='start' className={styles.group}>
-                            <Button
-                                text='Edit'
-                                icon='edit'
-                                onClick={() => {
-                                    history.push('/programs/edit/overview/' + match.params.id)
-                                }}
-                                className={styles.editbutton}
-                            />
+                            {archived !== 'archived' && (
+                                <Button
+                                    text='Edit'
+                                    icon='edit'
+                                    onClick={() => {
+                                        history.push(`/programs/edit/overview/${id}/${archived}`)
+                                    }}
+                                    className={styles.editbutton}
+                                />
+                            )}
 
                             <Button
-                                text='Archive'
+                                text={archived === 'archived' ? 'Recover' : 'Archive'}
                                 icon='archive'
                                 onClick={handleArchive}
                                 className={styles.archivebutton}
@@ -242,7 +269,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.programName}>{match.params.id}</div>
+                        <div className={styles.programName}>{id}</div>
                         <div className={styles.programText}>
                             {programData.countProgInUse} / {programData.countProgOverall} Used
                         </div>

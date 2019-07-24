@@ -1,27 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using backend_api.Models;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class ListController : ControllerBase
+    public class ListController : ContextController
     {
-        private readonly ITInventoryDBContext _context;
-
-        public ListController(ITInventoryDBContext context)
-        {
-            _context = context;
-        }
+        public ListController(ITInventoryDBContext context) : base(context) { }
 
         /* GET: api/List/Employees
         * Returns [ {
@@ -402,7 +393,7 @@ namespace backend_api.Controllers
             }
             return Ok(listOfPeripherals);
         }
-        /* GET: api/List/programs
+        /* GET: api/List/programs/{archived}
          * Returns [ {
          *              ProgramName : String,
          *              Total Users : Int,
@@ -414,23 +405,26 @@ namespace backend_api.Controllers
          *          
          * If IsCostPerYear is false, then the front end will say 'projected'
          *  for the yearly cost.
+         *  
+         *  If archived is true then the list contains only programs where isDeleted is true
          */
         // NOTE: The plug-in cost is not included in this table.
 
-        [Route("Programs")]
+        [Route("Programs/{archived}")]
         [HttpGet]
         [EnableQuery()]
 
-        public ActionResult<object> GetListOfPrograms()
+
+        public ActionResult<object> GetListOfPrograms([FromRoute]bool archived)
         {
             // List that will be returned containing the list of programs
             var ListOfPrograms = new List<object>();
 
             // list of all programs that are not deleted
-            var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == false);
+            var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == archived);
 
             //This List takes all the programs that not deleted and makes it them distinct
-            var DistinctUsefulPrograms = _context.Program.Where(x => x.IsDeleted == false).GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
+            var DistinctUsefulPrograms = _context.Program.Where(x => x.IsDeleted == archived).GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
 
             //loop through all the distinct programs 
             foreach (var prog in DistinctUsefulPrograms)
@@ -442,10 +436,10 @@ namespace backend_api.Controllers
                 var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName).Count();
 
                 // calculate the cost of each distinct program if it is charged yearly 
-                var ProgCostPerYear = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramCostPerYear != null && x.IsDeleted != true).Sum(x => x.ProgramCostPerYear);
+                var ProgCostPerYear = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramCostPerYear != null && x.IsDeleted == archived).Sum(x => x.ProgramCostPerYear);
 
                 // calculate the cost of each distinct program if it is charged as a flat rate 
-                var ProgCostPerUse = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramFlatCost != null && x.IsDeleted != true).Sum(x => x.ProgramFlatCost);
+                var ProgCostPerUse = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramFlatCost != null && x.IsDeleted == archived).Sum(x => x.ProgramFlatCost);
 
                 // icon path.
                 string icon = $"/image/program/{prog.ProgramId}";

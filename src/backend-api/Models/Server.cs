@@ -29,9 +29,11 @@ namespace backend_api.Models
         public string Location { get; set; }
         public string SerialNumber { get; set; }
         public int? MonthsPerRenewal { get; set; }
-
         public int GetId() { return ServerId; }
-
-        // public Employee Employee { get; set; }
+        public string GetMake() { return Make; }
+        public string GetModel() { return Model; }
+        public decimal? GetCostPerYear() { return CostPerYear; }
+        public decimal? GetFlatCost() { return FlatCost; }
+        public DateTime? GetPurchaseDate() { return PurchaseDate; }
     }
 }

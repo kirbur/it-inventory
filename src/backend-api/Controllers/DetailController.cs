@@ -1,17 +1,16 @@
-﻿using backend_api.Models;
+﻿using backend_api.Helpers;
+using backend_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace backend_api.Controllers
 {
-    // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DetailController : ContextController
@@ -49,8 +48,9 @@ namespace backend_api.Controllers
 
         }
 
-        /* GET: api/detail/ProgramOverview/{program}
-         * Function returns the program overview information     
+        /* GET: api/detail/ProgramOverview/{program}/{archived}
+         * Function returns the program overview information   
+         * If archived is true then the overview is for programs where isDeleted is true
          * Returns:{
          *          ProgramOverview:{
          *              icon: string,
@@ -84,8 +84,8 @@ namespace backend_api.Controllers
          *                          
          */
         [HttpGet]
-        [Route("ProgramOverview/{program}")]
-        public IActionResult GetProgramOverview([FromRoute] string program)
+        [Route("ProgramOverview/{program}/{archived}")]
+        public IActionResult GetProgramOverview([FromRoute] bool archived, [FromRoute] string program)
         {
             // Holds the license key of the program overview if they are all the same.
             string ProgramLicenseKey = null;
@@ -103,7 +103,7 @@ namespace backend_api.Controllers
                 string icon = $"/image/program/{id}";
 
                 // list of all programs that are not deleted
-                var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == false && x.ProgramName == program);
+                var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == archived && x.ProgramName == program);
 
                 // calculate the count of programs under this specific distinct program name that are in use
                 var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == program && x.EmployeeId != null && x.IsDeleted == false).Count();
@@ -175,7 +175,7 @@ namespace backend_api.Controllers
                             plugin.PluginId,
                             plugin.TextField,
                             plugin.MonthsPerRenewal,
-                            plugin.Datebought,
+                            plugin.DateBought,
                             plugin.PluginName,
                             plugin.RenewalDate,
                             plugin.PluginFlatCost,
@@ -209,6 +209,8 @@ namespace backend_api.Controllers
          * GET: api/detail/employee/{id}
          * Function returns the employee detail information.
          * Returns: [ {
+         *      isDeleted: boolean,
+         *      email: string,
          *      picture: partial URL (as string),
          *      totalProgramCostPerMonth: decimal,
          *      totalHardwareCost: decimal,
@@ -217,7 +219,9 @@ namespace backend_api.Controllers
          *      department: string,
          *      role: string,
          *      hireDate: date (as string),
-         *      isAdmin : bool
+         *      archiveDate: Date (as string),
+         *      isAdmin : bool,
+         *      TextField: string,
          *      hardware: [ {
          *          id: int,
          *          type: string,
@@ -255,7 +259,7 @@ namespace backend_api.Controllers
 
             // Find the requested employee
             var emp = _context.Employee.Find(id);
-            if (emp == null || emp.IsDeleted == true)
+            if (emp == null)
             {
                 return NotFound();
             }
@@ -404,7 +408,10 @@ namespace backend_api.Controllers
                 string picture = $"/image/employee/{id}";
 
                 // Get the department name
-                var department = _context.Department.Where(dep => dep.DepartmentId == emp.DepartmentID && !dep.IsDeleted).FirstOrDefault().DepartmentName;
+                var department = _context.Department
+                    .Where(dep => dep.DepartmentId == emp.DepartmentID)
+                    .Where(dep => dep.IsDeleted == false)
+                    .FirstOrDefault().DepartmentName;
 
                 // list that will hold the unassigned hardware
                 List<object> UnassignedHardware = new List<object>();
@@ -491,10 +498,31 @@ namespace backend_api.Controllers
                     }
                 }
 
+                // bool to store whether this current employee is an Admin
+                bool Admin = false;
+                using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
+                {
+                    // find the user from the AD using their first and last name
+                    var user = UserPrincipal.FindByIdentity(adContext, emp.FirstName + "." + emp.LastName);
+                    if (user != null)
+                    {
+                        // Return the isAdmin field from the AuthIDServer matching the Guid.
+                        Admin = _context.AuthIdserver
+                            .Where(x => x.ActiveDirectoryId == user.Guid.Value)
+                            .First().IsAdmin;
+                    }
+                    else
+                    {
+                        Admin = false;
+                    }
+                }
+
 
                 // Combine it all into a nice JSON :)
                 object employeeDetail = new
                 {
+                    emp.IsDeleted,
+                    emp.Email,
                     picture,
                     totalProgramCostMonthly = Math.Round(totalProgramCostPerMonth, 2, MidpointRounding.ToEven),
                     totalHardwareCost,
@@ -503,8 +531,9 @@ namespace backend_api.Controllers
                     department,
                     emp.Role,
                     emp.HireDate,
-                    // TODO: This is just a temp fix until we sort when to create authIdserver entries
-                    Admin = false,
+                    emp.ArchiveDate,
+                    Admin,
+                    emp.TextField,
                     hardware,
                     software,
                     licenses,
@@ -519,6 +548,7 @@ namespace backend_api.Controllers
         * GET: api/detail/program/{id}
         * Function returns the program detail information.
         * Returns: {
+        *    "isDeleted": boolean,
         *    "programName": string,
         *    "picture: partial URL (as string),
         *    "renewalDate": date,
@@ -554,7 +584,7 @@ namespace backend_api.Controllers
             //finding the program
             var prog = _context.Program.Find(id);
             // checking if the program actually exists and isn't deleted
-            if (prog == null || prog.IsDeleted == true)
+            if (prog == null )
             {
                 return NotFound();
             }
@@ -569,29 +599,56 @@ namespace backend_api.Controllers
                 var employeeName = "";
                 int employeeId = -1;
                 // Concatenating employees first and last name of the employee who owns the program if the program is assigned
-                // and if the program is not deleted
-                if (prog.EmployeeId != null && prog.IsDeleted == false)
+
+                if (prog.EmployeeId != null)
                 {
-                    var empFirst = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.FirstName).FirstOrDefault();
-                    var empLast = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.LastName).FirstOrDefault();
-                    employeeId = _context.Employee.Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false).Select(x => x.EmployeeId).FirstOrDefault();
+                    var empFirst = _context.Employee
+                        .Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false)
+                        .Select(x => x.FirstName)
+                        .FirstOrDefault();
+
+                    var empLast = _context.Employee
+                        .Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false)
+                        .Select(x => x.LastName)
+                        .FirstOrDefault();
+
+                    employeeId = _context.Employee
+                        .Where(x => x.EmployeeId == prog.EmployeeId && x.IsDeleted == false)
+                        .Select(x => x.EmployeeId)
+                        .FirstOrDefault();
+
                     employeeName = empFirst + " " + empLast;
                 }
                 List<object> entries = new List<object>();
                 // find all the events/history of the current program
                 foreach (var entry in _context.ProgramHistory.Where(x => x.ProgramId == prog.ProgramId))
                 {
-                    var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
-                    var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
+                    var empFirst = _context.Employee
+                        .Where(x => x.EmployeeId == entry.EmployeeId)
+                        .Select(x => x.FirstName)
+                        .FirstOrDefault();
+
+                    var empLast = _context.Employee
+                        .Where(x => x.EmployeeId == entry.EmployeeId)
+                        .Select(x => x.LastName)
+                        .FirstOrDefault();
+
                     var employeeNameHistory = empFirst + " " + empLast;
 
-                    var singleEntry = new { employeeNameHistory, entry.EventType, entry.EventDate, historyId = entry.ProgramHistoryId };
+                    var singleEntry = new
+                    {
+                        employeeNameHistory,
+                        entry.EventType,
+                        entry.EventDate,
+                        historyId = entry.ProgramHistoryId
+                    };
                     entries.Add(singleEntry);
                 }
 
                 // Returning the details of the program into a nice JSON object :)
                 var ProgramDetails = new
                 {
+                    prog.IsDeleted,
                     prog.ProgramId,
                     prog.ProgramName,
                     picture,
@@ -620,6 +677,7 @@ namespace backend_api.Controllers
        * GET: api/detail/department/{id}
        * Function returns the program detail information.
        * Returns : {
+       *    "isDeleted": boolean,
        *    "departmentName": String,
        *    "totalCostOfActHardwareInDep": decimal,
        *    "totalCostOfProgramsInDep": decimal,
@@ -664,7 +722,7 @@ namespace backend_api.Controllers
             //finding the department
             var dep = _context.Department.Find(DepId);
             // checking if the department actually exists and isn't deleted
-            if (dep == null || dep.IsDeleted == true)
+            if (dep == null )
             {
                 return NotFound();
             }
@@ -675,16 +733,19 @@ namespace backend_api.Controllers
                 string picture = $"/image/department/{DepId}";
 
                 //Cost of Programs per department value
-                decimal? TotalCostOfProgramsInDep = 0;
+                decimal? TotalCostOfProgramsInDep = 0.0m;
 
                 // cost of hardware per department value
-                decimal? TotalCostOfActHardwareInDep = 0;
+                decimal? TotalCostOfActHardwareInDep = 0.0m;
 
                 // lambda to collect all the employees in the current department into a list
-                var empsInDep = _context.Employee.Where(x => x.DepartmentID == DepId && x.IsDeleted == false);
+                var empsInDep = _context.Employee
+                    .Where(x => x.DepartmentID == DepId && x.IsDeleted == false);
 
                 // lambda to get the ids of the all the employees in the current department
-                var empsIDsInDep = empsInDep.Select(x => x.EmployeeId).ToList();
+                var empsIDsInDep = empsInDep
+                    .Select(x => x.EmployeeId)
+                    .ToList();
 
                 // lambda to count the number of employees in the current department
                 var CountEmpsInDep = empsInDep.Count();
@@ -695,80 +756,50 @@ namespace backend_api.Controllers
 
 
                 // Make sure the program is not deleted and the employeeID is not null
-                foreach (var prog in _context.Program.Where(x => x.IsDeleted == false && x.EmployeeId != null))
-                {
-                    // Checks to see if the program employee ID is in the department and if it is,
-                    // collect all the programs from this current department
-                    if (empsIDsInDep.Contains(System.Convert.ToInt32(prog.EmployeeId)))
+                _context.Program
+                    .Where(x => x.IsDeleted == false)
+                    .Where(x => x.EmployeeId != null)
+                    .ToList()
+                    .ForEach(x =>
                     {
-                        programsOfEmpsInDepartment.Add(prog);
+                        if (empsIDsInDep.Contains(x.EmployeeId.Value))
+                        {
+                            programsOfEmpsInDepartment.Add(x);
+                        }
                     }
-                }
+                    );
 
                 // lambda to calculate the total cost of the programs in the current department
-                TotalCostOfProgramsInDep = System.Convert.ToInt32(programsOfEmpsInDepartment.Where(x => x.IsDeleted == false && x.ProgramCostPerYear != null).Sum(x => x.ProgramCostPerYear));
+                TotalCostOfProgramsInDep = programsOfEmpsInDepartment
+                    .Where(x => x.ProgramCostPerYear != null)
+                    .Sum(x => x.ProgramCostPerYear);
 
                 // loop to calculate the cost of monitors that employees from the current department are accumulating 
-                foreach (var mon in _context.Monitor.Where(x => x.IsDeleted == false && x.FlatCost != null))
-                {
-                    if (empsIDsInDep.Contains(System.Convert.ToInt32(mon.EmployeeId)))
-                    {
-                        TotalCostOfActHardwareInDep += mon.FlatCost;
-                    }
-                }
+                TotalCostOfActHardwareInDep += CalculatedHardwareCost<Monitor>(empsIDsInDep);
+                TotalCostOfActHardwareInDep += CalculatedHardwareCost<Computer>(empsIDsInDep);
+                TotalCostOfActHardwareInDep += CalculatedHardwareCost<Peripheral>(empsIDsInDep);
+                TotalCostOfActHardwareInDep += CalculatedHardwareCost<Server>(empsIDsInDep);
 
-                // loop to calculate the cost of computers that employees from the current department are accumulating 
-                foreach (var Comp in _context.Computer.Where(x => x.IsDeleted == false && x.FlatCost != null))
-                {
-                    if (empsIDsInDep.Contains(System.Convert.ToInt32(Comp.EmployeeId)))
-                    {
-                        TotalCostOfActHardwareInDep += Comp.FlatCost;
-                    }
-                }
 
-                // loop to calculate the cost of peripheral that employees from the current department are accumulating 
-                foreach (var peripheral in _context.Peripheral.Where(x => x.IsDeleted == false && x.FlatCost != null))
-                {
-                    if (empsIDsInDep.Contains(System.Convert.ToInt32(peripheral.EmployeeId)))
-                    {
-                        TotalCostOfActHardwareInDep += peripheral.FlatCost;
-                    }
 
-                }
-
-                // loop to calculate the cost of servers that employees from the current department are accumulating 
-                foreach (var server in _context.Server.Where(x => x.IsDeleted == false && x.FlatCost != null))
-                {
-                    if (empsIDsInDep.Contains(System.Convert.ToInt32(server.EmployeeId)))
-                    {
-                        TotalCostOfActHardwareInDep += server.FlatCost;
-                    }
-
-                }
                 // list of employees that will hold the info for the employees list that on the table as specified in the method comment header
                 var ListOfEmployees = new List<object>();
 
 
                 // loop through all the employees and find how much they are costing individually costing in their programs and hardware
-                foreach (var emp in empsInDep.Where(x => x.IsDeleted == false))
+                foreach (var emp in empsInDep)
                 {
+                    decimal? HardwareCostForEmp = 0.0m;
                     // Sum the costs of all the computers owned by the current employee where the computer is not deleted and the cost is not null
-                    var CostComputerOwnedByEmployee = _context.Computer.Where(x => x.EmployeeId == emp.EmployeeId && x.FlatCost != null && x.IsDeleted != true).Sum(x => x.FlatCost);
-
-                    // Sum the costs of all the peripherals owned by the current employee where the peripheral is not deleted and the cost is not null
-                    var CostPeripheralOwnedByEmployee = _context.Peripheral.Where(x => x.EmployeeId == emp.EmployeeId && x.FlatCost != null && x.IsDeleted != true).Sum(x => x.FlatCost);
-
-                    // Sum the costs of all the monitors owned by the current employee where the monitor is not deleted and the cost is not null
-                    var CostMonitorOwnedByEmployee = _context.Monitor.Where(x => x.EmployeeId == emp.EmployeeId && x.FlatCost != null && x.IsDeleted != true).Sum(x => x.FlatCost);
-
-                    // Sum the costs of all the servers owned by the current employee where the server is not deleted and the cost is not null
-                    var CostServerOwnedByEmployee = _context.Server.Where(x => x.EmployeeId == emp.EmployeeId && x.FlatCost != null && x.IsDeleted != true).Sum(x => x.FlatCost);
-
-                    //Adding up all the costs into one variable
-                    var HardwareCostForEmp = CostComputerOwnedByEmployee + CostMonitorOwnedByEmployee + CostPeripheralOwnedByEmployee + CostServerOwnedByEmployee;
+                    HardwareCostForEmp += CalculatedHardwareCostForEmp<Monitor>(emp.EmployeeId);
+                    HardwareCostForEmp += CalculatedHardwareCostForEmp<Computer>(emp.EmployeeId);
+                    HardwareCostForEmp += CalculatedHardwareCostForEmp<Peripheral>(emp.EmployeeId);
+                    HardwareCostForEmp += CalculatedHardwareCostForEmp<Server>(emp.EmployeeId);
 
                     // Sum the costs of all the programs that are charged as cost per year owned by the current employee where the program is not deleted and the cost is not null
-                    var ProgCostForEmpPerYear = _context.Program.Where(x => x.EmployeeId == emp.EmployeeId && x.ProgramCostPerYear != null && x.IsDeleted != true).Sum(x => x.ProgramCostPerYear);
+                    var ProgCostForEmpPerYear = _context.Program
+                        .Where(x => x.EmployeeId == emp.EmployeeId && x.ProgramCostPerYear != null && x.IsDeleted != true)
+                        .Sum(x => x.ProgramCostPerYear);
 
                     // Dividing the yearly cost into months Adding the programs costs into one variable if the values are not null
                     decimal ProgramCostForEmp = Math.Round(System.Convert.ToDecimal(ProgCostForEmpPerYear / 12), 2, MidpointRounding.ToEven);
@@ -793,7 +824,11 @@ namespace backend_api.Controllers
 
                 // Make a list of the distinct programs of the employees
                 // in the department.
-                var distinctPrograms = programsOfEmpsInDepartment.Where(x => x.IsLicense == false).GroupBy(prog => prog.ProgramName).Select(name => name.FirstOrDefault()).Select(program => program.ProgramName);
+                var distinctPrograms = programsOfEmpsInDepartment
+                    .Where(x => x.IsLicense == false)
+                    .GroupBy(prog => prog.ProgramName)
+                    .Select(name => name.FirstOrDefault())
+                    .Select(program => program.ProgramName);
 
                 // Create a list with name, count, costPerYear containing the unique programs in the department
                 List<DepartmentTableProgram> listOfTablePrograms = new List<DepartmentTableProgram>();
@@ -819,7 +854,12 @@ namespace backend_api.Controllers
                 }
 
                 // lambda to find the distinct licenses from all the programs
-                var distinctLicensePrograms = programsOfEmpsInDepartment.Where(x => x.IsLicense == true).GroupBy(prog => prog.ProgramName).Select(name => name.FirstOrDefault()).Select(program => program.ProgramName).ToList();
+                var distinctLicensePrograms = programsOfEmpsInDepartment
+                    .Where(x => x.IsLicense == true)
+                    .GroupBy(prog => prog.ProgramName)
+                    .Select(name => name.FirstOrDefault())
+                    .Select(program => program.ProgramName)
+                    .ToList();
 
                 // list that will contain the licenses and how many licenses this current department is using
                 List<object> LicensesList = new List<object>();
@@ -827,7 +867,9 @@ namespace backend_api.Controllers
                 // loop though distinct licenses name and count how many programs that belong to this current have that specific name
                 foreach (var progName in distinctLicensePrograms)
                 {
-                    var CountOfThatLicense = programsOfEmpsInDepartment.Where(x => x.IsDeleted == false && x.IsLicense == true && x.ProgramName == progName).Count();
+                    var CountOfThatLicense = programsOfEmpsInDepartment
+                        .Where(x => x.IsLicense == true && x.ProgramName == progName)
+                        .Count();
 
                     // creating license object that contains the necessary returnables.
                     var License = new
@@ -844,6 +886,7 @@ namespace backend_api.Controllers
                 // creating list of necessary returnables that are specified in the method comment header
                 var DepartmentDetailPage = new
                 {
+                    dep.IsDeleted,
                     dep.DepartmentName,
                     TotalCostOfActHardwareInDep,
                     TotalCostOfProgramsInDep,
@@ -888,7 +931,8 @@ namespace backend_api.Controllers
                     "localHHD": string,
                     "location": string,
                     "serialNumber": string,
-                },
+                },                
+                "isDeleted": boolean,
                 "departmentName : string,
                 "departmentID : int,
                 "icon": partial URL (as string),
@@ -914,7 +958,7 @@ namespace backend_api.Controllers
         {
             // Find the requested server
             var sv = _context.Server.Find(serverID);
-            if (sv == null || sv.IsDeleted == true)
+            if (sv == null )
             {
                 return NotFound();
             }
@@ -924,7 +968,9 @@ namespace backend_api.Controllers
                 var icon = $"/image/server/{serverID}";
 
                 // Employee the server is assigned to.
-                var employeeAssigned = _context.Employee.Where(x => x.EmployeeId == sv.EmployeeId).FirstOrDefault();
+                var employeeAssigned = _context.Employee
+                    .Where(x => x.EmployeeId == sv.EmployeeId)
+                    .FirstOrDefault();
 
                 // int to hold the department Id for click-ability. -1 is the default if hardware is not assigned. 
                 int departmentID = -1;
@@ -934,7 +980,10 @@ namespace backend_api.Controllers
                 // if an employee is assigned to this hardware then find their department
                 if (employeeAssigned != null)
                 {
-                    var dep = _context.Department.Where(x => x.DepartmentId == employeeAssigned.DepartmentID).FirstOrDefault();
+                    var dep = _context.Department
+                        .Where(x => x.DepartmentId == employeeAssigned.DepartmentID)
+                        .FirstOrDefault();
+
                     departmentID = dep.DepartmentId;
                     departmentName = dep.DepartmentName;
                 }
@@ -945,11 +994,25 @@ namespace backend_api.Controllers
                 // Formatting the data returned of this piece of hardware's history and adding it to a list.
                 foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == serverID))
                 {
-                    var empFirst = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.FirstName).FirstOrDefault();
-                    var empLast = _context.Employee.Where(x => x.EmployeeId == entry.EmployeeId).Select(x => x.LastName).FirstOrDefault();
+                    var empFirst = _context.Employee
+                        .Where(x => x.EmployeeId == entry.EmployeeId)
+                        .Select(x => x.FirstName)
+                        .FirstOrDefault();
+
+                    var empLast = _context.Employee
+                        .Where(x => x.EmployeeId == entry.EmployeeId)
+                        .Select(x => x.LastName)
+                        .FirstOrDefault();
+
                     var employeeName = empFirst + " " + empLast;
 
-                    var singleEntry = new { employeeName, entry.EventType, entry.EventDate, historyId = entry.HardwareHistoryId };
+                    var singleEntry = 
+                        new {
+                            employeeName,
+                            entry.EventType,
+                            entry.EventDate,
+                            historyId = entry.HardwareHistoryId
+                        };
                     SeverHistory.Add(singleEntry);
                 }
 
@@ -959,6 +1022,7 @@ namespace backend_api.Controllers
 
                 var serverDetailPage = (new
                 {
+                    sv.IsDeleted,
                     server = sv,
                     departmentName,
                     departmentID,
@@ -1000,7 +1064,8 @@ namespace backend_api.Controllers
                         "localHHD": string,
                         "location": string,
                         "serialNumber": string
-                    },
+                    },                    
+                    "isDeleted": boolean,
                     "departmentName : string,
                     "departmentID : int,
                     "icon": partial URL (as string),
@@ -1024,7 +1089,7 @@ namespace backend_api.Controllers
         {
             // Find the requested server
             var comp = _context.Computer.Find(ComputerID);
-            if (comp == null || comp.IsDeleted == true)
+            if (comp == null )
             {
                 return NotFound();
             }
@@ -1065,6 +1130,7 @@ namespace backend_api.Controllers
 
                 var computerDetailPage = (new
                 {
+                    comp.IsDeleted,
                     computer = comp,
                     departmentName,
                     departmentID,
@@ -1103,6 +1169,7 @@ namespace backend_api.Controllers
                     "location": string,
                     "serialNumber": string,
                 },
+                "isDeleted": boolean,
                 "departmentName : string,
                 "departmentID : int,
                 "icon": partial URL (as string),
@@ -1126,7 +1193,7 @@ namespace backend_api.Controllers
         {
             // Find the requested monitor
             var mn = _context.Monitor.Find(monitorID);
-            if (mn == null || mn.IsDeleted == true)
+            if (mn == null )
             {
                 return NotFound();
             }
@@ -1170,6 +1237,7 @@ namespace backend_api.Controllers
 
                 var monitorDetailPage = (new
                 {
+                    mn.IsDeleted,
                     monitor = mn,
                     departmentName,
                     departmentID,
@@ -1203,6 +1271,7 @@ namespace backend_api.Controllers
                     "renewalDate": date (as string),
                     "serialNumber": string,
                 },
+                "isDeleted": boolean,
                 "departmentName : string,
                 "departmentID : int,
                 "icon": partial URL (as string),
@@ -1227,7 +1296,7 @@ namespace backend_api.Controllers
         {
             // Find the requested peripheral
             var pr = _context.Peripheral.Find(peripheralID);
-            if (pr == null || pr.IsDeleted == true)
+            if (pr == null )
             {
                 return NotFound();
             }
@@ -1270,6 +1339,7 @@ namespace backend_api.Controllers
                 var peripheralClicked = nameof(Peripheral) + "/" + pr.PeripheralId;
                 var peripheralDetailPage = (new
                 {
+                    pr.IsDeleted,
                     peripheral = pr,
                     departmentName,
                     departmentID,
@@ -1281,6 +1351,41 @@ namespace backend_api.Controllers
                 });
                 return Ok(new List<object> { peripheralDetailPage });
             }
+        }
+        private decimal? CalculatedHardwareCost<T>(List<int> employeeIds)
+            where T : class, IHardwareBase
+        {
+            decimal? CostOfActHardwareInDep = 0.0m;
+            // Get the table of the entity's type.
+            DbSet<T> table = _context.Set<T>();
+            table
+            .Where(x => x.IsDeleted == false)
+            .Where(x => x.FlatCost != null)
+            .Where(x => x.EmployeeId != null)
+            .ToList()
+            .ForEach(hardware =>
+                {
+                    if (employeeIds.Contains(hardware.EmployeeId.Value))
+                    {
+                        CostOfActHardwareInDep += hardware.FlatCost;
+                    }
+                }
+                );
+            return CostOfActHardwareInDep;
+        }
+
+        private decimal? CalculatedHardwareCostForEmp<T>(int employeeId)
+            where T : class, IHardwareBase
+        {
+            decimal? CostOfActHardwareInDep = 0.0m;
+            // Get the table of the entity's type.
+            DbSet<T> table = _context.Set<T>();
+            CostOfActHardwareInDep = table
+                .Where(x => x.EmployeeId == employeeId)
+                .Where(x=> x.FlatCost != null)
+                .Where(x=> x.IsDeleted != true)
+                .Sum(x => x.FlatCost);
+            return CostOfActHardwareInDep;
         }
     }
 }
