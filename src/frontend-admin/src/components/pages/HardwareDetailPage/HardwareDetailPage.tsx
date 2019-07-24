@@ -31,10 +31,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     const {history, match} = props
 
     const {
-        loginContextVariables: {accessToken, refreshToken, isAdmin},
+        loginContextVariables: {isAdmin},
+        loginContextVariables,
     } = useContext(LoginContext)
 
-    const axios = new AxiosService(accessToken, refreshToken)
+    const axios = new AxiosService(loginContextVariables)
 
     //default
     const [firstTableHeaders, setFirstTableHeaders] = useState(['yeah something went wrong'])

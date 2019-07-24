@@ -96,7 +96,7 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                     var refreshToken = new JwtSecurityToken(
                         issuer: "CQLCORP",
                         audience: "Refresh",
-                        expires: DateTime.Now.AddMinutes(10000), // how long you wish the token to be active for
+                        expires: DateTime.Now.AddDays(7), // how long you wish the token to be active for
                         signingCredentials: creds);
 
                     //Same as above except this is an Access token and can't be used as a refresh token
@@ -157,10 +157,10 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
         }
 
         /* Get: api/Login/AccessToken
-        * Returns {
+        * Returns [{
         *          String: Access Token,
         *          DateTime: ValidTo(expire date)
-        *         }
+        *         }]
         */
 
         [Route("AccessToken")]
@@ -179,7 +179,7 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
 
             // if the token is null, if the token does not belong to our database
             // or if the token's audience is not refresh then return unauthorized
-            if (JwtToken == null || tokenInDB == false || JwtToken.Audiences.FirstOrDefault() != "Refresh")
+            if (JwtToken == null || tokenInDB == false || JwtToken.Audiences.FirstOrDefault() != "Refresh" || DateTime.UtcNow > JwtToken.ValidTo)
             {
                 return Unauthorized();
             }
@@ -199,11 +199,11 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                        signingCredentials: creds);
 
             // returning access token with its expire date
-            return Ok(new
+            return Ok(new List<object> {new
             {
                 Accesstoken = new JwtSecurityTokenHandler().WriteToken(accessToken),
                 accessToken.ValidTo
-            });
+            } });
         }
     }
 
