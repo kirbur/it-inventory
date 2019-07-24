@@ -157,10 +157,10 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
         }
 
         /* Get: api/Login/AccessToken
-        * Returns {
+        * Returns [{
         *          String: Access Token,
         *          DateTime: ValidTo(expire date)
-        *         }
+        *         }]
         */
 
         [Route("AccessToken")]
