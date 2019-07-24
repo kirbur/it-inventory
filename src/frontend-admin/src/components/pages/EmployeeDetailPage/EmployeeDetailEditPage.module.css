@@ -6,7 +6,7 @@
 }
 
 .firstColumn {
-    padding: 50px;
+    padding: 100px;
     min-width: 160px;
     max-width: 300px;
     flex-grow: 1;
@@ -92,7 +92,7 @@
     transform: scale(4.5, 4.5);
     position: relative;
     top: 40px;
-    left: 5px;
+    left: 2px;
 }
 .adminText {
     color: #a5a5a5;
@@ -193,6 +193,12 @@ input:checked ~ .insideCheckmarkAdmin {
     font-size: 22px;
 }
 
+/* table styling */
+.tableContainer {
+    position: relative;
+    right: 50px;
+}
+
 /* so the table doesnt highlight on hover */
 .newRowThing:hover {
     background-color: white;
@@ -201,8 +207,9 @@ input:checked ~ .insideCheckmarkAdmin {
 /* add to table text and icon */
 .addContainer {
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    justify-content: start;
+    position: relative;
+    left: 50px;
 }
 .addIconBorder:hover {
     background-color: #009eff;
