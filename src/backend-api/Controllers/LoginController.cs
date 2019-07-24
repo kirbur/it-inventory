@@ -157,10 +157,10 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
         }
 
         /* Get: api/Login/AccessToken
-        * Returns {
+        * Returns [{
         *          String: Access Token,
         *          DateTime: ValidTo(expire date)
-        *         }
+        *         }]
         */
 
         [Route("AccessToken")]
@@ -199,11 +199,11 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                        signingCredentials: creds);
 
             // returning access token with its expire date
-            return Ok(new
+            return Ok(new List<object> {new
             {
                 Accesstoken = new JwtSecurityTokenHandler().WriteToken(accessToken),
                 accessToken.ValidTo
-            });
+            } });
         }
     }
 
