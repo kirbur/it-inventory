@@ -125,12 +125,15 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }, [search, selected, listData, archivedData, isArchive])
 
     const handleClick = () => {
-        history.push(`/programs/edit/overview/new/inventory`)
+        history.push({pathname: `/programs/edit/overview/new/inventory`, state: {prev: history.location}})
     }
 
     const handleRowClick = (row: any) => {
         // go to prog overview
-        history.push(`/programs/overview/${row[0]}/${isArchive ? 'archived' : 'inventory'}`)
+        history.push({
+            pathname: `/programs/overview/${row[0]}/${isArchive ? 'archived' : 'inventory'}`,
+            state: {prev: history.location},
+        })
     }
 
     var filteredRows: any[] = []

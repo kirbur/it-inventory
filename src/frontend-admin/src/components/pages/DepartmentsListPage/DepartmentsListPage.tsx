@@ -127,11 +127,11 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }, [useImages])
 
     const handleClick = () => {
-        history.push(`/departments/edit/new`)
+        history.push({pathname: `/departments/edit/new`, state: {prev: history.location}})
     }
 
     const handleRowClick = (row: any[]) => {
-        history.push(`departments/detail/${row[0].key}`)
+        history.push({pathname: `departments/detail/${row[0].key}`, state: {prev: history.location}})
     }
 
     var filteredRows: any[] = []

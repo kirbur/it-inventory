@@ -27,7 +27,6 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
             border: '0px',
             height: '45px',
             color: '#9b9b9b',
-            cursor: 'pointer',
         }),
         control: (provided: any, state: any) => ({
             ...provided,
@@ -42,6 +41,9 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
             ...provided,
             margin: '-5px',
             boxShadow: '-1px 5px 7px 0 rgba(0,0,0,0.5)',
+        }),
+        option: (provided: any, state: any) => ({
+            ...provided,
             cursor: 'pointer',
         }),
         indicatorSeparator: (provided: any) => ({
@@ -55,7 +57,6 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
         singleValue: (provided: any) => ({
             ...provided,
             color: '#9b9b9b',
-            cursor: 'pointer',
             height: '23px',
         }),
     }

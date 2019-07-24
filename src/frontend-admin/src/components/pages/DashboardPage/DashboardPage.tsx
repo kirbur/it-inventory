@@ -97,18 +97,18 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const onRowClick = (datum: IDashboardTableDatum) => {
         if (datum.name[datum.name.length - 1] === '*') {
             var str = datum.name.substring(0, datum.name.length - 1)
-            history.push(`/programs/overview/${str}/inventory`)
+            history.push({pathname: `/programs/overview/${str}/inventory`, state: {prev: history.location}})
         } else {
-            history.push(`/programs/overview/${datum.name}/inventory`)
+            history.push({pathname: `/programs/overview/${datum.name}/inventory`, state: {prev: history.location}})
         }
     }
 
     const onBarClick = (id: string) => {
-        history.push(`/programs/overview/${id}/inventory`)
+        history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
     }
 
     const onSliceClick = (id: string) => {
-        history.push(`/departments/detail/${id}`)
+        history.push({pathname: `/departments/detail/${id}`, state: {prev: history.location}})
     }
 
     useEffect(() => {
@@ -233,7 +233,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                     title={'licenses'}
                     titleClassName={styles.linkedTitle}
                     titleOnClick={() => {
-                        history.push('/programs')
+                        history.push({pathname: `/programs`, state: {prev: history.location}})
                     }}
                 >
                     <Group>
@@ -301,7 +301,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                     title={'Departments'}
                     titleClassName={styles.linkedTitle}
                     titleOnClick={() => {
-                        history.push('/departments')
+                        history.push({pathname: `/departments`, state: {prev: history.location}})
                     }}
                 >
                     <RechartPieChart
@@ -326,7 +326,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                     title={'software'}
                     titleClassName={styles.linkedTitle}
                     titleOnClick={() => {
-                        history.push('/programs')
+                        history.push({pathname: `/programs`, state: {prev: history.location}})
                     }}
                 >
                     <div className={styles.software}>

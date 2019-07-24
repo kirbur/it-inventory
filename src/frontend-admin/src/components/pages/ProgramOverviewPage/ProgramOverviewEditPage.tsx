@@ -11,6 +11,7 @@ import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
 import {Checkbox} from '../../reusables/Checkbox/Checkbox'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -258,7 +259,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     .catch((err: any) => console.error(err))
 
                 //after submitting go back to detail
-                history.push(`/programs`)
+                history.push({pathname: `/programs`, state: {prev: history.location}})
             } else {
                 msg = 'Failed because: \n'
                 msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
@@ -295,7 +296,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         .catch((err: any) => console.error(err))
 
                     //after submitting go back to detail
-                    history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
+                    history.push({
+                        pathname: `/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`,
+                        state: {prev: history.location},
+                    })
                 } else {
                     msg = 'Failed because: \n'
                     msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
@@ -340,9 +344,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 await axios.put(`update/programall`, updateProgram).catch((err: any) => console.error(err))
 
                 //after submitting go back to detail
-                history.push(
-                    `/programs/overview/${overviewInputs.name.changed ? overviewInputs.name.value : id}/inventory`
-                )
+                history.push({
+                    pathname: `/programs/overview/${
+                        overviewInputs.name.changed ? overviewInputs.name.value : id
+                    }/inventory`,
+                    state: {prev: history.location},
+                })
             }
 
             if (pluginForm) {
@@ -369,12 +376,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         await axios.post('/add/plugin', postPlugin).catch((err: any) => console.error(err))
 
                         //after submitting go back to detail
-                        history.push(`/programs/overview/${id}/inventory`)
+                        history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
                     } else {
                         await axios.put('/update/plugin', postPlugin).catch((err: any) => console.error(err))
 
                         //after submitting go back to detail
-                        history.push(`/programs/overview/${id}/inventory`)
+                        history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
                     }
                 } else {
                     msg = 'Failed to Add Plugin Because: \n'
@@ -390,7 +397,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 )
                 setRemovedPluginRows([])
                 //after submitting go back to detail
-                history.push(`/programs/overview/${id}/inventory`)
+                history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
             }
 
             if (removedProgramRows.length > 0) {
@@ -403,7 +410,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     })
                     setRemovedProgramRows([])
                     //after submitting go back to detail
-                    history.push(`/programs/overview/${id}/inventory`)
+                    history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
                 }
             }
         }
@@ -419,7 +426,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 .catch(err => console.error(err))
 
             //after submitting go back to detail
-            history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
+            history.push({
+                pathname: `/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`,
+                state: {prev: history.location},
+            })
         }
     }
 
@@ -474,27 +484,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
-                    {id === 'new' ? (
-                        <Button
-                            text='All Programs'
-                            icon='back'
-                            onClick={() => {
-                                history.push(`/programs`)
-                            }}
-                            className={styles.backButton}
-                            textClassName={styles.backButtonText}
-                        />
-                    ) : (
-                        <Button
-                            text={id}
-                            icon='back'
-                            onClick={() => {
-                                history.push(`/programs/overview/${id}/${archived}`)
-                            }}
-                            className={styles.backButton}
-                            textClassName={styles.backButtonText}
-                        />
-                    )}
+                    <BackButton history={history} className={styles.backButton} />
                     <div className={styles.imgContainer}>
                         <PictureInput setImage={setImgInput} image={imgInput} />
                     </div>
