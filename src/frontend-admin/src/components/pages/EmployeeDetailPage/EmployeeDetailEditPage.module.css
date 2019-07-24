@@ -251,6 +251,7 @@ input:checked ~ .insideCheckmarkAdmin {
 }
 
 .addContainer {
+    padding-top: 8px;
     margin: 5px 0 15px;
     align-self: flex-end;
 }
