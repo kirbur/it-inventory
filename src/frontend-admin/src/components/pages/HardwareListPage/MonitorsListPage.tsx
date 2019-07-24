@@ -287,6 +287,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                     options={options}
                     selected={selected}
                     setSelected={setSelected}
+                    iconPosition={styles.searchIcon}
                 />
             </Group>
             <div className={styles.table}>

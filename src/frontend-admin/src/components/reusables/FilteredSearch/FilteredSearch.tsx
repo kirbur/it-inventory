@@ -1,6 +1,7 @@
 import React from 'react'
 import Select, {components} from 'react-select'
 import {MdSearch} from 'react-icons/md'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './FilteredSearch.module.css'
@@ -12,11 +13,12 @@ export interface IFilteredSearchProps {
     options: {label: string; value: string}[]
     selected: any
     setSelected: any
+    iconPosition?: string
 }
 
 // Primary Component
 export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
-    const {search, setSearch, options, setSelected} = props
+    const {search, setSearch, options, setSelected, iconPosition = ''} = props
 
     const customStyles = {
         container: (provided: any, state: any) => ({
@@ -25,6 +27,7 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
             border: '0px',
             height: '45px',
             color: '#9b9b9b',
+            cursor: 'pointer',
         }),
         control: (provided: any, state: any) => ({
             ...provided,
@@ -33,11 +36,13 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
             border: '0px ',
             borderRadius: '4px',
             boxShadow: '0',
+            cursor: 'pointer',
         }),
         menu: (provided: any, state: any) => ({
             ...provided,
             margin: '-5px',
             boxShadow: '-1px 5px 7px 0 rgba(0,0,0,0.5)',
+            cursor: 'pointer',
         }),
         indicatorSeparator: (provided: any) => ({
             ...provided,
@@ -45,13 +50,12 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
         }),
         isFocused: (provided: any) => ({
             ...provided,
-
             border: '0px',
         }),
         singleValue: (provided: any) => ({
             ...provided,
             color: '#9b9b9b',
-
+            cursor: 'pointer',
             height: '23px',
         }),
     }
@@ -77,10 +81,8 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
                         setSearch(e.target.value)
                     }}
                 />
-                <div className={styles.searchIconContainer}>
-                    {/* <button type='submit' className={styles.searchIconButton}> */}
+                <div className={s(styles.searchIconContainer, iconPosition)}>
                     <MdSearch className={styles.searchIcon} size={30} />
-                    {/* </button> */}
                 </div>
                 <div className={styles.filterBy}>By</div>
                 <Select
