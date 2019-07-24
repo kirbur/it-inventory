@@ -32,7 +32,6 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
         updatedColors[index] = initialColors[index] + 95 // Change particular index in our cloned array
         setColors(updatedColors) // Set new color array
 
-        // TRYING TO ADD CURSOR TO PIES
         // document.getElementById("c").style.cursor = "pointer";
     }
 
