@@ -34,8 +34,8 @@ export class AxiosService {
     }
 
     //wrapper for get requests return the promise
-    public get: any = (url: string) => {
-        return this.instance
+    public async get(url: string) {
+        return await this.instance
             .get(url, {
                 headers: {
                     Authorization: `Bearer ${this.user.accessToken}`,
@@ -52,8 +52,8 @@ export class AxiosService {
     }
 
     //wrapper method for post requests return the promise
-    public post = (url: string, data: any) => {
-        return this.instance
+    public async post(url: string, data: any) {
+        return await this.instance
             .post(url, data, {
                 headers: {
                     Authorization: `Bearer ${this.user.accessToken}`,
@@ -70,8 +70,8 @@ export class AxiosService {
     }
 
     //wrapper method for put requests return the promise
-    public put = (url: string, data: any, headers?: any) => {
-        return this.instance
+    public async put(url: string, data: any, headers?: any) {
+        return await this.instance
             .put(url, data, {
                 headers: {
                     Authorization: `Bearer ${this.user.accessToken}`,
@@ -98,8 +98,8 @@ export class AxiosService {
     }
 
     //get new access token w/ refresh token
-    public refreshToken = (type: string, args: {url: string; data?: any; headers?: any}) => {
-        return this.instance
+    public async refreshToken(type: string, args: {url: string; data?: any; headers?: any}) {
+        return await this.instance
             .get('/login/accessToken', {
                 headers: {
                     Authorization: `Bearer ${this.user.refreshToken}`,
@@ -113,6 +113,7 @@ export class AxiosService {
                         validTo: response.data[0].validTo,
                     }
                     localStorage.setItem('user', JSON.stringify(this.user))
+
                     switch (type) {
                         case 'get':
                             return this.get(args.url)
