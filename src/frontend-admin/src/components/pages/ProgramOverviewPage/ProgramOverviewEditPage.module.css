@@ -61,6 +61,7 @@
 }
 
 .addContainer {
+    padding-top: 8px;
     margin: 5px 0 55px;
     align-self: flex-end;
 }
@@ -145,7 +146,7 @@
 }
 
 .checkBoxContainer {
-    width: 10%;
+    width: 55px;
 }
 .numCopies {
     width: 15%;

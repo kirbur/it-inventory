@@ -122,7 +122,10 @@ export const DetailPageTable = (props: ITableProps) => {
             transformedRow[0] = row[0].unavailable ? (
                 <td key={index + JSON.stringify(row)} className={styles.editRow}></td>
             ) : (
-                <td key={index + JSON.stringify(row)} onClick={e => remove(row)} className={styles.editRow}>
+                <td
+                    onClick={e => window.confirm('Are you sure you want to remove?') && remove(row)}
+                    className={styles.editRow}
+                >
                     <div className={styles.delete} />
                     <div className={styles.whiteLine} />
                 </td>
