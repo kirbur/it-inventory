@@ -54,7 +54,7 @@ export class AxiosService {
     //wrapper method for post requests return the promise
     public async post(url: string, data: any) {
         return await this.instance
-            .post(url, data, {
+            .post(url + '/', data, {
                 headers: {
                     Authorization: `Bearer ${this.user.accessToken}`,
                 },
@@ -72,7 +72,7 @@ export class AxiosService {
     //wrapper method for put requests return the promise
     public async put(url: string, data: any, headers?: any) {
         return await this.instance
-            .put(url, data, {
+            .put(url + '/', data, {
                 headers: {
                     Authorization: `Bearer ${this.user.accessToken}`,
                     ...headers,

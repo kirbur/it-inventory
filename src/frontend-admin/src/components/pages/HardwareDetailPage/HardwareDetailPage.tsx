@@ -5,7 +5,7 @@ import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
-import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
@@ -47,7 +47,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
     const [firstTableData, setFirstTableData] = useState<(string | number)[]>([])
     const [secondTableData, setSecondTableData] = useState<(string | number)[]>([])
-    const [thirdTableData, setThirdTableData] = useState<(string | number)[]>([])
+    // const [thirdTableData, setThirdTableData] = useState<(string | number)[]>([])
+
+    //  const [firstTableData, setFirstTableData] = useState<ITableItem[][]>([])
+    // const [secondTableData, setSecondTableData] = useState<ITableItem[][]>([])
+    const [thirdTableData, setThirdTableData] = useState<ITableItem[][]>([])
 
     const [historyLogEntries, setHistoryLogEntries] = useState<IHistoryLogArray[]>([])
     const [commentText, setCommentText] = useState('')
@@ -94,7 +98,36 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCostPerYear(data[0].server.costPerYear)
                     setFlatCost(data[0].server.flatCost)
 
-                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].server.location])
+                    // setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].server.location])
+                    setThirdTableData([
+                        [
+                            data[0].employeeAssignedId
+                                ? {
+                                      value: data[0].employeeAssignedName,
+                                      sortBy: data[0].employeeAssignedName,
+                                      id: data[0].employeeAssignedId,
+                                      onClick: (id: any) => {
+                                          history.push({
+                                              pathname: '/employees/detail/' + id,
+                                              state: {prev: history.location},
+                                          })
+                                      },
+                                  }
+                                : {value: data[0].employeeAssignedName, sortBy: data[0].employeeAssignedName},
+                            {
+                                value: data[0].departmentName,
+                                sortBy: data[0].departmentName,
+                                id: data[0].departmentID,
+                                onClick: (id: any) => {
+                                    history.push({
+                                        pathname: '/departments/detail/' + id,
+                                        state: {prev: history.location},
+                                    })
+                                },
+                            },
+                            {value: data[0].server.location, sortBy: data[0].server.location},
+                        ],
+                    ])
                     setCommentText(data[0].server.textField)
                     setHistoryLogEntries(data[0].serverHistory)
                     setIsDeleted(data[0].isDeleted)
@@ -132,7 +165,35 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCostPerYear(data[0].computer.costPerYear)
                     setFlatCost(data[0].computer.flatCost)
 
-                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].computer.location])
+                    setThirdTableData([
+                        [
+                            data[0].employeeAssignedId
+                                ? {
+                                      value: data[0].employeeAssignedName,
+                                      sortBy: data[0].employeeAssignedName,
+                                      id: data[0].employeeAssignedId,
+                                      onClick: (id: any) => {
+                                          history.push({
+                                              pathname: '/employees/detail/' + id,
+                                              state: {prev: history.location},
+                                          })
+                                      },
+                                  }
+                                : {value: data[0].employeeAssignedName, sortBy: data[0].employeeAssignedName},
+                            {
+                                value: data[0].departmentName,
+                                sortBy: data[0].departmentName,
+                                id: data[0].departmentID,
+                                onClick: (id: any) => {
+                                    history.push({
+                                        pathname: '/departments/detail/' + id,
+                                        state: {prev: history.location},
+                                    })
+                                },
+                            },
+                            {value: data[0].computer.location, sortBy: data[0].computer.location},
+                        ],
+                    ])
                     setCommentText(data[0].computer.textField)
                     setHistoryLogEntries(data[0].computerHistory)
                     setIsDeleted(data[0].isDeleted)
@@ -159,7 +220,35 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         data[0].monitor.serialNumber,
                     ])
                     setSecondTableData([])
-                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].monitor.location])
+                    setThirdTableData([
+                        [
+                            data[0].employeeAssignedId
+                                ? {
+                                      value: data[0].employeeAssignedName,
+                                      sortBy: data[0].employeeAssignedName,
+                                      id: data[0].employeeAssignedId,
+                                      onClick: (id: any) => {
+                                          history.push({
+                                              pathname: '/employees/detail/' + id,
+                                              state: {prev: history.location},
+                                          })
+                                      },
+                                  }
+                                : {value: data[0].employeeAssignedName, sortBy: data[0].employeeAssignedName},
+                            {
+                                value: data[0].departmentName,
+                                sortBy: data[0].departmentName,
+                                id: data[0].departmentID,
+                                onClick: (id: any) => {
+                                    history.push({
+                                        pathname: '/departments/detail/' + id,
+                                        state: {prev: history.location},
+                                    })
+                                },
+                            },
+                            {value: data[0].monitor.location, sortBy: data[0].monitor.location},
+                        ],
+                    ])
                     setCostPerYear(data[0].monitor.costPerYear)
                     setFlatCost(data[0].monitor.flatCost)
                     setCommentText(data[0].monitor.textField)
@@ -168,9 +257,9 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
-            setFirstTableHeaders(['Employee Assigned', 'Department Assigned', 'Serial #'])
+            setFirstTableHeaders([])
             setSecondTableHeaders([])
-            setThirdTableHeaders([])
+            setThirdTableHeaders(['Employee Assigned', 'Department Assigned', 'Serial #'])
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
@@ -180,13 +269,37 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         'Type: ' + data[0].peripheral.peripheralType,
                         'Purchase Date: ' + formatDate(data[0].peripheral.purchaseDate),
                     ])
-                    setFirstTableData([
-                        data[0].employeeAssignedName,
-                        data[0].departmentName,
-                        data[0].peripheral.serialNumber,
-                    ])
+                    setFirstTableData([])
                     setSecondTableData([])
-                    setThirdTableData([])
+                    setThirdTableData([
+                        [
+                            data[0].employeeAssignedId
+                                ? {
+                                      value: data[0].employeeAssignedName,
+                                      sortBy: data[0].employeeAssignedName,
+                                      id: data[0].employeeAssignedId,
+                                      onClick: (id: any) => {
+                                          history.push({
+                                              pathname: '/employees/detail/' + id,
+                                              state: {prev: history.location},
+                                          })
+                                      },
+                                  }
+                                : {value: data[0].employeeAssignedName, sortBy: data[0].employeeAssignedName},
+                            {
+                                value: data[0].departmentName,
+                                sortBy: data[0].departmentName,
+                                id: data[0].departmentID,
+                                onClick: (id: any) => {
+                                    history.push({
+                                        pathname: '/departments/detail/' + id,
+                                        state: {prev: history.location},
+                                    })
+                                },
+                            },
+                            {value: data[0].peripheral.serialNumber, sortBy: data[0].peripheral.serialNumber},
+                        ],
+                    ])
                     setCostPerYear(data[0].peripheral.costPerYear)
                     setFlatCost(data[0].peripheral.flatCost)
                     setCommentText(data[0].peripheral.textField)
@@ -337,11 +450,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     {thirdTableData && thirdTableData[0] && (
                         <DetailPageTable
                             headers={thirdTableHeaders}
-                            rows={[
+                            rows={
+                                thirdTableData /*[
                                 thirdTableData.map((datum: string | number) => {
                                     return {value: datum, sortBy: datum}
                                 }),
-                            ]}
+                            ]*/
+                            }
                             setRows={() => {}}
                             sort={false}
                             hover={false}

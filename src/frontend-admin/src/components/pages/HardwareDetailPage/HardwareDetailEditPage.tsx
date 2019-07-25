@@ -614,7 +614,10 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 })
             }
         }
-        history.push({pathname: `/hardware`, state: {prev: history.location}})
+        history.push({
+            pathname: `/hardware/detail/${match.params.type}/${match.params.id}`,
+            state: {prev: history.location},
+        })
     }
 
     function handleInputChange(index: number, sectionData: any[], value: string | number) {
