@@ -464,8 +464,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     Entity: {
                         PeripheralName: firstSectionData[0],
                         PeripheralType: firstSectionData[1],
-                        Mfg: null,
-                        SerialNumber: firstSectionData[3],
+                        SerialNumber: firstSectionData[2],
 
                         PurchaseDate: purchaseDateInput,
 
@@ -592,8 +591,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         PeripheralName: firstSectionData[0],
                         PeripheralType: firstSectionData[1],
-                        Mfg: null,
-                        SerialNumber: firstSectionData[3],
+                        SerialNumber: firstSectionData[2],
 
                         PurchaseDate: purchaseDateInput,
 

@@ -27,13 +27,11 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
     const [colors, setColors] = useState(initialColors)
     //colors off of invision: ['#009EFF', '#FF9340', '#3D4599', '#1425CC', '#CC4A14']
 
+
     const onMouseOver = (data: IRechartPieDatum[], index: number) => {
         const updatedColors = [...initialColors] // Create clone of initial colors array
         updatedColors[index] = initialColors[index] + 95 // Change particular index in our cloned array
         setColors(updatedColors) // Set new color array
-
-        // const d: HTMLElement = document.getElementById('c')
-        // d.style.cursor = 'pointer'
     }
 
     const onMouseOut = () => {
@@ -65,7 +63,7 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
             </div>
 
             {/* Pie Charts */}
-            <div className={styles.inline} id={'c'}>
+            <div className={styles.inline}>
                 <PieChart width={340 * pieChartData.length} height={300}>
                     {pieChartData.map((datum, j) => (
                         <Pie
