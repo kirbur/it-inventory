@@ -6,6 +6,7 @@ import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -219,7 +220,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             window.confirm(`Are you sure you want to ${isDeleted ? 'recover' : 'archive'} this ${match.params.type}?`)
         ) {
             await axios.put(`${isDeleted ? 'recover' : 'archive'}/${match.params.type}/${match.params.id}`, {})
-            history.push(`/hardware${isDeleted ? `/edit/${match.params.type}/${match.params.id}` : ''}`)
+            history.push({
+                pathname: `/hardware${isDeleted ? `/edit/${match.params.type}/${match.params.id}` : ''}`,
+                state: {prev: history.location},
+            })
         }
     }
 
@@ -251,15 +255,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
-                    <Button
-                        text='All Hardware'
-                        icon='back'
-                        onClick={() => {
-                            history.push('/hardware')
-                        }}
-                        className={styles.backButton}
-                        textClassName={styles.backButtonText}
-                    />
+                    <BackButton history={history} className={styles.backButton} />
                     <div className={styles.imgContainer}>
                         <div className={styles.imgPadding}>
                             <img className={styles.img} src={img} alt={''} />
@@ -280,7 +276,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                                     text='Edit'
                                     icon='edit'
                                     onClick={() => {
-                                        history.push('/hardware/edit/' + match.params.type + '/' + match.params.id)
+                                        history.push({
+                                            pathname: '/hardware/edit/' + match.params.type + '/' + match.params.id,
+                                            state: {prev: history.location},
+                                        })
                                     }}
                                     className={styles.editbutton}
                                 />

@@ -136,11 +136,11 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     }, [useImages])
 
     const handleClick = () => {
-        history.push(`hardware/edit/server/new`)
+        history.push({pathname: `hardware/edit/server/new`, state: {prev: history.location}})
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/detail/server/${row[0].key}`)
+        history.push({pathname: `hardware/detail/server/${row[0].key}`, state: {prev: history.location}})
     }
 
     var filteredRows: any[] = []

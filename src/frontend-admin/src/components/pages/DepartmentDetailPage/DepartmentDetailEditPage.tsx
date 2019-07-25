@@ -20,6 +20,7 @@ import {format} from '../../../utilities/formatEmptyStrings'
 import {cloneDeep} from 'lodash'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Types
 interface IDepartmentDetailEditPageProps {
@@ -193,7 +194,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                     },
                     name: deptData.departmentName,
                 })
-                history.push('/departments')
+                history.push({pathname: `/departments`, state: {prev: history.location}})
             } else {
                 await axios.put(`update/department`, {
                     DefaultHardware: {DefaultHardware: newDefaultHardware},
@@ -204,7 +205,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                     name: deptData.departmentName,
                     ID: match.params.id,
                 })
-                history.push(`/departments/detail/${match.params.id}`)
+                history.push({pathname: `/departments/detail/${match.params.id}`, state: {prev: history.location}})
             }
         }
     }
@@ -214,21 +215,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
             {/* column 1 */}
 
             <div className={styles.firstColumn}>
-                <Button
-                    text={
-                        match.params.id === 'new'
-                            ? 'All Departments'
-                            : deptData.departmentName
-                            ? deptData.departmentName
-                            : ''
-                    }
-                    icon='back'
-                    onClick={() => {
-                        history.push(`/departments${match.params.id === 'new' ? `` : `/detail/${match.params.id}`}`)
-                    }}
-                    className={styles.backButton}
-                    textClassName={styles.backButtonText}
-                />
+                <BackButton history={history} className={styles.backButton} />
 
                 <div className={styles.imgContainer}>
                     <PictureInput setImage={setImgInput} image={imgInput} />
@@ -237,7 +224,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 {/* name and date */}
-                <div className={styles.title}>Department Information</div>
+                <div className={s(styles.title, styles.paddingTop)}>Department Information</div>
 
                 <div className={styles.row}>
                     <div className={styles.text}>Department Name</div>

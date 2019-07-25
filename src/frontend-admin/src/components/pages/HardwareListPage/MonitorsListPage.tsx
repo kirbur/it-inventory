@@ -135,11 +135,11 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     }, [useImages])
 
     const handleClick = () => {
-        history.push('/hardware/edit/monitor/new')
+        history.push({pathname: '/hardware/edit/monitor/new', state: {prev: history.location}})
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/detail/monitor/${row[0].key}`)
+        history.push({pathname: `hardware/detail/monitor/${row[0].key}`, state: {prev: history.location}})
     }
 
     var filteredRows: any[] = []

@@ -141,11 +141,11 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
     }, [useImages])
 
     const handleClick = () => {
-        history.push('/hardware/edit/laptop/new')
+        history.push({pathname: '/hardware/edit/laptop/new', state: {prev: history.location}})
     }
 
     const handleRowClick = (row: any) => {
-        history.push(`hardware/detail/laptop/${row[0].key}`)
+        history.push({pathname: `hardware/detail/laptop/${row[0].key}`, state: {prev: history.location}})
     }
 
     var filteredRows: any[] = []

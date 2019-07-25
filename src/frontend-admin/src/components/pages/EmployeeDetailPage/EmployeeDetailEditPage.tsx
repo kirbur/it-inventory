@@ -9,6 +9,7 @@ import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {AddDropdown} from '../../reusables/Dropdown/AddDropdown'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -593,7 +594,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 })
                 .catch((err: any) => console.error(err))
 
-            history.push(`/employees`)
+            history.push({pathname: `/employees`, state: {prev: history.location}})
         } else if (match.params.id === 'new') {
             selectedEmployee.name === 'Select A New Employee' && window.alert('No employee was selected')
         }
@@ -652,7 +653,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
             await axios.put(`/update/Employee`, updateEmployee).catch((err: any) => console.error(err))
 
-            history.push(`/employees/detail/${match.params.id}`)
+            history.push({pathname: `/employees/detail/${match.params.id}`, state: {prev: history.location}})
         } else if (match.params.id !== 'new' && changed) {
             //one or maore of the inputs was null/undefined/empty
             msg = 'Failed because:\n'
@@ -673,7 +674,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     headers: {'Content-Type': 'multipart/form-data'},
                 })
                 .catch(err => console.error(err))
-            history.push(`/employees/detail/${match.params.id}`)
+            history.push({pathname: `/employees/detail/${match.params.id}`, state: {prev: history.location}})
         }
     }
 
@@ -723,27 +724,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             {/* column 1 */}
 
             <div className={styles.firstColumn}>
-                {match.params.id === 'new' ? (
-                    <Button
-                        text={'All Employees'}
-                        icon='back'
-                        onClick={() => {
-                            history.push(`/employees`)
-                        }}
-                        className={styles.backButton}
-                        textClassName={styles.backButtonText}
-                    />
-                ) : (
-                    <Button
-                        text={userData.name}
-                        icon='back'
-                        onClick={() => {
-                            history.push(`/employees/detail/${match.params.id}`)
-                        }}
-                        className={styles.backButton}
-                        textClassName={styles.backButtonText}
-                    />
-                )}
+                <BackButton history={history} className={styles.backButton} />
                 <div className={styles.imgContainer}>
                     <PictureInput setImage={setImgInput} image={imgInput} />
                 </div>
@@ -751,7 +732,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 {/* name and date */}
-                <div className={styles.title}>Employee Information</div>
+                <div className={s(styles.title, styles.paddingTop)}>Employee Information</div>
 
                 {/* Admin/nonadmin radio cards */}
                 <div className={styles.adminCardContainer}>

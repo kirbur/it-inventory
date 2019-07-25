@@ -8,6 +8,7 @@ import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/Progr
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import {History} from 'history'
 import {match} from 'react-router-dom'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -126,7 +127,8 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             }
 
             await axios.put(`update/program/${match.params.id}`, updateProgram).catch((err: any) => console.error(err))
-            history.push(`/programs/detail/${match.params.id}`)
+
+            history.push({pathname: `/programs/detail/${match.params.id}`, state: {prev: history.location}})
         }
     }
 
@@ -135,15 +137,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             {/* column 1 */}
 
             <div className={styles.firstColumn}>
-                <Button
-                    text={progData.name + ' ' + match.params.id}
-                    icon='back'
-                    onClick={() => {
-                        history.push(`/programs/detail/${match.params.id}`)
-                    }}
-                    className={styles.backButton}
-                    textClassName={styles.backButtonText}
-                />
+                <BackButton history={history} className={styles.backButton} />
                 <div className={styles.imgContainer}>
                     <PictureInput setImage={setImgInput} image={imgInput} />
                 </div>

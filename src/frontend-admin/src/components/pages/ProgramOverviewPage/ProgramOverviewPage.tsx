@@ -8,6 +8,7 @@ import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/Detai
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -64,6 +65,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
         match: {
             params: {archived, id},
         },
+        match,
     } = props
 
     const {
@@ -168,11 +170,11 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     }, [programData.icon])
 
     const handleEmpClick = (id: number) => {
-        history.push(`/employees/detail/${id}`)
+        history.push({pathname: `/employees/detail/${id}`, state: {prev: history.location}})
     }
 
     const handleCopyClick = (id: number) => {
-        history.push(`/programs/detail/${id}`)
+        history.push({pathname: `/programs/detail/${id}`, state: {prev: history.location}})
     }
 
     const handleArchive = () => {
@@ -189,7 +191,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     axios.put(`archive/program/${program[0].id}`, {}).catch((err: any) => console.error(err))
                 })
                 setProgramRows([])
-                history.push('/programs')
+                history.push({pathname: '/programs', state: {prev: history.location}})
             }
         }
 
@@ -199,7 +201,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     axios.put(`recover/program/${program[0].id}`, {}).catch((err: any) => console.error(err))
                 })
                 setProgramRows([])
-                history.push(`/programs/edit/overview/${id}/inventory`)
+                history.push({pathname: `/programs/edit/overview/${id}/inventory`, state: {prev: history.location}})
             }
         }
     }
@@ -209,15 +211,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
-                    <Button
-                        text='All Programs'
-                        icon='back'
-                        onClick={() => {
-                            history.push('/programs')
-                        }}
-                        className={styles.backButton}
-                        textClassName={styles.backButtonText}
-                    />
+                    <BackButton history={history} className={styles.backButton} />
                     <div className={styles.imgContainer}>
                         <div className={styles.imgPadding}>
                             <img className={styles.img} src={img} alt={''} />
@@ -257,7 +251,10 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                                     text='Edit'
                                     icon='edit'
                                     onClick={() => {
-                                        history.push(`/programs/edit/overview/${id}/${archived}`)
+                                        history.push({
+                                            pathname: `/programs/edit/overview/${id}/${archived}`,
+                                            state: {prev: history.location},
+                                        })
                                     }}
                                     className={styles.editbutton}
                                 />

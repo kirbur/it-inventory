@@ -6,7 +6,7 @@
 }
 
 .firstColumn {
-    padding: 100px;
+    padding: 50px;
     min-width: 160px;
     max-width: 300px;
     flex-grow: 1;
