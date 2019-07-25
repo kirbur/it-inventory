@@ -77,12 +77,10 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     var headerList: string[] = []
     const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{id: number; img: string}[]>([])
-    const [displayImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get('/list/employees')
             .then((data: IPulledData[]) => {
                 let employees: IEmployeeData[] = []
@@ -103,16 +101,17 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         programs: i.progForEmp ? i.progForEmp.join(', ') : '',
                         daysEmployed: getDays(i.hireDate),
                     })
-                    imgs.push({id: i.employeeId, img: i.photo})
+                    checkImage(i.photo, axios, placeholder).then(image => {
+                        imgs.push({id: i.employeeId, img: image})
+                    })
                 })
                 setListData(employees)
 
-                setImages(imgs)
-                setUseImages(true)
+                setDisplayImages(imgs)
             })
             .catch((err: any) => console.error(err))
 
-        axios
+        await axios
             .get('/archivedList/employee')
             .then((data: IPulledData[]) => {
                 let employees: any[] = []
@@ -139,22 +138,15 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         if (isArchive) {
             headers = ['Employees', 'Role', 'Date Hired', 'Date Archived', 'Days Employed']
         }
+    }
+
+    useEffect(() => {
+        getData()
     }, [])
 
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
     }, [search, selected, listData, archivedData, isArchive])
-
-    //Set display Images
-    useEffect(() => {
-        images.map((img: {id: number; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.id !== img.id)
-                setImages([...list, {id: img.id, img: data}])
-                displayImages.push({id: img.id, img: data})
-            })
-        )
-    }, [useImages])
 
     const formatCost = (hwCpost: number, progCost: number) => {
         return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo'
