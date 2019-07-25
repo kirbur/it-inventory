@@ -992,7 +992,7 @@ namespace backend_api.Controllers
                 }
 
                 // Server History
-                List<object> SeverHistory = new List<object>();
+                List<object> ServerHistory = new List<object>();
 
                 // Formatting the data returned of this piece of hardware's history and adding it to a list.
                 foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == serverID))
@@ -1016,7 +1016,7 @@ namespace backend_api.Controllers
                             entry.EventDate,
                             historyId = entry.HardwareHistoryId
                         };
-                    SeverHistory.Add(singleEntry);
+                    ServerHistory.Add(singleEntry);
                 }
 
                 var serverClicked = nameof(Server) + "/" + sv.ServerId;
@@ -1033,7 +1033,7 @@ namespace backend_api.Controllers
                     serverClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
                     employeeAssignedId = employeeAssigned != null ? employeeAssigned.EmployeeId: -1,
-                    SeverHistory,
+                    ServerHistory,
                     listOfEmployees = ListOfEmployees()
                 });
                 return Ok(new List<object> { serverDetailPage });
