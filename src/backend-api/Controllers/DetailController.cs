@@ -286,7 +286,7 @@ namespace backend_api.Controllers
                         sv.Make,
                         sv.Model,
                         sv.SerialNumber,
-                        sv.Mfg,
+                        sv.MFG,
                         sv.PurchaseDate,
                         tooltip,
                     };
@@ -311,7 +311,7 @@ namespace backend_api.Controllers
                         cp.Make,
                         cp.Model,
                         cp.SerialNumber,
-                        cp.Mfg,
+                        cp.MFG,
                         cp.PurchaseDate,
                         tooltip,
                     };
@@ -333,7 +333,7 @@ namespace backend_api.Controllers
                         mn.Make,
                         mn.Model,
                         mn.SerialNumber,
-                        mn.Mfg,
+                        mn.MFG,
                         mn.PurchaseDate,
                         tooltip,
                     };
@@ -356,7 +356,7 @@ namespace backend_api.Controllers
                         make = pr.PeripheralName,
                         model = pr.PeripheralType,
                         pr.SerialNumber,
-                        pr.Mfg,
+                        pr.MFG,
                         pr.PurchaseDate,
                         tooltip,
                     };
