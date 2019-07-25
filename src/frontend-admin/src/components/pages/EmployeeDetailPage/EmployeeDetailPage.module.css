@@ -96,6 +96,12 @@
     margin: 6px;
     font-size: 24px;
     color: #a5a5a5;
+    display: flex;
+}
+
+.deptText {
+    color: #009eff;
+    cursor: pointer;
 }
 
 .table {

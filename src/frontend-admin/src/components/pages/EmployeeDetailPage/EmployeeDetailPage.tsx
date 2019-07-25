@@ -30,6 +30,7 @@ interface IUser {
     photo: string
     name: string
     department: string
+    deptId: number
     role: string
     hireDate: string
     hwCost: number
@@ -55,6 +56,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         photo: '',
         name: '',
         department: '',
+        deptId: -1,
         role: '',
         hireDate: '',
         hwCost: 0,
@@ -89,6 +91,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     photo: data[0].picture,
                     name: data[0].firstName + ' ' + data[0].lastName,
                     department: data[0].department,
+                    deptId: data[0].departmentID,
                     role: data[0].role,
                     hireDate: formatDate(data[0].hireDate),
                     hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
@@ -249,7 +252,18 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         <div className={styles.employeeName}>{userData.name}</div>
                         <div className={styles.employeeText}>{userData.email}</div>
                         <div className={styles.employeeText}>
-                            {userData.department} | {userData.role}
+                            <div
+                                className={styles.deptText}
+                                onClick={() => {
+                                    history.push({
+                                        pathname: '/departments/detail/' + userData.deptId,
+                                        state: {prev: history.location},
+                                    })
+                                }}
+                            >
+                                {userData.department}
+                            </div>{' '}
+                            | {userData.role}
                         </div>
 
                         <div className={styles.employeeText}>
