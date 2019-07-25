@@ -70,10 +70,8 @@ let initDeptTable: {id: number; name: string; tableData: IDashboardTableDatum[]}
 // Primary Component
 export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const {history} = props
-    const {
-        loginContextVariables: {accessToken, refreshToken},
-    } = useContext(LoginContext)
-    const axios = new AxiosService(accessToken, refreshToken)
+    const {loginContextVariables} = useContext(LoginContext)
+    const axios = new AxiosService(loginContextVariables)
 
     //Liscence Bar Chart State
     const [licenses, setLicenses] = useState(initLicenses)

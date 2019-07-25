@@ -11,6 +11,7 @@ replace_web_config() {
         s/_ITINVENTORYDB_APPUSER_CONNSTRING_/$ITINVENTORYDB_APPUSER_CONNSTRING/g
         s/_JWT_SECRET_/$JWT_SECRET/g
         s/_JOBS_AUTHTOKEN_/$JOBS_AUTHTOKEN/g
+        s/_SMTP_SERVER_/$SMTP_SERVER/g
     " $1 > $2
 }
 

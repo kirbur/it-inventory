@@ -20,12 +20,8 @@ export class AxiosService {
     }
     private instance: AxiosInstance
 
-    public constructor(token: string, refreshToken: string) {
-        this.user = {
-            ...this.user,
-            accessToken: token,
-            refreshToken: refreshToken,
-        }
+    public constructor(user: ILoginContext) {
+        this.user = {...user}
 
         this.instance = axios.create({
             baseURL: URL,
@@ -46,10 +42,13 @@ export class AxiosService {
                 },
             })
             .then(response => {
-                this.checkTokenExpired(url)
+                this.checkTokenExpired('get', {url})
                 return response.data
             })
-            .catch(err => console.error(err))
+            .catch(err => {
+                console.error(err)
+                this.checkTokenExpired('get', {url})
+            })
     }
 
     //wrapper method for post requests return the promise
@@ -61,10 +60,13 @@ export class AxiosService {
                 },
             })
             .then(response => {
-                this.checkTokenExpired(url, data)
+                this.checkTokenExpired('post', {url, data})
                 return response
             })
-            .catch(err => console.error(err))
+            .catch(err => {
+                console.error(err)
+                this.checkTokenExpired('post', {url, data})
+            })
     }
 
     //wrapper method for put requests return the promise
@@ -73,42 +75,62 @@ export class AxiosService {
             .put(url, data, {
                 headers: {
                     Authorization: `Bearer ${this.user.accessToken}`,
+                    ...headers,
                 },
-                ...headers,
             })
             .then(response => {
-                this.checkTokenExpired(url, data)
+                this.checkTokenExpired('put', {url, data, headers})
                 return response
             })
-            .catch(err => console.error(err.response))
+            .catch(err => {
+                console.error(err)
+                this.checkTokenExpired('put', {url, data, headers})
+            })
     }
 
     //check if token needs refreshing
-    public checkTokenExpired = (url: string, data?: any) => {
+    public checkTokenExpired = (type: string, args: {url: string; data?: any; headers?: any}) => {
         const now = Date.parse(new Date().toISOString())
         const expires = Date.parse(this.user.validTo)
         if (expires - now <= 0) {
-            this.refreshToken(url, data)
+            this.refreshToken(type, args)
         }
     }
 
     //get new access token w/ refresh token
-    public refreshToken = (url: string, data?: any) => {
-        this.instance
-            .post('/login/accessToken', {
-                refreshToken: this.user.refreshToken,
+    public refreshToken = (type: string, args: {url: string; data?: any; headers?: any}) => {
+        return this.instance
+            .get('/login/accessToken', {
+                headers: {
+                    Authorization: `Bearer ${this.user.refreshToken}`,
+                },
             })
             .then(response => {
                 if (response.status === 200) {
                     this.user = {
                         ...this.user,
-                        accessToken: response.data.accessToken,
-                        validTo: response.data.validTo,
+                        accessToken: response.data[0].accesstoken,
+                        validTo: response.data[0].validTo,
                     }
-                    data ? this.post(url, data) : this.get(url) //re-try get/post request
+                    localStorage.setItem('user', JSON.stringify(this.user))
+                    switch (type) {
+                        case 'get':
+                            return this.get(args.url)
+                        case 'post':
+                            return this.post(args.url, args.data)
+                        case 'put':
+                            return this.put(args.url, args.data, args.headers)
+                    }
                 } else if (response.status === 401) {
-                    //Unauthorized
-                    //redirect back to login page
+                    this.user = {
+                        refreshToken: '',
+                        accessToken: '',
+                        validTo: '',
+                        givenName: '',
+                        isAdmin: false,
+                    }
+                    localStorage.removeItem('user')
+                    window.location.reload()
                 }
             })
     }
