@@ -224,7 +224,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 {/* name and date */}
-                <div className={styles.title}>Department Information</div>
+                <div className={s(styles.title, styles.paddingTop)}>Department Information</div>
 
                 <div className={styles.row}>
                     <div className={styles.text}>Department Name</div>
