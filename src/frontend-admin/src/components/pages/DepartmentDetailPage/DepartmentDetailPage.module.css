@@ -17,6 +17,7 @@
 
 .secondColumn {
     padding: 50px;
+    padding-left: 75px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -99,7 +100,7 @@
 .titleText {
     text-align: left;
     padding-top: 50px;
-    min-height: 300px;
+    padding-bottom: 100px;
 }
 
 .deptName {
@@ -198,7 +199,6 @@
 }
 .table {
     width: 400px;
-    /* margin-top: 50px; */
     display: flex;
     flex-direction: column;
     justify-content: left;
