@@ -21,6 +21,7 @@
     text-align: left;
     color: #a5a5a5;
     border-bottom: 1px solid #979797;
+    display: flex;
 }
 .description {
     text-align: left;

@@ -73,6 +73,10 @@ pipelines:
                   args:
                       credentialsId: itinventory.cqlcorp.net-jobs-authtoken
                       variable: JOBS_AUTHTOKEN
+                - type: string
+                  args:
+                      credentialsId: itinventory.cqlcorp.net-smtp-server
+                      variable: SMTP_SERVER
             script:
                 - export API_SFTPROOT=/www/itinventory.cqlcorp.net
 

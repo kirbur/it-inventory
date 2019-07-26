@@ -7,6 +7,7 @@ import {match} from 'react-router-dom'
 import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
@@ -29,6 +30,7 @@ interface IUser {
     photo: string
     name: string
     department: string
+    deptId: number
     role: string
     hireDate: string
     hwCost: number
@@ -54,6 +56,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         photo: '',
         name: '',
         department: '',
+        deptId: -1,
         role: '',
         hireDate: '',
         hwCost: 0,
@@ -73,11 +76,11 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const formatToolTip = (obj: any) => obj.cpu + ' | ' + obj.ramgb + 'GB | ' + obj.ssdgb + 'GB'
 
     const handleHardwareClick = (id: number | string) => {
-        history.push(`/hardware/detail/${id}`)
+        history.push({pathname: `/hardware/detail/${id}`, state: {prev: history.location}})
     }
 
     const handleProgramClick = (id: number | string) => {
-        history.push(`/programs/detail/${id}`)
+        history.push({pathname: `/programs/detail/${id}`, state: {prev: history.location}})
     }
 
     useEffect(() => {
@@ -88,6 +91,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     photo: data[0].picture,
                     name: data[0].firstName + ' ' + data[0].lastName,
                     department: data[0].department,
+                    deptId: data[0].departmentID,
                     role: data[0].role,
                     hireDate: formatDate(data[0].hireDate),
                     hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
@@ -187,7 +191,10 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
             await axios
                 .put(`/${isDeleted ? 'recover' : 'archive'}/employee/${match.params.id}`, {})
                 .catch((err: any) => console.error(err))
-            history.push(`/employees${isDeleted ? '/edit/' + match.params.id : ''}`)
+            history.push({
+                pathname: `/employees${isDeleted ? '/edit/' + match.params.id : ''}`,
+                state: {prev: history.location},
+            })
         }
     }
 
@@ -196,17 +203,11 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
-                    <Button
-                        text='All Employees'
-                        icon='back'
-                        onClick={() => {
-                            history.push('/employees')
-                        }}
-                        className={styles.backButton}
-                        textClassName={styles.backButtonText}
-                    />
-                    <div className={styles.imgPadding}>
-                        <img className={styles.img} src={img} alt={''} />
+                    <BackButton history={history} className={styles.backButton} />
+                    <div className={styles.imgContainer}>
+                        <div className={styles.imgPadding}>
+                            <img className={styles.img} src={img} alt={''} />
+                        </div>
                     </div>
                     <div className={styles.costText}>
                         <Group>
@@ -230,7 +231,10 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                                     text='Edit'
                                     icon='edit'
                                     onClick={() => {
-                                        history.push('/employees/edit/' + match.params.id)
+                                        history.push({
+                                            pathname: '/employees/edit/' + match.params.id,
+                                            state: {prev: history.location},
+                                        })
                                     }}
                                     className={styles.editbutton}
                                 />
@@ -248,7 +252,18 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         <div className={styles.employeeName}>{userData.name}</div>
                         <div className={styles.employeeText}>{userData.email}</div>
                         <div className={styles.employeeText}>
-                            {userData.department} | {userData.role}
+                            <div
+                                className={styles.deptText}
+                                onClick={() => {
+                                    history.push({
+                                        pathname: '/departments/detail/' + userData.deptId,
+                                        state: {prev: history.location},
+                                    })
+                                }}
+                            >
+                                {userData.department}
+                            </div>{' '}
+                            | {userData.role}
                         </div>
 
                         <div className={styles.employeeText}>

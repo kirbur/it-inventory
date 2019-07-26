@@ -5,6 +5,8 @@ import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -45,7 +47,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
     const [firstTableData, setFirstTableData] = useState<(string | number)[]>([])
     const [secondTableData, setSecondTableData] = useState<(string | number)[]>([])
-    const [thirdTableData, setThirdTableData] = useState<(string | number)[]>([])
+    // const [thirdTableData, setThirdTableData] = useState<(string | number)[]>([])
+
+    //  const [firstTableData, setFirstTableData] = useState<ITableItem[][]>([])
+    // const [secondTableData, setSecondTableData] = useState<ITableItem[][]>([])
+    const [thirdTableData, setThirdTableData] = useState<ITableItem[][]>([])
 
     const [historyLogEntries, setHistoryLogEntries] = useState<IHistoryLogArray[]>([])
     const [commentText, setCommentText] = useState('')
@@ -61,7 +67,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         if (match.params.type === 'server') {
             setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
             setSecondTableHeaders(['MFG Tag', 'Serial #', 'SAN', 'Local HHD'])
-            setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
+            setThirdTableHeaders(['Employee Assigned', 'Department', 'Location'])
             // make model purchaseDate renewalDate endOfLife virtualized
             setHeadingInfo(['the name', 'another name'])
             axios
@@ -92,7 +98,36 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCostPerYear(data[0].server.costPerYear)
                     setFlatCost(data[0].server.flatCost)
 
-                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].server.location])
+                    // setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].server.location])
+                    setThirdTableData([
+                        [
+                            data[0].employeeAssignedId
+                                ? {
+                                      value: data[0].employeeAssignedName,
+                                      sortBy: data[0].employeeAssignedName,
+                                      id: data[0].employeeAssignedId,
+                                      onClick: (id: any) => {
+                                          history.push({
+                                              pathname: '/employees/detail/' + id,
+                                              state: {prev: history.location},
+                                          })
+                                      },
+                                  }
+                                : {value: data[0].employeeAssignedName, sortBy: data[0].employeeAssignedName},
+                            {
+                                value: data[0].departmentName,
+                                sortBy: data[0].departmentName,
+                                id: data[0].departmentID,
+                                onClick: (id: any) => {
+                                    history.push({
+                                        pathname: '/departments/detail/' + id,
+                                        state: {prev: history.location},
+                                    })
+                                },
+                            },
+                            {value: data[0].server.location, sortBy: data[0].server.location},
+                        ],
+                    ])
                     setCommentText(data[0].server.textField)
                     setHistoryLogEntries(data[0].serverHistory)
                     setIsDeleted(data[0].isDeleted)
@@ -130,7 +165,35 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCostPerYear(data[0].computer.costPerYear)
                     setFlatCost(data[0].computer.flatCost)
 
-                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].computer.location])
+                    setThirdTableData([
+                        [
+                            data[0].employeeAssignedId
+                                ? {
+                                      value: data[0].employeeAssignedName,
+                                      sortBy: data[0].employeeAssignedName,
+                                      id: data[0].employeeAssignedId,
+                                      onClick: (id: any) => {
+                                          history.push({
+                                              pathname: '/employees/detail/' + id,
+                                              state: {prev: history.location},
+                                          })
+                                      },
+                                  }
+                                : {value: data[0].employeeAssignedName, sortBy: data[0].employeeAssignedName},
+                            {
+                                value: data[0].departmentName,
+                                sortBy: data[0].departmentName,
+                                id: data[0].departmentID,
+                                onClick: (id: any) => {
+                                    history.push({
+                                        pathname: '/departments/detail/' + id,
+                                        state: {prev: history.location},
+                                    })
+                                },
+                            },
+                            {value: data[0].computer.location, sortBy: data[0].computer.location},
+                        ],
+                    ])
                     setCommentText(data[0].computer.textField)
                     setHistoryLogEntries(data[0].computerHistory)
                     setIsDeleted(data[0].isDeleted)
@@ -157,7 +220,35 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         data[0].monitor.serialNumber,
                     ])
                     setSecondTableData([])
-                    setThirdTableData([data[0].employeeAssignedName, data[0].departmentName, data[0].monitor.location])
+                    setThirdTableData([
+                        [
+                            data[0].employeeAssignedId
+                                ? {
+                                      value: data[0].employeeAssignedName,
+                                      sortBy: data[0].employeeAssignedName,
+                                      id: data[0].employeeAssignedId,
+                                      onClick: (id: any) => {
+                                          history.push({
+                                              pathname: '/employees/detail/' + id,
+                                              state: {prev: history.location},
+                                          })
+                                      },
+                                  }
+                                : {value: data[0].employeeAssignedName, sortBy: data[0].employeeAssignedName},
+                            {
+                                value: data[0].departmentName,
+                                sortBy: data[0].departmentName,
+                                id: data[0].departmentID,
+                                onClick: (id: any) => {
+                                    history.push({
+                                        pathname: '/departments/detail/' + id,
+                                        state: {prev: history.location},
+                                    })
+                                },
+                            },
+                            {value: data[0].monitor.location, sortBy: data[0].monitor.location},
+                        ],
+                    ])
                     setCostPerYear(data[0].monitor.costPerYear)
                     setFlatCost(data[0].monitor.flatCost)
                     setCommentText(data[0].monitor.textField)
@@ -166,9 +257,9 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
-            setFirstTableHeaders(['Employee Assigned', 'Department Assigned', 'Serial #'])
+            setFirstTableHeaders([])
             setSecondTableHeaders([])
-            setThirdTableHeaders([])
+            setThirdTableHeaders(['Employee Assigned', 'Department Assigned', 'Serial #'])
             axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
@@ -178,13 +269,37 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         'Type: ' + data[0].peripheral.peripheralType,
                         'Purchase Date: ' + formatDate(data[0].peripheral.purchaseDate),
                     ])
-                    setFirstTableData([
-                        data[0].employeeAssignedName,
-                        data[0].departmentName,
-                        data[0].peripheral.serialNumber,
-                    ])
+                    setFirstTableData([])
                     setSecondTableData([])
-                    setThirdTableData([])
+                    setThirdTableData([
+                        [
+                            data[0].employeeAssignedId
+                                ? {
+                                      value: data[0].employeeAssignedName,
+                                      sortBy: data[0].employeeAssignedName,
+                                      id: data[0].employeeAssignedId,
+                                      onClick: (id: any) => {
+                                          history.push({
+                                              pathname: '/employees/detail/' + id,
+                                              state: {prev: history.location},
+                                          })
+                                      },
+                                  }
+                                : {value: data[0].employeeAssignedName, sortBy: data[0].employeeAssignedName},
+                            {
+                                value: data[0].departmentName,
+                                sortBy: data[0].departmentName,
+                                id: data[0].departmentID,
+                                onClick: (id: any) => {
+                                    history.push({
+                                        pathname: '/departments/detail/' + id,
+                                        state: {prev: history.location},
+                                    })
+                                },
+                            },
+                            {value: data[0].peripheral.serialNumber, sortBy: data[0].peripheral.serialNumber},
+                        ],
+                    ])
                     setCostPerYear(data[0].peripheral.costPerYear)
                     setFlatCost(data[0].peripheral.flatCost)
                     setCommentText(data[0].peripheral.textField)
@@ -218,7 +333,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             window.confirm(`Are you sure you want to ${isDeleted ? 'recover' : 'archive'} this ${match.params.type}?`)
         ) {
             await axios.put(`${isDeleted ? 'recover' : 'archive'}/${match.params.type}/${match.params.id}`, {})
-            history.push(`/hardware${isDeleted ? `/edit/${match.params.type}/${match.params.id}` : ''}`)
+            history.push({
+                pathname: `/hardware${isDeleted ? `/edit/${match.params.type}/${match.params.id}` : ''}`,
+                state: {prev: history.location},
+            })
         }
     }
 
@@ -250,17 +368,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
-                    <Button
-                        text='All Hardware'
-                        icon='back'
-                        onClick={() => {
-                            history.push('/hardware')
-                        }}
-                        className={styles.backButton}
-                        textClassName={styles.backButtonText}
-                    />
-                    <div className={styles.imgPadding}>
-                        <img className={styles.img} src={img} alt={''} />
+                    <BackButton history={history} className={styles.backButton} />
+                    <div className={styles.imgContainer}>
+                        <div className={styles.imgPadding}>
+                            <img className={styles.img} src={img} alt={''} />
+                        </div>
                     </div>
                     <div className={styles.costText}>
                         {renderFlatCost()}
@@ -277,7 +389,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                                     text='Edit'
                                     icon='edit'
                                     onClick={() => {
-                                        history.push('/hardware/edit/' + match.params.type + '/' + match.params.id)
+                                        history.push({
+                                            pathname: '/hardware/edit/' + match.params.type + '/' + match.params.id,
+                                            state: {prev: history.location},
+                                        })
                                     }}
                                     className={styles.editbutton}
                                 />
@@ -300,48 +415,55 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         ))}
                     </div>
 
-                    {/* tables? */}
-                    <div className={styles.tableContainer}>
-                        {/* first table */}
-                        <table className={styles.table}>
-                            <tr>
-                                {firstTableHeaders.map((header: string) => (
-                                    <td className={styles.header}>{header}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                {firstTableData.map((datum: string | number) => (
-                                    <td className={styles.rowData}>{datum}</td>
-                                ))}
-                            </tr>
-                        </table>
-                        {/* second table */}
-                        <table className={styles.table}>
-                            <tr>
-                                {secondTableHeaders.map((header: string) => (
-                                    <td className={styles.header}>{header}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                {secondTableData.map((datum: string | number) => (
-                                    <td className={styles.rowData}>{datum}</td>
-                                ))}
-                            </tr>
-                        </table>
-                        {/* third table */}
-                        <table className={styles.table}>
-                            <tr>
-                                {thirdTableHeaders.map((header: string) => (
-                                    <td className={styles.header}>{header}</td>
-                                ))}
-                            </tr>
-                            <tr>
-                                {thirdTableData.map((datum: string | number) => (
-                                    <td className={styles.rowData}>{datum}</td>
-                                ))}
-                            </tr>
-                        </table>
-                    </div>
+                    {/* <div className={styles.tableContainer}> */}
+                    {/* first table */}
+                    {firstTableData && firstTableData[0] && (
+                        <DetailPageTable
+                            headers={firstTableHeaders}
+                            rows={[
+                                firstTableData.map((datum: string | number) => {
+                                    return {value: datum, sortBy: datum}
+                                }),
+                            ]}
+                            setRows={() => {}}
+                            sort={false}
+                            hover={false}
+                            className={styles.detailTable}
+                        />
+                    )}
+                    {/* second table */}
+                    {secondTableData && secondTableData[0] && (
+                        <DetailPageTable
+                            headers={secondTableHeaders}
+                            rows={[
+                                secondTableData.map((datum: string | number) => {
+                                    return {value: datum, sortBy: datum}
+                                }),
+                            ]}
+                            setRows={() => {}}
+                            sort={false}
+                            hover={false}
+                            className={styles.detailTable}
+                        />
+                    )}
+                    {/* third table */}
+                    {thirdTableData && thirdTableData[0] && (
+                        <DetailPageTable
+                            headers={thirdTableHeaders}
+                            rows={
+                                thirdTableData /*[
+                                thirdTableData.map((datum: string | number) => {
+                                    return {value: datum, sortBy: datum}
+                                }),
+                            ]*/
+                            }
+                            setRows={() => {}}
+                            sort={false}
+                            hover={false}
+                            className={styles.detailTable}
+                        />
+                    )}
+                    {/* </div> */}
 
                     {/* history log */}
                     <div className={styles.historyLogContainer}>

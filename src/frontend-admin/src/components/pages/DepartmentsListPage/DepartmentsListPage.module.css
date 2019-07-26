@@ -48,7 +48,7 @@
     text-align: left;
     color: #a5a5a5;
     font-size: 24px;
-    padding-bottom: 16px;
+    padding-bottom: 8px;
     padding-top: 16px;
     display: flex;
     cursor: pointer;
@@ -73,7 +73,9 @@
 }
 .archiveButton {
     width: 150px;
-    margin-left: 25px;
+}
+.addButton {
+    margin-right: 25px;
 }
 
 /* sorting states */
