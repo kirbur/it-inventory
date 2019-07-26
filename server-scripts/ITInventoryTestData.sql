@@ -1,5 +1,5 @@
-USE ITInventoryDB;
---USE ITInventory;
+--USE ITInventoryDB;
+USE ITInventory;
 GO
 
 -- DELETE ALL FROM ALL TABLES (except AuthIDServer)
