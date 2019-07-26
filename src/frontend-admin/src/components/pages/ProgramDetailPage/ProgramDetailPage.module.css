@@ -86,6 +86,12 @@
     min-height: 300px;
 }
 
+.overviewLink {
+    color: #009eff;
+    cursor: pointer;
+    padding-right: 10px;
+}
+
 .programName {
     font-size: 36px;
     color: #000000;

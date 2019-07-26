@@ -204,7 +204,22 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     )}
                     <div className={styles.titleText}>
                         <div className={styles.programName}>
-                            {progData.name} {match.params.id}
+                            <Group>
+                                <div
+                                    className={styles.overviewLink}
+                                    onClick={() =>
+                                        history.push({
+                                            pathname: `/programs/overview/${progData.name}/${
+                                                isDeleted ? 'archived' : 'inventory'
+                                            }`,
+                                            state: {prev: history.location},
+                                        })
+                                    }
+                                >
+                                    {progData.name}
+                                </div>
+                                {match.params.id}
+                            </Group>
                         </div>
                         {progData.renewalDate !== '-' && (
                             <div className={styles.programText}>Renewal Date: {progData.renewalDate}</div>

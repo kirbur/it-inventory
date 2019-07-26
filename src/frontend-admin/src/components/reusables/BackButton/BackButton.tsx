@@ -29,7 +29,7 @@ export const BackButton: React.SFC<IBackButtonProps> = props => {
             ? pathArray[1]
             : 'All ' + pathArray[1]
 
-    if (text.search('edit')) {
+    if (history.location.state.prev.pathname.search('edit') !== -1) {
         text = 'All ' + pathArray[1]
     }
 
@@ -38,7 +38,7 @@ export const BackButton: React.SFC<IBackButtonProps> = props => {
             text={history.location.state ? text : pathArray}
             icon='back'
             onClick={() => {
-                if (text.search('edit')) {
+                if (history.location.state.prev.pathname.search('edit') !== -1) {
                     history.push(`/${pathArray[1]}`)
                 } else {
                     history.goBack()
