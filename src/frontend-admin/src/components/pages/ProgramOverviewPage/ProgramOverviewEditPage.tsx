@@ -151,7 +151,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
                     let plug: ITableItem[][] = []
                     let plugList: IPluginInfo[] = []
-                    data[0].listOfPlugins.map((i: ExpectedPluginType) => {
+                    data[0].listOfPlugins.forEach((i: ExpectedPluginType) => {
                         plug.push([
                             {
                                 value: format(i.pluginName),

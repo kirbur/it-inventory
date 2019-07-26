@@ -40,9 +40,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const axios = new AxiosService(loginContextVariables)
 
     // state
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{name: string; img: string}[]>([])
-    const [displayImages] = useState<{name: string; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{name: string; img: string}[]>([])
 
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState(listData)
@@ -59,8 +57,8 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const [checkboxes, setCheckboxes] = useState(false)
     const [pinned, setPinned] = useState<{name: string; pinned: boolean}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get('/list/programs/false')
             .then((data: any) => {
                 var programs: any[] = []
@@ -77,16 +75,17 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                         icon: i.icon,
                         cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
                     })
-                    imgs.push({name: i.programName, img: i.icon})
+                    checkImage(i.icon, axios, placeholder).then(image => {
+                        imgs.push({name: i.programName, img: image})
+                    })
                     pins.push({name: i.programName, pinned: i.isPinned})
                 })
                 setListData(programs)
-                setImages(imgs)
-                setUseImages(true)
+                setDisplayImages(imgs)
                 setPinned(pins)
             })
             .catch((err: any) => console.error(err))
-        axios
+        await axios
             .get('list/programs/true')
             .then((data: any) => {
                 var programs: any[] = []
@@ -107,18 +106,11 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                 setArchivedData(programs)
             })
             .catch((err: any) => console.error(err))
-    }, [])
+    }
 
-    //Set display Images
     useEffect(() => {
-        images.map((img: {name: string; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.name !== img.name)
-                setImages([...list, {name: img.name, img: data}])
-                displayImages.push({name: img.name, img: data})
-            })
-        )
-    }, [useImages])
+        getData()
+    }, [])
 
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))

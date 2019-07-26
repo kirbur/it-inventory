@@ -12,6 +12,7 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 // Utils
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Styles
 import styles from './EmployeeDetailPage.module.css'
@@ -27,7 +28,6 @@ interface IEmployeeDetailPageProps {
 }
 
 interface IUser {
-    photo: string
     name: string
     department: string
     deptId: number
@@ -53,7 +53,6 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState('')
     const [userData, setUserData] = useState<IUser>({
-        photo: '',
         name: '',
         department: '',
         deptId: -1,
@@ -83,12 +82,11 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         history.push({pathname: `/programs/detail/${id}`, state: {prev: history.location}})
     }
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get(`/detail/employee/${match.params.id}`)
             .then((data: any) => {
                 let user: IUser = {
-                    photo: data[0].picture,
                     name: data[0].firstName + ' ' + data[0].lastName,
                     department: data[0].department,
                     deptId: data[0].departmentID,
@@ -164,27 +162,17 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     ])
                 )
                 setLicenseRows(l)
+
+                checkImage(data[0].picture, axios, placeholder)
+                    .then(image => setImg(image))
+                    .catch(err => console.error(err))
             })
             .catch((err: any) => console.error(err))
-    }, [])
+    }
 
     useEffect(() => {
-        //once icon has a value, check to see if that picture exists. If it doesnt then use the placeholder
-        if (userData.photo !== '') {
-            axios
-                .get(userData.photo)
-                .then((data: any) => {
-                    if (data !== '') {
-                        setImg(URL + userData.photo)
-                    } else {
-                        setImg(placeholder)
-                    }
-                })
-                .catch((err: any) => console.error(err))
-        } else {
-            setImg('')
-        }
-    }, [userData.photo])
+        getData()
+    }, [])
 
     async function handleArchive() {
         if (window.confirm(`Are you sure you want to ${isDeleted ? 'recover' : 'archive'} ${userData.name}?`)) {
