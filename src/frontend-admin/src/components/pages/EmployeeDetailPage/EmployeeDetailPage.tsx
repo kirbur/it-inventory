@@ -164,9 +164,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                 setLicenseRows(l)
 
                 checkImage(data[0].picture, axios, placeholder)
-                    .then(image => {
-                        setImg(image)
-                    })
+                    .then(image => setImg(image))
                     .catch(err => console.error(err))
             })
             .catch((err: any) => console.error(err))

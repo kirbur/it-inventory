@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useContext, ReactText, SetStateAction} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import React, {useState, useEffect, useContext} from 'react'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
@@ -300,18 +300,21 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                             {formatDate(row[1])}
                         </td>
                     )
+                    break
                 case 2:
                     transformedRow[2] = (
                         <td key={row[7] + row[10]} className={styles.alignLeft}>
                             {isArchive ? row[10] : calculateDaysEmployed(row[10])}
                         </td>
                     )
+                    break
                 case 3:
                     transformedRow[3] = (
                         <td key={row[7] + row[2]} className={styles.alignLeft}>
                             {row[2]}
                         </td>
                     )
+                    break
             }
         }
 

@@ -105,9 +105,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                 ])
 
                 checkImage(data[0].picture, axios, placeholder)
-                    .then(image => {
-                        setImg(image)
-                    })
+                    .then(image => setImg(image))
                     .catch(err => console.error(err))
             })
             .catch((err: any) => console.error(err))

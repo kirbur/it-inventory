@@ -148,9 +148,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 setPluginRows(plug)
 
                 checkImage(data[0].programOverview.icon, axios, placeholder)
-                    .then(image => {
-                        setImg(image)
-                    })
+                    .then(image => setImg(image))
                     .catch(err => console.error(err))
             })
             .catch((err: any) => console.error(err))

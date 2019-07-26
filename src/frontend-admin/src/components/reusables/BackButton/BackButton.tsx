@@ -7,7 +7,6 @@ import {Button} from '../Button/Button'
 
 // styles
 import styles from './BackButton.module.css'
-import {path} from 'd3-path'
 
 // Types
 interface IBackButtonProps {

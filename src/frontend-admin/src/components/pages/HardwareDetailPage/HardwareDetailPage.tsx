@@ -129,9 +129,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setIsDeleted(data[0].isDeleted)
 
                     checkImage(data[0].icon, axios, serverPlaceholder)
-                        .then(image => {
-                            setImg(image)
-                        })
+                        .then(image => setImg(image))
                         .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
@@ -200,9 +198,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setIsDeleted(data[0].isDeleted)
 
                     checkImage(data[0].icon, axios, laptopPlaceholder)
-                        .then(image => {
-                            setImg(image)
-                        })
+                        .then(image => setImg(image))
                         .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
@@ -262,9 +258,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setIsDeleted(data[0].isDeleted)
 
                     checkImage(data[0].icon, axios, monitorPlaceholder)
-                        .then(image => {
-                            setImg(image)
-                        })
+                        .then(image => setImg(image))
                         .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
@@ -318,9 +312,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setIsDeleted(data[0].isDeleted)
 
                     checkImage(data[0].icon, axios, peripheralPlaceholder)
-                        .then(image => {
-                            setImg(image)
-                        })
+                        .then(image => setImg(image))
                         .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
@@ -330,24 +322,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     useEffect(() => {
         getData()
     }, [])
-
-    // useEffect(() => {
-    //     if (initialImg) {
-    //         axios.get(initialImg).then((pic: any) => {
-    //             if (pic !== '') {
-    //                 setImg(URL + initialImg)
-    //             } else if (match.params.type == 'server') {
-    //                 setImg(serverPlaceholder)
-    //             } else if (match.params.type == 'laptop') {
-    //                 setImg(laptopPlaceholder)
-    //             } else if (match.params.type == 'monitor') {
-    //                 setImg(monitorPlaceholder)
-    //             } else if (match.params.type == 'peripheral') {
-    //                 setImg(peripheralPlaceholder)
-    //             }
-    //         })
-    //     }
-    // }, [initialImg])
 
     async function handleArchive() {
         if (
