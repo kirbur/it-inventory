@@ -173,9 +173,13 @@ namespace backend_api.Controllers
                 try
                 {
                     // Update the properties of the program.
+
+                    // storing IsLicense in temp value
+                    bool IsLicenseTemp = prog.IsLicense;
                     PropertyUtil<Models.Program, ProgramObjectModel>.UpdateProperties(prog, updatedProg);
                     prog.IsCostPerYear = input.Program.MonthsPerRenewal != null && input.Program.MonthsPerRenewal - 12 >= 0 ? true : false;
-
+                    // reseting license back to its original value using temp
+                    prog.IsLicense = IsLicenseTemp;
                     // Case 1: When an unassigned program becomes assigned
                     if (input.Program.EmployeeId != null && progEmpId == null)
                     {
