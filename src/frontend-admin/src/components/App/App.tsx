@@ -52,7 +52,7 @@ export const LoginContext = React.createContext(initialValues)
 // Primary Component
 export const App: React.FC = () => {
     useEffect(() => {
-        document.title = 'CQL'
+        document.title = 'IT Inventory | CQL'
     })
     const user = localStorage.getItem('user')
     const [loginContextVariables, setLoginContextVariables] = useState(
