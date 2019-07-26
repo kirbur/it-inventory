@@ -302,12 +302,20 @@ input:checked ~ .insideCheckmarkAdmin {
     position: relative;
     left: 50px;
 }
+.ddc1 {
+    position: relative;
+    right: 10px;
+}
 .dropdown1 {
     z-index: 1;
     align-self: flex-end;
     margin: 15px 0;
 }
 
+.ddc2 {
+    position: relative;
+    right: 5px;
+}
 .dropdown2 {
     z-index: 2;
     align-self: flex-end;
@@ -321,6 +329,7 @@ input:checked ~ .insideCheckmarkAdmin {
 }
 
 .descriptionContainer {
+    padding-top: 25px;
     width: 100%;
     display: flex;
     flex-direction: column;
