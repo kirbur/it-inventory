@@ -14,6 +14,7 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {formatCost} from '../../../utilities/FormatCost'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Styles
 import styles from './ProgramOverviewPage.module.css'
@@ -30,7 +31,6 @@ interface IProgramOverviewPageProps {
 interface ExpectedProgramOverview {
     countProgInUse: number
     countProgOverall: number
-    icon: string
     isCostPerYear: boolean
     progCostPerYear: number
     progFlatCost: number
@@ -78,7 +78,6 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     const [programData, setProgramData] = useState<ExpectedProgramOverview>({
         countProgInUse: 0,
         countProgOverall: 0,
-        icon: '',
         isCostPerYear: false,
         progCostPerYear: 0,
         progFlatCost: 0,
@@ -91,8 +90,8 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     const programHeaders = [`${id}`, 'Employee', 'License Key', 'Renewal Date']
     const pluginHeaders = ['Plugins', 'Renewal Date', 'Cost']
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get(`/detail/ProgramOverview/${id}/${archived === 'archived' ? true : false}`)
             .then((data: any) => {
                 setProgramData(data[0].programOverview)
@@ -147,27 +146,18 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     ])
                 )
                 setPluginRows(plug)
+
+                checkImage(data[0].programOverview.icon, axios, placeholder)
+                    .then(image => {
+                        setImg(image)
+                    })
+                    .catch(err => console.error(err))
             })
             .catch((err: any) => console.error(err))
-    }, [])
-
+    }
     useEffect(() => {
-        //once icon has a value, check to see if that picture exists. If it doesnt then use the placeholder
-        if (programData.icon !== '') {
-            axios
-                .get(programData.icon)
-                .then((data: any) => {
-                    if (data !== '') {
-                        setImg(URL + programData.icon)
-                    } else {
-                        setImg(placeholder)
-                    }
-                })
-                .catch((err: any) => console.error(err))
-        } else {
-            setImg('')
-        }
-    }, [programData.icon])
+        getData()
+    }, [])
 
     const handleEmpClick = (id: number) => {
         history.push({pathname: `/employees/detail/${id}`, state: {prev: history.location}})

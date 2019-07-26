@@ -10,6 +10,7 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Styles
 import styles from './HardwareDetailPage.module.css'
@@ -47,10 +48,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
     const [firstTableData, setFirstTableData] = useState<(string | number)[]>([])
     const [secondTableData, setSecondTableData] = useState<(string | number)[]>([])
-    // const [thirdTableData, setThirdTableData] = useState<(string | number)[]>([])
-
-    //  const [firstTableData, setFirstTableData] = useState<ITableItem[][]>([])
-    // const [secondTableData, setSecondTableData] = useState<ITableItem[][]>([])
     const [thirdTableData, setThirdTableData] = useState<ITableItem[][]>([])
 
     const [historyLogEntries, setHistoryLogEntries] = useState<IHistoryLogArray[]>([])
@@ -61,19 +58,18 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
     const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState()
-    const [initialImg, setInitialImg] = useState()
+    // const [initialImg, setInitialImg] = useState()
 
-    useEffect(() => {
+    async function getData() {
         if (match.params.type === 'server') {
             setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
             setSecondTableHeaders(['MFG Tag', 'Serial #', 'SAN', 'Local HHD'])
             setThirdTableHeaders(['Employee Assigned', 'Department', 'Location'])
             // make model purchaseDate renewalDate endOfLife virtualized
             setHeadingInfo(['the name', 'another name'])
-            axios
+            await axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
-                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].server.make,
                         'Model: ' + data[0].server.model,
@@ -131,6 +127,12 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCommentText(data[0].server.textField)
                     setHistoryLogEntries(data[0].serverHistory)
                     setIsDeleted(data[0].isDeleted)
+
+                    checkImage(data[0].icon, axios, serverPlaceholder)
+                        .then(image => {
+                            setImg(image)
+                        })
+                        .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'laptop' || match.params.type === 'computer') {
@@ -139,10 +141,9 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
             // make model purchaseDate renewalDate endOfLife
             setHeadingInfo(['name', 'the make', 'model name'])
-            axios
+            await axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
-                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].computer.make,
                         'Model: ' + data[0].computer.model,
@@ -197,16 +198,21 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCommentText(data[0].computer.textField)
                     setHistoryLogEntries(data[0].computerHistory)
                     setIsDeleted(data[0].isDeleted)
+
+                    checkImage(data[0].icon, axios, laptopPlaceholder)
+                        .then(image => {
+                            setImg(image)
+                        })
+                        .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'monitor') {
             setFirstTableHeaders(['Screen Size', 'Resolution', 'Inputs', 'Serial #'])
             setSecondTableHeaders([])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
-            axios
+            await axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
-                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].monitor.make,
                         'Model: ' + data[0].monitor.model,
@@ -254,16 +260,21 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCommentText(data[0].monitor.textField)
                     setHistoryLogEntries(data[0].monitorHistory)
                     setIsDeleted(data[0].isDeleted)
+
+                    checkImage(data[0].icon, axios, monitorPlaceholder)
+                        .then(image => {
+                            setImg(image)
+                        })
+                        .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
             setFirstTableHeaders([])
             setSecondTableHeaders([])
             setThirdTableHeaders(['Employee Assigned', 'Department Assigned', 'Serial #'])
-            axios
+            await axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
-                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Name: ' + data[0].peripheral.peripheralName,
                         'Type: ' + data[0].peripheral.peripheralType,
@@ -305,28 +316,38 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCommentText(data[0].peripheral.textField)
                     setHistoryLogEntries(data[0].peripheralHistory)
                     setIsDeleted(data[0].isDeleted)
+
+                    checkImage(data[0].icon, axios, peripheralPlaceholder)
+                        .then(image => {
+                            setImg(image)
+                        })
+                        .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
         }
-    }, [])
+    }
 
     useEffect(() => {
-        if (initialImg) {
-            axios.get(initialImg).then((pic: any) => {
-                if (pic !== '') {
-                    setImg(URL + initialImg)
-                } else if (match.params.type == 'server') {
-                    setImg(serverPlaceholder)
-                } else if (match.params.type == 'laptop') {
-                    setImg(laptopPlaceholder)
-                } else if (match.params.type == 'monitor') {
-                    setImg(monitorPlaceholder)
-                } else if (match.params.type == 'peripheral') {
-                    setImg(peripheralPlaceholder)
-                }
-            })
-        }
-    }, [initialImg])
+        getData()
+    }, [])
+
+    // useEffect(() => {
+    //     if (initialImg) {
+    //         axios.get(initialImg).then((pic: any) => {
+    //             if (pic !== '') {
+    //                 setImg(URL + initialImg)
+    //             } else if (match.params.type == 'server') {
+    //                 setImg(serverPlaceholder)
+    //             } else if (match.params.type == 'laptop') {
+    //                 setImg(laptopPlaceholder)
+    //             } else if (match.params.type == 'monitor') {
+    //                 setImg(monitorPlaceholder)
+    //             } else if (match.params.type == 'peripheral') {
+    //                 setImg(peripheralPlaceholder)
+    //             }
+    //         })
+    //     }
+    // }, [initialImg])
 
     async function handleArchive() {
         if (
