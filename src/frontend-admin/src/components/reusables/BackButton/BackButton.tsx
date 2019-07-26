@@ -29,12 +29,20 @@ export const BackButton: React.SFC<IBackButtonProps> = props => {
             ? pathArray[1]
             : 'All ' + pathArray[1]
 
+    if (text.search('edit')) {
+        text = 'All ' + pathArray[1]
+    }
+
     return (
         <Button
             text={history.location.state ? text : pathArray}
             icon='back'
             onClick={() => {
-                history.goBack()
+                if (text.search('edit')) {
+                    history.push(`/${pathArray[1]}`)
+                } else {
+                    history.goBack()
+                }
             }}
             className={s(styles.button, className)}
             textClassName={textClassName}
