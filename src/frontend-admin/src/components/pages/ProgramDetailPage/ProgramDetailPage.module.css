@@ -39,7 +39,6 @@
 }
 
 .imgPadding {
-    height: 100%;
     background-color: #f4f4f4;
     border-radius: 10px;
 
@@ -54,10 +53,11 @@
 }
 
 .img {
-    width: 85%;
-    max-width: 250px;
-    max-height: 250px;
-    margin: auto;
+    max-width: 95%;
+    max-height: 95%;
+    width: auto;
+    height: auto;
+
 }
 
 .costText {
