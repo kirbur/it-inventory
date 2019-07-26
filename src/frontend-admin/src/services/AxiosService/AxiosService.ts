@@ -43,7 +43,6 @@ export class AxiosService {
                 responseType: (responseType !== undefined ? responseType : "json")
             })
             .then(response => {
-                console.log(response)
                 this.checkTokenExpired('get', {url})
                 return response.data
             })
