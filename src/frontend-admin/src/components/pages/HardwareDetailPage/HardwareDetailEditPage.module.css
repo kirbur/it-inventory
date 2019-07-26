@@ -10,26 +10,37 @@
 
 /* main column styling */
 .columns {
+    margin: 0 50px;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: center;
 }
+
 .firstColumn {
-    min-width: 300px;
-    margin: 50px;
-    /* padding-right: 50px; */
-    /* flex-grow: 1; */
+    padding: 50px;
+    min-width: 160px;
+    max-width: 300px;
+    flex-grow: 1;
 }
+
 .secondColumn {
-    width: 900px;
-    margin: 50px;
-    /* flex-grow: 2; */
+    padding: 50px;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
 /* image styling */
+.imgContainer {
+    position: relative;
+    width: 100%;
+}
+
+.imgContainer:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
+}
 .imgPadding {
     padding: 25px;
     background-color: #f4f4f4;

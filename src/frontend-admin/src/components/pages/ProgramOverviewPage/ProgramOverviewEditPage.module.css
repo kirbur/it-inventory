@@ -1,33 +1,47 @@
 .progOverviewEditMain {
     margin: 0 50px;
 }
-
 .columns {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: center;
 }
 
 .firstColumn {
-    padding: 100px;
-}
-
-.secondColumn {
-    padding: 125px 50px;
-    display: flex;
-    flex-direction: column;
+    padding: 50px;
+    padding-right: 100px;
+    min-width: 160px;
+    max-width: 300px;
     flex-grow: 1;
 }
 
-/*first col*/
+.secondColumn {
+    padding: 50px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/*First Column*/
 .backButton {
     margin-bottom: 30px;
+}
+
+.imgContainer {
+    position: relative;
+    width: 100%;
+}
+
+.imgContainer:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
 }
 
 /*second col*/
 
 .title {
+    margin-top: 50px;
     text-align: left;
     font-size: 24px;
     padding-bottom: 25px;
@@ -57,7 +71,7 @@
 .input {
     width: 100%;
     height: 45px;
-    border: 1.5px solid #a5a5a5;
+    border: 2px solid #a5a5a5;
     border-radius: 3px;
     font-size: 18px;
     padding-left: 12px;
@@ -136,16 +150,17 @@
 .checkBoxContainer {
     width: 55px;
 }
-.numCopies {
-    width: 15%;
-    white-space: nowrap;
+
+.checkBox {
+    height: 47px;
 }
+
 .nameInputWithEdit {
-    width: 65%;
+    width: 85%;
 }
 
 .nameInput {
-    width: 40%;
+    width: 55%;
 }
 .editButton {
     margin-top: 30px;

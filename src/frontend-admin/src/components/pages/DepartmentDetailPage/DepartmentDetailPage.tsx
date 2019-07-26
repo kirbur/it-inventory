@@ -5,6 +5,7 @@ import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
 import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Styles
 import styles from './DepartmentDetailPage.module.css'
@@ -33,7 +34,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const hardwareHeaders = ['Hardware']
     const employeeHeaders = ['Employees', 'Date Hired', 'Cost']
     const softwareHeaders = ['Software', '#', 'Cost']
-    const licenseHeaders = ['License', 'CALs']
+    const licenseHeaders = ['Licenses', 'CALs']
 
     const [deptData, setDeptData] = useState<any>({})
     const [employeeRows, setEmployeeRows] = useState<any[]>([])
@@ -52,10 +53,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     } = useContext(LoginContext)
 
     const handleEmployeeClick = (id: number | string) => {
-        history.push(`/employees/detail/${id}`)
+        history.push({pathname: `/employees/detail/${id}`, state: {prev: history.location}})
     }
     const handleProgramClick = (id: number | string) => {
-        history.push(`/programs/detail/${id}`)
+        history.push({pathname: `/programs/detail/${id}`, state: {prev: history.location}})
     }
     function renderProgramCost(isProgramCostPerYear: boolean, programCostPerYear: number) {
         if (isProgramCostPerYear == true) {
@@ -97,12 +98,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         },
                         {
                             //all programCostForEmp is per month
-                            value:
-                                'HW: $' +
-                                format(i.hardwareCostForEmp) +
-                                ' | SW: $' +
-                                format(i.programCostForEmp) +
-                                ' /mo',
+                            value: 'HW: $' + i.hardwareCostForEmp + ' | SW: $' + i.programCostForEmp + ' /mo',
                             sortBy: i.hardwareCostForEmp,
                         },
                     ])
@@ -188,7 +184,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 )
             ) {
                 await axios.put(`${isDeleted ? 'recover' : 'archive'}/department/${match.params.id}`, {})
-                history.push(`/departments${isDeleted ? `/edit/${match.params.id}` : ''}`)
+                history.push({
+                    pathname: `/departments${isDeleted ? `/edit/${match.params.id}` : ''}`,
+                    state: {prev: history.location},
+                })
             }
         }
     }
@@ -198,17 +197,11 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
-                    <Button
-                        text='All Departments'
-                        icon='back'
-                        onClick={() => {
-                            history.push('/departments')
-                        }}
-                        className={styles.backButton}
-                        textClassName={styles.backButtonText}
-                    />
-                    <div className={styles.imgPadding}>
-                        <img className={styles.img} src={img} alt={''} />
+                    <BackButton history={history} className={styles.backButton} />
+                    <div className={styles.imgContainer}>
+                        <div className={styles.imgPadding}>
+                            <img className={styles.img} src={img} alt={''} />
+                        </div>
                     </div>
                     <Group>
                         <p>Software</p>
@@ -230,7 +223,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                                     text='Edit'
                                     icon='edit'
                                     onClick={() => {
-                                        history.push('/departments/edit/' + match.params.id)
+                                        history.push({
+                                            pathname: '/departments/edit/' + match.params.id,
+                                            state: {prev: history.location},
+                                        })
                                     }}
                                     className={styles.editbutton}
                                 />
@@ -251,11 +247,26 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
 
                     <div className={styles.title}>Department Breakdown</div>
 
-                    <DetailPageTable headers={employeeHeaders} rows={employeeRows} setRows={setEmployeeRows} />
+                    <DetailPageTable
+                        headers={employeeHeaders}
+                        rows={employeeRows}
+                        setRows={setEmployeeRows}
+                        className={styles.tableMargin}
+                    />
 
-                    <DetailPageTable headers={softwareHeaders} rows={softwareRows} setRows={setSoftwareRows} />
+                    <DetailPageTable
+                        headers={softwareHeaders}
+                        rows={softwareRows}
+                        setRows={setSoftwareRows}
+                        className={styles.tableMargin}
+                    />
 
-                    <DetailPageTable headers={licenseHeaders} rows={licenseRows} setRows={setLicenseRows} />
+                    <DetailPageTable
+                        headers={licenseHeaders}
+                        rows={licenseRows}
+                        setRows={setLicenseRows}
+                        className={styles.tableMargin}
+                    />
 
                     <div className={styles.line} />
                     <div className={styles.title}>Department Defaults</div>
