@@ -34,12 +34,13 @@ export class AxiosService {
     }
 
     //wrapper for get requests return the promise
-    public async get(url: string) {
+    public async get(url: string, responseType?: "json" | "arraybuffer" | "blob" | "document" | "text" | "stream" | undefined) {
         return await this.instance
             .get(url, {
                 headers: {
                     Authorization: `Bearer ${this.user.accessToken}`,
                 },
+                responseType: (responseType !== undefined ? responseType : "json")
             })
             .then(response => {
                 this.checkTokenExpired('get', {url})
