@@ -101,7 +101,6 @@
     text-align: left;
     padding-top: 50px;
     padding-bottom: 100px;
-    /* min-height: 300px; */
 }
 
 .deptName {
@@ -200,7 +199,6 @@
 }
 .table {
     width: 400px;
-    /* margin-top: 50px; */
     display: flex;
     flex-direction: column;
     justify-content: left;
