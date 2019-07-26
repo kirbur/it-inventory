@@ -25,6 +25,7 @@ export interface IProgramFormInputs {
     purchaseDate?: {value: Date; changed: boolean}
     purchaseLink: {value: string; changed: boolean}
     licenseKey: {value: string; changed: boolean}
+    numCopies?: {value: number; changed: boolean}
 }
 
 interface IProgramFormProps {
@@ -38,27 +39,45 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
 
     return (
         <div className={styles.formMain}>
-            <Group direction={'row'}>
-                {state.purchaseDate && state.purchaseDate.value !== undefined && (
-                    <div className={styles.row1Input}>
-                        <div className={styles.inputText}>Purchase Date</div>
+            <Group direction={'row'} justify={'between'}>
+                <div className={styles.dateContainer}>
+                    {state.purchaseDate && state.purchaseDate.value !== undefined && (
+                        <div className={styles.dateInput}>
+                            <div className={styles.inputText}>Purchase Date</div>
+                            <DatePicker
+                                dateFormat='MM/dd/yyyy'
+                                selected={state.purchaseDate.value}
+                                onChange={e => e && setState({...state, purchaseDate: {value: e, changed: true}})}
+                                className={styles.input}
+                            />
+                        </div>
+                    )}
+                    <div className={styles.dateInput}>
+                        <div className={styles.inputText}>Renewal Date</div>
                         <DatePicker
                             dateFormat='MM/dd/yyyy'
-                            selected={state.purchaseDate.value}
-                            onChange={e => e && setState({...state, purchaseDate: {value: e, changed: true}})}
+                            selected={state.renewalDate.value}
+                            onChange={e => e && setState({...state, renewalDate: {value: e, changed: true}})}
                             className={styles.input}
                         />
                     </div>
-                )}
-                <div className={styles.row1Input}>
-                    <div className={styles.inputText}>Renewal Date</div>
-                    <DatePicker
-                        dateFormat='MM/dd/yyyy'
-                        selected={state.renewalDate.value}
-                        onChange={e => e && setState({...state, renewalDate: {value: e, changed: true}})}
-                        className={styles.input}
-                    />
                 </div>
+                {state.numCopies && state.numCopies.value !== undefined && (
+                    <div className={styles.row1Input}>
+                        <div className={styles.inputText}># of Copies</div>
+                        <input
+                            className={s(styles.input, styles.costInput)}
+                            type='number'
+                            value={state.numCopies.value}
+                            onChange={cost =>
+                                setState({
+                                    ...state,
+                                    numCopies: {value: parseInt(cost.target.value), changed: true},
+                                })
+                            }
+                        />
+                    </div>
+                )}
             </Group>
 
             {/* Cost Group */}

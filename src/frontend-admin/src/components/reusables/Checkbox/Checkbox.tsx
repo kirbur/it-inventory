@@ -11,18 +11,19 @@ interface ICheckboxProps {
     checked: boolean
     title?: string
     className?: string
+    boxClassName?: string
     onClick: () => void
 }
 
 // Primary Component
 export const Checkbox: React.SFC<ICheckboxProps> = props => {
-    const {checked, title = '', onClick, className = ''} = props
+    const {checked, title = '', onClick, className = '', boxClassName = ''} = props
 
     return (
         <div className={s(styles.checkboxContainer, className)}>
             <div className={styles.checkboxTitle}>{title}</div>
             <div className={styles.checkbox} onClick={onClick}>
-                <div className={s(styles.check, checked ? styles.checked : '')}>
+                <div className={s(styles.check, checked ? styles.checked : '', boxClassName)}>
                     {checked && <div className={styles.checkmark} />}
                 </div>
             </div>

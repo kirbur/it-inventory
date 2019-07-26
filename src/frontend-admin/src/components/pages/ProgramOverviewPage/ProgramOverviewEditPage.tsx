@@ -11,6 +11,7 @@ import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
 import {Checkbox} from '../../reusables/Checkbox/Checkbox'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -75,7 +76,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         name: {value: id === 'new' ? '' : id, changed: false},
         isLicense: {value: false, changed: false},
     })
-    const [numCopies, setNumCopies] = useState(1)
 
     const defaultPluginInfo = {
         id: -1,
@@ -105,6 +105,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         flatCost: {value: 0, changed: false},
         hasFlatCost: false,
         monthsPerRenewal: {value: 0, changed: false},
+        numCopies: {value: 1, changed: false},
     })
 
     const [programUpdateInput, setProgramUpdateInput] = useState<IProgramFormInputs>({
@@ -127,7 +128,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 .get(`/detail/ProgramOverview/${id}/${archived === 'archived' ? true : false}`)
                 .then((data: any) => {
                     setImgLocation(data[0].programOverview.icon)
-                    setNumCopies(data[0].programOverview.countProgOverall)
 
                     let prog: ITableItem[][] = []
                     data[0].inDivPrograms.map((i: ExpectedProgramType) =>
@@ -206,7 +206,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     async function handleSubmit() {
         var postProgram = {
             Program: {
-                numberOfPrograms: Number.isNaN(numCopies) ? 0 : numCopies,
+                numberOfPrograms: programInput.numCopies
+                    ? Number.isNaN(programInput.numCopies.value)
+                        ? 1
+                        : programInput.numCopies.value
+                    : 1,
                 ProgramName: overviewInputs.name.value,
                 ProgramCostPerYear:
                     Number.isNaN(programInput.cost.value) || programInput.cost.value <= 0
@@ -242,7 +246,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     .post('/add/program', postProgram)
                     .then((response: any) => {
                         if (response.status === 201) {
-                            msg = numCopies + ' copies of ' + overviewInputs.name.value + ' were added to inventory!'
+                            msg = programInput.numCopies
+                                ? programInput.numCopies.value +
+                                  ' copies of ' +
+                                  overviewInputs.name.value +
+                                  ' were added to inventory!'
+                                : ''
                             window.alert(msg)
                         }
                         return
@@ -250,7 +259,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     .catch((err: any) => console.error(err))
 
                 //after submitting go back to detail
-                history.push(`/programs`)
+                history.push({pathname: `/programs`, state: {prev: history.location}})
             } else {
                 msg = 'Failed because: \n'
                 msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
@@ -274,8 +283,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         .post('/add/program', postProgram)
                         .then((response: any) => {
                             if (response.status === 201) {
-                                msg =
-                                    numCopies + ' copies of ' + overviewInputs.name.value + ' were added to inventory!'
+                                msg = programInput.numCopies
+                                    ? programInput.numCopies.value +
+                                      ' copies of ' +
+                                      overviewInputs.name.value +
+                                      ' were added to inventory!'
+                                    : ''
                                 window.alert(msg)
                             }
                             return
@@ -283,7 +296,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         .catch((err: any) => console.error(err))
 
                     //after submitting go back to detail
-                    history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
+                    history.push({
+                        pathname: `/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`,
+                        state: {prev: history.location},
+                    })
                 } else {
                     msg = 'Failed because: \n'
                     msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
@@ -328,9 +344,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 await axios.put(`update/programall`, updateProgram).catch((err: any) => console.error(err))
 
                 //after submitting go back to detail
-                history.push(
-                    `/programs/overview/${overviewInputs.name.changed ? overviewInputs.name.value : id}/inventory`
-                )
+                history.push({
+                    pathname: `/programs/overview/${
+                        overviewInputs.name.changed ? overviewInputs.name.value : id
+                    }/inventory`,
+                    state: {prev: history.location},
+                })
             }
 
             if (pluginForm) {
@@ -357,12 +376,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         await axios.post('/add/plugin', postPlugin).catch((err: any) => console.error(err))
 
                         //after submitting go back to detail
-                        history.push(`/programs/overview/${id}/inventory`)
+                        history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
                     } else {
                         await axios.put('/update/plugin', postPlugin).catch((err: any) => console.error(err))
 
                         //after submitting go back to detail
-                        history.push(`/programs/overview/${id}/inventory`)
+                        history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
                     }
                 } else {
                     msg = 'Failed to Add Plugin Because: \n'
@@ -378,7 +397,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 )
                 setRemovedPluginRows([])
                 //after submitting go back to detail
-                history.push(`/programs/overview/${id}/inventory`)
+                history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
             }
 
             if (removedProgramRows.length > 0) {
@@ -391,7 +410,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     })
                     setRemovedProgramRows([])
                     //after submitting go back to detail
-                    history.push(`/programs/overview/${id}/inventory`)
+                    history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
                 }
             }
         }
@@ -407,7 +426,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 .catch(err => console.error(err))
 
             //after submitting go back to detail
-            history.push(`/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`)
+            history.push({
+                pathname: `/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`,
+                state: {prev: history.location},
+            })
         }
     }
 
@@ -462,28 +484,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
-                    {id === 'new' ? (
-                        <Button
-                            text='All Programs'
-                            icon='back'
-                            onClick={() => {
-                                history.push(`/programs`)
-                            }}
-                            className={styles.backButton}
-                            textClassName={styles.backButtonText}
-                        />
-                    ) : (
-                        <Button
-                            text={id}
-                            icon='back'
-                            onClick={() => {
-                                history.push(`/programs/overview/${id}/${archived}`)
-                            }}
-                            className={styles.backButton}
-                            textClassName={styles.backButtonText}
-                        />
-                    )}
-                    <PictureInput setImage={setImgInput} image={imgInput} />
+                    <BackButton history={history} className={styles.backButton} />
+                    <div className={styles.imgContainer}>
+                        <PictureInput setImage={setImgInput} image={imgInput} />
+                    </div>
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
@@ -504,6 +508,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
                         <Checkbox
                             className={styles.checkBoxContainer}
+                            boxClassName={styles.checkBox}
                             checked={overviewInputs.isLicense.value}
                             title={'License'}
                             onClick={() =>
@@ -513,16 +518,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 })
                             }
                         />
-
-                        <div className={styles.numCopies}>
-                            <div className={styles.inputText}># of Copies</div>
-                            <input
-                                type='number'
-                                className={styles.input}
-                                value={numCopies}
-                                onChange={e => setNumCopies(parseInt(e.target.value))}
-                            />
-                        </div>
 
                         {id !== 'new' && (
                             <Button
@@ -560,7 +555,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                     setProgramForm({edit: false, add: !programForm.add})
                                 }}
                                 textInside={false}
-                                text={`Add ${numCopies} Copy(s)`}
+                                text={`Add Copy(s)`}
                             />
                             {programForm.add && (
                                 <div className={styles.programForm}>

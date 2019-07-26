@@ -156,9 +156,19 @@ input:checked ~ .insideCheckmarkAdmin {
 }
 
 .row1Input {
-    margin: 15px 40px 15px 0;
+    margin: 15px 15px 15px 0;
 }
 .row2Input {
-    margin: 15px 0 0 0;
+    margin: 15px 15px 15px 0;
     width: 30%;
+}
+
+.dateInput {
+    width: 45%;
+}
+.dateContainer {
+    margin: 15px 0;
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
 }

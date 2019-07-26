@@ -73,7 +73,9 @@
 }
 .archiveButton {
     width: 150px;
-    margin-left: 25px;
+}
+.addButton {
+    margin-right: 25px;
 }
 
 /* sorting states */

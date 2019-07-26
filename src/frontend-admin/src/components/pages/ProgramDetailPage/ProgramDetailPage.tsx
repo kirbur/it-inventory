@@ -8,6 +8,7 @@ import {Group} from '../../reusables/Group/Group'
 import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
 import {History} from 'history'
 import {match} from 'react-router-dom'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -138,9 +139,12 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     .put(`${isDeleted ? 'recover' : 'archive'}/program/${match.params.id}`, {})
                     .catch((err: any) => console.error(err))
 
-                history.push(
-                    `/programs${isDeleted ? '/edit/detail/' + match.params.id : '/overview/' + progData.name}/inventory`
-                )
+                history.push({
+                    pathname: `/programs${
+                        isDeleted ? '/edit/detail/' + match.params.id : '/overview/' + progData.name
+                    }/inventory`,
+                    state: {prev: history.location},
+                })
             }
         }
     }
@@ -150,17 +154,11 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
-                    <Button
-                        text={progData.name}
-                        icon='back'
-                        onClick={() => {
-                            history.push(`/programs/overview/${progData.name}/inventory`)
-                        }}
-                        className={styles.backButton}
-                        textClassName={styles.backButtonText}
-                    />
-                    <div className={styles.imgPadding}>
-                        <img className={styles.img} src={img} alt={''} />
+                    <BackButton history={history} className={styles.backButton} />
+                    <div className={styles.imgContainer}>
+                        <div className={styles.imgPadding}>
+                            <img className={styles.img} src={img} alt={''} />
+                        </div>
                     </div>
 
                     <div className={styles.costText}>
@@ -197,7 +195,10 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                     text='Edit'
                                     icon='edit'
                                     onClick={() => {
-                                        history.push('/programs/edit/detail/' + match.params.id)
+                                        history.push({
+                                            pathname: '/programs/edit/detail/' + match.params.id,
+                                            state: {prev: history.location},
+                                        })
                                     }}
                                     className={styles.editbutton}
                                 />
@@ -224,7 +225,12 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                 Assigned to{' '}
                                 <div
                                     className={styles.empName}
-                                    onClick={() => history.push(`/employees/detail/${progData.employeeId}`)}
+                                    onClick={() =>
+                                        history.push({
+                                            pathname: `/employees/detail/${progData.employeeId}`,
+                                            state: {prev: history.location},
+                                        })
+                                    }
                                 >
                                     {progData.employee}
                                 </div>
@@ -232,7 +238,13 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         )}
                     </div>
 
-                    <DetailPageTable headers={progHeaders} rows={progRows} setRows={setProgRows} sort={false} />
+                    <DetailPageTable
+                        headers={progHeaders}
+                        rows={progRows}
+                        setRows={setProgRows}
+                        sort={false}
+                        hover={false}
+                    />
 
                     <div className={styles.spaceBetween} />
 

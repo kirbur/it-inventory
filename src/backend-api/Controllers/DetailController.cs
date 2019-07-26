@@ -217,6 +217,7 @@ namespace backend_api.Controllers
          *      firstName: string,
          *      lastName: string,
          *      department: string,
+         *      departmentID: number,
          *      role: string,
          *      hireDate: date (as string),
          *      archiveDate: Date (as string),
@@ -483,6 +484,7 @@ namespace backend_api.Controllers
                     emp.FirstName,
                     emp.LastName,
                     department,
+                    emp.DepartmentID,
                     emp.Role,
                     emp.HireDate,
                     emp.ArchiveDate,
@@ -892,6 +894,7 @@ namespace backend_api.Controllers
                 "icon": partial URL (as string),
                 "serverClicked" : string,
                 "employeeAssignedName": string,
+                "employeeAssignedId": number,
 
                 // TODO: update this comment
                 "serverHistory": [
@@ -943,7 +946,7 @@ namespace backend_api.Controllers
                 }
 
                 // Server History
-                List<object> SeverHistory = new List<object>();
+                List<object> ServerHistory = new List<object>();
 
                 // Formatting the data returned of this piece of hardware's history and adding it to a list.
                 foreach (var entry in _context.HardwareHistory.Where(x => x.HardwareType.ToLower() == model && x.HardwareId == serverID))
@@ -967,7 +970,7 @@ namespace backend_api.Controllers
                             entry.EventDate,
                             historyId = entry.HardwareHistoryId
                         };
-                    SeverHistory.Add(singleEntry);
+                    ServerHistory.Add(singleEntry);
                 }
 
                 var serverClicked = nameof(Server) + "/" + sv.ServerId;
@@ -983,7 +986,8 @@ namespace backend_api.Controllers
                     icon,
                     serverClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
-                    SeverHistory,
+                    employeeAssignedId = employeeAssigned != null ? employeeAssigned.EmployeeId: -1,
+                    ServerHistory,
                     listOfEmployees = ListOfEmployees()
                 });
                 return Ok(new List<object> { serverDetailPage });
@@ -1025,6 +1029,7 @@ namespace backend_api.Controllers
                     "icon": partial URL (as string),
                     "computerClicked" : string,
                     "employeeAssignedName": string,
+                    "employeeAssignedId": number,
                     "compHistory": [
                         {
                         "hardwareHistoryId": int,
@@ -1091,6 +1096,7 @@ namespace backend_api.Controllers
                     icon,
                     computerClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    employeeAssignedId = employeeAssigned != null ? employeeAssigned.EmployeeId : -1,
                     ComputerHistory,
                     listOfEmployees = ListOfEmployees()
                 });
@@ -1129,6 +1135,7 @@ namespace backend_api.Controllers
                 "icon": partial URL (as string),
                 "monitorClicked" : string,
                 "employeeAssignedName": string,
+                "employeeAssignedId": number,
                 "monitorHistory": [
                     {
                         "hardwareHistoryId": int,
@@ -1198,6 +1205,7 @@ namespace backend_api.Controllers
                     icon,
                     monitorClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    employeeAssignedId = employeeAssigned != null ? employeeAssigned.EmployeeId : -1,
                     MonitorHistory,
                     listOfEmployees = ListOfEmployees()
                 });
@@ -1231,6 +1239,7 @@ namespace backend_api.Controllers
                 "icon": partial URL (as string),
                 "peripheralClicked" : string,
                 "employeeAssignedName": string,
+                "employeeAssignedId": number,
                 "monitorHistory": [
                     {
                         "hardwareHistoryId": int,
@@ -1300,6 +1309,7 @@ namespace backend_api.Controllers
                     icon,
                     peripheralClicked,
                     employeeAssignedName = employeeAssigned != null ? employeeAssigned.FirstName + " " + employeeAssigned.LastName : "",
+                    employeeAssignedId = employeeAssigned != null ? employeeAssigned.EmployeeId : -1,
                     peripheralHistory,
                     listOfEmployees = ListOfEmployees()
                 });
