@@ -9,6 +9,7 @@ import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -212,11 +213,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
+                    <DetailImage src={img} />
                     <div className={styles.costText}>
                         {programData.progFlatCost > 0 && (
                             <Group>

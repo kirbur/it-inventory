@@ -9,6 +9,7 @@ import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLo
 import {History} from 'history'
 import {match} from 'react-router-dom'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -155,12 +156,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
-
+                    <DetailImage src={img} />
                     <div className={styles.costText}>
                         {progData.flatCost > 0 && (
                             <Group>
