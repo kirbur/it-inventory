@@ -9,6 +9,7 @@ import {formatDate} from '../../../utilities/FormatDate'
 import {formatCost} from '../../../utilities/FormatCost'
 import {History} from 'history'
 import {checkImage} from '../../../utilities/CheckImage'
+import {searchFilter} from '../../../utilities/SearchFilter'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -120,38 +121,19 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }, [useImages])
 
     useEffect(() => {
-        // Search through listData based on current value
-        // of search bar and save results in filtered
-        if (isArchive) {
-            var filteredTableInput = archivedData.filter((row: any) => {
-                return !row[selected.value]
-                    ? false
-                    : row[selected.value]
-                          .toString()
-                          .toLowerCase()
-                          .search(search.toLowerCase()) !== -1
-            })
-            setFilteredData(filteredTableInput)
-        } else {
-            var filteredTableInput = listData.filter((row: any) => {
-                return !row[selected.value]
-                    ? false
-                    : row[selected.value]
-                          .toString()
-                          .toLowerCase()
-                          .search(search.toLowerCase()) !== -1
-            })
-            setFilteredData(filteredTableInput)
-        }
-    }, [search, selected, listData, isArchive])
+        setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
+    }, [search, selected, listData, archivedData, isArchive])
 
     const handleClick = () => {
-        history.push(`/programs/edit/overview/new/inventory`)
+        history.push({pathname: `/programs/edit/overview/new/inventory`, state: {prev: history.location}})
     }
 
     const handleRowClick = (row: any) => {
         // go to prog overview
-        history.push(`/programs/overview/${row[0]}/${isArchive ? 'archived' : 'inventory'}`)
+        history.push({
+            pathname: `/programs/overview/${row[0]}/${isArchive ? 'archived' : 'inventory'}`,
+            state: {prev: history.location},
+        })
     }
 
     var filteredRows: any[] = []

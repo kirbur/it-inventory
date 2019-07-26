@@ -2,12 +2,14 @@
     margin: 0 50px;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: center;
 }
 
 .firstColumn {
-    padding: 100px;
+    padding: 50px;
+    min-width: 160px;
+    max-width: 300px;
+    flex-grow: 1;
 }
 
 .secondColumn {
@@ -20,6 +22,17 @@
 /*First Column*/
 .backButton {
     margin-bottom: 30px;
+}
+
+.imgContainer {
+    position: relative;
+    width: 100%;
+}
+
+.imgContainer:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
 }
 
 /*Second Column*/
@@ -284,14 +297,20 @@ input:checked ~ .insideCheckmarkAdmin {
 
 .dropdown1 {
     z-index: 1;
+    align-self: flex-end;
+    margin: 15px 0;
 }
 
 .dropdown2 {
     z-index: 2;
+    align-self: flex-end;
+    margin: 15px 0;
 }
 
 .dropdown3 {
     z-index: 3;
+    align-self: flex-end;
+    margin: 15px 0;
 }
 
 .descriptionContainer {
