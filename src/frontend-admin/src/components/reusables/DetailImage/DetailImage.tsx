@@ -6,6 +6,10 @@ interface IDetailImageProps {
     src: string;
 }
 
+/*
+DetailImage will render an image with a grey background and padding.
+Will scale the image as the page flexes.
+*/
 export const DetailImage: React.FC<IDetailImageProps> = props => {
     const {
         src,
