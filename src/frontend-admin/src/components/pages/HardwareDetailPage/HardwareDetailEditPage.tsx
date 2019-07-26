@@ -110,8 +110,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 'Make',
                 'Model',
                 'OS',
-                'RAM',
-                'Local HHD',
+                'RAM (GB)',
+                'Local HHD (GB)',
                 '# of Cores',
                 'MFG Tag',
                 'Serial #',
@@ -162,9 +162,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 'Make',
                 'Model',
                 'CPU',
-                'RAM',
-                'SSD',
-                'Screen Size',
+                'RAM (GB)',
+                'SSD (GB)',
+                'Screen Size (in)',
                 'Monitor Output',
                 'Serial #',
                 'MFG Tag',
@@ -213,7 +213,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     .catch((err: any) => console.error(err))
             }
         } else if (match.params.type === 'monitor') {
-            setFirstSectionHeaders(['Make', 'Model', 'Screen Size', 'Resolution', 'Inputs', 'Serial #'])
+            setFirstSectionHeaders(['Make', 'Model', 'Screen Size (in)', 'Resolution (k)', 'Inputs', 'Serial #'])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date'])
             setThirdSectionHeaders(['Employee Assigned', 'Location'])
             if (match.params.id !== 'new') {
