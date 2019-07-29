@@ -15,7 +15,7 @@ import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './EmployeesListPage.module.css'
@@ -61,6 +61,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<IEmployeeData[]>([])
@@ -299,7 +300,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                     <img className={styles.icon} src={displayImages.filter(x => x.id === row[7])[0].img} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <text className={styles.employeeName}>{row[0]}</text> <br />
+                    <text className={s(styles.employeeName, isDarkMode ? styles.employeeNameDark : {})}>{row[0]}</text> <br />
                     <text className={styles.role}>{row[5]}</text>
                 </div>
             </td>
