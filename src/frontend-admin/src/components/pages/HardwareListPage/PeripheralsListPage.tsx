@@ -66,12 +66,10 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
     const [isArchive, setIsArchive] = useState(false)
 
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{id: number; img: string}[]>([])
-    const [displayImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get('/list/peripherals')
             .then((data: IPulledData[]) => {
                 const peripherals: IPeripheralData[] = []
@@ -83,15 +81,16 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                         purchaseDate: format(i.purchaseDate),
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
                     })
-                    imgs.push({id: i.peripheralId, img: i.icon})
+                    checkImage(i.icon, axios, placeholder).then(image => {
+                        imgs.push({id: i.peripheralId, img: image})
+                    })
                 })
                 setListData(peripherals)
 
-                setImages(imgs)
-                setUseImages(true)
+                setDisplayImages(imgs)
             })
             .catch((err: any) => console.error(err))
-        axios
+        await axios
             .get('/archivedList/peripheral')
             .then((data: IPulledData[]) => {
                 const peripherals: IPeripheralData[] = []
@@ -106,22 +105,15 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                 setArchivedData(peripherals)
             })
             .catch((err: any) => console.error(err))
+    }
+
+    useEffect(() => {
+        getData()
     }, [])
 
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
     }, [search, selected, listData, archivedData, isArchive])
-
-    //Set display Images
-    useEffect(() => {
-        images.map((img: {id: number; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.id !== img.id)
-                setImages([...list, {id: img.id, img: data}])
-                displayImages.push({id: img.id, img: data})
-            })
-        )
-    }, [useImages])
 
     const handleClick = () => {
         history.push({pathname: '/hardware/edit/peripheral/new', state: {prev: history.location}})

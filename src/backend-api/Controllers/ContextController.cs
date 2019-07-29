@@ -146,5 +146,37 @@ namespace backend_api.Controllers
                 EventDate = date,
             });
         }
+
+        public List<object> UnassignedHardwareHelper<T>()
+             where T : class, IHardwareBase
+        {
+            // list of the unassigned hardware that will be returned
+            List<object> UnassignedHardware = new List<object>();
+
+            // finding our table from our context class
+            DbSet<T> table = _context.Set<T>();
+
+            // loop through the hardware and find unassigned and non-deleted hardware
+            foreach (var hardware in table.Where(x => x.EmployeeId == null && x.IsDeleted == false))
+            {
+                // get their make and their model so we can return this as part of our object that will be displayed.
+                /*
+                 * NOTE: GetMake() and GetModel() return name and type when the given context is peripheral
+                 */
+                var hardwareName = hardware.GetMake() + " " + hardware.GetModel();
+                var HW = new
+                {
+                    hardwareId = hardware.GetId(),
+                    type = table.GetType().GetGenericArguments().Single().Name,
+                    hardwareName,
+                    hardware.SerialNumber,
+                    hardware.MFG,
+                    hardware.PurchaseDate,
+
+                };
+                UnassignedHardware.Add(HW);
+            }
+            return UnassignedHardware;
+        }
     }
 }

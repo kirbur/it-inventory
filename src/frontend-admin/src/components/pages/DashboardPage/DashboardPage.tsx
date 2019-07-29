@@ -243,7 +243,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                         history.push({pathname: `/programs`, state: {prev: history.location}})
                     }}
                 >
-                    <Group>
+                    <Group className={styles.group}>
                         {licenses &&
                             licenses.map(i => (
                                 <HorizontalBarChart

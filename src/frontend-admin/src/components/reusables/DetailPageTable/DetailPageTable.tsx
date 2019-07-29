@@ -141,10 +141,10 @@ export const DetailPageTable = (props: ITableProps) => {
                     className={s(styles.rowData, row[0].onClick && styles.clickCursor, click)}
                     onClick={() => row[i].onClick && row[0].id && row[i].onClick(row[i].id)}
                 >
-                    <a data-tip={row[i].tooltip}>
+                    <div data-tip={row[i].tooltip}>
                         {row[i].value}
                         <MdInfoOutline size={15} />
-                    </a>
+                    </div>
                     <ReactTooltip place='bottom' type='light' effect='float' className={styles.tooltip} />
                 </td>
             ) : (

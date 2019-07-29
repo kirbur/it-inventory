@@ -64,9 +64,6 @@ export const ThemeContext = React.createContext(themeDefault);
 
 // Primary Component
 export const App: React.FC = () => {
-    useEffect(() => {
-        document.title = 'CQL'
-    })
     const user = localStorage.getItem('user')
     const [loginContextVariables, setLoginContextVariables] = useState(
         user

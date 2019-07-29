@@ -103,7 +103,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
     const hardwareHeaders = ['Hardware', 'Serial Number', 'MFG Tag', 'Purchase Date']
     const softwareHeaders = ['Software', 'Key/Username', 'Monthly Cost']
-    const licenseHeaders = ['Licenses', 'Key/Username', 'Monthly Cost', 'CALs']
+    const licenseHeaders = ['Licenses', 'Key/Username', 'Monthly Cost']
 
     const [deptList, setDeptList] = useState<IDepartment[]>([])
     const [deptImages, setDeptImages] = useState<{id: number; img: string}[]>([])
@@ -131,7 +131,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             .then((data: any) => {
                 var availableEmp: any[] = []
                 data[0].myDomainUsers.sort().map((emp: any, index: number) => availableEmp.push({name: emp, id: index}))
-
                 setEmployeeDropdown(availableEmp)
 
                 setDeptList(data[0].departments)
@@ -142,6 +141,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     uhw.push({
                         name: i.hardwareName,
                         id: i.type.toLowerCase() + '/' + i.hardwareId,
+                        serialNumber: format(i.serialNumber),
+                        mfg: format(i.mfg),
+                        purchaseDate: formatDate(i.purchaseDate),
                     })
                 )
                 setHardwareDropdown(uhw)
@@ -151,6 +153,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     usw.push({
                         name: i.programName,
                         id: i.programId,
+                        key: format(i.programLicenseKey),
+                        monthlyCost: '$' + i.monthlyCost,
                     })
                 )
                 setSoftwareDropdown(usw)
@@ -160,6 +164,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     ul.push({
                         name: i.programName,
                         id: i.programId,
+                        key: format(i.programLicenseKey),
+                        monthlyCost: '$' + i.monthlyCost,
                     })
                 )
                 setLicenseDropdown(ul)
@@ -288,6 +294,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         hardwareDropdown.push({
                             name: add[0].value.toString(),
                             id: add[0].id ? add[0].id.toString() : '',
+                            serialNumber: add[1].value.toString(),
+                            mfg: add[2].value.toString(),
+                            purchaseDate: add[3].value.toString(),
                         })
                     }
                 })
@@ -305,9 +314,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         ) {
                             var arr = [
                                 {value: available.name, id: available.id, sortBy: available.name},
-                                {value: '', id: available.id, sortBy: available.id},
-                                {value: '', id: available.id, sortBy: available.id},
-                                {value: '', id: available.id, sortBy: available.id},
+                                {value: available.serialNumber, id: available.id, sortBy: available.serialNumber},
+                                {value: available.mfg, id: available.id, sortBy: available.mfg},
+                                {value: available.purchaseDate, id: available.id, sortBy: available.purchaseDate},
                             ]
 
                             toBeAdded.push(arr)
@@ -342,6 +351,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         softwareDropdown.push({
                             name: add[0].value.toString(),
                             id: add[0].id ? add[0].id.toString() : '',
+                            key: add[1].value.toString(),
+                            monthlyCost: add[2].value.toString(),
                         })
                     }
                 })
@@ -355,8 +366,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
                             var arr = [
                                 {value: available.name, id: available.id, sortBy: available.name},
-                                {value: '', id: available.id, sortBy: available.id},
-                                {value: '', id: available.id, sortBy: available.id},
+                                {value: available.key, id: available.id, sortBy: available.key},
+                                {value: available.monthlyCost, id: available.id, sortBy: available.monthlyCost},
                             ]
 
                             toBeAdded.push(arr)
@@ -390,6 +401,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         licenseDropdown.push({
                             name: add[0].value.toString(),
                             id: add[0].id ? add[0].id.toString() : '',
+                            key: add[1].value.toString(),
+                            monthlyCost: add[2].value.toString(),
                         })
                     }
                 })
@@ -403,9 +416,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
                             var arr = [
                                 {value: available.name, id: available.id, sortBy: available.name},
-                                {value: '', id: available.id, sortBy: available.id},
-                                {value: '', id: available.id, sortBy: available.id},
-                                {value: '', id: available.id, sortBy: available.id},
+                                {value: available.key, id: available.id, sortBy: available.key},
+                                {value: available.monthlyCost, id: available.id, sortBy: available.monthlyCost},
+                                {value: '', id: available.id, sortBy: ''},
                             ]
 
                             toBeAdded.push(arr)
@@ -440,9 +453,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         var arr = [
             [
                 {value: newRow.name, id: newRow.id, sortBy: newRow.name},
-                {value: '', id: newRow.id, sortBy: newRow.id},
-                {value: '', id: newRow.id, sortBy: newRow.id},
-                {value: '', id: newRow.id, sortBy: newRow.id},
+                {value: newRow.serialNumber, id: newRow.id, sortBy: newRow.serialNumber},
+                {value: newRow.mfg, id: newRow.id, sortBy: newRow.mfg},
+                {value: newRow.purchaseDate, id: newRow.id, sortBy: newRow.purchaseDate},
             ],
         ]
 
@@ -470,7 +483,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         setHardwareRows({...hardwareRows, added: [...arr], removed: [...hardwareRows.removed, [...row]]})
 
         //add it to the dropdown
-        var drop = {name: row[0].value, id: row[0].id}
+        var drop = {
+            name: row[0].value,
+            id: row[0].id,
+            serialNumber: row[1].value,
+            mfg: row[2].value,
+            purchaseDate: row[3].value,
+        }
         setHardwareDropdown([...hardwareDropdown, drop])
     }
 
@@ -479,8 +498,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         var arr = [
             [
                 {value: newRow.name, id: newRow.id, sortBy: newRow.name},
-                {value: '', id: newRow.id, sortBy: newRow.id},
-                {value: '', id: newRow.id, sortBy: newRow.id},
+                {value: newRow.key, id: newRow.id, sortBy: newRow.key},
+                {value: newRow.monthlyCost, id: newRow.id, sortBy: newRow.monthlyCost},
             ],
         ]
         //take it out of remove if its there
@@ -506,7 +525,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         setSoftwareRows({...softwareRows, added: [...arr], removed: [...softwareRows.removed, [...row]]})
 
         //add it to the dropdown
-        var drop = {name: row[0].value, id: row[0].id}
+        var drop = {
+            name: row[0].value,
+            id: row[0].id,
+            key: row[1].id,
+            monthlyCost: row[2].id,
+        }
         setSoftwareDropdown([...softwareDropdown, drop])
     }
 
@@ -515,9 +539,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         var arr = [
             [
                 {value: newRow.name, id: newRow.id, sortBy: newRow.name},
-                {value: '', id: newRow.id, sortBy: newRow.id},
-                {value: '', id: newRow.id, sortBy: newRow.id},
-                {value: '', id: newRow.id, sortBy: newRow.id},
+                {value: newRow.key, id: newRow.id, sortBy: newRow.key},
+                {value: newRow.monthlyCost, id: newRow.id, sortBy: newRow.monthlyCost},
+                {value: '', id: newRow.id, sortBy: ''},
             ],
         ]
         //take it out of remove if its there
@@ -544,7 +568,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         setLicenseRows({...licenseRows, added: [...arr], removed: [...licenseRows.removed, [...row]]})
 
         //add it to the dropdown
-        var drop = {name: row[0].value, id: row[0].id}
+        var drop = {
+            name: row[0].value,
+            id: row[0].id,
+            key: row[1].value,
+            monthlyCost: row[2].value,
+        }
         setLicenseDropdown([...licenseDropdown, drop])
     }
 

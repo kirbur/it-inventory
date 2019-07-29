@@ -68,6 +68,10 @@
     width: 98%;
 }
 
+.group {
+    flex-wrap: wrap;
+}
+
 .dashMainDark {
     background-color: #282c29;
 }

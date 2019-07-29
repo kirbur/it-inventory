@@ -70,12 +70,10 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
     const [isArchive, setIsArchive] = useState(false)
 
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{id: number; img: string}[]>([])
-    const [displayImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get('/list/servers')
             .then((data: IPulledData[]) => {
                 const servers: IServerData[] = []
@@ -91,16 +89,18 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                         icon: i.icon,
                         model: format(i.model),
                     })
-                    imgs.push({id: i.serverId, img: i.icon})
+
+                    checkImage(i.icon, axios, placeholder).then(image => {
+                        imgs.push({id: i.serverId, img: image})
+                    })
                 })
 
                 setListData(servers)
 
-                setImages(imgs)
-                setUseImages(true)
+                setDisplayImages(imgs)
             })
             .catch((err: any) => console.error(err))
-        axios
+        await axios
             .get('/archivedList/server')
             .then((data: IPulledData[]) => {
                 const servers: IServerData[] = []
@@ -119,22 +119,15 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                 setArchivedData(servers)
             })
             .catch((err: any) => console.error(err))
+    }
+
+    useEffect(() => {
+        getData()
     }, [])
 
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
     }, [search, selected, listData, archivedData, isArchive])
-
-    //Set display Images
-    useEffect(() => {
-        images.map((img: {id: number; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.id !== img.id)
-                setImages([...list, {id: img.id, img: data}])
-                displayImages.push({id: img.id, img: data})
-            })
-        )
-    }, [useImages])
 
     const handleClick = () => {
         history.push({pathname: `hardware/edit/server/new`, state: {prev: history.location}})

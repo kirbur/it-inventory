@@ -70,12 +70,10 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
     const [isArchive, setIsArchive] = useState(false)
 
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{id: number; img: string}[]>([])
-    const [displayImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get('/list/monitors')
             .then((data: IPulledData[]) => {
                 const monitors: IMonitorData[] = []
@@ -91,15 +89,16 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                         icon: i.icon,
                         model: format(i.model),
                     })
-                    imgs.push({id: i.monitorId, img: i.icon})
+                    checkImage(i.icon, axios, placeholder).then(image => {
+                        imgs.push({id: i.monitorId, img: image})
+                    })
                 })
                 setListData(monitors)
 
-                setImages(imgs)
-                setUseImages(true)
+                setDisplayImages(imgs)
             })
             .catch((err: any) => console.error(err))
-        axios
+        await axios
             .get('/archivedList/monitor')
             .then((data: IPulledData[]) => {
                 const monitors: IMonitorData[] = []
@@ -118,22 +117,15 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                 setArchivedData(monitors)
             })
             .catch((err: any) => console.error(err))
+    }
+
+    useEffect(() => {
+        getData()
     }, [])
 
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
     }, [search, selected, listData, archivedData, isArchive])
-
-    //Set display Images
-    useEffect(() => {
-        images.map((img: {id: number; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.id !== img.id)
-                setImages([...list, {id: img.id, img: data}])
-                displayImages.push({id: img.id, img: data})
-            })
-        )
-    }, [useImages])
 
     const handleClick = () => {
         history.push({pathname: '/hardware/edit/monitor/new', state: {prev: history.location}})
