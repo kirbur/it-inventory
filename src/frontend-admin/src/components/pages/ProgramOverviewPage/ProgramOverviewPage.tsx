@@ -199,7 +199,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     }
 
     return (
-        <div className={styles.progOverviewMain}>
+        <div className={s(styles.progOverviewMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>

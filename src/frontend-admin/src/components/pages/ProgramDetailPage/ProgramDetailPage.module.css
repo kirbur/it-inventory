@@ -1,5 +1,5 @@
 .progDetailMain {
-    margin: 0 50px;
+    padding: 0 50px;
 }
 
 .columns {
@@ -105,4 +105,8 @@
 
 .linkDark {
     color: #5ec2ff;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

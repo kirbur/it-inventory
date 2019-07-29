@@ -134,7 +134,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     }
 
     return (
-        <div className={styles.columns}>
+        <div className={s(styles.columns, isDarkMode ? styles.backgroundDark : {})}>
             {/* column 1 */}
 
             <div className={styles.firstColumn}>

@@ -1,5 +1,5 @@
 .progOverviewMain {
-    margin: 0 50px;
+    padding: 0 50px;
 }
 
 .columns {
@@ -62,4 +62,8 @@
 
 .dark {
     color: white;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

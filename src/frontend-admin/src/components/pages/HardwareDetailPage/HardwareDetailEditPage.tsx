@@ -870,7 +870,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     }
 
     return (
-        <div className={styles.columns}>
+        <div className={s(styles.columns, isDarkMode ? styles.backgroundDark : {})}>
             {/* column 1 */}
             <div className={styles.firstColumn}>
                 <BackButton history={history} className={styles.backButton} />

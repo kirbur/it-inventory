@@ -191,7 +191,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     }
 
     return (
-        <div className={styles.empDetailMain}>
+        <div className={s(styles.empDetailMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>

@@ -143,7 +143,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     }
 
     return (
-        <div className={styles.progDetailMain}>
+        <div className={s(styles.progDetailMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>

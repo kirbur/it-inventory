@@ -212,7 +212,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     }
 
     return (
-        <div className={styles.columns}>
+        <div className={s(styles.columns, isDarkMode ? styles.backgroundDark : {})}>
             {/* column 1 */}
 
             <div className={styles.firstColumn}>

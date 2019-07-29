@@ -481,7 +481,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     }
 
     return (
-        <div className={styles.progOverviewEditMain}>
+        <div className={s(styles.progOverviewEditMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>

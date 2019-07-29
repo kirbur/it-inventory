@@ -10,7 +10,7 @@
 
 /* main column styling */
 .columns {
-    margin: 0 50px;
+    padding: 0 50px;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -348,4 +348,8 @@ input:checked ~ .insideCheckmarkDark {
 }
 input:checked ~ .insideCheckmarkAdminDark {
     background-color: #5ec2ff;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

@@ -357,7 +357,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     }
 
     return (
-        <div className={styles.detailMain}>
+        <div className={s(styles.detailMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
