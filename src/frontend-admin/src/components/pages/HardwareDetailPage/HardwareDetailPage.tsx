@@ -349,6 +349,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         return costTexts
     }
 
+    var titleStyle = styles.titleText
+    if (match.params.type === 'server') {
+        titleStyle = styles.serverTitle
+    }
+
     return (
         <div className={styles.detailMain}>
             <div className={styles.columns}>
@@ -388,7 +393,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     )}
 
                     {/* title/makeModel/dates/virtualized */}
-                    <div className={styles.titleText}>
+                    <div className={titleStyle}>
                         <div className={styles.hardwareName}>{match.params.type}</div>
                         {headingInfo.map((heading: string) => (
                             <div className={styles.hardwareText}>{heading} </div>

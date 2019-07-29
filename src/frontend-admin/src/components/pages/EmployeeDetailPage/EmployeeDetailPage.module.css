@@ -36,7 +36,7 @@
 .titleText {
     text-align: left;
     padding-top: 50px;
-    min-height: 300px;
+    min-height: 260px;
 }
 
 .employeeName {
@@ -59,8 +59,6 @@
 
 .table {
     margin-bottom: 50px;
-    position: relative;
-    right: 25px;
 }
 
 .descriptionContainer {
