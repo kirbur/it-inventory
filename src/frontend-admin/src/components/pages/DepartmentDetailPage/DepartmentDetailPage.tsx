@@ -7,6 +7,7 @@ import {Group} from '../../reusables/Group/Group'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {BackButton} from '../../reusables/BackButton/BackButton'
 import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Styles
 import styles from './DepartmentDetailPage.module.css'
@@ -193,16 +194,12 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
                     <DetailImage src={img} />
-                    <Group>
-                        <p>Software</p>
-                        <div className={styles.costLine} />
-                        <p>${deptData.softwareCost} /month </p>
-                    </Group>
-                    <Group>
-                        <p>Hardware</p>
-                        <div className={styles.costLine} />
-                        <p>${deptData.hardwareCost} </p>
-                    </Group>
+                    <DetailCostText 
+                        costTexts={[
+                            {title: 'Software', cost: `$${deptData.softwareCost} /month`},
+                            {title: 'Hardware', cost: `$${deptData.hardwareCost}`},
+                        ]}
+                    />
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>

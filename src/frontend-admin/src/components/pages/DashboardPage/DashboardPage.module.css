@@ -66,3 +66,7 @@
 .software {
     width: 98%;
 }
+
+.group {
+    flex-wrap: wrap;
+}

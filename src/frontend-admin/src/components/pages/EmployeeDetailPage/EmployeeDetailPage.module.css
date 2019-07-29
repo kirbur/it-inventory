@@ -22,21 +22,6 @@
     flex-direction: column;
 }
 
-/*First Column*/
-.costText {
-    text-align: left;
-    color: #979797;
-    font-size: 18px;
-}
-
-.costLine {
-    margin: 0 5px;
-    flex-grow: 1;
-    height: 1px;
-    align-self: center;
-    background: #979797;
-}
-
 /*Second Column*/
 .archivebutton {
     margin-left: 18px;

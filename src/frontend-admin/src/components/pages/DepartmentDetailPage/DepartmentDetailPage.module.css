@@ -35,14 +35,6 @@
     padding-right: 50px;
 }
 
-.costLine {
-    margin: 0 5px;
-    flex-grow: 1;
-    height: 1px;
-    align-self: center;
-    background: #979797;
-}
-
 /* line and title */
 .line {
     border-bottom: 2px solid #a5a5a5;
@@ -55,12 +47,6 @@
     font-size: 24px;
     margin-top: 50px;
     margin-bottom: 50px;
-}
-
-.costText {
-    text-align: left;
-    color: #979797;
-    font-size: 18px;
 }
 
 .titleText {
