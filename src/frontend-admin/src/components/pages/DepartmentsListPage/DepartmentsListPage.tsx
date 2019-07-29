@@ -62,12 +62,10 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const headerList = ['Departments', 'Total Employees', 'Programs Cost']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{id: number; img: string}[]>([])
-    const [displayImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get('/list/departments')
             .then((data: IPulledData[]) => {
                 var depts: IDepartmentData[] = []
@@ -80,16 +78,17 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                         cost: i.costOfPrograms,
                         icon: URL + format(i.icon),
                     })
-                    imgs.push({id: i.departmentId, img: i.icon})
+                    checkImage(i.icon, axios, placeholder).then(image => {
+                        imgs.push({id: i.departmentId, img: image})
+                    })
                 })
                 setListData(depts)
 
-                setImages(imgs)
-                setUseImages(true)
+                setDisplayImages(imgs)
             })
             .catch((err: any) => console.error(err))
 
-        axios
+        await axios
             .get(`/archivedList/department`)
             .then((data: IPulledData[]) => {
                 var depts: IDepartmentData[] = []
@@ -105,6 +104,10 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                 setArchivedData(depts)
             })
             .catch((err: any) => console.error(err))
+    }
+
+    useEffect(() => {
+        getData()
     }, [])
 
     const formatCost = (cost: number) => {
@@ -114,17 +117,6 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
     }, [search, selected, listData, archivedData, isArchive])
-
-    //Set display Images
-    useEffect(() => {
-        images.map((img: {id: number; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.id !== img.id)
-                setImages([...list, {id: img.id, img: data}])
-                displayImages.push({id: img.id, img: data})
-            })
-        )
-    }, [useImages])
 
     const handleClick = () => {
         history.push({pathname: `/departments/edit/new`, state: {prev: history.location}})

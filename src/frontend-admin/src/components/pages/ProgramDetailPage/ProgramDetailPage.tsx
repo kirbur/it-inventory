@@ -14,6 +14,7 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Styles
 import styles from './ProgramDetailPage.module.css'
@@ -47,7 +48,6 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         description: string
         employee: string
         employeeId: number
-        icon: string
         renewalDate: string
         isCostPerYear: boolean
         flatCost: number
@@ -59,7 +59,6 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         description: '',
         employee: '',
         employeeId: -1,
-        icon: placeholder,
         renewalDate: '',
         isCostPerYear: false,
         flatCost: 0,
@@ -70,8 +69,8 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     const [progRows, setProgRows] = useState<ITableItem[][]>([])
     const progHeaders = ['License Key', 'Purchase Link']
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get(`/detail/program/${match.params.id}`)
             .then((data: any) => {
                 setProgData({
@@ -80,7 +79,6 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     description: format(data[0].description),
                     employee: data[0].employeeName,
                     employeeId: data[0].employeeId,
-                    icon: data[0].picture,
                     renewalDate: formatDate(data[0].renewalDate),
                     isCostPerYear: data[0].isCostPerYear,
                     flatCost: data[0].programFlatCost,
@@ -105,44 +103,36 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         }
                     }),
                 ])
+
+                checkImage(data[0].picture, axios, placeholder)
+                    .then(image => setImg(image))
+                    .catch(err => console.error(err))
             })
             .catch((err: any) => console.error(err))
-    }, [match.params.id])
+    }
 
     useEffect(() => {
-        //Check to see if the given icon string corresponds to
-        //an actual image, if not display the placeholder
-        if (progData.icon) {
-            axios
-                .get(progData.icon)
-                .then((data: any) => {
-                    if (data !== '') {
-                        setImg(URL + progData.icon)
-                    } else {
-                        setImg(placeholder)
-                    }
-                })
-                .catch((err: any) => console.error(err))
-        }
-    }, [progData.icon])
+        getData()
+    }, [])
 
     async function handleArchive() {
-        if (progData.hasPlugin) {
+        if (progData.hasPlugin && !isDeleted) {
             window.alert('Please archive the plugins before you archive this program.')
-        } else {
-            if (
-                window.confirm(
-                    `Are you sure you want to ${isDeleted ? 'recover' : 'archive'} this copy of ${progData.name}?`
-                )
-            ) {
-                await axios
-                    .put(`${isDeleted ? 'recover' : 'archive'}/program/${match.params.id}`, {})
-                    .catch((err: any) => console.error(err))
+        } else if (isDeleted) {
+            if (window.confirm(`Are you sure you want to recover this copy of ${progData.name}?`)) {
+                await axios.put(`recover/program/${match.params.id}`, {}).catch((err: any) => console.error(err))
 
                 history.push({
-                    pathname: `/programs${
-                        isDeleted ? '/edit/detail/' + match.params.id : '/overview/' + progData.name
-                    }/inventory`,
+                    pathname: `/programs/edit/detail/${match.params.id}/inventory`,
+                    state: {prev: history.location},
+                })
+            }
+        } else {
+            if (window.confirm(`Are you sure you want to archive this copy of ${progData.name}?`)) {
+                await axios.put(`archive/program/${match.params.id}`, {}).catch((err: any) => console.error(err))
+
+                history.push({
+                    pathname: `/programs/overview/${progData.name}/inventory`,
                     state: {prev: history.location},
                 })
             }
@@ -214,7 +204,22 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     )}
                     <div className={styles.titleText}>
                         <div className={styles.programName}>
-                            {progData.name} {match.params.id}
+                            <Group>
+                                <div
+                                    className={styles.overviewLink}
+                                    onClick={() =>
+                                        history.push({
+                                            pathname: `/programs/overview/${progData.name}/${
+                                                isDeleted ? 'archived' : 'inventory'
+                                            }`,
+                                            state: {prev: history.location},
+                                        })
+                                    }
+                                >
+                                    {progData.name}
+                                </div>
+                                {match.params.id}
+                            </Group>
                         </div>
                         {progData.renewalDate !== '-' && (
                             <div className={styles.programText}>Renewal Date: {progData.renewalDate}</div>

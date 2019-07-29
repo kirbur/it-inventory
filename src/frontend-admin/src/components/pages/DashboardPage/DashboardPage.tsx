@@ -228,6 +228,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
     return (
         <div className={styles.dashMain}>
+            {console.log(licenses)}
             <div className={styles.dashColumn}>
                 <Card
                     title={'licenses'}
