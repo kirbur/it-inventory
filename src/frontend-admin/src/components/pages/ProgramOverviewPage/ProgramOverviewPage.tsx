@@ -277,9 +277,19 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                             <div className={styles.programText}>License Key: {programData.programlicenseKey}</div>
                         )}
                     </div>
-                    <DetailPageTable headers={programHeaders} rows={programRows} setRows={setProgramRows} />
+                    <DetailPageTable
+                        headers={programHeaders}
+                        rows={programRows}
+                        setRows={setProgramRows}
+                        className={styles.table}
+                    />
                     <div className={styles.spaceBetweenTables} />
-                    <DetailPageTable headers={pluginHeaders} rows={pluginRows} setRows={setPluginRows} />
+                    <DetailPageTable
+                        headers={pluginHeaders}
+                        rows={pluginRows}
+                        setRows={setPluginRows}
+                        className={styles.table}
+                    />
                 </div>
             </div>
         </div>
