@@ -12,13 +12,14 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 // Utils
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './EmployeeDetailPage.module.css'
 import placeholder from '../../../content/Images/Placeholders/employee-placeholder.png'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Types
 interface IEmployeeDetailPageProps {
@@ -48,6 +49,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [isDeleted, setIsDeleted] = useState(false)
@@ -249,7 +251,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.employeeName}>{userData.name}</div>
+                        <div className={s(styles.employeeName, isDarkMode ? styles.employeeNameDark : {})}>{userData.name}</div>
                         <div className={styles.employeeText}>{userData.email}</div>
                         <div className={styles.employeeText}>
                             <div

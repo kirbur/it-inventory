@@ -326,3 +326,7 @@ input:checked ~ .insideCheckmarkAdmin {
     font-family: cqlRegularFont;
     resize: none;
 }
+
+.titleDark {
+    color: white;
+}

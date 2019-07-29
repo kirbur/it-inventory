@@ -158,3 +158,15 @@
 .buttonMainDark:hover {
     background-color: #5ec2ff;
 }
+
+.iconButtonDark {
+    border: 2px solid #5ec2ff;
+}
+
+.iconButtonContainerDark {
+    color: #5ec2ff;
+}
+
+.iconButtonContainerDark:hover .iconButtonDark {
+    background: #5ec2ff;
+}

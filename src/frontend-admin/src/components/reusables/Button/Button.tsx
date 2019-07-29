@@ -50,8 +50,8 @@ export const Button: React.SFC<IButtonProps> = props => {
             {children}
         </div>
     ) : (
-        <div onClick={onClick} className={s(styles.iconButtonContainer, className)}>
-            <div className={styles.iconbuttonMain}>
+        <div onClick={onClick} className={s(styles.iconButtonContainer, className, isDarkMode ? styles.iconButtonContainerDark : {})}>
+            <div className={s(styles.iconbuttonMain, isDarkMode ? styles.iconButtonDark : {})}>
                 {/* {icon === 'add' && <div className={styles.addIcon} />} */}
                 {icon === 'add' && <GoPlus className={styles.icon} size={20} />}
                 {icon === 'archive' && <FaArchive className={styles.icon} size={20} />}

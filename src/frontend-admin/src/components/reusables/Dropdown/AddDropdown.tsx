@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useContext} from 'react'
 
 // Packages
 
@@ -12,6 +12,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 // Styles
 import styles from './AddDropdown.module.css'
 import dropdownStyles from './Dropdown.module.css'
+import { ThemeContext } from '../../App';
 
 // Types
 interface IAddDropdownProps {
@@ -27,6 +28,7 @@ interface IAddDropdownProps {
 // Primary Component
 export const AddDropdown: React.SFC<IAddDropdownProps> = props => {
     const {content, onSelect, title, className = ''} = props
+    const { isDarkMode } = useContext(ThemeContext)
 
     return (
         <Button className={s(styles.addDropdownMain, className)} icon='add' onClick={() => {}} textInside={false}>
@@ -34,7 +36,7 @@ export const AddDropdown: React.SFC<IAddDropdownProps> = props => {
                 <DropdownList
                     triggerElement={({toggle}) => (
                         <button onClick={toggle} className={s(dropdownStyles.dropdownButton, styles.dropdownButton)}>
-                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle)}>{title}</div>
+                            <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitle, isDarkMode ? styles.dropdownTitleDark : {})}>{title}</div>
                         </button>
                     )}
                     choicesList={() => (
