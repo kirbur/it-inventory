@@ -330,3 +330,11 @@ input:checked ~ .insideCheckmarkAdmin {
 .titleDark {
     color: white;
 }
+
+input:checked ~ .checkmarkDark {
+    border-color: #5ec2ff;
+}
+
+input:checked ~ .insideCheckmarkAdminDark {
+    background-color: #5ec2ff;
+}

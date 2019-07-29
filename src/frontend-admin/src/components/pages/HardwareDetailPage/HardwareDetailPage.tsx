@@ -13,6 +13,7 @@ import {DetailCostText, ICostText} from '../../reusables/DetailCostText/DetailCo
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
 import {checkImage} from '../../../utilities/CheckImage'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './HardwareDetailPage.module.css'
@@ -22,7 +23,7 @@ import peripheralPlaceholder from '../../../content/Images/Placeholders/peripher
 import monitorPlaceholder from '../../../content/Images/Placeholders/monitor-placeholder.png'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 import {sortByDate} from '../../../utilities/quickSort'
 
 // Types
@@ -39,6 +40,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
 
@@ -389,7 +391,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
                     {/* title/makeModel/dates/virtualized */}
                     <div className={styles.titleText}>
-                        <div className={styles.hardwareName}>{match.params.type}</div>
+                        <div className={s(styles.hardwareName, isDarkMode ? styles.hardwareNameDark : {})}>{match.params.type}</div>
                         {headingInfo.map((heading: string) => (
                             <div className={styles.hardwareText}>{heading} </div>
                         ))}

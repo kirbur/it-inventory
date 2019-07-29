@@ -45,6 +45,10 @@
     padding-right: 10px;
 }
 
+.overviewLink:hover {
+    text-decoration: underline;
+}
+
 .programName {
     font-size: 36px;
     color: #000000;
@@ -92,4 +96,12 @@
 
 .spaceBetween {
     height: 50px;
+}
+
+.dark {
+    color: white;
+}
+
+.linkDark {
+    color: #5ec2ff;
 }

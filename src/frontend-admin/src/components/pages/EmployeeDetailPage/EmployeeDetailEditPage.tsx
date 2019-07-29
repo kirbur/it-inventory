@@ -773,15 +773,15 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 <input
                                     type='radio'
                                     name='admin'
-                                    className={styles.checkmark}
+                                    className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
                                     checked={adminInput}
                                     onChange={() => {
                                         setAdminInput(true)
                                         setChanged(true)
                                     }}
                                 />
-                                <div className={styles.checkmark} />
-                                <div className={styles.insideCheckmarkAdmin} />
+                                <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                                <div className={s(styles.insideCheckmarkAdmin, isDarkMode ? styles.insideCheckmarkAdminDark : {})} />
 
                                 <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Admin User</div>
                                 <div className={styles.adminText}>
@@ -799,15 +799,15 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             <input
                                 type='radio'
                                 name='admin'
-                                className={styles.checkmark}
+                                className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
                                 checked={!adminInput}
                                 onChange={() => {
                                     setAdminInput(false)
                                     setChanged(true)
                                 }}
                             />
-                            <div className={styles.checkmark} />
-                            <div className={styles.insideCheckmarkAdmin} />
+                            <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                            <div className={s(styles.insideCheckmarkAdmin, isDarkMode ? styles.insideCheckmarkAdminDark : {})} />
                             <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Non Admin User</div>
                             <div className={styles.adminText}>
                                 This user will be able to view all content and review the overall company as it grows.
@@ -923,7 +923,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 <input
                                     type='radio'
                                     name='employeeDept'
-                                    className={styles.checkmark}
+                                    className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
                                     checked={dept.departmentId === deptInput.departmentId}
                                     onChange={() => {
                                         setDeptInput(dept)
@@ -931,8 +931,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                         setChanged(true)
                                     }}
                                 />
-                                <div className={styles.checkmark} />
-                                <div className={styles.insideCheckmark} />
+                                <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                                <div className={s(styles.insideCheckmark, isDarkMode ? styles.insideCheckmarkAdminDark : {})} />
                                 <div className={styles.deptIconContainer}>
                                     {deptImages &&
                                     deptImages.filter(x => x.id === dept.departmentId) &&

@@ -152,6 +152,7 @@ export const DetailPageTable = (props: ITableProps) => {
                     key={JSON.stringify(row) + headers[i]}
                     className={s(
                         styles.rowData,
+                        isDarkMode ? styles.rowDataDark : {},
                         row[i].onClick && styles.clickCursor,
                         click,
                         row[0].unavailable ? styles.unavailable : ''

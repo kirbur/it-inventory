@@ -15,7 +15,7 @@ import styles from './DepartmentDetailEditPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 import {Button} from '../../reusables/Button/Button'
 import {AxiosService} from '../../../services/AxiosService/AxiosService'
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {cloneDeep} from 'lodash'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
@@ -50,6 +50,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     }
 
     const {loginContextVariables} = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [deptData, setDeptData] = useState<any>({})
@@ -224,7 +225,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 {/* name and date */}
-                <div className={s(styles.title, styles.paddingTop)}>Department Information</div>
+                <div className={s(styles.title, styles.paddingTop, isDarkMode ? styles.textDark : {})}>Department Information</div>
 
                 <div className={styles.row}>
                     <div className={styles.text}>Department Name</div>

@@ -20,7 +20,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {formatCost} from '../../../utilities/FormatCost'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './ProgramOverviewEditPage.module.css'
@@ -53,6 +53,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         },
     } = props
     const {loginContextVariables} = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
 
@@ -491,7 +492,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
-                    <div className={styles.title}>Program Information</div>
+                    <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Program Information</div>
 
                     <Group justify={'between'} className={styles.row1Group}>
                         <div className={id !== 'new' ? styles.nameInput : styles.nameInputWithEdit}>

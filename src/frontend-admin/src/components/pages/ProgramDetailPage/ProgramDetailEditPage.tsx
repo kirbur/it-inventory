@@ -14,7 +14,7 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './ProgramDetailEditPage.module.css'
@@ -33,6 +33,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     const {history, match} = props
 
     const {loginContextVariables} = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [progData, setProgData] = useState<{name: string; employee: string; dateBought: string}>({
@@ -144,7 +145,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
             </div>
             {/* column 2 */}
             <div className={styles.secondColumn}>
-                <div className={s(styles.title, styles.paddingBottom)}>Program Information</div>
+                <div className={s(styles.title, styles.paddingBottom, isDarkMode ? styles.dark : {})}>Program Information</div>
 
                 {programInput && <ProgramForm state={programInput} setState={setProgramInput} />}
 

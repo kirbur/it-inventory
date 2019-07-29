@@ -54,3 +54,7 @@
 .spaceBetweenTables {
     height: 50px;
 }
+
+.dark {
+    color: white;
+}

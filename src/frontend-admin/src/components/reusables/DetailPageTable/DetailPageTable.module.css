@@ -123,5 +123,9 @@
 
 
 .clickableDark {
-    color: #5ec2ff;
+    color: #5ec2ff !important;
+}
+
+.rowDataDark {
+    color: #f4f4f4;
 }

@@ -235,7 +235,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         <div className={styles.employeeText}>{userData.email}</div>
                         <div className={styles.employeeText}>
                             <div
-                                className={styles.deptText}
+                                className={s(styles.deptText, isDarkMode ? styles.deptTextDark : {})}
                                 onClick={() => {
                                     history.push({
                                         pathname: '/departments/detail/' + userData.deptId,

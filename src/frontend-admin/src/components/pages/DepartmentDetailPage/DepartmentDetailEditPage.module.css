@@ -216,3 +216,7 @@
 .zIndex3 {
     z-index: 3;
 }
+
+.textDark {
+    color: white;
+}
