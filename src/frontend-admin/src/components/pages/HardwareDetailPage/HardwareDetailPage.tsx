@@ -85,13 +85,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         data[0].server.ipAddress,
                         data[0].server.numberOfCores,
                         data[0].server.operatingSystem,
-                        data[0].server.ram,
+                        data[0].server.ram + ' GB',
                     ])
                     setSecondTableData([
                         data[0].server.mfg,
                         data[0].server.serialNumber,
                         data[0].server.san,
-                        data[0].server.localHHD,
+                        data[0].server.localHHD + ' GB',
                     ])
                     setCostPerYear(data[0].server.costPerYear)
                     setFlatCost(data[0].server.flatCost)
@@ -153,13 +153,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     ])
                     setFirstTableData([
                         data[0].computer.cpu,
-                        data[0].computer.ramgb,
-                        data[0].computer.ssdgb,
+                        data[0].computer.ramgb + ' GB',
+                        data[0].computer.ssdgb + ' GB',
                         data[0].computer.fqdn,
                     ])
                     setSecondTableData([
                         data[0].computer.monitorOutput,
-                        data[0].computer.screenSize,
+                        data[0].computer.screenSize + ' in',
                         data[0].computer.serialNumber,
                         data[0].computer.mfg,
                     ])
@@ -218,8 +218,8 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         'Renewal Date: ' + formatDate(data[0].monitor.renewalDate),
                     ])
                     setFirstTableData([
-                        data[0].monitor.screenSize,
-                        data[0].monitor.resolution,
+                        data[0].monitor.screenSize + ' in',
+                        data[0].monitor.resolution + 'k',
                         data[0].monitor.inputs,
                         data[0].monitor.serialNumber,
                     ])
@@ -349,6 +349,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         return costTexts
     }
 
+    var titleStyle = styles.titleText
+    if (match.params.type === 'server') {
+        titleStyle = styles.serverTitle
+    }
+
     return (
         <div className={styles.detailMain}>
             <div className={styles.columns}>
@@ -388,7 +393,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     )}
 
                     {/* title/makeModel/dates/virtualized */}
-                    <div className={styles.titleText}>
+                    <div className={titleStyle}>
                         <div className={styles.hardwareName}>{match.params.type}</div>
                         {headingInfo.map((heading: string) => (
                             <div className={styles.hardwareText}>{heading} </div>

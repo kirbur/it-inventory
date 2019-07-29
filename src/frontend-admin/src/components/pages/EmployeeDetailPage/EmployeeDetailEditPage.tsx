@@ -953,66 +953,72 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 <div className={styles.line} />
 
                 {/* Tables */}
-                <div className={styles.paddingTop}>
-                    <DetailPageTable
-                        headers={hardwareHeaders}
-                        rows={displayTable(hardwareRows, 'hw')}
-                        setRows={() => {}}
-                        style={styles.newRowThing}
-                        edit={true}
-                        remove={handleRemoveHardware}
-                        // sorting={false}
-                    />
+                <div className={styles.tableContainer}>
+                    <div className={styles.paddingTop}>
+                        <DetailPageTable
+                            headers={hardwareHeaders}
+                            rows={displayTable(hardwareRows, 'hw')}
+                            setRows={() => {}}
+                            style={styles.newRowThing}
+                            edit={true}
+                            remove={handleRemoveHardware}
+                            // sorting={false}
+                        />
+                    </div>
+                    {hardwareDropdown && (
+                        <AddDropdown
+                            title={'Assign new hardware'}
+                            content={hardwareDropdown}
+                            onSelect={handleAddHardware}
+                            className={s(styles.moveItRight, styles.dropdown3)}
+                        />
+                    )}
+
+                    <div className={styles.paddingTop}>
+                        <DetailPageTable
+                            headers={softwareHeaders}
+                            rows={displayTable(softwareRows, 'sw')}
+                            setRows={() => {}}
+                            style={styles.newRowThing}
+                            className={styles.paddingTop}
+                            edit={true}
+                            remove={handleRemoveSoftware}
+                            // sorting={false}
+                        />
+                        <div className={styles.ddc2}>
+                            {softwareDropdown && (
+                                <AddDropdown
+                                    title={'Assign new software'}
+                                    content={softwareDropdown}
+                                    onSelect={handleAddSoftware}
+                                    className={s(styles.moveItRight, styles.dropdown2)}
+                                />
+                            )}
+                        </div>
+                    </div>
+
+                    <div className={styles.paddingTop}>
+                        <DetailPageTable
+                            headers={licenseHeaders}
+                            rows={displayTable(licenseRows, 'l')}
+                            setRows={() => {}}
+                            style={styles.newRowThing}
+                            edit={true}
+                            remove={handleRemoveLicence}
+                        />
+                    </div>
+
+                    <div className={styles.ddc1}>
+                        {licenseDropdown && (
+                            <AddDropdown
+                                title={'Assign new license'}
+                                content={licenseDropdown}
+                                onSelect={handleAddLicense}
+                                className={s(styles.moveItRight, styles.dropdown1)}
+                            />
+                        )}
+                    </div>
                 </div>
-                {hardwareDropdown && (
-                    <AddDropdown
-                        title={'Assign new hardware'}
-                        content={hardwareDropdown}
-                        onSelect={handleAddHardware}
-                        className={styles.dropdown3}
-                    />
-                )}
-
-                <div className={styles.paddingTop}>
-                    <DetailPageTable
-                        headers={softwareHeaders}
-                        rows={displayTable(softwareRows, 'sw')}
-                        setRows={() => {}}
-                        style={styles.newRowThing}
-                        edit={true}
-                        remove={handleRemoveSoftware}
-                        // sorting={false}
-                    />
-                </div>
-
-                {softwareDropdown && (
-                    <AddDropdown
-                        title={'Assign new software'}
-                        content={softwareDropdown}
-                        onSelect={handleAddSoftware}
-                        className={styles.dropdown2}
-                    />
-                )}
-
-                <div className={styles.paddingTop}>
-                    <DetailPageTable
-                        headers={licenseHeaders}
-                        rows={displayTable(licenseRows, 'l')}
-                        setRows={() => {}}
-                        style={styles.newRowThing}
-                        edit={true}
-                        remove={handleRemoveLicence}
-                    />
-                </div>
-
-                {licenseDropdown && (
-                    <AddDropdown
-                        title={'Assign new license'}
-                        content={licenseDropdown}
-                        onSelect={handleAddLicense}
-                        className={styles.dropdown1}
-                    />
-                )}
 
                 <div className={s(styles.inputContainer, styles.descriptionContainer)}>
                     <div className={styles.text}>Description</div>

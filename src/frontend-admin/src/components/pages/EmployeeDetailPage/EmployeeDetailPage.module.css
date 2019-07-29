@@ -20,6 +20,7 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    padding-left: 75px;
 }
 
 /*Second Column*/
@@ -35,7 +36,7 @@
 .titleText {
     text-align: left;
     padding-top: 50px;
-    min-height: 300px;
+    min-height: 260px;
 }
 
 .employeeName {
@@ -63,6 +64,8 @@
 .descriptionContainer {
     width: 100%;
     text-align: left;
+    position: relative;
+    right: 25px;
 }
 
 .descriptionTitle {
