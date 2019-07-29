@@ -12,13 +12,6 @@
     justify-content: center;
 }
 
-.searchContainer {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    padding-bottom: 60px;
-}
-
 .imgContainer {
     width: 75px;
     height: 75px;
@@ -37,9 +30,11 @@
     display: flex;
     flex: column;
 }
+.addButton {
+    margin-right: 25px;
+}
 .archiveButton {
     width: 150px;
-    margin-left: 25px;
     margin-right: 25px;
 }
 .alignLeft {

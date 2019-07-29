@@ -836,8 +836,15 @@ namespace backend_api.Controllers
                     LicensesList.Add(License);
                 }
                 // pull stringifyed default hardware and software out into a nice JSON object :) using JSON package.
-                JObject jsonHardware = JObject.Parse(dep.DefaultHardware);
-                JObject jsonPrograms = JObject.Parse(dep.DefaultPrograms);
+                // if deparment is "Utilities" or "Unassigned", ignore this
+
+                JObject jsonHardware = null;
+                JObject jsonPrograms = null;
+                if (dep.DepartmentName != "Utilities" && dep.DepartmentName != "Unassigned")
+                {
+                    jsonHardware = JObject.Parse(dep.DefaultHardware);
+                    jsonPrograms = JObject.Parse(dep.DefaultPrograms);
+                }
 
                 // creating list of necessary returnables that are specified in the method comment header
                 var DepartmentDetailPage = new
@@ -848,9 +855,9 @@ namespace backend_api.Controllers
                     TotalCostOfProgramsInDep,
                     picture,
                     CountEmpsInDep,
-                    DefaultHardware = jsonHardware["DefaultHardware"],
-                    DefaultLicenses = jsonPrograms["license"],
-                    DefaultSoftware = jsonPrograms["software"],
+                    DefaultHardware = jsonHardware != null ? jsonHardware["DefaultHardware"] : null,
+                    DefaultLicenses = jsonPrograms != null ? jsonPrograms["license"] : null,
+                    DefaultSoftware = jsonPrograms != null ? jsonPrograms["software"] : null,
                     ListOfEmployees,
                     listOfTablePrograms,
                     LicensesList

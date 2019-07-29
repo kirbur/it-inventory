@@ -111,8 +111,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 'Make',
                 'Model',
                 'OS',
-                'RAM',
-                'Local HHD',
+                'RAM (GB)',
+                'Local HHD (GB)',
                 '# of Cores',
                 'MFG Tag',
                 'Serial #',
@@ -163,9 +163,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 'Make',
                 'Model',
                 'CPU',
-                'RAM',
-                'SSD',
-                'Screen Size',
+                'RAM (GB)',
+                'SSD (GB)',
+                'Screen Size (in)',
                 'Monitor Output',
                 'Serial #',
                 'MFG Tag',
@@ -214,7 +214,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     .catch((err: any) => console.error(err))
             }
         } else if (match.params.type === 'monitor') {
-            setFirstSectionHeaders(['Make', 'Model', 'Screen Size', 'Resolution', 'Inputs', 'Serial #'])
+            setFirstSectionHeaders(['Make', 'Model', 'Screen Size (in)', 'Resolution (k)', 'Inputs', 'Serial #'])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date'])
             setThirdSectionHeaders(['Employee Assigned', 'Location'])
             if (match.params.id !== 'new') {
@@ -301,12 +301,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         //checks for every form
         if (hasRecurringCost) {
             if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
-                alertMssg += '\n Recurring cost and months must have values!'
+                alertMssg += '\n Recurring cost and months must have values greater than zero!'
             }
         }
         if (hasFlatCost) {
             if (costSection[0] == 0 || costSection[0] == null) {
-                alertMssg += '\n Initial cost must have a value!'
+                alertMssg += '\n Initial cost must have a value greater than zero!'
             }
         }
         //everything must be filled out - sorting doesnt work with null values
@@ -466,8 +466,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     Entity: {
                         PeripheralName: firstSectionData[0],
                         PeripheralType: firstSectionData[1],
-                        Mfg: null,
-                        SerialNumber: firstSectionData[3],
+                        SerialNumber: firstSectionData[2],
 
                         PurchaseDate: purchaseDateInput,
 
@@ -594,8 +593,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         PeripheralName: firstSectionData[0],
                         PeripheralType: firstSectionData[1],
-                        Mfg: null,
-                        SerialNumber: firstSectionData[3],
+                        SerialNumber: firstSectionData[2],
 
                         PurchaseDate: purchaseDateInput,
 

@@ -17,6 +17,7 @@
 
 .secondColumn {
     padding: 50px;
+    padding-left: 75px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -36,7 +37,7 @@
 .titleText {
     text-align: left;
     padding-top: 50px;
-    min-height: 300px;
+    min-height: 260px;
 }
 
 .programName {
@@ -53,6 +54,10 @@
 
 .spaceBetweenTables {
     height: 50px;
+}
+
+.table {
+    margin-bottom: 50px;
 }
 
 .dark {

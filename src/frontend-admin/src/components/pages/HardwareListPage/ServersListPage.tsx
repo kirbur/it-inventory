@@ -251,7 +251,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                 case 2:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[2]}</td>
                 case 3:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[3]} GB</td>
                 case 4:
                     transformedRow[3] = <td className={styles.alignLeft}>{row[4]}</td>
                 case 5:

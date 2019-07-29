@@ -326,7 +326,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         <div className={styles.employeesListMain}>
             <Group direction='row' justify='between' className={styles.group}>
                 <div className={styles.buttonContainer}>
-                    {isAdmin && <Button text='Add' icon='add' onClick={handleClick} />}
+                    {isAdmin && <Button text='Add' icon='add' onClick={handleClick} className={styles.addButton} />}
                     <Button
                         text={isArchive ? 'View Active' : 'View Archives'}
                         onClick={() => setIsArchive(!isArchive)}

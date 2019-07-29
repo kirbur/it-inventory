@@ -7,7 +7,6 @@
 
 .firstColumn {
     padding: 50px;
-    padding-right: 100px;
     min-width: 160px;
     max-width: 300px;
     flex-grow: 1;
@@ -15,6 +14,7 @@
 
 .secondColumn {
     padding: 50px;
+    padding-left: 75px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;

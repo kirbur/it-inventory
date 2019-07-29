@@ -248,7 +248,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]} in</td>
                 case 3:
                     transformedRow[3] = <td className={styles.alignLeft}>{row[3]}k</td>
                 case 4:
