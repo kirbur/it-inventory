@@ -68,7 +68,5 @@
 }
 
 .group {
-    display: flex;
     flex-wrap: wrap;
-    white-space: normal;
 }
