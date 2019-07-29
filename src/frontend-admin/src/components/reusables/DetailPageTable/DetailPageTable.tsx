@@ -86,7 +86,7 @@ export const DetailPageTable = (props: ITableProps) => {
     }
 
     var renderedHeaders = []
-    edit && renderedHeaders.push(<td className={styles.editRow}></td>)
+    edit && renderedHeaders.push(<td key={'delete'} className={styles.editRow}></td>)
     for (let i = 0; i < headers.length; i++) {
         let header = sort ? (
             <td
@@ -111,18 +111,21 @@ export const DetailPageTable = (props: ITableProps) => {
         renderedHeaders.push(header)
     }
 
-    editRows && renderedHeaders.push(<td className={styles.editRow}></td>)
+    editRows && renderedHeaders.push(<td key={'edit'} className={styles.editRow}></td>)
 
     var renderedRows: any[] = []
-    rows.forEach(row => {
+    rows.forEach((row, index) => {
         const transformedRow: any[] = []
         var start = 0
         if (edit) {
             start = 1
             transformedRow[0] = row[0].unavailable ? (
-                <td className={styles.editRow}></td>
+                <td key={index + JSON.stringify(row)} className={styles.editRow}></td>
             ) : (
-                <td onClick={e => remove(row)} className={styles.editRow}>
+                <td
+                    onClick={e => window.confirm('Are you sure you want to remove?') && remove(row)}
+                    className={styles.editRow}
+                >
                     <div className={styles.delete} />
                     <div className={styles.whiteLine} />
                 </td>
@@ -175,7 +178,9 @@ export const DetailPageTable = (props: ITableProps) => {
 
             <tbody>
                 {renderedRows.map((row, i) => (
-                    <tr className={s(styles.tr, hover ? styles.hover : '')}>{row}</tr>
+                    <tr key={i} className={s(style, styles.tr, hover ? styles.hover : '')}>
+                        {row}
+                    </tr>
                 ))}
             </tbody>
         </table>

@@ -1,8 +1,6 @@
 .dashMain {
     display: flex;
-    position: absolute;
-    padding: 20px;
-    width: fill;
+    padding-top: 20px;
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -10,7 +8,7 @@
 .dashColumn {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    /* flex-grow: 1; */
     flex-basis: 50%;
 
     max-width: 740px;
@@ -33,13 +31,13 @@
 }
 /* icon styling */
 .statsIcon {
-    color: #ff9340;
+    color: #ff8a5b;
     transform: scale(10, 5);
     margin-bottom: 10px;
     margin-top: 40px;
 }
 .upArrowIcon {
-    color: #ff9340;
+    color: #ff8a5b;
     transform: scale(5, 10);
     position: relative;
     right: 15px;
@@ -47,7 +45,7 @@
     margin-top: 40px;
 }
 .downArrowIcon {
-    color: #ff9340;
+    color: #ff8a5b;
     transform: scale(5, 10);
     position: relative;
     left: 15px;

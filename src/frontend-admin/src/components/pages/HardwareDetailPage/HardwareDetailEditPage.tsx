@@ -7,6 +7,7 @@ import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLo
 import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {Checkbox} from '../../reusables/Checkbox/Checkbox'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -482,7 +483,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     },
                 })
             }
-            history.push('/hardware')
+            history.push({pathname: '/hardware', state: {prev: history.location}})
         } else {
             //not new --> editing existing page
             if (match.params.type === 'monitor') {
@@ -613,7 +614,10 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 })
             }
         }
-        history.push(`/hardware`)
+        history.push({
+            pathname: `/hardware/detail/${match.params.type}/${match.params.id}`,
+            state: {prev: history.location},
+        })
     }
 
     function handleInputChange(index: number, sectionData: any[], value: string | number) {
@@ -870,16 +874,10 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         <div className={styles.columns}>
             {/* column 1 */}
             <div className={styles.firstColumn}>
-                <Button
-                    text='All Hardware'
-                    icon='back'
-                    onClick={() => {
-                        history.push('/hardware')
-                    }}
-                    className={styles.backButton}
-                    textClassName={styles.backButtonText}
-                />
-                <PictureInput setImage={setImgInput} image={imgInput} />
+                <BackButton history={history} className={styles.backButton} />
+                <div className={styles.imgContainer}>
+                    <PictureInput setImage={setImgInput} image={imgInput} />
+                </div>
             </div>
 
             {/* column 2 */}

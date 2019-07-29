@@ -1,21 +1,36 @@
 .columns {
+    margin: 0 50px;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: center;
 }
+
 .firstColumn {
-    min-width: 300px;
-    padding: 25px;
+    padding: 50px;
     padding-right: 100px;
+    min-width: 160px;
+    max-width: 300px;
+    flex-grow: 1;
 }
+
 .secondColumn {
-    min-width: 700px;
-    padding: 25px;
-    padding-top: 100px;
+    padding: 50px;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
+
+.imgContainer {
+    position: relative;
+    width: 100%;
+}
+
+.imgContainer:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
+}
+
 .row {
     display: flex;
     flex-direction: column;
@@ -23,7 +38,7 @@
 }
 
 .backButton {
-    margin-bottom: 50px;
+    margin-bottom: 30px;
 }
 
 .title {
@@ -196,4 +211,8 @@
 .addContainer {
     margin: 5px 0 15px;
     align-self: flex-end;
+}
+
+.zIndex3 {
+    z-index: 3;
 }

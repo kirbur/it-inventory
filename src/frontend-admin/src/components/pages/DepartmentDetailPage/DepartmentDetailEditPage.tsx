@@ -3,6 +3,7 @@ import React, {useState, useEffect, useContext} from 'react'
 // Components
 import icon from '../../../content/Images/CQL-favicon.png'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
+import {AddDropdown} from '../../reusables/Dropdown/AddDropdown'
 
 import 'react-datepicker/dist/react-datepicker.css'
 
@@ -19,6 +20,7 @@ import {format} from '../../../utilities/formatEmptyStrings'
 import {cloneDeep} from 'lodash'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
+import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Types
 interface IDepartmentDetailEditPageProps {
@@ -192,7 +194,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                     },
                     name: deptData.departmentName,
                 })
-                history.push('/departments')
+                history.push({pathname: `/departments`, state: {prev: history.location}})
             } else {
                 await axios.put(`update/department`, {
                     DefaultHardware: {DefaultHardware: newDefaultHardware},
@@ -203,7 +205,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                     name: deptData.departmentName,
                     ID: match.params.id,
                 })
-                history.push(`/departments/detail/${match.params.id}`)
+                history.push({pathname: `/departments/detail/${match.params.id}`, state: {prev: history.location}})
             }
         }
     }
@@ -213,21 +215,16 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
             {/* column 1 */}
 
             <div className={styles.firstColumn}>
-                <Button
-                    text='All Departments'
-                    icon='back'
-                    onClick={() => {
-                        history.push('/departments')
-                    }}
-                    className={styles.backButton}
-                    textClassName={styles.backButtonText}
-                />
-                <PictureInput setImage={setImgInput} image={imgInput} />
+                <BackButton history={history} className={styles.backButton} />
+
+                <div className={styles.imgContainer}>
+                    <PictureInput setImage={setImgInput} image={imgInput} />
+                </div>
             </div>
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 {/* name and date */}
-                <div className={styles.title}>Department Information</div>
+                <div className={s(styles.title, styles.paddingTop)}>Department Information</div>
 
                 <div className={styles.row}>
                     <div className={styles.text}>Department Name</div>
@@ -252,49 +249,15 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                                 edit={true}
                                 remove={handleRemoveHardware}
                             />
-                            <Button
-                                className={styles.addDefaultContainer}
-                                icon='add'
-                                onClick={() => {}}
-                                textInside={false}
-                            >
-                                <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                                    {hardwareDropdown && (
-                                        <DropdownList
-                                            triggerElement={({isOpen, toggle}) => (
-                                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                                    <div
-                                                        className={s(
-                                                            dropdownStyles.dropdownTitle,
-                                                            styles.dropdownTitle
-                                                        )}
-                                                    >
-                                                        Add default hardware
-                                                    </div>
-                                                </button>
-                                            )}
-                                            choicesList={() => (
-                                                <ul className={dropdownStyles.dropdownList}>
-                                                    {hardwareDropdown.map(i => (
-                                                        <li
-                                                            className={dropdownStyles.dropdownListItem}
-                                                            key={i.id}
-                                                            onClick={() => handleAddHardware(i.name)}
-                                                        >
-                                                            <button className={dropdownStyles.dropdownListItemButton}>
-                                                                <div className={dropdownStyles.dropdownItemLabel}>
-                                                                    {i.name}
-                                                                </div>
-                                                            </button>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        />
-                                    )}
-                                    <div />
-                                </div>
-                            </Button>
+
+                            {hardwareDropdown && (
+                                <AddDropdown
+                                    title={'Add default hardware'}
+                                    content={hardwareDropdown}
+                                    onSelect={(i: {name: string; id: string | number}) => handleAddHardware(i.name)}
+                                    className={s(styles.addDefaultContainer, styles.zIndex3)}
+                                />
+                            )}
                         </div>
                         {/* default licenses */}
                         <div className={styles.table}>
@@ -306,49 +269,15 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                                 edit={true}
                                 remove={handleRemoveLicense}
                             />
-                            <Button
-                                className={styles.addDefaultContainer}
-                                icon='add'
-                                onClick={() => {}}
-                                textInside={false}
-                            >
-                                <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                                    {licenseDropdown && (
-                                        <DropdownList
-                                            triggerElement={({isOpen, toggle}) => (
-                                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                                    <div
-                                                        className={s(
-                                                            dropdownStyles.dropdownTitle,
-                                                            styles.dropdownTitle
-                                                        )}
-                                                    >
-                                                        Add default license
-                                                    </div>
-                                                </button>
-                                            )}
-                                            choicesList={() => (
-                                                <ul className={dropdownStyles.dropdownList}>
-                                                    {licenseDropdown.map(i => (
-                                                        <li
-                                                            className={dropdownStyles.dropdownListItem}
-                                                            key={i.name}
-                                                            onClick={() => handleAddLicense(i.name)}
-                                                        >
-                                                            <button className={dropdownStyles.dropdownListItemButton}>
-                                                                <div className={dropdownStyles.dropdownItemLabel}>
-                                                                    {i.name}
-                                                                </div>
-                                                            </button>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        />
-                                    )}
-                                    <div />
-                                </div>
-                            </Button>
+
+                            {licenseDropdown && (
+                                <AddDropdown
+                                    title={'Add default license'}
+                                    content={licenseDropdown}
+                                    onSelect={(i: {name: string; id: string | number}) => handleAddLicense(i.name)}
+                                    className={styles.addDefaultContainer}
+                                />
+                            )}
                         </div>
                     </div>
                     {/* default software */}
@@ -362,49 +291,14 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                                 edit={true}
                                 remove={handleRemoveSoftware}
                             />
-                            <Button
-                                className={styles.addDefaultContainer}
-                                icon='add'
-                                onClick={() => {}}
-                                textInside={false}
-                            >
-                                <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>
-                                    {softwareDropdown && (
-                                        <DropdownList
-                                            triggerElement={({isOpen, toggle}) => (
-                                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                                    <div
-                                                        className={s(
-                                                            dropdownStyles.dropdownTitle,
-                                                            styles.dropdownTitle
-                                                        )}
-                                                    >
-                                                        Add default software
-                                                    </div>
-                                                </button>
-                                            )}
-                                            choicesList={() => (
-                                                <ul className={dropdownStyles.dropdownList}>
-                                                    {softwareDropdown.map(i => (
-                                                        <li
-                                                            className={dropdownStyles.dropdownListItem}
-                                                            key={i.name}
-                                                            onClick={() => handleAddSoftware(i.name)}
-                                                        >
-                                                            <button className={dropdownStyles.dropdownListItemButton}>
-                                                                <div className={dropdownStyles.dropdownItemLabel}>
-                                                                    {i.name}
-                                                                </div>
-                                                            </button>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        />
-                                    )}
-                                    <div />
-                                </div>
-                            </Button>
+                            {softwareDropdown && (
+                                <AddDropdown
+                                    title={'Add default software'}
+                                    content={softwareDropdown}
+                                    onSelect={(i: {name: string; id: string | number}) => handleAddSoftware(i.name)}
+                                    className={styles.addDefaultContainer}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

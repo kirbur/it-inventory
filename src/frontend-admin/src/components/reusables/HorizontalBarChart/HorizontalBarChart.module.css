@@ -19,7 +19,7 @@
 }
 
 .barFiller {
-    background: rgba(255, 147, 64, 1);
+    background: rgb(255, 138, 91);
     height: 100%;
     border-radius: inherit;
     text-align: right;
@@ -27,7 +27,7 @@
     color: #eee;
 }
 .barFiller:hover {
-    background: rgba(255, 147, 64, 0.9);
+    background: rgba(255, 138, 91, 0.9);
 }
 
 .barTitle {

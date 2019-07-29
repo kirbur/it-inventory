@@ -29,15 +29,21 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
         control: (provided: any, state: any) => ({
             ...provided,
             color: '#9b9b9b',
-            height: '45px',
+            height: '40px',
             border: '0px ',
             borderRadius: '4px',
             boxShadow: '0',
+            cursor: 'pointer',
+            margin: '5px',
         }),
         menu: (provided: any, state: any) => ({
             ...provided,
             margin: '-5px',
             boxShadow: '-1px 5px 7px 0 rgba(0,0,0,0.5)',
+        }),
+        option: (provided: any, state: any) => ({
+            ...provided,
+            cursor: 'pointer',
         }),
         indicatorSeparator: (provided: any) => ({
             ...provided,
@@ -45,14 +51,12 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
         }),
         isFocused: (provided: any) => ({
             ...provided,
-
             border: '0px',
         }),
         singleValue: (provided: any) => ({
             ...provided,
             color: '#9b9b9b',
-
-            height: '22px',
+            height: '25px',
         }),
     }
 
@@ -77,11 +81,7 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
                         setSearch(e.target.value)
                     }}
                 />
-                <div className={styles.searchIconContainer}>
-                    {/* <button type='submit' className={styles.searchIconButton}> */}
-                    <MdSearch className={styles.searchIcon} size={30} />
-                    {/* </button> */}
-                </div>
+
                 <div className={styles.filterBy}>By</div>
                 <Select
                     defaultValue={options[0]}
@@ -102,6 +102,9 @@ export const FilteredSearch: React.SFC<IFilteredSearchProps> = props => {
                     isSearchable={false}
                 />
             </form>
+            <div className={styles.searchIconContainer}>
+                <MdSearch className={styles.searchIcon} size={30} />
+            </div>
         </div>
     )
 }
