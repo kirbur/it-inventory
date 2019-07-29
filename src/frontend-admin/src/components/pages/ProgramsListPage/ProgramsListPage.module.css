@@ -124,3 +124,7 @@
 tr:hover .checkboxRow {
     background: white;
 }
+
+.programsListMainDark {
+    background-color: #282c29;
+}

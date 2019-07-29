@@ -58,7 +58,7 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
         }
     }
     return (
-        <div className={styles.hardwareListMain}>
+        <div className={s(styles.hardwareListMain, isDarkMode ? styles.listMainDark : {})}>
             <div className={styles.dropdown}>
                 <Button className={styles.dropdownButton}>
                     <div className={s(dropdownStyles.dropdownContainer, styles.dropdownContainer)}>

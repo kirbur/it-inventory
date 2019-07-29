@@ -259,7 +259,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     })
 
     return (
-        <div className={styles.departmentsListMain}>
+        <div className={s(styles.departmentsListMain, isDarkMode ? styles.listMainDark : {})}>
             <Group direction='row' justify='between' className={styles.group}>
                 <div className={styles.buttonContainer}>
                     {isAdmin && <Button text='Add' icon='add' onClick={handleClick} className={styles.addButton} />}

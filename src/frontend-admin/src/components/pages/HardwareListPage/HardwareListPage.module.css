@@ -171,3 +171,7 @@
     border-left: 2px solid #5ec2ff;
     border-top: 2px solid #5ec2ff;
 }
+
+.listMainDark {
+    background-color: #282c29;
+}

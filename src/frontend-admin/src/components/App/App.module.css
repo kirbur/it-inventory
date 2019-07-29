@@ -1,5 +1,7 @@
 .app {
     text-align: center;
+    height: fill;
+    max-height: 100vw;
 }
 
 .logoContainer {
