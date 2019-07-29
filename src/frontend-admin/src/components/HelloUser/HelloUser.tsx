@@ -14,7 +14,7 @@ export const HelloUser: React.FC<IHelloUserProps> = props => {
     const {name, className = ''} = props
 
     const userContext = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const { isDarkMode, setIsDarkMode } = useContext(ThemeContext)
     return (
         <div className={s(styles.helloMain, className)}>
             <div className={(dropdownStyles.dropdownContainer, styles.helloContainer)}>
@@ -40,6 +40,16 @@ export const HelloUser: React.FC<IHelloUserProps> = props => {
                             >
                                 <button className={dropdownStyles.dropdownListItemButton}>
                                     <div className={dropdownStyles.dropdownItemLabel}>Logout</div>
+                                </button>
+                            </li>
+                            <li
+                                className={dropdownStyles.dropdownListItem}
+                            >
+                                <button
+                                    className={dropdownStyles.dropdownListItemButton}
+                                    onClick={() => setIsDarkMode(!isDarkMode)}
+                                >
+                                    <div className={dropdownStyles.dropdownItemLabel}>{isDarkMode ? 'Dis' : 'En'}able Dark Mode</div>
                                 </button>
                             </li>
                         </ul>

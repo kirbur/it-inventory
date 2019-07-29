@@ -99,11 +99,6 @@ export const App: React.FC = () => {
                     {loginContextVariables.givenName !== '' && (
                         <div className={s(styles.navContainer, isDarkMode ? styles.dark : {})}>
                             <HelloUser name={loginContextVariables.givenName} className={styles.helloMesssage} />
-                            <div>
-                                <button onClick={() => setIsDarkMode(!isDarkMode)}>
-                                <span>Dark mode is {isDarkMode ? 'on' : 'off'}</span>
-                                </button>
-                            </div>
                             <nav className={s(styles.navBar, isDarkMode ? styles.navDark : {})}>
                                 <NavLink className={styles.logoContainer} to='/dashboard'>
 
