@@ -1,5 +1,5 @@
 .hardwareListMain {
-    margin: 50px 85px;
+    padding: 50px 85px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -157,4 +157,15 @@
     position: relative;
     top: 15px;
     left: 5px;
+}
+
+.dark
+{
+    color: #5ec2ff;
+}
+
+.dropdownArrowDark {
+    top: 13px;
+    border-left: 2px solid #5ec2ff;
+    border-top: 2px solid #5ec2ff;
 }

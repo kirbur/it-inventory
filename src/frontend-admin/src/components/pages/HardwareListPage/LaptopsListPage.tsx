@@ -15,7 +15,7 @@ import {Table} from '../../reusables/Table/Table'
 import {History} from 'history'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './HardwareListPage.module.css'
@@ -58,6 +58,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
         loginContextVariables: {isAdmin},
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<any[]>([])
@@ -236,7 +237,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
                     <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={s(styles.hardwareName, isDarkMode ? styles.dark : {})}>{row[0]}</text> <br />
                     <text className={styles.alignLeft}>{row[8]}</text>
                 </div>
             </td>
@@ -246,7 +247,7 @@ export const LaptopsListPage: React.SFC<ILaptopsListPageProps> = props => {
                     <img className={styles.icon} src={placeholder} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={s(styles.hardwareName, isDarkMode ? styles.dark : {})}>{row[0]}</text> <br />
                     <text className={styles.alignLeft}>{row[8]}</text>
                 </div>
             </td>

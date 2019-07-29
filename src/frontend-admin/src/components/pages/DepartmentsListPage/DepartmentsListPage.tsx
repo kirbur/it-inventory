@@ -19,7 +19,7 @@ import styles from './DepartmentsListPage.module.css'
 import placeholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Types
 interface IDepartmentsListPageProps {
@@ -48,6 +48,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         loginContextVariables: {isAdmin},
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<IDepartmentData[]>([])
@@ -224,7 +225,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                     <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <text className={styles.departmentName}>{row[0]}</text>
+                    <text className={s(styles.departmentName, isDarkMode ? styles.dark : {})}>{row[0]}</text>
                 </div>
             </td>
         ) : (

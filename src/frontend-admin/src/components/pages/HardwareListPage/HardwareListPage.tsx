@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Components
@@ -13,6 +13,7 @@ import {History} from 'history'
 // Styles
 import styles from './HardwareListPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
+import { ThemeContext } from '../../App';
 
 // Types
 
@@ -23,6 +24,7 @@ interface IHardwareListPageProps {
 // Primary Component
 export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
     const {history} = props
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
     const currentList = localStorage.getItem('selectedHW')
@@ -63,9 +65,9 @@ export const HardwareListPage: React.SFC<IHardwareListPageProps> = props => {
                         <DropdownList
                             triggerElement={({isOpen, toggle}) => (
                                 <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitleContainer)}>
+                                    <div className={s(dropdownStyles.dropdownTitle, styles.dropdownTitleContainer, isDarkMode ? styles.dark : {})}>
                                         <div className={styles.dropdownTitle}>{selectedHW.name}</div>
-                                        <div className={s(dropdownStyles.dropdownArrow, styles.dropdownArrow)} />
+                                        <div className={s(dropdownStyles.dropdownArrow, styles.dropdownArrow, isDarkMode ? styles.dropdownArrowDark : {})} />
                                     </div>
                                 </button>
                             )}

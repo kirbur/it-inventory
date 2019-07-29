@@ -1,5 +1,5 @@
 .departmentsListMain {
-    margin: 50px 85px;
+    padding: 50px 85px;
 }
 
 .page {
@@ -106,4 +106,8 @@
     position: relative;
     top: 15px;
     left: 5px;
+}
+
+.dark {
+    color: #5ec2ff;
 }
