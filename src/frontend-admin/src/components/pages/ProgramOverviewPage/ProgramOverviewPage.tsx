@@ -9,6 +9,8 @@ import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -200,35 +202,29 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
-                    <div className={styles.costText}>
-                        {programData.progFlatCost > 0 && (
-                            <Group>
-                                <p>Paid</p>
-                                <div className={styles.costLine} />
-                                <p>${programData.progFlatCost} </p>
-                            </Group>
-                        )}
-                        {programData.isCostPerYear ? (
-                            <Group>
-                                <p>Yearly</p>
-                                <div className={styles.costLine} />
-                                <p>${programData.progCostPerYear} </p>
-                            </Group>
-                        ) : (
-                            programData.progCostPerYear > 0 && (
-                                <Group>
-                                    <p>Monthly</p>
-                                    <div className={styles.costLine} />
-                                    <p>${programData.progCostPerYear} </p>
-                                </Group>
-                            )
-                        )}
-                    </div>
+                    <DetailImage src={img} />
+                    {programData.progFlatCost > 0 && (
+                        <DetailCostText
+                            costTexts={[
+                                {title: 'Paid', cost: `$${programData.progFlatCost}`},
+                            ]}
+                        />
+                    )}
+                    {programData.isCostPerYear ? (
+                        <DetailCostText
+                        costTexts={[
+                            {title: 'Yearly', cost: `$${programData.progCostPerYear}`},
+                        ]}
+                    />
+                    ) : (
+                        programData.progCostPerYear > 0 && (
+                            <DetailCostText
+                            costTexts={[
+                                {title: 'Monthly', cost: `$${programData.progCostPerYear}`},
+                            ]}
+                        />
+                        )
+                    )}
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>

@@ -318,6 +318,9 @@ namespace backend_api.Controllers
             {
                 return BadRequest("No employees");
             }
+            var ListOfLicenses = _context.Program
+                .Where(x => x.IsLicense == true)
+                .Where(x => x.IsDeleted == false);
 
             var UsefulProgramsList = _context.Program
                 .Where(x => x.IsPinned == true)
@@ -327,8 +330,11 @@ namespace backend_api.Controllers
             //temp list to hold the list with the difference field
             List<LicenseBarGraph> ThrowAwayList = new List<LicenseBarGraph>();
 
-            //This List takes the usefulPrograms list and makes it distinct
-            var DistinctUsefulPrograms = UsefulProgramsList
+            //temp list to hold the list with the difference field of the programs that are pinned.
+            List<LicenseBarGraph> ThrowAwayPinnedList = new List<LicenseBarGraph>();
+
+            //This List takes the LicensesList and makes it distinct
+            var DistinctUsefulPrograms = ListOfLicenses
                 .GroupBy(x => x.ProgramName)
                 .Select(x => x.FirstOrDefault());
 
@@ -338,28 +344,59 @@ namespace backend_api.Controllers
             {
                 //First lambda counts all the programs in the useful program list where the name is the same as the 
                 //name in the distinct programs list
-                var CountProgOverall = UsefulProgramsList
+                var CountProgOverall = ListOfLicenses
                     .Where(x => x.ProgramName == prog.ProgramName)
                     .Count();
 
                 //Second lambda counts all the programs in the useful program list where the name is the same as the 
                 //name in the distinct programs list and where the license is being used
-                var CountProgInUse = UsefulProgramsList
+                var CountProgInUse = ListOfLicenses
                     .Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId != null)
                     .Count();
 
                 //adding all the necessary returnables(is that a word?)
                 int difference = CountProgOverall - CountProgInUse;
-                ThrowAwayList.Add(new LicenseBarGraph
-                    (prog.ProgramName,
-                    CountProgInUse,
-                    CountProgOverall,
-                    difference
+
+                // if the program is pinned add to our pinned list
+                if (prog.IsPinned == true)
+                {
+                    ThrowAwayPinnedList.Add(new LicenseBarGraph(
+                        prog.ProgramName,
+                        CountProgInUse,
+                        CountProgOverall,
+                        difference
                     ));
+
+                }
+                // else add it to our non pinned list
+                else
+                {
+                    ThrowAwayList.Add(new LicenseBarGraph(
+                        prog.ProgramName,
+                        CountProgInUse,
+                        CountProgOverall,
+                        difference
+                    ));
+                }
             }
-            //List which sorts programs by how many they have left which are not in use;
+
+
+            //List which sorts the unpinned programs by how many they have left which are not in use;
             //Ordered with having the license with least left at the top
-            var SortedList = ThrowAwayList.OrderBy(x => x.Difference);
+            //only take 3. This can be changed
+            var SortedNotPinnedList = ThrowAwayList.OrderBy(x => x.Difference).Take(3);
+
+            // checking the programs that are not pinned and adding them to the pinned list if they are not already there
+            var ThrowAwayListNames = ThrowAwayPinnedList.Select(x => x.ProgramName).ToList();
+            foreach(var prog in SortedNotPinnedList)
+            {
+                if (!(ThrowAwayListNames.Contains(prog.ProgramName)))
+                {
+                    ThrowAwayPinnedList.Add(prog);
+                }
+            }
+            // sort the new list of both the pinned and the non pinned licenses.
+            var SortedList = ThrowAwayPinnedList.OrderBy(x => x.Difference);
 
             //removing the difference field from the List which was needed to utilize Linq's order by
             // we does this by creating the same object but this time without the differences field

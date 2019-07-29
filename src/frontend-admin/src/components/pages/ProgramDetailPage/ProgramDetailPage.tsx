@@ -9,6 +9,8 @@ import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLo
 import {History} from 'history'
 import {match} from 'react-router-dom'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -145,36 +147,29 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
-
-                    <div className={styles.costText}>
-                        {progData.flatCost > 0 && (
-                            <Group>
-                                <p>Paid</p>
-                                <div className={styles.costLine} />
-                                <p>${progData.flatCost} </p>
-                            </Group>
-                        )}
-                        {progData.isCostPerYear ? (
-                            <Group>
-                                <p>Yearly</p>
-                                <div className={styles.costLine} />
-                                <p>${progData.costPerYear} </p>
-                            </Group>
-                        ) : (
-                            progData.costPerYear > 0 && (
-                                <Group>
-                                    <p>Monthly</p>
-                                    <div className={styles.costLine} />
-                                    <p>${progData.costPerYear} </p>
-                                </Group>
-                            )
-                        )}
-                    </div>
+                    <DetailImage src={img} />
+                    {progData.flatCost > 0 && (
+                        <DetailCostText
+                            costTexts={[
+                                {title: 'Paid', cost: `$${progData.flatCost}`},
+                            ]}
+                        />
+                    )}
+                    {progData.isCostPerYear ? (
+                        <DetailCostText
+                        costTexts={[
+                            {title: 'Yearly', cost: `$${progData.costPerYear}`},
+                        ]}
+                    />
+                    ) : (
+                        progData.costPerYear > 0 && (
+                            <DetailCostText
+                            costTexts={[
+                                {title: 'Monthly', cost: `$${progData.costPerYear}`},
+                            ]}
+                        />
+                        )
+                    )}
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>

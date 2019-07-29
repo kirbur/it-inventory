@@ -7,6 +7,8 @@ import {Group} from '../../reusables/Group/Group'
 import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
 import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText, ICostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -335,27 +337,16 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         }
     }
 
-    function renderFlatCost() {
+    // Returns an arry of the costs to be dislayed.
+    function getCosts(): ICostText[] {
+        let costTexts: ICostText[] = []
         if (flatCost !== undefined && flatCost !== null && flatCost !== 0) {
-            return (
-                <Group>
-                    <p>Initial Cost</p>
-                    <div className={styles.costLine} />
-                    <p>${flatCost} </p>
-                </Group>
-            )
+            costTexts.push({title: "Initial Cost", cost: `$${flatCost}`})
         }
-    }
-    function renderCostPerYear() {
         if (costPerYear !== undefined && costPerYear !== null && costPerYear !== 0) {
-            return (
-                <Group>
-                    <p>Cost Per Year</p>
-                    <div className={styles.costLine} />
-                    <p>${costPerYear} </p>
-                </Group>
-            )
+            costTexts.push({title: "Cost Per Year", cost: `$${costPerYear}`})
         }
+        return costTexts
     }
 
     return (
@@ -364,17 +355,11 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
-                    <div className={styles.costText}>
-                        {renderFlatCost()}
-                        {renderCostPerYear()}
-                    </div>
+                    <DetailImage src={img} />
+                    <DetailCostText
+                        costTexts={getCosts()}
+                    />
                 </div>
-
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
                     {isAdmin && (

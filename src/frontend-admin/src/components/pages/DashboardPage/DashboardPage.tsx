@@ -228,6 +228,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
     return (
         <div className={styles.dashMain}>
+            {console.log(licenses)}
             <div className={styles.dashColumn}>
                 <Card
                     title={'licenses'}
@@ -236,7 +237,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                         history.push({pathname: `/programs`, state: {prev: history.location}})
                     }}
                 >
-                    <Group>
+                    <Group className={styles.group}>
                         {licenses &&
                             licenses.map(i => (
                                 <HorizontalBarChart

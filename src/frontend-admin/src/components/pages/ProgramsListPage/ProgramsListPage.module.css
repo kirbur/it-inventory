@@ -22,7 +22,9 @@
 .icon {
     margin: auto;
     max-height: 75px;
-    width: 75px;
+    max-width: 75px;
+    height: auto;
+    width: auto;
 }
 .buttonContainer {
     display: flex;

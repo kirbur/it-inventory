@@ -16,7 +16,7 @@ namespace backend_api.Controllers
     {
         public UpdateController(ITInventoryDBContext context) : base(context) { }
 
-        /* PUT: api/udpate/department
+        /* PUT: api/update/department
          * Will update a specified row on the department table
          * Param input format:
                 {
