@@ -300,12 +300,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         //checks for every form
         if (hasRecurringCost) {
             if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
-                alertMssg += '\n Recurring cost and months must have values!'
+                alertMssg += '\n Recurring cost and months must have values greater than zero!'
             }
         }
         if (hasFlatCost) {
             if (costSection[0] == 0 || costSection[0] == null) {
-                alertMssg += '\n Initial cost must have a value!'
+                alertMssg += '\n Initial cost must have a value greater than zero!'
             }
         }
         //everything must be filled out - sorting doesnt work with null values

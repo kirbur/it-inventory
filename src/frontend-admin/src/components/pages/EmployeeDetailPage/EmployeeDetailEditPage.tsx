@@ -951,20 +951,22 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             rows={displayTable(softwareRows, 'sw')}
                             setRows={() => {}}
                             style={styles.newRowThing}
+                            className={styles.paddingTop}
                             edit={true}
                             remove={handleRemoveSoftware}
                             // sorting={false}
                         />
+                        <div className={styles.ddc2}>
+                            {softwareDropdown && (
+                                <AddDropdown
+                                    title={'Assign new software'}
+                                    content={softwareDropdown}
+                                    onSelect={handleAddSoftware}
+                                    className={s(styles.moveItRight, styles.dropdown2)}
+                                />
+                            )}
+                        </div>
                     </div>
-
-                    {softwareDropdown && (
-                        <AddDropdown
-                            title={'Assign new software'}
-                            content={softwareDropdown}
-                            onSelect={handleAddSoftware}
-                            className={s(styles.moveItRight, styles.dropdown2)}
-                        />
-                    )}
 
                     <div className={styles.paddingTop}>
                         <DetailPageTable
@@ -977,14 +979,16 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         />
                     </div>
 
-                    {licenseDropdown && (
-                        <AddDropdown
-                            title={'Assign new license'}
-                            content={licenseDropdown}
-                            onSelect={handleAddLicense}
-                            className={s(styles.moveItRight, styles.dropdown1)}
-                        />
-                    )}
+                    <div className={styles.ddc1}>
+                        {licenseDropdown && (
+                            <AddDropdown
+                                title={'Assign new license'}
+                                content={licenseDropdown}
+                                onSelect={handleAddLicense}
+                                className={s(styles.moveItRight, styles.dropdown1)}
+                            />
+                        )}
+                    </div>
                 </div>
 
                 <div className={s(styles.inputContainer, styles.descriptionContainer)}>
