@@ -61,6 +61,7 @@ namespace backend_api
                x.SaveToken = true;
                x.TokenValidationParameters = new TokenValidationParameters
                {
+                   ClockSkew = TimeSpan.Zero,
                    ValidateIssuerSigningKey = true,
                    IssuerSigningKey = new SymmetricSecurityKey(key),
                    ValidateIssuer = false,

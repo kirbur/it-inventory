@@ -326,50 +326,40 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             <Switch>
                 <Route path='/programs/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
             </Switch>
-            {isAdmin ? (
-                <Group direction='row' justify='between' className={styles.group}>
-                    <div className={styles.buttonContainer}>
-                        <Button text='Add' icon='add' onClick={handleClick} />
-                        <Button
-                            text={isArchive ? 'View Active' : 'View Archives'}
-                            onClick={() => {
-                                setIsArchive(!isArchive)
-                                setCheckboxes(false)
-                            }}
-                            className={styles.archiveButton}
-                        />
 
-                        {!isArchive && checkboxes ? (
-                            <Button text='Save Changes' onClick={handlePinChanges} className={styles.dashboardButton} />
-                        ) : (
-                            !isArchive && (
-                                <Button
-                                    text='Pin To Dashboard'
-                                    onClick={() => setCheckboxes(!checkboxes)}
-                                    className={styles.dashboardButton}
-                                />
-                            )
-                        )}
-                    </div>
-                    <FilteredSearch
-                        search={search}
-                        setSearch={setSearch}
-                        options={options}
-                        selected={selected}
-                        setSelected={setSelected}
+            <Group direction='row' justify='between' className={styles.group}>
+                <div className={styles.buttonContainer}>
+                    {isAdmin && <Button text='Add' icon='add' onClick={handleClick} className={styles.addButton} />}
+                    <Button
+                        text={isArchive ? 'View Active' : 'View Archives'}
+                        onClick={() => {
+                            setIsArchive(!isArchive)
+                            setCheckboxes(false)
+                        }}
+                        className={styles.archiveButton}
                     />
-                </Group>
-            ) : (
-                <div className={styles.searchContainer}>
-                    <FilteredSearch
-                        search={search}
-                        setSearch={setSearch}
-                        options={options}
-                        selected={selected}
-                        setSelected={setSelected}
-                    />
+
+                    {!isArchive && checkboxes && isAdmin ? (
+                        <Button text='Save Changes' onClick={handlePinChanges} className={styles.dashboardButton} />
+                    ) : (
+                        !isArchive &&
+                        isAdmin && (
+                            <Button
+                                text='Pin To Dashboard'
+                                onClick={() => setCheckboxes(!checkboxes)}
+                                className={styles.dashboardButton}
+                            />
+                        )
+                    )}
                 </div>
-            )}
+                <FilteredSearch
+                    search={search}
+                    setSearch={setSearch}
+                    options={options}
+                    selected={selected}
+                    setSelected={setSelected}
+                />
+            </Group>
 
             <div className={styles.page}>
                 <Table headers={renderHeaders()} rows={renderedRows} />
