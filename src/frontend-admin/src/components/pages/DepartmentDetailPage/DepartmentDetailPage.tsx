@@ -6,6 +6,8 @@ import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Styles
 import styles from './DepartmentDetailPage.module.css'
@@ -18,6 +20,7 @@ import {LoginContext} from '../../App/App'
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Types
 interface IDepartmentDetailPageProps {
@@ -44,7 +47,6 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const [defaultSoftware, setDefaultSoftware] = useState<any[]>([])
     const [defaultLicenses, setDefaultLicenses] = useState<any[]>([])
     const [img, setImg] = useState()
-    const [initialImg, setInitialImg] = useState()
     const [isDeleted, setIsDeleted] = useState(false)
 
     const {
@@ -68,11 +70,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
 
     const axios = new AxiosService(loginContextVariables)
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get(`/detail/department/${match.params.id}`)
             .then((data: any) => {
-                setInitialImg(data[0].picture)
                 let dept: any = {
                     // photo: data[0].picture,'
                     employeeCount: data[0].countEmpsInDep,
@@ -156,23 +157,17 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 let dl: any[] = []
                 data[0].defaultLicenses.map((i: any) => dl.push([{value: format(i), sortBy: i}]))
                 setDefaultLicenses(dl)
+
+                checkImage(data[0].picture, axios, placeholder)
+                    .then(image => setImg(image))
+                    .catch(err => console.error(err))
             })
             .catch((err: any) => console.error(err))
-
-        //TODO: get dropdown content for all 3 dropdowns
-    }, [])
+    }
 
     useEffect(() => {
-        if (initialImg) {
-            axios.get(initialImg).then((pic: any) => {
-                if (pic !== '') {
-                    setImg(URL + initialImg)
-                } else {
-                    setImg(placeholder)
-                }
-            })
-        }
-    }, [initialImg])
+        getData()
+    }, [])
 
     async function handleArchive() {
         if (employeeRows.length > 0) {
@@ -198,21 +193,13 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
-                    <Group>
-                        <p>Software</p>
-                        <div className={styles.costLine} />
-                        <p>${deptData.softwareCost} /month </p>
-                    </Group>
-                    <Group>
-                        <p>Hardware</p>
-                        <div className={styles.costLine} />
-                        <p>${deptData.hardwareCost} </p>
-                    </Group>
+                    <DetailImage src={img} />
+                    <DetailCostText 
+                        costTexts={[
+                            {title: 'Software', cost: `$${deptData.softwareCost} /month`},
+                            {title: 'Hardware', cost: `$${deptData.hardwareCost}`},
+                        ]}
+                    />
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
