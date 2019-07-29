@@ -6,6 +6,7 @@ import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
 
 // Styles
 import styles from './DepartmentDetailPage.module.css'
@@ -191,11 +192,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
+                    <DetailImage src={img} />
                     <Group>
                         <p>Software</p>
                         <div className={styles.costLine} />
