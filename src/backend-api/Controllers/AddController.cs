@@ -584,7 +584,7 @@ namespace backend_api.Controllers
 		                "ScreenSize" : float?,
 		                "Mfg" : string?,
 		                "RenewalDate" : string? (formatted yyyy-mm-dd),
-		                "Location" : "xx"? (either GR or AA),
+		                "Location" : "string"?,
 		                "SerialNumber" : string?,
 		                "MonthsPerRenewal" : int?,
 	                }
@@ -623,7 +623,7 @@ namespace backend_api.Controllers
 		                "IPAddress" : string?,
 		                "SAN" : string?,
 		                "LocalHHD" : string?,
-		                "Location" : "xx"? (either GR or AA),
+		                "Location" : "string"?,
 		                "SerialNumber" : string?,
 		                "MonthsPerRenewal" : int?,
 	                }
@@ -660,7 +660,7 @@ namespace backend_api.Controllers
 		                "Make" : string?,
 		                "Model" : string?,
 		                "Fqdn" : string?,
-		                "Location" : "xx"? (either GR or AA),
+		                "Location" : "string"?,
 		                "SerialNumber" : string?,
 		                "MonthsPerRenewal" : int?
 	                }
@@ -689,7 +689,7 @@ namespace backend_api.Controllers
 		                "PurchaseDate" : string? (formatted yyyy-mm-dd),,
 		                "CostPerYear" : decimal?,
 		                "Mfg" : string?,
-		                "Location" : "xx"? (either GR or AA),
+		                "Location" : "string"?,
 		                "RenewalDate" : string? (formatted yyyy-mm-dd),
 		                "SerialNumber" : string?,
 		                "MonthsPerRenewal" : int?,
