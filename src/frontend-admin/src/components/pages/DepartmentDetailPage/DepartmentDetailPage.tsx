@@ -170,20 +170,14 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     }, [])
 
     async function handleArchive() {
-        if (employeeRows.length > 0) {
-            window.alert('Cannot archive department with employees in it!')
-        } else {
-            if (
-                window.confirm(
-                    `Are you sure you want to ${isDeleted ? 'recover' : 'archive'} ${deptData.departmentName}?`
-                )
-            ) {
-                await axios.put(`${isDeleted ? 'recover' : 'archive'}/department/${match.params.id}`, {})
-                history.push({
-                    pathname: `/departments${isDeleted ? `/edit/${match.params.id}` : ''}`,
-                    state: {prev: history.location},
-                })
-            }
+        if (
+            window.confirm(`Are you sure you want to ${isDeleted ? 'recover' : 'archive'} ${deptData.departmentName}?`)
+        ) {
+            await axios.put(`${isDeleted ? 'recover' : 'archive'}/department/${match.params.id}`, {})
+            history.push({
+                pathname: `/departments${isDeleted ? `/edit/${match.params.id}` : ''}`,
+                state: {prev: history.location},
+            })
         }
     }
 
@@ -194,7 +188,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
                     <DetailImage src={img} />
-                    <DetailCostText 
+                    <DetailCostText
                         costTexts={[
                             {title: 'Software', cost: `$${deptData.softwareCost} /month`},
                             {title: 'Hardware', cost: `$${deptData.hardwareCost}`},
