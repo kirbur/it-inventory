@@ -776,7 +776,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 <input
                                     type='text'
                                     className={styles.input}
-                                    placeholder={sectionData[i]}
+                                    value={sectionData[i]}
                                     onChange={e => e && handleInputChange(i, sectionData, e.target.value)}
                                 ></input>
                             </div>
@@ -787,7 +787,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 <input
                                     type='text'
                                     className={styles.input}
-                                    placeholder={sectionData[i + 1]}
+                                    value={sectionData[i + 1]}
                                     onChange={e => e && handleInputChange(i + 1, sectionData, e.target.value)}
                                 ></input>
                             </div>
@@ -798,7 +798,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 <input
                                     type='text'
                                     className={styles.input}
-                                    placeholder={sectionData[i + 2]}
+                                    value={sectionData[i + 2]}
                                     onChange={e => e && handleInputChange(i + 2, sectionData, e.target.value)}
                                 ></input>
                             </div>
