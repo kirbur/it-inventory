@@ -10,8 +10,8 @@
 .inlineLegend {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    width: 600px;
+    /* justify-content: center; */
+    width: 540px;
     position: relative;
     left: 75px;
 }
@@ -50,7 +50,7 @@
 /* when pie data is empty */
 .circleContainer {
     position: relative;
-    bottom: 380px;
+    bottom: 340px;
     width: 340px;
     height: 0px;
 }
