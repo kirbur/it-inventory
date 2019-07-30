@@ -29,7 +29,6 @@ interface IDepartmentData {
     cost: number
     id: number
     name: string
-    // icon: string
     totalEmployees: number
 }
 interface IPulledData {
