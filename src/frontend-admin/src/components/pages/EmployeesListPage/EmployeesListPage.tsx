@@ -80,6 +80,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
     async function getData() {
+        var imagePromises: any[] = []
         await axios
             .get('/list/employees')
             .then((data: IPulledData[]) => {
@@ -101,14 +102,19 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         programs: i.progForEmp ? i.progForEmp.join(', ') : '',
                         daysEmployed: getDays(i.hireDate),
                     })
-                    checkImage(i.photo, axios, placeholder).then(image => {
-                        imgs.push({id: i.employeeId, img: image})
-                    })
+
+                    imagePromises.push(
+                        checkImage(i.photo, axios, placeholder).then(image => {
+                            return {id: i.employeeId, img: image}
+                        })
+                    )
                 })
                 setListData(employees)
-
-                setDisplayImages(imgs)
             })
+            .catch((err: any) => console.error(err))
+
+        await Promise.all(imagePromises)
+            .then(response => setDisplayImages(response))
             .catch((err: any) => console.error(err))
 
         await axios
@@ -262,12 +268,16 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     function concatenatedName(row: any[]) {
-        return displayImages &&
-            displayImages.filter(x => x.id === row[7]) &&
-            displayImages.filter(x => x.id === row[7])[0] ? (
+        var image = placeholder
+        for (let i = 0; i < displayImages.length; i++) {
+            if (displayImages[i].id === row[7]) {
+                image = displayImages[i].img
+            }
+        }
+        return image ? (
             <td key={row[7]} className={styles.employees}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[7])[0].img} alt={''} />
+                    <img className={styles.icon} src={image} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.employeeName}>{row[0]}</text> <br />

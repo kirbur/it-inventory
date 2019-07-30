@@ -68,6 +68,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
     async function getData() {
+        var imagePromises: any[] = []
         await axios
             .get('/list/peripherals')
             .then((data: IPulledData[]) => {
@@ -80,15 +81,21 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                         purchaseDate: format(i.purchaseDate),
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
                     })
-                    checkImage(i.icon, axios, placeholder).then(image => {
-                        imgs.push({id: i.peripheralId, img: image})
-                    })
+
+                    imagePromises.push(
+                        checkImage(i.icon, axios, placeholder).then(image => {
+                            return {id: i.peripheralId, img: image}
+                        })
+                    )
                 })
                 setListData(peripherals)
-
-                setDisplayImages(imgs)
             })
             .catch((err: any) => console.error(err))
+
+        await Promise.all(imagePromises)
+            .then(response => setDisplayImages(response))
+            .catch((err: any) => console.error(err))
+
         await axios
             .get('/archivedList/peripheral')
             .then((data: IPulledData[]) => {
@@ -200,12 +207,16 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     }
 
     function concatenatedName(row: any[]) {
-        return displayImages &&
-            displayImages.filter(x => x.id === row[1]) &&
-            displayImages.filter(x => x.id === row[1])[0] ? (
+        var image = placeholder
+        for (let i = 0; i < displayImages.length; i++) {
+            if (displayImages[i].id === row[1]) {
+                image = displayImages[i].img
+            }
+        }
+        return image ? (
             <td key={row[1]} className={styles.hardware}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                    <img className={styles.icon} src={image} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
                     <div className={styles.hardwareName}>{row[0]}</div>
