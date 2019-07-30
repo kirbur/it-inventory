@@ -50,7 +50,7 @@
 /* when pie data is empty */
 .circleContainer {
     position: relative;
-    bottom: 420px;
+    bottom: 380px;
     width: 340px;
     height: 0px;
 }
