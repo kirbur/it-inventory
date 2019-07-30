@@ -34,10 +34,15 @@
 }
 
 /* title/makeModel/dates styling */
+.serverTitle {
+    text-align: left;
+    padding-top: 50px;
+    min-height: 320px;
+}
 .titleText {
     text-align: left;
     padding-top: 50px;
-    min-height: 300px;
+    min-height: 260px;
 }
 .hardwareName {
     font-size: 36px;

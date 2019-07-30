@@ -37,7 +37,7 @@
 .titleText {
     text-align: left;
     padding-top: 50px;
-    min-height: 300px;
+    min-height: 260px;
 }
 
 .programName {
@@ -54,4 +54,7 @@
 
 .spaceBetweenTables {
     height: 50px;
+}
+.table {
+    margin-bottom: 50px;
 }
