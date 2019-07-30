@@ -228,6 +228,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
     return (
         <div className={styles.dashMain}>
+            {console.log(licenses)}
             <div className={styles.dashColumn}>
                 <Card
                     title={'licenses'}
@@ -236,7 +237,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                         history.push({pathname: `/programs`, state: {prev: history.location}})
                     }}
                 >
-                    <Group>
+                    <Group className={styles.group}>
                         {licenses &&
                             licenses.map(i => (
                                 <HorizontalBarChart
@@ -251,27 +252,31 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                 </Card>
 
                 <div className={styles.dashRow}>
-                    <CostCard
-                        cardTitle='Yearly Cost'
-                        data={{
-                            programsCost: costs.costOfProgramsPerYear,
-                            pluginsCost: costs.costOfPluginsPerYear,
-                        }}
-                        icon={
-                            <span>
-                                <IoIosArrowRoundUp className={styles.upArrowIcon} />
-                                <IoIosArrowRoundDown className={styles.downArrowIcon} />
-                            </span>
-                        }
-                    />
-                    <CostCard
-                        cardTitle='Monthly Cost'
-                        data={{
-                            programsCost: costs.costOfProgramsPerYear / 12,
-                            pluginsCost: costs.costOfPluginsPerYear / 12,
-                        }}
-                        icon={<IoIosStats className={styles.statsIcon} />}
-                    />
+                    <div className={styles.costIcons}>
+                        <CostCard
+                            cardTitle='Yearly Cost'
+                            data={{
+                                programsCost: costs.costOfProgramsPerYear,
+                                pluginsCost: costs.costOfPluginsPerYear,
+                            }}
+                            icon={
+                                <span>
+                                    <IoIosArrowRoundUp className={styles.upArrowIcon} />
+                                    <IoIosArrowRoundDown className={styles.downArrowIcon} />
+                                </span>
+                            }
+                        />
+                    </div>
+                    <div className={styles.costIcons}>
+                        <CostCard
+                            cardTitle='Monthly Cost'
+                            data={{
+                                programsCost: costs.costOfProgramsPerYear / 12,
+                                pluginsCost: costs.costOfPluginsPerYear / 12,
+                            }}
+                            icon={<IoIosStats className={styles.statsIcon} />}
+                        />
+                    </div>
                 </div>
                 <Card>
                     {dropdownContent && (

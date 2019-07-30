@@ -417,56 +417,10 @@ namespace backend_api.Controllers
                 // list that will hold the unassigned hardware
                 List<object> UnassignedHardware = new List<object>();
 
-                // loop with lambda that finds the unassigned, not deleted monitors and adds the necessary returnables of them into a list 
-                foreach (var mon in _context.Monitor.Where(x => x.EmployeeId == null && x.IsDeleted == false))
-                {
-                    var monitorName = mon.Make + " " + mon.Model;
-                    var monitor = new
-                    {
-                        mon.MonitorId,
-                        type = nameof(Monitor),
-                        monitorName
-                    };
-                    UnassignedHardware.Add(monitor);
-                }
-                // loop with lambda that finds the unassigned, not deleted servers and adds the necessary returnables of them into a list 
-                foreach (var serv in _context.Server.Where(x => x.EmployeeId == null && x.IsDeleted == false))
-                {
-                    var serverName = serv.Make + " " + serv.Model;
-                    var server = new
-                    {
-                        serv.ServerId,
-                        type = nameof(Server),
-                        serverName
-                    };
-                    UnassignedHardware.Add(server);
-                }
-
-                // loop with lambda that finds the unassigned, not deleted computers and adds the necessary returnables of them into a list 
-                foreach (var comp in _context.Computer.Where(x => x.EmployeeId == null && x.IsDeleted == false))
-                {
-                    var compName = comp.Make + " " + comp.Model;
-                    var computer = new
-                    {
-                        comp.ComputerId,
-                        type = nameof(Computer),
-                        compName
-                    };
-                    UnassignedHardware.Add(computer);
-                }
-
-                // loop with lambda that finds the unassigned, not deleted peripherals and adds the necessary returnables of them into a list 
-                foreach (var periph in _context.Peripheral.Where(x => x.EmployeeId == null && x.IsDeleted == false))
-                {
-                    var periphName = periph.PeripheralName + " " + periph.PeripheralType;
-                    var peripheral = new
-                    {
-                        periph.PeripheralId,
-                        type = nameof(Peripheral),
-                        periphName
-                    };
-                    UnassignedHardware.Add(peripheral);
-                }
+                UnassignedHardware.AddRange(UnassignedHardwareHelper<Monitor>());
+                UnassignedHardware.AddRange(UnassignedHardwareHelper<Server>());
+                UnassignedHardware.AddRange(UnassignedHardwareHelper<Computer>());
+                UnassignedHardware.AddRange(UnassignedHardwareHelper<Peripheral>());
 
                 // Unassigned programs lists for returning purposes
                 List<object> UnassignedSoftware = new List<object>();
@@ -882,8 +836,15 @@ namespace backend_api.Controllers
                     LicensesList.Add(License);
                 }
                 // pull stringifyed default hardware and software out into a nice JSON object :) using JSON package.
-                JObject jsonHardware = JObject.Parse(dep.DefaultHardware);
-                JObject jsonPrograms = JObject.Parse(dep.DefaultPrograms);
+                // if deparment is "Utilities" or "Unassigned", ignore this
+
+                JObject jsonHardware = null;
+                JObject jsonPrograms = null;
+                if (dep.DepartmentName != "Utilities" && dep.DepartmentName != "Unassigned")
+                {
+                    jsonHardware = JObject.Parse(dep.DefaultHardware);
+                    jsonPrograms = JObject.Parse(dep.DefaultPrograms);
+                }
 
                 // creating list of necessary returnables that are specified in the method comment header
                 var DepartmentDetailPage = new
@@ -894,9 +855,9 @@ namespace backend_api.Controllers
                     TotalCostOfProgramsInDep,
                     picture,
                     CountEmpsInDep,
-                    DefaultHardware = jsonHardware["DefaultHardware"],
-                    DefaultLicenses = jsonPrograms["license"],
-                    DefaultSoftware = jsonPrograms["software"],
+                    DefaultHardware = jsonHardware != null ? jsonHardware["DefaultHardware"] : null,
+                    DefaultLicenses = jsonPrograms != null ? jsonPrograms["license"] : null,
+                    DefaultSoftware = jsonPrograms != null ? jsonPrograms["software"] : null,
                     ListOfEmployees,
                     listOfTablePrograms,
                     LicensesList
