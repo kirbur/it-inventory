@@ -29,7 +29,6 @@ interface IDepartmentData {
     cost: number
     id: number
     name: string
-    icon: string
     totalEmployees: number
 }
 interface IPulledData {
@@ -65,6 +64,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
     async function getData() {
+        var imagePromises: any[] = []
         await axios
             .get('/list/departments')
             .then((data: IPulledData[]) => {
@@ -76,16 +76,20 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                         id: i.departmentId,
                         totalEmployees: i.numOfEmp,
                         cost: i.costOfPrograms,
-                        icon: URL + format(i.icon),
                     })
-                    checkImage(i.icon, axios, placeholder).then(image => {
-                        imgs.push({id: i.departmentId, img: image})
-                    })
+
+                    imagePromises.push(
+                        checkImage(i.icon, axios, placeholder).then(image => {
+                            return {id: i.departmentId, img: image}
+                        })
+                    )
                 })
                 setListData(depts)
-
-                setDisplayImages(imgs)
             })
+            .catch((err: any) => console.error(err))
+
+        await Promise.all(imagePromises)
+            .then(response => setDisplayImages(response))
             .catch((err: any) => console.error(err))
 
         await axios
@@ -98,7 +102,6 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                         id: i.departmentId,
                         totalEmployees: 0,
                         cost: 0,
-                        icon: placeholder,
                     })
                 )
                 setArchivedData(depts)
@@ -154,12 +157,12 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const [sortState, setSortState] = useState(initState)
 
     function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
+        if (sortState.headerStateCounts[index] === 0) {
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
             tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
+        } else if (sortState.headerStateCounts[index] === 1) {
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
@@ -208,12 +211,16 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }
 
     function concatenatedDept(row: any[]) {
-        return displayImages &&
-            displayImages.filter(x => x.id === row[1]) &&
-            displayImages.filter(x => x.id === row[1])[0] ? (
+        var image = placeholder
+        for (let i = 0; i < displayImages.length; i++) {
+            if (displayImages[i].id === row[1]) {
+                image = displayImages[i].img
+            }
+        }
+        return image ? (
             <td key={row[1]} className={styles.departments}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                    <img className={styles.icon} src={image} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
                     <text className={styles.departmentName}>{row[0]}</text>
@@ -239,18 +246,21 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedDept(row)
+                    break
                 case 2:
                     transformedRow[2] = (
                         <td className={styles.alignLeft} key={i}>
                             {row[2] === 1 ? row[2] + ' employee' : row[2] + ' employees'}
                         </td>
                     )
+                    break
                 case 3:
                     transformedRow[3] = (
                         <td className={styles.alignLeft} key={i}>
                             {formatCost(row[3])}
                         </td>
                     )
+                    break
             }
         }
 

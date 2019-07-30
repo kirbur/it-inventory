@@ -58,6 +58,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const [pinned, setPinned] = useState<{name: string; pinned: boolean}[]>([])
 
     async function getData() {
+        var imagePromises: any[] = []
         await axios
             .get('/list/programs/false')
             .then((data: any) => {
@@ -75,16 +76,23 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                         icon: i.icon,
                         cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
                     })
-                    checkImage(i.icon, axios, placeholder).then(image => {
-                        imgs.push({name: i.programName, img: image})
-                    })
+
+                    imagePromises.push(
+                        checkImage(i.icon, axios, placeholder).then(image => {
+                            return {name: i.programName, img: image}
+                        })
+                    )
                     pins.push({name: i.programName, pinned: i.isPinned})
                 })
                 setListData(programs)
-                setDisplayImages(imgs)
                 setPinned(pins)
             })
             .catch((err: any) => console.error(err))
+
+        await Promise.all(imagePromises)
+            .then(response => setDisplayImages(response))
+            .catch((err: any) => console.error(err))
+
         await axios
             .get('list/programs/true')
             .then((data: any) => {
@@ -230,12 +238,16 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }
 
     function concatenatedDept(row: any[]) {
-        return displayImages &&
-            displayImages.filter(x => x.name === row[0]) &&
-            displayImages.filter(x => x.name === row[0])[0] ? (
+        var image = placeholder
+        for (let i = 0; i < displayImages.length; i++) {
+            if (displayImages[i].name === row[0]) {
+                image = displayImages[i].img
+            }
+        }
+        return image ? (
             <td key={row[0]} className={styles.programs} onClick={() => handleRowClick(row)}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={displayImages.filter(x => x.name === row[0])[0].img} alt={''} />
+                    <img className={styles.icon} src={image} alt={''} />
                 </div>
 
                 <div className={styles.alignLeft}>
