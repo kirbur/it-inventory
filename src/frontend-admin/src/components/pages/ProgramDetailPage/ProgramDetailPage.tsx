@@ -213,7 +213,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                 >
                                     {progData.name}
                                 </div>
-                                {match.params.id}
+                                {`Copy ${match.params.id}`}
                             </Group>
                         </div>
                         {progData.renewalDate !== '-' && (
