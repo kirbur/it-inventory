@@ -27,7 +27,6 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
     const [colors, setColors] = useState(initialColors)
     //colors off of invision: ['#009EFF', '#FF9340', '#3D4599', '#1425CC', '#CC4A14']
 
-
     const onMouseOver = (data: IRechartPieDatum[], index: number) => {
         const updatedColors = [...initialColors] // Create clone of initial colors array
         updatedColors[index] = initialColors[index] + 95 // Change particular index in our cloned array
@@ -97,6 +96,18 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                 </PieChart>
             </div>
 
+            {/* empty pies */}
+            {pieChartData.map((datum, i) =>
+                hasData(i) ? (
+                    <div />
+                ) : (
+                    <div className={styles.circleContainer} style={{position: 'relative', left: 10 + 340 * i}}>
+                        <div className={styles.emptyCircle} />
+                        <div className={styles.emptyDataText}>No data to display</div>
+                    </div>
+                )
+            )}
+
             {/* Legend */}
             <div className={styles.inlineLegend}>
                 {pieChartData[0].data.map((datum, index) => (
@@ -116,18 +127,6 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                     </div>
                 ))}
             </div>
-
-            {/* empty pies */}
-            {pieChartData.map((datum, i) =>
-                hasData(i) ? (
-                    <div />
-                ) : (
-                    <div className={styles.circleContainer} style={{position: 'relative', left: 10 + 340 * i}}>
-                        <div className={styles.emptyCircle} />
-                        <div className={styles.emptyDataText}>No data to display</div>
-                    </div>
-                )
-            )}
         </div>
     )
 }
