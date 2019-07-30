@@ -37,9 +37,11 @@
     display: flex;
     flex: column;
 }
+.addButton {
+    margin-right: 25px;
+}
 .archiveButton {
     width: 150px;
-    margin-left: 25px;
     margin-right: 25px;
 }
 .alignLeft {
