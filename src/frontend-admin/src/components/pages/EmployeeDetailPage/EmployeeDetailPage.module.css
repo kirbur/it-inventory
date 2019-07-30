@@ -64,8 +64,6 @@
 .descriptionContainer {
     width: 100%;
     text-align: left;
-    position: relative;
-    right: 25px;
 }
 
 .descriptionTitle {
