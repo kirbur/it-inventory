@@ -589,7 +589,7 @@ namespace backend_api.Controllers
 		                "MonthsPerRenewal" : int?,
 	                }
                 }
-         * Return: 201 created if successful, and 400 bad request if not.
+         * Return: 200 if successful, and 400 bad request if not.
          */
         [HttpPost]
         [Route("Monitor")]
@@ -628,7 +628,7 @@ namespace backend_api.Controllers
 		                "MonthsPerRenewal" : int?,
 	                }
                 }
-         * Return: 201 created if successful, and 400 bad request if not.
+         * Return: 200 if successful, and 400 bad request if not.
          */
         [HttpPost]
         [Route("Server")]
@@ -665,7 +665,7 @@ namespace backend_api.Controllers
 		                "MonthsPerRenewal" : int?
 	                }
                 }
-         * Return: 201 created if successful, and 400 bad request if not.
+         * Return: 200 if successful, and 400 bad request if not.
          */
         [HttpPost]
         [Route("Laptop")]
@@ -695,7 +695,7 @@ namespace backend_api.Controllers
 		                "MonthsPerRenewal" : int?,
 	                }
                 }
-         * Return: 201 created if successful, and 400 bad request if not.
+         * Return: 200 if successful, and 400 bad request if not.
          */
         [HttpPost]
         [Route("Peripheral")]
@@ -706,7 +706,7 @@ namespace backend_api.Controllers
 
         /* PostHardware<T>(hardware, table) is a method to post any hardware type 
          *   to it's corresponding table and add hardware history.
-         * Return: 201 created if successful, and 400 bad request if not.
+         * Return: 200 if successful, and 400 bad request if not.
          */
         private IActionResult PostHardware<T>(T hardware, DbSet<T> table)
             where T : class, IHardwareBase
@@ -756,12 +756,8 @@ namespace backend_api.Controllers
             }
 
             // If we make it here, everything must have succeeded
-            return StatusCode(201);
+            return Ok(id);
         }
-
-        /* UnassignedHardwareHelper<T>() is a method to find the unassigned hardware from the given type
-        *   and return it
-        */
         
     }
 }
