@@ -313,7 +313,7 @@ namespace backend_api.Controllers
                     
                 }
                 // if we get here then the various fields were created and changed and now we can return 201 created.
-                return StatusCode(201);
+                return StatusCode(201, emp.EmployeeId);
             }
         }
 
@@ -401,7 +401,7 @@ namespace backend_api.Controllers
                 _context.SaveChanges();
 
                 // if we get here then the various fields were created and changed and now we can return 201 created.
-                return StatusCode(201);
+                return StatusCode(201, dep.DepartmentId);
             }
             catch (Exception e)
             {
