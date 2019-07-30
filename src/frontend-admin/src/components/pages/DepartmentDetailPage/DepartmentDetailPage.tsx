@@ -147,15 +147,21 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 setLicenseRows(l)
 
                 let dhw: any[] = []
-                data[0].defaultHardware.map((i: any) => dhw.push([{value: format(i), sortBy: i}]))
+                if (data[0].defaultHardware !== null) {
+                    data[0].defaultHardware.map((i: any) => dhw.push([{value: format(i), sortBy: i}]))
+                }
                 setDefaultHardware(dhw)
 
                 let dsw: any[] = []
-                data[0].defaultSoftware.map((i: any) => dsw.push([{value: format(i), sortBy: i}]))
+                if (data[0].defaultSoftware !== null) {
+                    data[0].defaultSoftware.map((i: any) => dsw.push([{value: format(i), sortBy: i}]))
+                }
                 setDefaultSoftware(dsw)
 
                 let dl: any[] = []
-                data[0].defaultLicenses.map((i: any) => dl.push([{value: format(i), sortBy: i}]))
+                if (data[0].defaultLicenses !== null) {
+                    data[0].defaultLicenses.map((i: any) => dl.push([{value: format(i), sortBy: i}]))
+                }
                 setDefaultLicenses(dl)
 
                 checkImage(data[0].picture, axios, placeholder)
@@ -170,20 +176,14 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     }, [])
 
     async function handleArchive() {
-        if (employeeRows.length > 0) {
-            window.alert('Cannot archive department with employees in it!')
-        } else {
-            if (
-                window.confirm(
-                    `Are you sure you want to ${isDeleted ? 'recover' : 'archive'} ${deptData.departmentName}?`
-                )
-            ) {
-                await axios.put(`${isDeleted ? 'recover' : 'archive'}/department/${match.params.id}`, {})
-                history.push({
-                    pathname: `/departments${isDeleted ? `/edit/${match.params.id}` : ''}`,
-                    state: {prev: history.location},
-                })
-            }
+        if (
+            window.confirm(`Are you sure you want to ${isDeleted ? 'recover' : 'archive'} ${deptData.departmentName}?`)
+        ) {
+            await axios.put(`${isDeleted ? 'recover' : 'archive'}/department/${match.params.id}`, {})
+            history.push({
+                pathname: `/departments${isDeleted ? `/edit/${match.params.id}` : ''}`,
+                state: {prev: history.location},
+            })
         }
     }
 
@@ -194,7 +194,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
                     <DetailImage src={img} />
-                    <DetailCostText 
+                    <DetailCostText
                         costTexts={[
                             {title: 'Software', cost: `$${deptData.softwareCost} /month`},
                             {title: 'Hardware', cost: `$${deptData.hardwareCost}`},
