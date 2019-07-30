@@ -1,0 +1,111 @@
+.departmentsListMain {
+    margin: 50px 85px;
+}
+
+.page {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.group {
+    padding-bottom: 60px;
+}
+
+.imgContainer {
+    width: 75px;
+    height: 75px;
+    padding: 25px;
+    display: flex;
+}
+
+.icon {
+    margin: auto;
+    max-height: 75px;
+    max-width: 75px;
+    height: auto;
+    width: auto;
+}
+
+.alignLeft {
+    text-align: left;
+    min-width: 100px;
+}
+.alignLeftAndPadding {
+    text-align: left;
+    padding-left: 34px;
+    color: #979797;
+}
+
+.departments {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.departmentName {
+    color: #009eff;
+}
+
+.header {
+    text-align: left;
+    color: #a5a5a5;
+    font-size: 24px;
+    padding-bottom: 8px;
+    padding-top: 16px;
+    display: flex;
+    cursor: pointer;
+
+    text-transform: uppercase;
+
+    /*No selecting*/
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.nameHeader {
+    padding-left: 24px;
+}
+
+.buttonContainer {
+    display: flex;
+    flex: column;
+}
+.archiveButton {
+    width: 150px;
+}
+.addButton {
+    margin-right: 25px;
+}
+
+/* sorting states */
+.notSorted {
+    border-left: 8px solid #636363;
+    border-right: 8px solid #636363;
+    border-top: 2px solid #636363;
+    border-bottom: none;
+    height: 2px;
+    position: relative;
+    top: 15px;
+    left: 5px;
+}
+.ascending {
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid #636363;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: relative;
+    bottom: 10px;
+    left: 5px;
+}
+.descending {
+    border-top: 8px solid #636363;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: relative;
+    top: 15px;
+    left: 5px;
+}

@@ -1,0 +1,60 @@
+.progOverviewMain {
+    margin: 0 50px;
+}
+
+.columns {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.firstColumn {
+    padding: 50px;
+    min-width: 160px;
+    max-width: 300px;
+    flex-grow: 1;
+}
+
+.secondColumn {
+    padding: 50px;
+    padding-left: 75px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/*First Column*/
+.backButton {
+    margin-bottom: 30px;
+}
+
+/*second column*/
+.archivebutton {
+    margin-left: 18px;
+    padding: 0 5px;
+}
+
+.titleText {
+    text-align: left;
+    padding-top: 50px;
+    min-height: 260px;
+}
+
+.programName {
+    font-size: 36px;
+    color: #000000;
+    font-weight: bold;
+}
+
+.programText {
+    margin: 6px;
+    font-size: 24px;
+    color: #a5a5a5;
+}
+
+.spaceBetweenTables {
+    height: 50px;
+}
+.table {
+    margin-bottom: 50px;
+}

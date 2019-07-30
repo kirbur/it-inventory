@@ -1,0 +1,344 @@
+.columns {
+    margin: 0 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.firstColumn {
+    padding: 50px;
+    min-width: 160px;
+    max-width: 300px;
+    flex-grow: 1;
+}
+
+.secondColumn {
+    padding: 50px;
+    padding-left: 75px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/*First Column*/
+.backButton {
+    margin-bottom: 30px;
+}
+
+.imgContainer {
+    position: relative;
+    width: 100%;
+    /* height: 100%; */
+}
+
+.imgContainer:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
+}
+
+/*Second Column*/
+.title {
+    text-align: left;
+    font-size: 24px;
+    padding-bottom: 25px;
+}
+
+.paddingTop {
+    padding-top: 50px;
+}
+
+.paddingRight {
+    padding-right: 50px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.line {
+    border-bottom: 2px solid #a5a5a5;
+    width: 100%;
+    height: 10px;
+    margin-top: 50px;
+}
+
+/* admin/nonadmin cards */
+.adminCardContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-bottom: 25px;
+}
+.adminCard {
+    border: 2px solid #979797;
+    border-radius: 2px;
+    width: 390px;
+    height: 200px;
+    display: flex;
+    flex-direction: row;
+}
+.card {
+    text-align: left;
+    padding: 15px;
+    width: 300px;
+}
+.adminIcon {
+    transform: scale(3.75, 3.75);
+    position: relative;
+    top: 40px;
+    left: 5px;
+}
+.adminIconShield {
+    transform: scale(4.5, 4.5);
+    position: relative;
+    top: 40px;
+    left: 2px;
+}
+.adminText {
+    color: #a5a5a5;
+    font-size: 18px;
+}
+
+/* name and date */
+.input {
+    width: 380px;
+    height: 45px;
+    border: 1.5px solid #a5a5a5;
+    border-radius: 3px;
+    font-size: 18px;
+    padding-left: 12px;
+    margin-bottom: 20px;
+    font-family: cqlRegularFont;
+}
+.text {
+    color: #a5a5a5;
+    font-size: 24px;
+    text-align: left;
+}
+
+/* styling for radio buttons */
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+.card input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+.container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    width: 450px;
+}
+.checkmark {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    border: 2px solid #979797;
+}
+.insideCheckmark {
+    z-index: 1;
+    position: relative;
+    right: 25px;
+    border-radius: 50%;
+    height: 21px;
+    width: 21px;
+    background-color: white;
+}
+.insideCheckmarkAdmin {
+    z-index: 1;
+    position: relative;
+    /* right: 25px; */
+    bottom: 25px;
+    left: 4px;
+    border-radius: 50%;
+    height: 21px;
+    width: 21px;
+    background-color: white;
+}
+/* changes checkmark after input clicked */
+input:checked ~ .checkmark {
+    border-color: #009eff;
+}
+input:checked ~ .insideCheckmark {
+    background-color: #009eff;
+}
+input:checked ~ .insideCheckmarkAdmin {
+    background-color: #009eff;
+}
+
+.employeeDepartment {
+    max-width: 900px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.deptIconContainer {
+    margin: 25px;
+    width: 75px;
+    height: 75px;
+    display: flex;
+}
+.deptIcon {
+    width: 75px;
+    max-height: 75px;
+    margin: auto;
+}
+.deptName {
+    color: #636363;
+    font-size: 22px;
+}
+
+/* table styling */
+.tableContainer {
+    position: relative;
+    right: 50px;
+}
+
+/* so the table doesnt highlight on hover */
+.newRowThing:hover {
+    background-color: white;
+}
+
+/* add to table text and icon */
+.addContainer {
+    display: flex;
+    justify-content: start;
+    position: relative;
+    left: 50px;
+}
+.addIconBorder:hover {
+    background-color: #009eff;
+    cursor: pointer;
+}
+.addIconBorder:hover .addIcon {
+    color: white;
+}
+.addIconBorder {
+    border: 2px solid #009eff;
+    border-radius: 3px;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.addIcon {
+    color: #009eff;
+    transform: scale(2, 2);
+}
+.assignText {
+    padding-left: 5px;
+    color: #009eff;
+    font-size: 20px;
+}
+
+/* submit button at the bottom */
+.submitContainer {
+    padding-top: 50px;
+    display: flex;
+    justify-content: center;
+}
+.submitButton {
+    border: 2px solid #009eff;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 35px;
+}
+
+/*dropdown styles*/
+.dropdownTitle {
+    margin-top: -3px;
+    font-family: cqlmedium;
+    text-transform: none;
+    color: #009eff;
+    font-size: 20px;
+}
+
+.addContainer {
+    padding-top: 8px;
+    margin: 5px 0 15px;
+    align-self: flex-end;
+}
+
+.dropdownList {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
+/*Employee Dropdown Style*/
+.employeeDropdownButton {
+    background: white;
+}
+
+.employeeDropdownButton:hover {
+    background: white;
+}
+
+.employeeDropdownTitle {
+    line-height: 40px;
+    width: 380px;
+    height: 45px;
+    font-size: 18px;
+    font-family: cqlRegularFont;
+}
+
+.employeeDropdownArrow {
+    top: 14px;
+}
+
+.moveItRight {
+    position: relative;
+    left: 50px;
+}
+.ddc1 {
+    position: relative;
+    right: 10px;
+}
+.dropdown1 {
+    z-index: 1;
+    align-self: flex-end;
+    margin: 15px 0;
+}
+
+.ddc2 {
+    position: relative;
+    right: 5px;
+}
+.dropdown2 {
+    z-index: 2;
+    align-self: flex-end;
+    margin: 15px 0;
+}
+
+.dropdown3 {
+    z-index: 3;
+    align-self: flex-end;
+    margin: 15px 0;
+}
+
+.descriptionContainer {
+    padding-top: 25px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.description {
+    justify-self: flex-start;
+    width: 98%;
+    height: 100px;
+    font-family: cqlRegularFont;
+    resize: none;
+}
