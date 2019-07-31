@@ -1,5 +1,5 @@
 .progDetailMain {
-    margin: 0 50px;
+    padding: 0 50px;
 }
 
 .columns {
@@ -44,6 +44,10 @@
     color: #009eff;
     cursor: pointer;
     padding-right: 10px;
+}
+
+.overviewLink:hover {
+    text-decoration: underline;
 }
 
 .programName {
@@ -93,4 +97,16 @@
 
 .spaceBetween {
     height: 50px;
+}
+
+.dark {
+    color: white;
+}
+
+.linkDark {
+    color: #5ec2ff;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

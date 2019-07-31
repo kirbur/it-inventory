@@ -14,6 +14,7 @@ import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 // Utils
 import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {checkImage} from '../../../utilities/CheckImage'
 
 // Styles
@@ -21,7 +22,7 @@ import styles from './EmployeeDetailPage.module.css'
 import placeholder from '../../../content/Images/Placeholders/employee-placeholder.png'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Types
 interface IEmployeeDetailPageProps {
@@ -50,6 +51,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [isDeleted, setIsDeleted] = useState(false)
@@ -189,7 +191,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     }
 
     return (
-        <div className={styles.empDetailMain}>
+        <div className={s(styles.empDetailMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
@@ -229,11 +231,11 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.employeeName}>{userData.name}</div>
+                        <div className={s(styles.employeeName, isDarkMode ? styles.employeeNameDark : {})}>{userData.name}</div>
                         <div className={styles.employeeText}>{userData.email}</div>
                         <div className={styles.employeeText}>
                             <div
-                                className={styles.deptText}
+                                className={s(styles.deptText, isDarkMode ? styles.deptTextDark : {})}
                                 onClick={() => {
                                     history.push({
                                         pathname: '/departments/detail/' + userData.deptId,

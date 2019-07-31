@@ -35,3 +35,13 @@
     bottom: -5px;
     left: 0px;
 }
+
+.bottomCornerDark {
+    border-bottom: solid #5ec2ff;
+    border-left: solid #5ec2ff;
+}
+
+.topCornerDark {
+    border-right: solid #5ec2ff;
+    border-top: solid #5ec2ff;
+}

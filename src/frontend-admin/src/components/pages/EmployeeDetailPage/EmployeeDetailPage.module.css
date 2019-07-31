@@ -1,5 +1,5 @@
 .empDetailMain {
-    margin: 0 50px;
+    padding: 0 50px;
 }
 
 .columns {
@@ -78,4 +78,16 @@
     color: #4a4a4a;
     font-size: 20px;
     line-height: 27px;
+}
+
+.employeeNameDark {
+    color: white;
+}
+
+.deptTextDark {
+    color: #5ec2ff;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

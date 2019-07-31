@@ -1,5 +1,5 @@
 .programsListMain {
-    margin: 50px 85px;
+    padding: 50px 85px;
 }
 
 .group {
@@ -123,4 +123,8 @@
 
 tr:hover .checkboxRow {
     background: white;
+}
+
+.programsListMainDark {
+    background-color: #282c29;
 }

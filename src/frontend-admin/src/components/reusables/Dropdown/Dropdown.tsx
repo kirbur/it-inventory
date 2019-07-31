@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styles from './Dropdown.module.css'
 import {DropdownList} from './DropdownList'
 import {Title} from '../../reusables/Title/Title'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
+import { ThemeContext } from '../../App';
 
 export interface IDropdownItem {
     id: number
@@ -19,6 +21,7 @@ interface IDropdownProps {
 
 export const Dropdown: React.FC<IDropdownProps> = props => {
     const {content, titleClassName, selected, setSelected} = props
+    const { isDarkMode } = useContext(ThemeContext)
     //const [selected, setSelected] = useState(content[0])
     if (content[0] === undefined) {
         content.push({
@@ -37,7 +40,7 @@ export const Dropdown: React.FC<IDropdownProps> = props => {
                                     <button onClick={toggle} className={styles.dropdownButton}>
                                         <div className={styles.dropdownTitle}>
                                             <div className={titleClassName}>{selected.name}</div>
-                                            <div className={styles.dropdownArrow} />
+                                            <div className={s(styles.dropdownArrow, isDarkMode ? styles.dropdownArrowDark : {})} />
                                         </div>
                                     </button>
                                 )}

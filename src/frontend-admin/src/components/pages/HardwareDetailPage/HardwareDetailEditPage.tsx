@@ -17,7 +17,7 @@ import styles from './HardwareDetailEditPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 import {cloneDeep} from 'lodash'
 import {sortByDate} from '../../../utilities/quickSort'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
@@ -56,6 +56,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
 
@@ -879,7 +880,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     }
 
     return (
-        <div className={styles.columns}>
+        <div className={s(styles.columns, isDarkMode ? styles.backgroundDark : {})}>
             {/* column 1 */}
             <div className={styles.firstColumn}>
                 <BackButton history={history} className={styles.backButton} />
@@ -890,7 +891,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
             {/* column 2 */}
             <div className={styles.secondColumn}>
-                <div className={styles.hardwareHeader}>{match.params.type} Information</div>
+                <div className={s(styles.hardwareHeader, isDarkMode ? styles.headerDark : {})}>{match.params.type} Information</div>
                 {/* first section */}
                 {firstSectionHeaders.length > 0 && renderSection(firstSectionHeaders, firstSectionData)}
                 {firstSectionHeaders.length > 0 && <div className={styles.line} />}
@@ -973,6 +974,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                     className={styles.input}
                                 />
                             </div>
+                            {/* TODO: make this a component. */}
                             <div className={styles.inputContainer}>
                                 <div className={styles.inputHeader}>Event Type</div>
                                 <div className={styles.radioContainer}>
@@ -984,8 +986,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                             checked={eventInput === 'Broken'}
                                             onChange={() => setEventInput('Broken')}
                                         />
-                                        <div className={styles.checkmark} />
-                                        <div className={styles.insideCheckmark} />
+                                        <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                                        <div className={s(styles.insideCheckmark, isDarkMode ? styles.insideCheckmarkDark : {})} />
                                     </div>
                                     <div className={styles.inputHeader}>Broken</div>
                                 </div>
@@ -998,15 +1000,15 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                             checked={eventInput === 'Repaired'}
                                             onChange={() => setEventInput('Repaired')}
                                         />
-                                        <div className={styles.checkmark} />
-                                        <div className={styles.insideCheckmark} />
+                                        <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                                        <div className={s(styles.insideCheckmark, isDarkMode ? styles.insideCheckmarkDark : {})} />
                                         <div className={styles.inputHeader}>Repaired</div>
                                     </div>
                                 </div>
                                 {/* the rest of the logs are done on the backend */}
                             </div>
                             {/* should send back the employee of this page */}
-                            <div className={styles.historyLogSubmit}>
+                            <div className={s(styles.historyLogSubmit, isDarkMode ? styles.textDark : {})}>
                                 <Button
                                     icon='add'
                                     onClick={handleSubmitHistoryLog}
@@ -1017,7 +1019,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         </div>
                     )}
                     {!historyLogBool && (
-                        <div className={styles.historyLogAdd}>
+                        <div className={s(styles.historyLogAdd, isDarkMode ? styles.textDark : {})}>
                             <Button
                                 icon='add'
                                 onClick={() => setHistoryLogBool(!historyLogBool)}

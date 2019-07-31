@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import {History} from 'history'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
@@ -7,6 +7,7 @@ import {Button} from '../Button/Button'
 
 // styles
 import styles from './BackButton.module.css'
+import { ThemeContext } from '../../App';
 
 // Types
 interface IBackButtonProps {
@@ -18,6 +19,7 @@ interface IBackButtonProps {
 // Primary Component
 export const BackButton: React.SFC<IBackButtonProps> = props => {
     const {history, className = '', textClassName = ''} = props
+    const { isDarkMode } = useContext(ThemeContext)
 
     var pathArray = history.location.state ? history.location.state.prev.pathname.split('/') : 'Back'
     var text =
@@ -46,7 +48,7 @@ export const BackButton: React.SFC<IBackButtonProps> = props => {
                 }
             }}
             className={s(styles.button, className)}
-            textClassName={textClassName}
+            textClassName={s(textClassName, isDarkMode ? styles.dark : {})}
         />
     )
 }

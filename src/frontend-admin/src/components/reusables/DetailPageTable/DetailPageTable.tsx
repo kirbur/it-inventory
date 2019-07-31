@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 
 //components
 import ReactTooltip from 'react-tooltip'
@@ -12,6 +12,7 @@ import styles from './DetailPageTable.module.css'
 //utilities
 import {cloneDeep} from 'lodash'
 import {sortTable} from '../../../utilities/quickSort'
+import { ThemeContext } from '../../App';
 
 export interface ITableItem {
     value: string | number
@@ -48,6 +49,7 @@ export const DetailPageTable = (props: ITableProps) => {
         hover = true,
         className = '',
     } = props
+    const { isDarkMode } = useContext(ThemeContext)
 
     //initialize all the header states and styling to be not sorted
     const headerStates = []
@@ -132,7 +134,7 @@ export const DetailPageTable = (props: ITableProps) => {
             )
         }
         for (let i = 0; i < headers.length; i++) {
-            var click = row[i] && row[i].onClick ? styles.clickable : ''
+            var click = row[i] && row[i].onClick ? (s(styles.clickable, isDarkMode ? styles.clickableDark : {})) : ''
             transformedRow[i + start] = row[i].tooltip ? (
                 <td
                     key={JSON.stringify(row) + headers[i]}
@@ -150,6 +152,7 @@ export const DetailPageTable = (props: ITableProps) => {
                     key={JSON.stringify(row) + headers[i]}
                     className={s(
                         styles.rowData,
+                        isDarkMode ? styles.rowDataDark : {},
                         row[i].onClick && styles.clickCursor,
                         click,
                         row[0].unavailable ? styles.unavailable : ''

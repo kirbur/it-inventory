@@ -17,12 +17,13 @@ import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {formatCost} from '../../../utilities/FormatCost'
 import {checkImage} from '../../../utilities/CheckImage'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './ProgramOverviewPage.module.css'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Types
 interface IProgramOverviewPageProps {
@@ -74,6 +75,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [img, setImg] = useState('')
@@ -197,7 +199,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     }
 
     return (
-        <div className={styles.progOverviewMain}>
+        <div className={s(styles.progOverviewMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
@@ -253,7 +255,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.programName}>{id}</div>
+                        <div className={s(styles.programName, isDarkMode ? styles.dark : {})}>{id}</div>
                         <div className={styles.programText}>
                             {programData.countProgInUse} / {programData.countProgOverall} Used
                         </div>

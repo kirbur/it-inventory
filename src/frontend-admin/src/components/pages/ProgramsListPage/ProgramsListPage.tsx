@@ -19,7 +19,7 @@ import {Table} from '../../reusables/Table/Table'
 import {Checkbox} from '../../reusables/Checkbox/Checkbox'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './ProgramsListPage.module.css'
@@ -38,6 +38,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
     const [displayImages, setDisplayImages] = useState<{name: string; img: string}[]>([])
@@ -334,7 +335,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }
 
     return (
-        <div className={styles.programsListMain}>
+        <div className={s(styles.programsListMain, isDarkMode ? styles.programsListMainDark : {})}>
             <Switch>
                 <Route path='/programs/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
             </Switch>

@@ -70,3 +70,7 @@
     bottom: 45px;
     right: 10px;
 }
+
+.dark {
+    color: white !important;
+}

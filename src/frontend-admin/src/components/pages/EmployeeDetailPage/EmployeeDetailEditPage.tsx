@@ -20,7 +20,7 @@ import styles from './EmployeeDetailEditPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 import {Button} from '../../reusables/Button/Button'
 import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import deptPlaceholder from '../../../content/Images/Placeholders/department-placeholder.png'
@@ -58,6 +58,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const {history, match} = props
 
     const {loginContextVariables} = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [userData, setUserData] = useState<IEmployee>({
@@ -751,7 +752,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     return (
-        <div className={styles.columns}>
+        <div className={s(styles.columns, isDarkMode ? styles.backgroundDark : {})}>
             {/* column 1 */}
 
             <div className={styles.firstColumn}>
@@ -763,7 +764,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 {/* name and date */}
-                <div className={s(styles.title, styles.paddingTop)}>Employee Information</div>
+                <div className={s(styles.title, styles.paddingTop, isDarkMode ? styles.titleDark : {})}>Employee Information</div>
 
                 {/* Admin/nonadmin radio cards */}
                 <div className={styles.adminCardContainer}>
@@ -774,46 +775,47 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 <input
                                     type='radio'
                                     name='admin'
-                                    className={styles.checkmark}
+                                    className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
                                     checked={adminInput}
                                     onChange={() => {
                                         setAdminInput(true)
                                         setChanged(true)
                                     }}
                                 />
-                                <div className={styles.checkmark} />
-                                <div className={styles.insideCheckmarkAdmin} />
+                                <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                                <div className={s(styles.insideCheckmarkAdmin, isDarkMode ? styles.insideCheckmarkAdminDark : {})} />
 
-                                <div className={styles.title}>Admin User</div>
+                                <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Admin User</div>
                                 <div className={styles.adminText}>
                                     This user will be able to edit any detail pages and be able to add new hardware,
                                     software, etc.
                                 </div>
                             </div>
-                            <FaUserShield className={styles.adminIconShield} />
+                            <FaUserShield className={s(styles.adminIconShield, isDarkMode ? styles.titleDark : {})} />
                         </div>
                     </div>
                     {/* non admin card */}
+                    {/* // TODO: Make this a component */}
                     <div className={styles.adminCard}>
                         <div className={styles.card}>
                             <input
                                 type='radio'
                                 name='admin'
-                                className={styles.checkmark}
+                                className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
                                 checked={!adminInput}
                                 onChange={() => {
                                     setAdminInput(false)
                                     setChanged(true)
                                 }}
                             />
-                            <div className={styles.checkmark} />
-                            <div className={styles.insideCheckmarkAdmin} />
-                            <div className={styles.title}>Non Admin User</div>
+                            <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                            <div className={s(styles.insideCheckmarkAdmin, isDarkMode ? styles.insideCheckmarkAdminDark : {})} />
+                            <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Non Admin User</div>
                             <div className={styles.adminText}>
                                 This user will be able to view all content and review the overall company as it grows.
                             </div>
                         </div>
-                        <FaUser className={styles.adminIcon} />
+                        <FaUser className={s(styles.adminIconShield, isDarkMode ? styles.titleDark : {})} />
                     </div>
                 </div>
 
@@ -915,7 +917,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 <div className={styles.line} />
 
                 {/* Employee Dept radio buttons */}
-                <div className={s(styles.title, styles.paddingTop, styles.paddingBottom)}>Employee Department</div>
+                <div className={s(styles.title, styles.paddingTop, styles.paddingBottom, isDarkMode ? styles.titleDark : {})}>Employee Department</div>
                 {deptInput && deptList && (
                     <div className={styles.employeeDepartment}>
                         {deptList.map((dept: any) => (
@@ -923,7 +925,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 <input
                                     type='radio'
                                     name='employeeDept'
-                                    className={styles.checkmark}
+                                    className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
                                     checked={dept.departmentId === deptInput.departmentId}
                                     onChange={() => {
                                         setDeptInput(dept)
@@ -931,8 +933,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                         setChanged(true)
                                     }}
                                 />
-                                <div className={styles.checkmark} />
-                                <div className={styles.insideCheckmark} />
+                                <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                                <div className={s(styles.insideCheckmark, isDarkMode ? styles.insideCheckmarkAdminDark : {})} />
                                 <div className={styles.deptIconContainer}>
                                     {deptImages &&
                                     deptImages.filter(x => x.id === dept.departmentId) &&

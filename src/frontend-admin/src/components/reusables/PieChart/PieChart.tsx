@@ -1,7 +1,9 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 import {PieChart, Pie, Cell} from 'recharts'
 import {CustomLabel} from './CustomLabel/CustomLabel'
 import styles from './PieChart.module.css'
+import {ThemeContext} from '../../App/App'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Types
 export interface IRechartPieDatum {
@@ -36,6 +38,9 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
     const onMouseOut = () => {
         setColors(initialColors)
     }
+    const {
+        isDarkMode
+    } = useContext(ThemeContext)
 
     function hasData(i: number) {
         for (let j = 0; j < pieChartData[i].data.length; j++) {
@@ -53,7 +58,7 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                 {pieChartData.map((datum, i) => (
                     <h3
                         key={datum.headingName}
-                        className={i === pieChartData.length - 1 ? styles.lastHeader : styles.header}
+                        className={s(i === pieChartData.length - 1 ? styles.lastHeader : styles.header, isDarkMode ? styles.dark : {})}
                     >
                         {datum.headingName}
                         {datum.headingName === 'Hardware' && <div className={styles.headingText}>*last 30 days</div>}
@@ -123,7 +128,9 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                         }
                     >
                         <div className={styles.circle} style={{backgroundColor: colors[index]}} />
-                        {datum.name}
+                        <div className={s(isDarkMode ? styles.dark : {})}>
+                            {datum.name}
+                        </div>
                     </div>
                 ))}
             </div>

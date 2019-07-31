@@ -1,5 +1,5 @@
 .detailMain {
-    margin: 0px 50px;
+    padding: 0px 50px;
 }
 
 /* edit/archive styling */
@@ -84,4 +84,12 @@
 }
 .detailTable {
     margin-bottom: 50px;
+}
+
+.hardwareNameDark {
+    color: white;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

@@ -1,5 +1,6 @@
 .dashMain {
     display: flex;
+    padding-top: 20px;
     flex-wrap: wrap;
     justify-content: center;
     padding-top: 10px;
@@ -73,4 +74,12 @@
 
 .group {
     flex-wrap: wrap;
+}
+
+.dashMainDark {
+    background-color: #282c29;
+}
+
+.linkedTitleDark {
+    color: white;
 }

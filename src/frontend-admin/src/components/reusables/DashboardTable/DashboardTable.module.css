@@ -25,8 +25,20 @@
 }
 .tr:hover {
     color: white;
-    background-color: #009eff;
+    background-color: #009eff !important;
 }
 .tr:hover .name {
+    color: white;
+}
+
+.dark {
+    color : #5ec2ff;
+}
+
+.trDark:nth-child(odd) {
+    background-color: rgb(110, 110, 110);
+}
+
+.trDark {
     color: white;
 }

@@ -16,7 +16,7 @@ import {Table} from '../../reusables/Table/Table'
 import {History} from 'history'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './HardwareListPage.module.css'
@@ -52,6 +52,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<IPeripheralData[]>([])
@@ -219,7 +220,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                     <img className={styles.icon} src={image} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <div className={styles.hardwareName}>{row[0]}</div>
+                    <div className={s(styles.hardwareName, isDarkMode ? styles.dark : {})}>{row[0]}</div>
                 </div>
             </td>
         ) : (
@@ -228,7 +229,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                     <img className={styles.icon} src={placeholder} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <div className={styles.hardwareName}>{row[0]}</div>
+                    <div className={s(styles.hardwareName, isDarkMode ? styles.dark : {})}>{row[0]}</div>
                 </div>
             </td>
         )

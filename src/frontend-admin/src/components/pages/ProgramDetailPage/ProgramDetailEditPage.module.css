@@ -1,5 +1,5 @@
 .columns {
-    margin: 0 50px;
+    padding: 0 50px;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -104,4 +104,12 @@
     color: #a5a5a5;
     font-size: 24px;
     text-align: left;
+}
+
+.dark {
+    color: white;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

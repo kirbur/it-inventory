@@ -23,7 +23,7 @@ import styles from './ProgramDetailPage.module.css'
 import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Types
 interface IProgramDetailPageProps {
@@ -39,6 +39,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     var axios = new AxiosService(loginContextVariables)
 
@@ -142,7 +143,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     }
 
     return (
-        <div className={styles.progDetailMain}>
+        <div className={s(styles.progDetailMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
@@ -198,10 +199,10 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.programName}>
+                        <div className={s(styles.programName, isDarkMode ? styles.dark : {})}>
                             <Group>
                                 <div
-                                    className={styles.overviewLink}
+                                    className={s(styles.overviewLink, isDarkMode ? styles.linkDark : {})}
                                     onClick={() =>
                                         history.push({
                                             pathname: `/programs/overview/${progData.name}/${
@@ -224,7 +225,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                             <div className={s(styles.programText, styles.assignedTo)}>
                                 Assigned to{' '}
                                 <div
-                                    className={styles.empName}
+                                    className={s(styles.empName, isDarkMode ? styles.linkDark : {})}
                                     onClick={() =>
                                         history.push({
                                             pathname: `/employees/detail/${progData.employeeId}`,

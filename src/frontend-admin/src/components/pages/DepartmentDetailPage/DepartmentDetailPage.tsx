@@ -14,7 +14,7 @@ import styles from './DepartmentDetailPage.module.css'
 import placeholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -53,6 +53,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const handleEmployeeClick = (id: number | string) => {
         history.push({pathname: `/employees/detail/${id}`, state: {prev: history.location}})
@@ -188,7 +189,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     }
 
     return (
-        <div className={styles.detailMain}>
+        <div className={s(styles.detailMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
@@ -228,11 +229,11 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.deptName}>{deptData.departmentName}</div>
+                        <div className={s(styles.deptName, isDarkMode ? styles.textDark : {})}>{deptData.departmentName}</div>
                         <div className={styles.deptText}>{deptData.employeeCount} employees</div>
                     </div>
 
-                    <div className={styles.title}>Department Breakdown</div>
+                    <div className={s(styles.title, isDarkMode ? styles.textDark : {})}>Department Breakdown</div>
 
                     <DetailPageTable
                         headers={employeeHeaders}
@@ -256,7 +257,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                     />
 
                     <div className={styles.line} />
-                    <div className={styles.title}>Department Defaults</div>
+                    <div className={s(styles.title, isDarkMode ? styles.textDark : {})}>Department Defaults</div>
 
                     {/* default hardware */}
                     <div className={styles.tableRow}>

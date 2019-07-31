@@ -13,3 +13,11 @@
     flex-direction: column;
     align-items: center;
 }
+
+.cardDark {
+    background-color: #635f5f;
+}
+
+.cardTitleDark {
+    color: white;
+}

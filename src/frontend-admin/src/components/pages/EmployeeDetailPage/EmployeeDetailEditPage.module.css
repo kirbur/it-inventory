@@ -1,5 +1,5 @@
 .columns {
-    margin: 0 50px;
+    padding: 0 50px;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -204,7 +204,7 @@ input:checked ~ .insideCheckmarkAdmin {
 
 /* so the table doesnt highlight on hover */
 .newRowThing:hover {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0);
 }
 
 /* add to table text and icon */
@@ -341,4 +341,20 @@ input:checked ~ .insideCheckmarkAdmin {
     height: 100px;
     font-family: cqlRegularFont;
     resize: none;
+}
+
+.titleDark {
+    color: white;
+}
+
+input:checked ~ .checkmarkDark {
+    border-color: #5ec2ff;
+}
+
+input:checked ~ .insideCheckmarkAdminDark {
+    background-color: #5ec2ff;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

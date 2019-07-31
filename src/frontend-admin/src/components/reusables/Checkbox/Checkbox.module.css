@@ -28,3 +28,12 @@
     border-top: 7px solid #009eff;
     transform: rotate(225deg);
 }
+
+.checkedDark {
+    border: 2px solid #5ec2ff;
+}
+
+.checkmarkDark {
+    border-left: 7px solid #5ec2ff;
+    border-top: 7px solid #5ec2ff;
+}
