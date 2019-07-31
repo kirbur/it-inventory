@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useContext, ReactText, SetStateAction} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import React, {useState, useEffect, useContext} from 'react'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
@@ -16,7 +16,7 @@ import {Group} from '../../reusables/Group/Group'
 import {Table} from '../../reusables/Table/Table'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './EmployeesListPage.module.css'
@@ -62,6 +62,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<IEmployeeData[]>([])
@@ -77,12 +78,11 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     var headerList: string[] = []
     const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{id: number; img: string}[]>([])
-    const [displayImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        var imagePromises: any[] = []
+        await axios
             .get('/list/employees')
             .then((data: IPulledData[]) => {
                 let employees: IEmployeeData[] = []
@@ -103,16 +103,22 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         programs: i.progForEmp ? i.progForEmp.join(', ') : '',
                         daysEmployed: getDays(i.hireDate),
                     })
-                    imgs.push({id: i.employeeId, img: i.photo})
+
+                    imagePromises.push(
+                        checkImage(i.photo, axios, placeholder).then(image => {
+                            return {id: i.employeeId, img: image}
+                        })
+                    )
                 })
                 setListData(employees)
-
-                setImages(imgs)
-                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
 
-        axios
+        await Promise.all(imagePromises)
+            .then(response => setDisplayImages(response))
+            .catch((err: any) => console.error(err))
+
+        await axios
             .get('/archivedList/employee')
             .then((data: IPulledData[]) => {
                 let employees: any[] = []
@@ -139,22 +145,15 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         if (isArchive) {
             headers = ['Employees', 'Role', 'Date Hired', 'Date Archived', 'Days Employed']
         }
+    }
+
+    useEffect(() => {
+        getData()
     }, [])
 
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
     }, [search, selected, listData, archivedData, isArchive])
-
-    //Set display Images
-    useEffect(() => {
-        images.map((img: {id: number; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.id !== img.id)
-                setImages([...list, {id: img.id, img: data}])
-                displayImages.push({id: img.id, img: data})
-            })
-        )
-    }, [useImages])
 
     const formatCost = (hwCpost: number, progCost: number) => {
         return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo'
@@ -270,15 +269,19 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }
 
     function concatenatedName(row: any[]) {
-        return displayImages &&
-            displayImages.filter(x => x.id === row[7]) &&
-            displayImages.filter(x => x.id === row[7])[0] ? (
+        var image = placeholder
+        for (let i = 0; i < displayImages.length; i++) {
+            if (displayImages[i].id === row[7]) {
+                image = displayImages[i].img
+            }
+        }
+        return image ? (
             <td key={row[7]} className={styles.employees}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[7])[0].img} alt={''} />
+                    <img className={styles.icon} src={image} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <text className={styles.employeeName}>{row[0]}</text> <br />
+                    <text className={s(styles.employeeName, isDarkMode ? styles.employeeNameDark : {})}>{row[0]}</text> <br />
                     <text className={styles.role}>{row[5]}</text>
                 </div>
             </td>
@@ -308,18 +311,21 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                             {formatDate(row[1])}
                         </td>
                     )
+                    break
                 case 2:
                     transformedRow[2] = (
                         <td key={row[7] + row[10]} className={styles.alignLeft}>
                             {isArchive ? row[10] : calculateDaysEmployed(row[10])}
                         </td>
                     )
+                    break
                 case 3:
                     transformedRow[3] = (
                         <td key={row[7] + row[2]} className={styles.alignLeft}>
                             {row[2]}
                         </td>
                     )
+                    break
             }
         }
 
@@ -327,10 +333,10 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     })
 
     return (
-        <div className={styles.employeesListMain}>
+        <div className={s(styles.employeesListMain, isDarkMode ? styles.employeesListMainDark : {})}>
             <Group direction='row' justify='between' className={styles.group}>
                 <div className={styles.buttonContainer}>
-                    {isAdmin && <Button text='Add' icon='add' onClick={handleClick} />}
+                    {isAdmin && <Button text='Add' icon='add' onClick={handleClick} className={styles.addButton} />}
                     <Button
                         text={isArchive ? 'View Active' : 'View Archives'}
                         onClick={() => setIsArchive(!isArchive)}

@@ -10,7 +10,7 @@
 
 /* main column styling */
 .columns {
-    margin: 0 50px;
+    padding: 0 50px;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -83,7 +83,7 @@
 
 /* section styling */
 .section {
-    margin-top: 50px;
+    margin-top: 25px;
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -330,4 +330,26 @@ input:checked ~ .insideCheckmarkAdmin {
 .submitText {
     color: #009eff;
     font-size: 24px;
+}
+
+.headerDark {
+    color: white;
+}
+
+.textDark {
+    color: #5ec2ff;
+}
+
+input:checked ~ .checkmarkDark {
+    border-color: #5ec2ff;
+}
+input:checked ~ .insideCheckmarkDark {
+    background-color: #5ec2ff;
+}
+input:checked ~ .insideCheckmarkAdminDark {
+    background-color: #5ec2ff;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

@@ -89,3 +89,8 @@
     width: 110%;
     align-self: center;
 }
+
+.dropdownArrowDark {
+    border-left: 2px solid white;
+    border-top: 2px solid white;
+}

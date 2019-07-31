@@ -1,6 +1,7 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import styles from './Title.module.css'
-import {concatStyles} from '../../../utilities/mikesConcat'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {ThemeContext} from '../../App/App'
 
 interface ITitleProps {
     title: any //any so that dropdown can be used
@@ -10,14 +11,17 @@ interface ITitleProps {
 
 export const Title: React.FC<ITitleProps> = props => {
     const {title, className, onClick = () => {}} = props
+    const {
+        isDarkMode
+    } = useContext(ThemeContext)
 
     return (
         <div className={styles.titleContainer}>
-            <div className={styles.bottomCorner} />
-            <div className={concatStyles(styles.title, className)} onClick={onClick}>
+            <div className={s(styles.bottomCorner, isDarkMode ? styles.bottomCornerDark : {})} />
+            <div className={s(styles.title, className)} onClick={onClick}>
                 {title}
             </div>
-            <div className={styles.topCorner} />
+            <div className={s(styles.topCorner, isDarkMode ? styles.topCornerDark : {})} />
         </div>
     )
 }

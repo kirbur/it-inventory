@@ -1,3 +1,7 @@
 .button {
     text-transform: capitalize;
 }
+
+.dark {
+    color: #979797;
+}

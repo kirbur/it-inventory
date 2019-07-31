@@ -1,5 +1,5 @@
 .empDetailMain {
-    margin: 0 50px;
+    padding: 0 50px;
 }
 
 .columns {
@@ -20,54 +20,7 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-}
-
-/*First Column*/
-.imgContainer {
-    position: relative;
-    width: 100%;
-}
-
-.imgContainer:before {
-    content: '';
-    display: block;
-    padding-top: 100%;
-}
-
-.imgPadding {
-    height: 100%;
-    background-color: #f4f4f4;
-    border-radius: 10px;
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.img {
-    width: 85%;
-    max-width: 250px;
-    max-height: 250px;
-    margin: auto;
-}
-
-.costText {
-    text-align: left;
-    color: #979797;
-    font-size: 18px;
-}
-
-.costLine {
-    margin: 0 5px;
-    flex-grow: 1;
-    height: 1px;
-    align-self: center;
-    background: #979797;
+    padding-left: 75px;
 }
 
 /*Second Column*/
@@ -83,7 +36,7 @@
 .titleText {
     text-align: left;
     padding-top: 50px;
-    min-height: 300px;
+    min-height: 260px;
 }
 
 .employeeName {
@@ -125,4 +78,16 @@
     color: #4a4a4a;
     font-size: 20px;
     line-height: 27px;
+}
+
+.employeeNameDark {
+    color: white;
+}
+
+.deptTextDark {
+    color: #5ec2ff;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

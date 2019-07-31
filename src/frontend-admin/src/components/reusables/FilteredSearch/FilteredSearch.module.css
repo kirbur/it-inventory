@@ -12,6 +12,7 @@
     border-radius: 4px;
     display: flex;
     font-family: cqlLight;
+    background-color: white;
 }
 
 .searchBar {

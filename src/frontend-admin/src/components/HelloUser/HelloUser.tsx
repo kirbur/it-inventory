@@ -3,7 +3,7 @@ import styles from './HelloUser.module.css'
 import dropdownStyles from '../reusables/Dropdown/Dropdown.module.css'
 import {DropdownList} from '../reusables/Dropdown/DropdownList'
 import {concatStyles as s} from '../../utilities/mikesConcat'
-import {LoginContext, initialValues} from '../App/App'
+import {LoginContext, initialValues, ThemeContext} from '../App/App'
 
 interface IHelloUserProps {
     name: string
@@ -14,6 +14,7 @@ export const HelloUser: React.FC<IHelloUserProps> = props => {
     const {name, className = ''} = props
 
     const userContext = useContext(LoginContext)
+    const { isDarkMode, setIsDarkMode } = useContext(ThemeContext)
     return (
         <div className={s(styles.helloMain, className)}>
             <div className={(dropdownStyles.dropdownContainer, styles.helloContainer)}>
@@ -21,8 +22,8 @@ export const HelloUser: React.FC<IHelloUserProps> = props => {
                     triggerElement={({isOpen, toggle}) => (
                         <button onClick={toggle} className={dropdownStyles.dropdownButton}>
                             <div className={dropdownStyles.dropdownTitle}>
-                                <div className={styles.helloMessage}>Hello, {name}</div>
-                                <div className={s(dropdownStyles.dropdownArrow, styles.dropdownArrow)} />
+                                <div className={s(styles.helloMessage, isDarkMode ? styles.dark : {})}>Hello, {name}</div>
+                                <div className={s(dropdownStyles.dropdownArrow, styles.dropdownArrow, isDarkMode ? styles.dropdownArrowDark : {})} />
                             </div>
                         </button>
                     )}
@@ -39,6 +40,16 @@ export const HelloUser: React.FC<IHelloUserProps> = props => {
                             >
                                 <button className={dropdownStyles.dropdownListItemButton}>
                                     <div className={dropdownStyles.dropdownItemLabel}>Logout</div>
+                                </button>
+                            </li>
+                            <li
+                                className={dropdownStyles.dropdownListItem}
+                            >
+                                <button
+                                    className={dropdownStyles.dropdownListItemButton}
+                                    onClick={() => setIsDarkMode(!isDarkMode)}
+                                >
+                                    <div className={dropdownStyles.dropdownItemLabel}>{isDarkMode ? 'Dis' : 'En'}able Dark Mode</div>
                                 </button>
                             </li>
                         </ul>

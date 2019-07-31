@@ -1,5 +1,5 @@
 .departmentsListMain {
-    margin: 50px 85px;
+    padding: 50px 85px;
 }
 
 .page {
@@ -22,7 +22,9 @@
 .icon {
     margin: auto;
     max-height: 75px;
-    width: 75px;
+    max-width: 75px;
+    height: auto;
+    width: auto;
 }
 
 .alignLeft {
@@ -106,4 +108,12 @@
     position: relative;
     top: 15px;
     left: 5px;
+}
+
+.dark {
+    color: #5ec2ff;
+}
+
+.listMainDark {
+    background-color: #282c29;
 }
