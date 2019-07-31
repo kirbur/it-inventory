@@ -356,6 +356,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
     async function handleSubmit() {
         //update image
+        var newID = ''
+
         if (imgInput) {
             var formData = new FormData()
             formData.append('file', imgInput)
@@ -396,6 +398,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Mfg: 0,
                         TextField: commentText,
                     },
+                }).then((response:any) => {
+                    newID = response.data
                 })
             } else if (match.params.type === 'server') {
                 await axios.post(`add/server`, {
@@ -429,6 +433,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         TextField: commentText,
                     },
+                }).then((response:any) => {
+                    newID = response.data
                 })
             } else if (match.params.type === 'laptop') {
                 await axios.post(`add/laptop`, {
@@ -459,6 +465,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         TextField: commentText,
                     },
+                }).then((response:any) => {
+                    newID = response.data
                 })
             } else if (match.params.type === 'peripheral') {
                 await axios.post(`add/peripheral`, {
@@ -480,9 +488,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         TextField: commentText,
                     },
+                }).then((response:any) => {
+                    newID = response.data
                 })
             }
-            history.push({pathname: '/hardware', state: {prev: history.location}})
+            history.push({pathname: `/hardware/detail/${match.params.type}/${newID}`, state: {prev: history.location}})
         } else {
             //not new --> editing existing page
             if (match.params.type === 'monitor') {
@@ -611,11 +621,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     DeleteHistory: removeHistoryLog,
                 })
             }
+            history.push({
+                pathname: `/hardware/detail/${match.params.type}/${match.params.id}`,
+                state: {prev: history.location},
+            })
         }
-        history.push({
-            pathname: `/hardware/detail/${match.params.type}/${match.params.id}`,
-            state: {prev: history.location},
-        })
     }
 
     function handleInputChange(index: number, sectionData: any[], value: string | number) {

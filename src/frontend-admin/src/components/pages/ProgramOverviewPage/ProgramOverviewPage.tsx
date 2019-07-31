@@ -103,7 +103,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         i.employeeName
                             ? [
                                   {
-                                      value: i.programId,
+                                      value: `Copy ${i.programId}`,
                                       id: i.programId,
                                       sortBy: i.programId,
                                       onClick: handleCopyClick,

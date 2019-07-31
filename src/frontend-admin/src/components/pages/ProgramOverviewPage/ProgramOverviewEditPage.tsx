@@ -132,7 +132,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     let prog: ITableItem[][] = []
                     data[0].inDivPrograms.map((i: ExpectedProgramType) =>
                         prog.push([
-                            {value: i.programId, id: i.programId, sortBy: i.programId},
+                            {value: `Copy ${i.programId}`, id: i.programId, sortBy: i.programId},
                             {
                                 value: format(i.employeeName),
                                 id: i.employeeId,

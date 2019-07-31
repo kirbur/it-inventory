@@ -164,6 +164,8 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
         return tempArray
     }
     async function handleSubmit() {
+        var newID = ''
+
         if (imgInput) {
             var formData = new FormData()
             formData.append('file', imgInput)
@@ -193,8 +195,10 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                         software: newDefaultSoftware,
                     },
                     name: deptData.departmentName,
+                }).then((response: any) => {
+                    newID = response.data
                 })
-                history.push({pathname: `/departments`, state: {prev: history.location}})
+                history.push({pathname: `/departments/detail/${newID}`, state: {prev: history.location}})
             } else {
                 await axios.put(`update/department`, {
                     DefaultHardware: {DefaultHardware: newDefaultHardware},

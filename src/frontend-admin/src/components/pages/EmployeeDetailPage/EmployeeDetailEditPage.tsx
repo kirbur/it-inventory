@@ -579,6 +579,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     async function handleSubmit() {
         var name = ['first', 'last']
         var msg = ''
+        var newID = ''
 
         /*ADD NEW EMPLOYEE */
         if (
@@ -618,12 +619,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 .post('/add/Employee', postEmployee)
                 .then((response: any) => {
                     if (response && response.status === 201) {
+                        newID = response.data
                         window.alert(`${selectedEmployee.name} was successfully added!`)
                     }
                 })
                 .catch((err: any) => console.error(err))
 
-            history.push({pathname: `/employees`, state: {prev: history.location}})
+            history.push({pathname: `/employees/detail/${newID}`, state: {prev: history.location}})
         } else if (match.params.id === 'new') {
             selectedEmployee.name === 'Select A New Employee' && window.alert('No employee was selected')
         }
