@@ -156,7 +156,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         <DetailCostText costTexts={[{title: 'Yearly', cost: `$${progData.costPerYear}`}]} />
                     ) : (
                         progData.costPerYear > 0 && (
-                            <DetailCostText costTexts={[{title: 'Monthly', cost: `$${progData.costPerYear}`}]} />
+                            <DetailCostText costTexts={[{title: 'Monthly', cost: `$${progData.costPerYear / 12}`}]} />
                         )
                     )}
                 </div>
