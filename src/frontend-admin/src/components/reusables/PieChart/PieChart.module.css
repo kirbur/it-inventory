@@ -63,6 +63,11 @@
     top: 80px;
     left: 50px;
 }
+
+.darkModeCircle{
+background: #888;
+}
+
 .emptyDataText {
     color: black;
     font-size: 18px;

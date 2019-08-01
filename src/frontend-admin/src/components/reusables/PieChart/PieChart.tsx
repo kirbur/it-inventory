@@ -1,9 +1,9 @@
-import React, {useState, useContext} from 'react'
-import {PieChart, Pie, Cell} from 'recharts'
-import {CustomLabel} from './CustomLabel/CustomLabel'
+import React, { useState, useContext } from 'react'
+import { PieChart, Pie, Cell } from 'recharts'
+import { CustomLabel } from './CustomLabel/CustomLabel'
 import styles from './PieChart.module.css'
-import {ThemeContext} from '../../App/App'
-import {concatStyles as s} from '../../../utilities/mikesConcat'
+import { ThemeContext } from '../../App/App'
+import { concatStyles as s } from '../../../utilities/mikesConcat'
 
 // Types
 export interface IRechartPieDatum {
@@ -24,7 +24,7 @@ interface IRechartPieProps {
 }
 
 export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props => {
-    const {pieChartData, initialColors, onSliceClick} = props
+    const { pieChartData, initialColors, onSliceClick } = props
 
     const [colors, setColors] = useState(initialColors)
     //colors off of invision: ['#009EFF', '#FF9340', '#3D4599', '#1425CC', '#CC4A14']
@@ -90,8 +90,8 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                                     onClick={
                                         onSliceClick
                                             ? () => {
-                                                  onSliceClick(entry.id)
-                                              }
+                                                onSliceClick(entry.id)
+                                            }
                                             : undefined
                                     }
                                 />
@@ -106,11 +106,11 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                 hasData(i) ? (
                     <div />
                 ) : (
-                    <div className={styles.circleContainer} style={{position: 'relative', left: 10 + 340 * i}}>
-                        <div className={styles.emptyCircle} />
-                        <div className={styles.emptyDataText}>No data to display</div>
-                    </div>
-                )
+                        <div className={styles.circleContainer} style={{ position: 'relative', left: 10 + 340 * i }}>
+                            <div className={s(styles.emptyCircle, isDarkMode && styles.darkModeCircle)} />
+                            <div className={styles.emptyDataText}>No data to display</div>
+                        </div>
+                    )
             )}
 
             {/* Legend */}
@@ -122,12 +122,12 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
                         onClick={
                             onSliceClick
                                 ? () => {
-                                      onSliceClick(datum.id)
-                                  }
+                                    onSliceClick(datum.id)
+                                }
                                 : undefined
                         }
                     >
-                        <div className={styles.circle} style={{backgroundColor: colors[index]}} />
+                        <div className={styles.circle} style={{ backgroundColor: colors[index] }} />
                         <div className={s(isDarkMode ? styles.dark : {})}>
                             {datum.name}
                         </div>
