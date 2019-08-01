@@ -426,7 +426,7 @@ namespace backend_api.Controllers
             //This List takes all the programs that not deleted and makes it them distinct
             var DistinctUsefulPrograms = _context.Program
                 .Where(x => x.IsDeleted == archived)
-                .GroupBy(x => x.ProgramName)
+                .GroupBy(x => x.ProgramName.ToLower())
                 .Select(x => x.FirstOrDefault());
 
             //loop through all the distinct programs 
