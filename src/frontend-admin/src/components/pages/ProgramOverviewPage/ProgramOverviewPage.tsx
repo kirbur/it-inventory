@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {History} from 'history'
 import {match} from 'react-router-dom'
 
@@ -68,7 +68,6 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
         match: {
             params: {archived, id},
         },
-        match,
     } = props
 
     const {

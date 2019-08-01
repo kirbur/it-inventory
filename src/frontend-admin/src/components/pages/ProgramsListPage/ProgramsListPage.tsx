@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {Route, Switch} from 'react-router-dom'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -38,7 +38,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     // state
     const [displayImages, setDisplayImages] = useState<{name: string; img: string}[]>([])
@@ -64,9 +64,8 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             .get('/list/programs/false')
             .then((data: any) => {
                 var programs: any[] = []
-                var imgs: {name: string; img: string}[] = []
                 var pins: {name: string; pinned: boolean}[] = []
-                data.map((i: any) => {
+                data.forEach((i: any) => {
                     programs.push({
                         name: format(i.programName),
                         renewalDate: formatDate(i.renewalDate),
@@ -99,7 +98,7 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
             .then((data: any) => {
                 var programs: any[] = []
                 var pins: {name: string; pinned: boolean}[] = []
-                data.map((i: any) => {
+                data.forEach((i: any) => {
                     programs.push({
                         name: format(i.programName),
                         renewalDate: formatDate(i.renewalDate),
