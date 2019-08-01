@@ -424,28 +424,53 @@ namespace backend_api.Controllers
             var UsefulProgramsList = _context.Program.Where(x => x.IsDeleted == archived);
 
             //This List takes all the programs that not deleted and makes it them distinct
-            var DistinctUsefulPrograms = _context.Program.Where(x => x.IsDeleted == archived).GroupBy(x => x.ProgramName).Select(x => x.FirstOrDefault());
+            var DistinctUsefulPrograms = _context.Program
+                .Where(x => x.IsDeleted == archived)
+                .GroupBy(x => x.ProgramName)
+                .Select(x => x.FirstOrDefault());
 
             //loop through all the distinct programs 
             foreach (var prog in DistinctUsefulPrograms)
             {
+                //find any id of a program with the same name so we can use for finding icon
+                int id = _context.Program.Where(x => x.ProgramName == prog.ProgramName).Select(x => x.ProgramId).FirstOrDefault();
+
                 // calculate the count of programs under this specific distinct program name that are in use
-                var CountProgInUse = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId != null).Count();
+                var CountProgInUse = UsefulProgramsList
+                    .Where(x => x.ProgramName == prog.ProgramName && x.EmployeeId != null)
+                    .Count();
 
                 // calculate the count of programs under this specific distinct program name
-                var CountProgOverall = UsefulProgramsList.Where(x => x.ProgramName == prog.ProgramName).Count();
+                var CountProgOverall = UsefulProgramsList
+                    .Where(x => x.ProgramName == prog.ProgramName)
+                    .Count();
 
                 // calculate the cost of each distinct program if it is charged yearly 
-                var ProgCostPerYear = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramCostPerYear != null && x.IsDeleted == archived).Sum(x => x.ProgramCostPerYear);
+                var ProgCostPerYear = _context.Program
+                    .Where(x => x.ProgramName == prog.ProgramName && x.ProgramCostPerYear != null && x.IsDeleted == archived)
+                    .Sum(x => x.ProgramCostPerYear);
 
                 // calculate the cost of each distinct program if it is charged as a flat rate 
-                var ProgCostPerUse = _context.Program.Where(x => x.ProgramName == prog.ProgramName && x.ProgramFlatCost != null && x.IsDeleted == archived).Sum(x => x.ProgramFlatCost);
+                var ProgCostPerUse = _context.Program
+                    .Where(x => x.ProgramName == prog.ProgramName && x.ProgramFlatCost != null && x.IsDeleted == archived)
+                    .Sum(x => x.ProgramFlatCost);
 
                 // icon path.
-                string icon = $"/image/program/{prog.ProgramId}";
+                string icon = $"/image/program/{id}";
 
                 //create our object of returnables
-                ListOfPrograms.Add(new { prog.ProgramName, prog.RenewalDate, CountProgOverall, ProgCostPerYear, CountProgInUse, ProgCostPerUse, prog.IsCostPerYear, icon, prog.IsPinned });
+                ListOfPrograms.Add(
+                    new {
+                        prog.ProgramName,
+                        prog.RenewalDate,
+                        CountProgOverall,
+                        ProgCostPerYear,
+                        CountProgInUse,
+                        ProgCostPerUse,
+                        prog.IsCostPerYear,
+                        icon,
+                        prog.IsPinned
+                    });
             }
             return Ok(ListOfPrograms);
         }
