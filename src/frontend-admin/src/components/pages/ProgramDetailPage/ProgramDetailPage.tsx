@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
 import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
@@ -39,7 +39,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     var axios = new AxiosService(loginContextVariables)
 
@@ -150,25 +150,13 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     <BackButton history={history} className={styles.backButton} />
                     <DetailImage src={img} />
                     {progData.flatCost > 0 && (
-                        <DetailCostText
-                            costTexts={[
-                                {title: 'Paid', cost: `$${progData.flatCost}`},
-                            ]}
-                        />
+                        <DetailCostText costTexts={[{title: 'Paid', cost: `$${progData.flatCost}`}]} />
                     )}
                     {progData.isCostPerYear ? (
-                        <DetailCostText
-                        costTexts={[
-                            {title: 'Yearly', cost: `$${progData.costPerYear}`},
-                        ]}
-                    />
+                        <DetailCostText costTexts={[{title: 'Yearly', cost: `$${progData.costPerYear}`}]} />
                     ) : (
                         progData.costPerYear > 0 && (
-                            <DetailCostText
-                            costTexts={[
-                                {title: 'Monthly', cost: `$${progData.costPerYear}`},
-                            ]}
-                        />
+                            <DetailCostText costTexts={[{title: 'Monthly', cost: `$${progData.costPerYear}`}]} />
                         )
                     )}
                 </div>

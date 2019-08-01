@@ -1,6 +1,6 @@
 .app {
     text-align: center;
-    height: fill;
+    height: stretch;
     max-height: 100vw;
 }
 

@@ -62,7 +62,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<IEmployeeData[]>([])
@@ -86,8 +86,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             .get('/list/employees')
             .then((data: IPulledData[]) => {
                 let employees: IEmployeeData[] = []
-                var imgs: {id: number; img: string}[] = []
-                data.map((i: IPulledData) => {
+                data.forEach((i: IPulledData) => {
                     employees.push({
                         name: format(i.employeeName),
                         dateHired: i.hireDate,
@@ -122,7 +121,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             .get('/archivedList/employee')
             .then((data: IPulledData[]) => {
                 let employees: any[] = []
-                data.map((i: IPulledData) => {
+                data.map((i: IPulledData) =>
                     employees.push({
                         name: format(i.firstName + ' ' + i.lastName),
                         dateHired: formatDate(i.hireDate),
@@ -137,7 +136,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         space2: 0,
                         dateArchived: formatDate(i.archiveDate),
                     })
-                })
+                )
                 setArchivedData(employees)
             })
             .catch((err: any) => console.error(err))
@@ -281,7 +280,8 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                     <img className={styles.icon} src={image} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <text className={s(styles.employeeName, isDarkMode ? styles.employeeNameDark : {})}>{row[0]}</text> <br />
+                    <text className={s(styles.employeeName, isDarkMode ? styles.employeeNameDark : {})}>{row[0]}</text>{' '}
+                    <br />
                     <text className={styles.role}>{row[5]}</text>
                 </div>
             </td>

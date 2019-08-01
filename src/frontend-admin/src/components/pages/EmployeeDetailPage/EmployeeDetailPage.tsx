@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {History} from 'history'
 import {match} from 'react-router-dom'
 
@@ -51,7 +51,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [isDeleted, setIsDeleted] = useState(false)
@@ -199,8 +199,8 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     <DetailImage src={img} />
                     <DetailCostText
                         costTexts={[
-                            {title: `Software`, cost: `$${userData.swCost} /month` },
-                            {title: `Hardware`, cost: `$${userData.hwCost}` },
+                            {title: `Software`, cost: `$${userData.swCost} /month`},
+                            {title: `Hardware`, cost: `$${userData.hwCost}`},
                         ]}
                     />
                 </div>
@@ -231,7 +231,9 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={s(styles.employeeName, isDarkMode ? styles.employeeNameDark : {})}>{userData.name}</div>
+                        <div className={s(styles.employeeName, isDarkMode ? styles.employeeNameDark : {})}>
+                            {userData.name}
+                        </div>
                         <div className={styles.employeeText}>{userData.email}</div>
                         <div className={styles.employeeText}>
                             <div

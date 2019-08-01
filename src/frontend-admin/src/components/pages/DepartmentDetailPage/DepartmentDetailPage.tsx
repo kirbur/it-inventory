@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 //components
 import {Button} from '../../reusables/Button/Button'
@@ -53,7 +53,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     const handleEmployeeClick = (id: number | string) => {
         history.push({pathname: `/employees/detail/${id}`, state: {prev: history.location}})
@@ -62,7 +62,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
         history.push({pathname: `/programs/detail/${id}`, state: {prev: history.location}})
     }
     function renderProgramCost(isProgramCostPerYear: boolean, programCostPerYear: number) {
-        if (isProgramCostPerYear == true) {
+        if (isProgramCostPerYear === true) {
             return '$' + programCostPerYear.toString() + ' /year'
         } else {
             return '$' + programCostPerYear.toString() + ' /mo'
@@ -229,7 +229,9 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={s(styles.deptName, isDarkMode ? styles.textDark : {})}>{deptData.departmentName}</div>
+                        <div className={s(styles.deptName, isDarkMode ? styles.textDark : {})}>
+                            {deptData.departmentName}
+                        </div>
                         <div className={styles.deptText}>{deptData.employeeCount} employees</div>
                     </div>
 

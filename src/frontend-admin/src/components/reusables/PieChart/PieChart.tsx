@@ -104,9 +104,9 @@ export const RechartPieChart: React.FunctionComponent<IRechartPieProps> = props 
             {/* empty pies */}
             {pieChartData.map((datum, i) =>
                 hasData(i) ? (
-                    <div />
+                    <div key={i} />
                 ) : (
-                        <div className={styles.circleContainer} style={{ position: 'relative', left: 10 + 340 * i }}>
+                        <div key={i} className={styles.circleContainer} style={{ position: 'relative', left: 10 + 340 * i }}>
                             <div className={s(styles.emptyCircle, isDarkMode && styles.darkModeCircle)} />
                             <div className={styles.emptyDataText}>No data to display</div>
                         </div>

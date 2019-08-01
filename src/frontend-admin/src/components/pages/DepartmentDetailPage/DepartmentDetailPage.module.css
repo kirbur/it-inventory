@@ -147,7 +147,7 @@
 .tableRow {
     display: flex;
     flex-direction: row;
-    align-items: start;
+    align-items: flex-start;
     margin-bottom: 50px;
 }
 .table {

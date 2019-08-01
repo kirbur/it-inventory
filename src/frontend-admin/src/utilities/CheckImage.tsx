@@ -1,4 +1,4 @@
-import {AxiosService} from '../services/AxiosService/AxiosService'
+import { AxiosService } from '../services/AxiosService/AxiosService'
 
 export async function checkImage(img: string, axios: AxiosService, placeholder: string) {
     let image: string = ""
@@ -6,7 +6,7 @@ export async function checkImage(img: string, axios: AxiosService, placeholder: 
         .get(img, "blob")
         .then((data: any) => {
             if (data.size !== 0) {
-                let objectURL: string = window.URL.createObjectURL(new Blob([data], {type: data.type}))
+                let objectURL: string = window.URL.createObjectURL(new Blob([data], { type: data.type }))
                 image = objectURL
             }
             else {

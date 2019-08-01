@@ -52,11 +52,8 @@ export interface MonitorData {
 export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = props => {
     const {history, match} = props
 
-    const {
-        loginContextVariables: {isAdmin},
-        loginContextVariables,
-    } = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {loginContextVariables} = useContext(LoginContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
 
@@ -300,12 +297,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         let alertMssg = ''
         //checks for every form
         if (hasRecurringCost) {
-            if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
+            if (costSection[1] === 0 || costSection[1] === null || costSection[2] === 0 || costSection[2] === null) {
                 alertMssg += '\n Recurring cost and months must have values greater than zero!'
             }
         }
         if (hasFlatCost) {
-            if (costSection[0] == 0 || costSection[0] == null) {
+            if (costSection[0] === 0 || costSection[0] === null) {
                 alertMssg += '\n Initial cost must have a value greater than zero!'
             }
         }
@@ -376,122 +373,130 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
         if (match.params.id === 'new') {
             if (match.params.type === 'monitor') {
-                await axios.post(`add/monitor`, {
-                    Entity: {
-                        Make: firstSectionData[0],
-                        Model: firstSectionData[1],
-                        ScreenSize: firstSectionData[2],
-                        Resolution: firstSectionData[3],
-                        Inputs: firstSectionData[4],
-                        SerialNumber: firstSectionData[5],
+                await axios
+                    .post(`add/monitor`, {
+                        Entity: {
+                            Make: firstSectionData[0],
+                            Model: firstSectionData[1],
+                            ScreenSize: firstSectionData[2],
+                            Resolution: firstSectionData[3],
+                            Inputs: firstSectionData[4],
+                            SerialNumber: firstSectionData[5],
 
-                        Location: thirdSectionData[1],
-                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
+                            Location: thirdSectionData[1],
+                            EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        RenewalDate: renewalDateInput,
-                        PurchaseDate: purchaseDateInput,
+                            RenewalDate: renewalDateInput,
+                            PurchaseDate: purchaseDateInput,
 
-                        FlatCost: hasFlatCost ? costSection[0] : null,
-                        CostPerYear: hasRecurringCost
-                            ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : 0,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
-                        Mfg: 0,
-                        TextField: commentText,
-                    },
-                }).then((response:any) => {
-                    newID = response.data
-                })
+                            FlatCost: hasFlatCost ? costSection[0] : null,
+                            CostPerYear: hasRecurringCost
+                                ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
+                                : 0,
+                            MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
+                            Mfg: 0,
+                            TextField: commentText,
+                        },
+                    })
+                    .then((response: any) => {
+                        newID = response.data
+                    })
             } else if (match.params.type === 'server') {
-                await axios.post(`add/server`, {
-                    Entity: {
-                        Make: firstSectionData[0],
-                        Model: firstSectionData[1],
-                        OperatingSystem: firstSectionData[2],
-                        Ram: firstSectionData[3],
-                        LocalHHD: firstSectionData[4],
-                        NumberOfCores: firstSectionData[5],
-                        MFG: firstSectionData[6],
-                        SerialNumber: firstSectionData[7],
-                        IPAddress: firstSectionData[8],
-                        SAN: firstSectionData[9],
-                        Fqdn: firstSectionData[10],
+                await axios
+                    .post(`add/server`, {
+                        Entity: {
+                            Make: firstSectionData[0],
+                            Model: firstSectionData[1],
+                            OperatingSystem: firstSectionData[2],
+                            Ram: firstSectionData[3],
+                            LocalHHD: firstSectionData[4],
+                            NumberOfCores: firstSectionData[5],
+                            MFG: firstSectionData[6],
+                            SerialNumber: firstSectionData[7],
+                            IPAddress: firstSectionData[8],
+                            SAN: firstSectionData[9],
+                            Fqdn: firstSectionData[10],
 
-                        RenewalDate: renewalDateInput,
-                        PurchaseDate: purchaseDateInput,
-                        EndOfLife: endOfLifeInput,
+                            RenewalDate: renewalDateInput,
+                            PurchaseDate: purchaseDateInput,
+                            EndOfLife: endOfLifeInput,
 
-                        Virtualize: isVirtualized,
+                            Virtualize: isVirtualized,
 
-                        Location: thirdSectionData[1],
-                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
+                            Location: thirdSectionData[1],
+                            EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : 0,
-                        CostPerYear: hasRecurringCost
-                            ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : 0,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
+                            FlatCost: hasFlatCost ? costSection[0] : 0,
+                            CostPerYear: hasRecurringCost
+                                ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
+                                : 0,
+                            MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
-                        TextField: commentText,
-                    },
-                }).then((response:any) => {
-                    newID = response.data
-                })
+                            TextField: commentText,
+                        },
+                    })
+                    .then((response: any) => {
+                        newID = response.data
+                    })
             } else if (match.params.type === 'laptop') {
-                await axios.post(`add/laptop`, {
-                    Entity: {
-                        Make: firstSectionData[0],
-                        Model: firstSectionData[1],
-                        Cpu: firstSectionData[2],
-                        Ramgb: firstSectionData[3],
-                        Ssdgb: firstSectionData[4],
-                        ScreenSize: firstSectionData[5],
-                        MonitorOutput: firstSectionData[6],
-                        SerialNumber: firstSectionData[7],
-                        MFG: firstSectionData[8],
-                        Fqdn: firstSectionData[9],
+                await axios
+                    .post(`add/laptop`, {
+                        Entity: {
+                            Make: firstSectionData[0],
+                            Model: firstSectionData[1],
+                            Cpu: firstSectionData[2],
+                            Ramgb: firstSectionData[3],
+                            Ssdgb: firstSectionData[4],
+                            ScreenSize: firstSectionData[5],
+                            MonitorOutput: firstSectionData[6],
+                            SerialNumber: firstSectionData[7],
+                            MFG: firstSectionData[8],
+                            Fqdn: firstSectionData[9],
 
-                        RenewalDate: renewalDateInput,
-                        PurchaseDate: purchaseDateInput,
-                        EndOfLife: endOfLifeInput,
+                            RenewalDate: renewalDateInput,
+                            PurchaseDate: purchaseDateInput,
+                            EndOfLife: endOfLifeInput,
 
-                        Location: thirdSectionData[1],
-                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
+                            Location: thirdSectionData[1],
+                            EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : 0,
-                        CostPerYear: hasRecurringCost
-                            ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : 0,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
+                            FlatCost: hasFlatCost ? costSection[0] : 0,
+                            CostPerYear: hasRecurringCost
+                                ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
+                                : 0,
+                            MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
-                        TextField: commentText,
-                    },
-                }).then((response:any) => {
-                    newID = response.data
-                })
+                            TextField: commentText,
+                        },
+                    })
+                    .then((response: any) => {
+                        newID = response.data
+                    })
             } else if (match.params.type === 'peripheral') {
-                await axios.post(`add/peripheral`, {
-                    Entity: {
-                        PeripheralName: firstSectionData[0],
-                        PeripheralType: firstSectionData[1],
-                        SerialNumber: firstSectionData[2],
+                await axios
+                    .post(`add/peripheral`, {
+                        Entity: {
+                            PeripheralName: firstSectionData[0],
+                            PeripheralType: firstSectionData[1],
+                            SerialNumber: firstSectionData[2],
 
-                        PurchaseDate: purchaseDateInput,
+                            PurchaseDate: purchaseDateInput,
 
-                        Location: thirdSectionData[1],
-                        EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
+                            Location: thirdSectionData[1],
+                            EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
 
-                        FlatCost: hasFlatCost ? costSection[0] : 0,
-                        CostPerYear: hasRecurringCost
-                            ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
-                            : 0,
-                        MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
+                            FlatCost: hasFlatCost ? costSection[0] : 0,
+                            CostPerYear: hasRecurringCost
+                                ? (parseFloat(costSection[1].toString()) * 12) / parseFloat(costSection[2].toString())
+                                : 0,
+                            MonthsPerRenewal: hasRecurringCost ? costSection[2] : 0,
 
-                        TextField: commentText,
-                    },
-                }).then((response:any) => {
-                    newID = response.data
-                })
+                            TextField: commentText,
+                        },
+                    })
+                    .then((response: any) => {
+                        newID = response.data
+                    })
             }
             history.push({pathname: `/hardware/detail/${match.params.type}/${newID}`, state: {prev: history.location}})
         } else {
@@ -632,11 +637,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     function handleInputChange(index: number, sectionData: any[], value: string | number) {
         let tempData = cloneDeep(sectionData)
         tempData[index] = value
-        if (sectionData == firstSectionData) {
+        if (sectionData === firstSectionData) {
             setFirstSectionData(tempData)
-        } else if (sectionData == secondSectionData) {
+        } else if (sectionData === secondSectionData) {
             setSecondSectionData(tempData)
-        } else if (sectionData == thirdSectionData) {
+        } else if (sectionData === thirdSectionData) {
             setThirdSectionData(tempData)
         }
     }
@@ -644,7 +649,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     // make first section
     function renderSection(sectionHeaders: string[], sectionData: any[]) {
         var rows = []
-        if (sectionData == secondSectionData) {
+        if (sectionData === secondSectionData) {
             for (let i = 0; i < sectionHeaders.length; i += 3) {
                 rows.push(
                     <div className={styles.row}>
@@ -686,7 +691,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 )
             }
             //employee assigned
-        } else if (sectionData == thirdSectionData) {
+        } else if (sectionData === thirdSectionData) {
             for (let i = 0; i < sectionHeaders.length; i += 3) {
                 rows.push(
                     <div className={styles.row}>
@@ -764,7 +769,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 ></input>
                             </div>
                         )}
-                        {match.params.type == 'server' && (
+                        {match.params.type === 'server' && (
                             <div className={styles.inputContainer}>
                                 <div className={styles.inputHeader}>Virtualize</div>
                                 <Checkbox
@@ -863,7 +868,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         } else {
             //remove from addHistoryLog
             let tempAddHistoryLog = cloneDeep(addHistoryLog)
-            tempAddHistoryLog = tempAddHistoryLog.filter(log => log.key != historyLogEntries[index].key)
+            tempAddHistoryLog = tempAddHistoryLog.filter(log => log.key !== historyLogEntries[index].key)
 
             setAddHistoryLog(tempAddHistoryLog)
         }
@@ -891,7 +896,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
             {/* column 2 */}
             <div className={styles.secondColumn}>
-                <div className={s(styles.hardwareHeader, isDarkMode ? styles.headerDark : {})}>{match.params.type} Information</div>
+                <div className={s(styles.hardwareHeader, isDarkMode ? styles.headerDark : {})}>
+                    {match.params.type} Information
+                </div>
                 {/* first section */}
                 {firstSectionHeaders.length > 0 && renderSection(firstSectionHeaders, firstSectionData)}
                 {firstSectionHeaders.length > 0 && <div className={styles.line} />}
@@ -987,7 +994,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                             onChange={() => setEventInput('Broken')}
                                         />
                                         <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
-                                        <div className={s(styles.insideCheckmark, isDarkMode ? styles.insideCheckmarkDark : {})} />
+                                        <div
+                                            className={s(
+                                                styles.insideCheckmark,
+                                                isDarkMode ? styles.insideCheckmarkDark : {}
+                                            )}
+                                        />
                                     </div>
                                     <div className={styles.inputHeader}>Broken</div>
                                 </div>
@@ -1001,7 +1013,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                             onChange={() => setEventInput('Repaired')}
                                         />
                                         <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
-                                        <div className={s(styles.insideCheckmark, isDarkMode ? styles.insideCheckmarkDark : {})} />
+                                        <div
+                                            className={s(
+                                                styles.insideCheckmark,
+                                                isDarkMode ? styles.insideCheckmarkDark : {}
+                                            )}
+                                        />
                                         <div className={styles.inputHeader}>Repaired</div>
                                     </div>
                                 </div>
