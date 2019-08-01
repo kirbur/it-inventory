@@ -75,7 +75,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [img, setImg] = useState('')
@@ -121,7 +121,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                               ]
                             : [
                                   {
-                                      value: i.programId,
+                                      value: `Copy ${i.programId}`,
                                       id: i.programId,
                                       sortBy: i.programId,
                                       onClick: handleCopyClick,
@@ -206,25 +206,13 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     <BackButton history={history} className={styles.backButton} />
                     <DetailImage src={img} />
                     {programData.progFlatCost > 0 && (
-                        <DetailCostText
-                            costTexts={[
-                                {title: 'Paid', cost: `$${programData.progFlatCost}`},
-                            ]}
-                        />
+                        <DetailCostText costTexts={[{title: 'Paid', cost: `$${programData.progFlatCost}`}]} />
                     )}
                     {programData.isCostPerYear ? (
-                        <DetailCostText
-                        costTexts={[
-                            {title: 'Yearly', cost: `$${programData.progCostPerYear}`},
-                        ]}
-                    />
+                        <DetailCostText costTexts={[{title: 'Yearly', cost: `$${programData.progCostPerYear}`}]} />
                     ) : (
                         programData.progCostPerYear > 0 && (
-                            <DetailCostText
-                            costTexts={[
-                                {title: 'Monthly', cost: `$${programData.progCostPerYear}`},
-                            ]}
-                        />
+                            <DetailCostText costTexts={[{title: 'Monthly', cost: `$${programData.progCostPerYear}`}]} />
                         )
                     )}
                 </div>

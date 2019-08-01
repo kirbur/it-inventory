@@ -77,7 +77,8 @@ export const App: React.FC = () => {
               }
     )
 
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const dark = localStorage.getItem('darkMode')
+    const [isDarkMode, setIsDarkMode] = useState(dark? JSON.parse(dark):false);
 
     var contextValue = {
         loginContextVariables: loginContextVariables,
