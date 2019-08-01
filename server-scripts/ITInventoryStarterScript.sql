@@ -11,7 +11,7 @@ INSERT [Department] ([DepartmentID], [DefaultHardware], [DefaultPrograms], [Depa
 SET IDENTITY_INSERT [Department] OFF
 SET IDENTITY_INSERT [Employee] ON
 
-INSERT [Employee] ([EmployeeID], [HireDate], [DepartmentID], [IsDeleted], [FirstName], [LastName], [Email], [Role], [ADGUID], [ArchiveDate], [TextField]) VALUES (1, CAST(N'2002-05-05' AS Date), 3, 0, N'Dan', N'Moynihan', N'dan.moynihan@cqlcorp.com', N'IT Admin', N'811cbf54-2913-4ffc-8f33-6418ddb4e06d', null, N'')
+INSERT [Employee] ([EmployeeID], [HireDate], [DepartmentID], [IsDeleted], [FirstName], [LastName], [Email], [Role], [ADGUID], [ArchiveDate], [TextField]) VALUES (1, CAST(N'2004-10-01' AS Date), 3, 0, N'Dan', N'Moynihan', N'dan.moynihan@cqlcorp.com', N'IT Admin', N'811cbf54-2913-4ffc-8f33-6418ddb4e06d', null, N'')
 
 SET IDENTITY_INSERT [Employee] OFF
 
