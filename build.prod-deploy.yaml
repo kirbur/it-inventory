@@ -1,14 +1,19 @@
 tag: false
-maintainers: michael.leonard@cqlcorp.com
 pipelines:
     default:
+
+        ## TODO: Use artifacts from existing build rather than duplicating dev build
+        #        - copy-artifacts:
+        #            sources:
+        #                - job: github.com/cqlcorp/it-inventory
+        #                  ref: "$COPY_ARTIFACTS_FROM_REF"
 
         ############################################################
         # NOTE
         #
         # Any changes you make to this might also be necessary in
-        # build.prod-deploy.yaml, that is until the production build
-        # relies on copy-artifacts
+        # build.yaml, that is until the production build relies on
+        # copy-artifacts
         ############################################################
 
         - step:
@@ -51,48 +56,46 @@ pipelines:
             artifacts: artifacts/**
 
         - step:
-            name: Deploy to DEV (on develop branch)
-            condition:
-                branch: develop
+            name: Deploy to PRODUCTION
             checkout: false
             image: containers.cqlcorp.net/build/git
             credentials:
                 - type: string
                   args:
-                      credentialsId: itinventory.cqlcorp.net-sftp-host
+                      credentialsId: PRODUCTION_ITINVENTORY_SFTP_HOST
                       variable: SFTPHOST
                 - type: usernamePassword
                   args:
-                      credentialsId: itinventory.cqlcorp.net-sftp-username-password
+                      credentialsId: PRODUCTION_ITINVENTORY_SFTP_USERNAME_PASSWORD
                       usernameVariable: SFTPUSER
                       passwordVariable: SFTPPASSWORD
                 - type: string
                   args:
-                      credentialsId: itinventory.cqlcorp.net-itinventorydb-connstring-dbo
+                      credentialsId: PRODUCTION_ITINVENTORYDB_CONNSTRING_DBO
                       variable: ITINVENTORYDB_DBO_CONNSTRING
                 - type: string
                   args:
-                      credentialsId: itinventory.cqlcorp.net-itinventorydb-connstring-appuser
+                      credentialsId: PRODUCTION_ITINVENTORYDB_CONNSTRING_APPUSER
                       variable: ITINVENTORYDB_APPUSER_CONNSTRING
                 - type: string
                   args:
-                      credentialsId: itinventory.cqlcorp.net-jwt-secret
+                      credentialsId: PRODUCTION_ITINVENTORY_JWT_SECRET
                       variable: JWT_SECRET
                 - type: string
                   args:
-                      credentialsId: itinventory.cqlcorp.net-jobs-authtoken
+                      credentialsId: PRODUCTION_ITINVENTORY_JOBS_AUTHTOKEN
                       variable: JOBS_AUTHTOKEN
                 - type: string
                   args:
-                      credentialsId: itinventory.cqlcorp.net-smtp-server
+                      credentialsId: PRODUCTION_ITINVENTORY_SMTP_SERVER
                       variable: SMTP_SERVER
             script:
-                - export API_SFTPROOT=/www/itinventory.cqlcorp.net
+                - export API_SFTPROOT=/
 
-                - export API_WEBCONFIGTEMPLATE=env/DEV/itinventory.cqlcorp.net/web.config.template
+                - export API_WEBCONFIGTEMPLATE=env/PROD/itinventory.cqlcorp.com/web.config.template
 
                 - export SFTPURI="sftp://$SFTPUSER:$SFTPPASSWORD@$SFTPHOST"
-                - cp env/DEV/app_offline.htm /tmp/app_offline.htm
+                - cp env/PROD/app_offline.htm /tmp/app_offline.htm
 
                 - ./deploy-iis.sh
 
