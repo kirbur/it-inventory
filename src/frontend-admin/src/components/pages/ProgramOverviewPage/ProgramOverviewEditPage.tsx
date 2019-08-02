@@ -20,7 +20,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {formatCost} from '../../../utilities/FormatCost'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './ProgramOverviewEditPage.module.css'
@@ -53,6 +53,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         },
     } = props
     const {loginContextVariables} = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
 
@@ -132,7 +133,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     let prog: ITableItem[][] = []
                     data[0].inDivPrograms.map((i: ExpectedProgramType) =>
                         prog.push([
-                            {value: i.programId, id: i.programId, sortBy: i.programId},
+                            {value: `Copy ${i.programId}`, id: i.programId, sortBy: i.programId},
                             {
                                 value: format(i.employeeName),
                                 id: i.employeeId,
@@ -151,7 +152,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
                     let plug: ITableItem[][] = []
                     let plugList: IPluginInfo[] = []
-                    data[0].listOfPlugins.map((i: ExpectedPluginType) => {
+                    data[0].listOfPlugins.forEach((i: ExpectedPluginType) => {
                         plug.push([
                             {
                                 value: format(i.pluginName),
@@ -297,7 +298,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
                     //after submitting go back to detail
                     history.push({
-                        pathname: `/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`,
+                        pathname: `/programs/overview/${id}/inventory`,
                         state: {prev: history.location},
                     })
                 } else {
@@ -427,7 +428,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
             //after submitting go back to detail
             history.push({
-                pathname: `/programs/overview/${id}/${archived ? 'archived' : 'inventory'}`,
+                pathname: `/programs/overview/${id}/inventory`,
                 state: {prev: history.location},
             })
         }
@@ -480,7 +481,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     }
 
     return (
-        <div className={styles.progOverviewEditMain}>
+        <div className={s(styles.progOverviewEditMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
@@ -491,7 +492,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
-                    <div className={styles.title}>Program Information</div>
+                    <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Program Information</div>
 
                     <Group justify={'between'} className={styles.row1Group}>
                         <div className={id !== 'new' ? styles.nameInput : styles.nameInputWithEdit}>

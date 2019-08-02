@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { ThemeContext } from '../../App';
 
 // icons
 import {FaArchive, FaEdit} from 'react-icons/fa'
@@ -10,6 +11,7 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './Button.module.css'
+
 
 // Types
 type ButtonIcon = 'add' | 'archive' | 'edit' | 'back' | 'submit'
@@ -28,6 +30,7 @@ interface IButtonProps {
 // Primary Component
 export const Button: React.SFC<IButtonProps> = props => {
     const {onClick = () => {}, className = '', text = '', textClassName = '', children, icon, textInside = true} = props
+    const {isDarkMode} = useContext(ThemeContext)
 
     return icon === 'back' ? (
         <div onClick={onClick} className={s(styles.backButton, className)}>
@@ -36,7 +39,7 @@ export const Button: React.SFC<IButtonProps> = props => {
             {children}
         </div>
     ) : textInside ? (
-        <div onClick={onClick} className={s(styles.buttonMain, className)}>
+        <div onClick={onClick} className={s(styles.buttonMain, className, isDarkMode ? styles.buttonMainDark : {})}>
             <div className={s(styles.buttonText, textClassName)}>{text}</div>
             {/* {icon === 'add' && <div className={styles.addIcon} />} */}
             {icon === 'add' && <GoPlus className={styles.icon} size={20} />}
@@ -47,8 +50,8 @@ export const Button: React.SFC<IButtonProps> = props => {
             {children}
         </div>
     ) : (
-        <div onClick={onClick} className={s(styles.iconButtonContainer, className)}>
-            <div className={styles.iconbuttonMain}>
+        <div onClick={onClick} className={s(styles.iconButtonContainer, className, isDarkMode ? styles.iconButtonContainerDark : {})}>
+            <div className={s(styles.iconbuttonMain, isDarkMode ? styles.iconButtonDark : {})}>
                 {/* {icon === 'add' && <div className={styles.addIcon} />} */}
                 {icon === 'add' && <GoPlus className={styles.icon} size={20} />}
                 {icon === 'archive' && <FaArchive className={styles.icon} size={20} />}

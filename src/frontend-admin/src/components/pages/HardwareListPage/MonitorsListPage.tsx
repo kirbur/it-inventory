@@ -15,7 +15,7 @@ import {Table} from '../../reusables/Table/Table'
 import {History} from 'history'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './HardwareListPage.module.css'
@@ -55,6 +55,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<any[]>([])
@@ -69,12 +70,11 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     const options = columns.map((c, i) => ({label: searchByHeaders[i], value: c}))
     const [isArchive, setIsArchive] = useState(false)
 
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{id: number; img: string}[]>([])
-    const [displayImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        var imagePromises: any[] = []
+        await axios
             .get('/list/monitors')
             .then((data: IPulledData[]) => {
                 const monitors: IMonitorData[] = []
@@ -90,15 +90,22 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                         icon: i.icon,
                         model: format(i.model),
                     })
-                    imgs.push({id: i.monitorId, img: i.icon})
+
+                    imagePromises.push(
+                        checkImage(i.icon, axios, placeholder).then(image => {
+                            return {id: i.monitorId, img: image}
+                        })
+                    )
                 })
                 setListData(monitors)
-
-                setImages(imgs)
-                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
-        axios
+
+        await Promise.all(imagePromises)
+            .then(response => setDisplayImages(response))
+            .catch((err: any) => console.error(err))
+
+        await axios
             .get('/archivedList/monitor')
             .then((data: IPulledData[]) => {
                 const monitors: IMonitorData[] = []
@@ -117,22 +124,15 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                 setArchivedData(monitors)
             })
             .catch((err: any) => console.error(err))
+    }
+
+    useEffect(() => {
+        getData()
     }, [])
 
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
     }, [search, selected, listData, archivedData, isArchive])
-
-    //Set display Images
-    useEffect(() => {
-        images.map((img: {id: number; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.id !== img.id)
-                setImages([...list, {id: img.id, img: data}])
-                displayImages.push({id: img.id, img: data})
-            })
-        )
-    }, [useImages])
 
     const handleClick = () => {
         history.push({pathname: '/hardware/edit/monitor/new', state: {prev: history.location}})
@@ -221,15 +221,19 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     }
 
     function concatenatedName(row: any[]) {
-        return displayImages &&
-            displayImages.filter(x => x.id === row[1]) &&
-            displayImages.filter(x => x.id === row[1])[0] ? (
+        var image = placeholder
+        for (let i = 0; i < displayImages.length; i++) {
+            if (displayImages[i].id === row[1]) {
+                image = displayImages[i].img
+            }
+        }
+        return image ? (
             <td key={row[1]} className={styles.hardware}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                    <img className={styles.icon} src={image} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={s(styles.hardwareName, isDarkMode ? styles.dark : {})}>{row[0]}</text> <br />
                     <text className={styles.alignLeft}>{row[7]}</text>
                 </div>
             </td>
@@ -239,7 +243,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                     <img className={styles.icon} src={placeholder} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <text className={styles.hardwareName}>{row[0]}</text> <br />
+                    <text className={s(styles.hardwareName, isDarkMode ? styles.dark : {})}>{row[0]}</text> <br />
                     <text className={styles.alignLeft}>{row[7]}</text>
                 </div>
             </td>
@@ -255,7 +259,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
                 case 2:
-                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]}</td>
+                    transformedRow[2] = <td className={styles.alignLeft}>{row[2]} in</td>
                 case 3:
                     transformedRow[3] = <td className={styles.alignLeft}>{row[3]}k</td>
                 case 4:

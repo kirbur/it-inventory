@@ -1,5 +1,5 @@
 .employeesListMain {
-    margin: 50px 85px;
+    padding: 50px 85px;
 }
 
 .page {
@@ -29,15 +29,19 @@
 .icon {
     margin: auto;
     max-height: 75px;
-    width: 75px;
+    max-width: 75px;
+    height: auto;
+    width: auto;
 }
 .buttonContainer {
     display: flex;
     flex: column;
 }
+.addButton {
+    margin-right: 25px;
+}
 .archiveButton {
     width: 150px;
-    margin-left: 25px;
     margin-right: 25px;
 }
 .alignLeft {
@@ -113,4 +117,12 @@
     position: relative;
     top: 15px;
     left: 5px;
+}
+
+.employeeNameDark {
+    color: #5ec2ff;
+}
+
+.employeesListMainDark {
+    background-color: #282c29;
 }

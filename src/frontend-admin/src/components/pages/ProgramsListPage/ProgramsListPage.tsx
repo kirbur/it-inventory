@@ -19,7 +19,7 @@ import {Table} from '../../reusables/Table/Table'
 import {Checkbox} from '../../reusables/Checkbox/Checkbox'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './ProgramsListPage.module.css'
@@ -38,11 +38,10 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{name: string; img: string}[]>([])
-    const [displayImages] = useState<{name: string; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{name: string; img: string}[]>([])
 
     const [listData, setListData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState(listData)
@@ -59,8 +58,9 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     const [checkboxes, setCheckboxes] = useState(false)
     const [pinned, setPinned] = useState<{name: string; pinned: boolean}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        var imagePromises: any[] = []
+        await axios
             .get('/list/programs/false')
             .then((data: any) => {
                 var programs: any[] = []
@@ -77,16 +77,24 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                         icon: i.icon,
                         cost: formatCost(i.isCostPerYear, i.progCostPerYear, i.progCostPerUse), //used for searching, not displayed
                     })
-                    imgs.push({name: i.programName, img: i.icon})
+
+                    imagePromises.push(
+                        checkImage(i.icon, axios, placeholder).then(image => {
+                            return {name: i.programName, img: image}
+                        })
+                    )
                     pins.push({name: i.programName, pinned: i.isPinned})
                 })
                 setListData(programs)
-                setImages(imgs)
-                setUseImages(true)
                 setPinned(pins)
             })
             .catch((err: any) => console.error(err))
-        axios
+
+        await Promise.all(imagePromises)
+            .then(response => setDisplayImages(response))
+            .catch((err: any) => console.error(err))
+
+        await axios
             .get('list/programs/true')
             .then((data: any) => {
                 var programs: any[] = []
@@ -107,18 +115,11 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
                 setArchivedData(programs)
             })
             .catch((err: any) => console.error(err))
-    }, [])
+    }
 
-    //Set display Images
     useEffect(() => {
-        images.map((img: {name: string; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.name !== img.name)
-                setImages([...list, {name: img.name, img: data}])
-                displayImages.push({name: img.name, img: data})
-            })
-        )
-    }, [useImages])
+        getData()
+    }, [])
 
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
@@ -238,12 +239,16 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }
 
     function concatenatedDept(row: any[]) {
-        return displayImages &&
-            displayImages.filter(x => x.name === row[0]) &&
-            displayImages.filter(x => x.name === row[0])[0] ? (
+        var image = placeholder
+        for (let i = 0; i < displayImages.length; i++) {
+            if (displayImages[i].name === row[0]) {
+                image = displayImages[i].img
+            }
+        }
+        return image ? (
             <td key={row[0]} className={styles.programs} onClick={() => handleRowClick(row)}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={displayImages.filter(x => x.name === row[0])[0].img} alt={''} />
+                    <img className={styles.icon} src={image} alt={''} />
                 </div>
 
                 <div className={styles.alignLeft}>
@@ -330,54 +335,44 @@ export const ProgramsListPage: React.SFC<IProgramsListPageProps> = props => {
     }
 
     return (
-        <div className={styles.programsListMain}>
+        <div className={s(styles.programsListMain, isDarkMode ? styles.programsListMainDark : {})}>
             <Switch>
                 <Route path='/programs/:name' render={props => <div>{props.match.params.name} Detail Page</div>} />
             </Switch>
-            {isAdmin ? (
-                <Group direction='row' justify='between' className={styles.group}>
-                    <div className={styles.buttonContainer}>
-                        <Button text='Add' icon='add' onClick={handleClick} />
-                        <Button
-                            text={isArchive ? 'View Active' : 'View Archives'}
-                            onClick={() => {
-                                setIsArchive(!isArchive)
-                                setCheckboxes(false)
-                            }}
-                            className={styles.archiveButton}
-                        />
 
-                        {!isArchive && checkboxes ? (
-                            <Button text='Save Changes' onClick={handlePinChanges} className={styles.dashboardButton} />
-                        ) : (
-                            !isArchive && (
-                                <Button
-                                    text='Pin To Dashboard'
-                                    onClick={() => setCheckboxes(!checkboxes)}
-                                    className={styles.dashboardButton}
-                                />
-                            )
-                        )}
-                    </div>
-                    <FilteredSearch
-                        search={search}
-                        setSearch={setSearch}
-                        options={options}
-                        selected={selected}
-                        setSelected={setSelected}
+            <Group direction='row' justify='between' className={styles.group}>
+                <div className={styles.buttonContainer}>
+                    {isAdmin && <Button text='Add' icon='add' onClick={handleClick} className={styles.addButton} />}
+                    <Button
+                        text={isArchive ? 'View Active' : 'View Archives'}
+                        onClick={() => {
+                            setIsArchive(!isArchive)
+                            setCheckboxes(false)
+                        }}
+                        className={styles.archiveButton}
                     />
-                </Group>
-            ) : (
-                <div className={styles.searchContainer}>
-                    <FilteredSearch
-                        search={search}
-                        setSearch={setSearch}
-                        options={options}
-                        selected={selected}
-                        setSelected={setSelected}
-                    />
+
+                    {!isArchive && checkboxes && isAdmin ? (
+                        <Button text='Save Changes' onClick={handlePinChanges} className={styles.dashboardButton} />
+                    ) : (
+                        !isArchive &&
+                        isAdmin && (
+                            <Button
+                                text='Pin To Dashboard'
+                                onClick={() => setCheckboxes(!checkboxes)}
+                                className={styles.dashboardButton}
+                            />
+                        )
+                    )}
                 </div>
-            )}
+                <FilteredSearch
+                    search={search}
+                    setSearch={setSearch}
+                    options={options}
+                    selected={selected}
+                    setSelected={setSelected}
+                />
+            </Group>
 
             <div className={styles.page}>
                 <Table headers={renderHeaders()} rows={renderedRows} />

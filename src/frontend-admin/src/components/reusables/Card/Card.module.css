@@ -5,11 +5,19 @@
     display: flex;
     flex-direction: column;
     border-radius: 15px;
-    flex-grow: 1;
+    /* flex-grow: 1; */
 }
 
 .cardChildren {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.cardDark {
+    background-color: #635f5f;
+}
+
+.cardTitleDark {
+    color: white;
 }

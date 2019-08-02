@@ -17,7 +17,7 @@ import styles from './HardwareDetailEditPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 import {cloneDeep} from 'lodash'
 import {sortByDate} from '../../../utilities/quickSort'
 import {DropdownList} from '../../reusables/Dropdown/DropdownList'
@@ -56,6 +56,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
 
@@ -110,8 +111,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 'Make',
                 'Model',
                 'OS',
-                'RAM',
-                'Local HHD',
+                'RAM (GB)',
+                'Local HHD (GB)',
                 '# of Cores',
                 'MFG Tag',
                 'Serial #',
@@ -162,9 +163,9 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 'Make',
                 'Model',
                 'CPU',
-                'RAM',
-                'SSD',
-                'Screen Size',
+                'RAM (GB)',
+                'SSD (GB)',
+                'Screen Size (in)',
                 'Monitor Output',
                 'Serial #',
                 'MFG Tag',
@@ -213,7 +214,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     .catch((err: any) => console.error(err))
             }
         } else if (match.params.type === 'monitor') {
-            setFirstSectionHeaders(['Make', 'Model', 'Screen Size', 'Resolution', 'Inputs', 'Serial #'])
+            setFirstSectionHeaders(['Make', 'Model', 'Screen Size (in)', 'Resolution (k)', 'Inputs', 'Serial #'])
             setSecondSectionHeaders(['Purchase Date', 'Renewal Date'])
             setThirdSectionHeaders(['Employee Assigned', 'Location'])
             if (match.params.id !== 'new') {
@@ -300,12 +301,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
         //checks for every form
         if (hasRecurringCost) {
             if (costSection[1] == 0 || costSection[1] == null || costSection[2] == 0 || costSection[2] == null) {
-                alertMssg += '\n Recurring cost and months must have values!'
+                alertMssg += '\n Recurring cost and months must have values greater than zero!'
             }
         }
         if (hasFlatCost) {
             if (costSection[0] == 0 || costSection[0] == null) {
-                alertMssg += '\n Initial cost must have a value!'
+                alertMssg += '\n Initial cost must have a value greater than zero!'
             }
         }
         //everything must be filled out - sorting doesnt work with null values
@@ -356,6 +357,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
     async function handleSubmit() {
         //update image
+        var newID = ''
+
         if (imgInput) {
             var formData = new FormData()
             formData.append('file', imgInput)
@@ -396,6 +399,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         Mfg: 0,
                         TextField: commentText,
                     },
+                }).then((response:any) => {
+                    newID = response.data
                 })
             } else if (match.params.type === 'server') {
                 await axios.post(`add/server`, {
@@ -429,6 +434,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         TextField: commentText,
                     },
+                }).then((response:any) => {
+                    newID = response.data
                 })
             } else if (match.params.type === 'laptop') {
                 await axios.post(`add/laptop`, {
@@ -459,14 +466,15 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         TextField: commentText,
                     },
+                }).then((response:any) => {
+                    newID = response.data
                 })
             } else if (match.params.type === 'peripheral') {
                 await axios.post(`add/peripheral`, {
                     Entity: {
                         PeripheralName: firstSectionData[0],
                         PeripheralType: firstSectionData[1],
-                        Mfg: null,
-                        SerialNumber: firstSectionData[3],
+                        SerialNumber: firstSectionData[2],
 
                         PurchaseDate: purchaseDateInput,
 
@@ -481,9 +489,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         TextField: commentText,
                     },
+                }).then((response:any) => {
+                    newID = response.data
                 })
             }
-            history.push({pathname: '/hardware', state: {prev: history.location}})
+            history.push({pathname: `/hardware/detail/${match.params.type}/${newID}`, state: {prev: history.location}})
         } else {
             //not new --> editing existing page
             if (match.params.type === 'monitor') {
@@ -593,8 +603,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
                         PeripheralName: firstSectionData[0],
                         PeripheralType: firstSectionData[1],
-                        Mfg: null,
-                        SerialNumber: firstSectionData[3],
+                        SerialNumber: firstSectionData[2],
 
                         PurchaseDate: purchaseDateInput,
 
@@ -613,11 +622,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     DeleteHistory: removeHistoryLog,
                 })
             }
+            history.push({
+                pathname: `/hardware/detail/${match.params.type}/${match.params.id}`,
+                state: {prev: history.location},
+            })
         }
-        history.push({
-            pathname: `/hardware/detail/${match.params.type}/${match.params.id}`,
-            state: {prev: history.location},
-        })
     }
 
     function handleInputChange(index: number, sectionData: any[], value: string | number) {
@@ -778,7 +787,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 <input
                                     type='text'
                                     className={styles.input}
-                                    placeholder={sectionData[i]}
+                                    value={sectionData[i]}
                                     onChange={e => e && handleInputChange(i, sectionData, e.target.value)}
                                 ></input>
                             </div>
@@ -789,7 +798,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 <input
                                     type='text'
                                     className={styles.input}
-                                    placeholder={sectionData[i + 1]}
+                                    value={sectionData[i + 1]}
                                     onChange={e => e && handleInputChange(i + 1, sectionData, e.target.value)}
                                 ></input>
                             </div>
@@ -800,7 +809,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                 <input
                                     type='text'
                                     className={styles.input}
-                                    placeholder={sectionData[i + 2]}
+                                    value={sectionData[i + 2]}
                                     onChange={e => e && handleInputChange(i + 2, sectionData, e.target.value)}
                                 ></input>
                             </div>
@@ -871,7 +880,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     }
 
     return (
-        <div className={styles.columns}>
+        <div className={s(styles.columns, isDarkMode ? styles.backgroundDark : {})}>
             {/* column 1 */}
             <div className={styles.firstColumn}>
                 <BackButton history={history} className={styles.backButton} />
@@ -882,7 +891,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
 
             {/* column 2 */}
             <div className={styles.secondColumn}>
-                <div className={styles.hardwareHeader}>{match.params.type} Information</div>
+                <div className={s(styles.hardwareHeader, isDarkMode ? styles.headerDark : {})}>{match.params.type} Information</div>
                 {/* first section */}
                 {firstSectionHeaders.length > 0 && renderSection(firstSectionHeaders, firstSectionData)}
                 {firstSectionHeaders.length > 0 && <div className={styles.line} />}
@@ -965,6 +974,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                     className={styles.input}
                                 />
                             </div>
+                            {/* TODO: make this a component. */}
                             <div className={styles.inputContainer}>
                                 <div className={styles.inputHeader}>Event Type</div>
                                 <div className={styles.radioContainer}>
@@ -976,8 +986,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                             checked={eventInput === 'Broken'}
                                             onChange={() => setEventInput('Broken')}
                                         />
-                                        <div className={styles.checkmark} />
-                                        <div className={styles.insideCheckmark} />
+                                        <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                                        <div className={s(styles.insideCheckmark, isDarkMode ? styles.insideCheckmarkDark : {})} />
                                     </div>
                                     <div className={styles.inputHeader}>Broken</div>
                                 </div>
@@ -990,15 +1000,15 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                                             checked={eventInput === 'Repaired'}
                                             onChange={() => setEventInput('Repaired')}
                                         />
-                                        <div className={styles.checkmark} />
-                                        <div className={styles.insideCheckmark} />
+                                        <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                                        <div className={s(styles.insideCheckmark, isDarkMode ? styles.insideCheckmarkDark : {})} />
                                         <div className={styles.inputHeader}>Repaired</div>
                                     </div>
                                 </div>
                                 {/* the rest of the logs are done on the backend */}
                             </div>
                             {/* should send back the employee of this page */}
-                            <div className={styles.historyLogSubmit}>
+                            <div className={s(styles.historyLogSubmit, isDarkMode ? styles.textDark : {})}>
                                 <Button
                                     icon='add'
                                     onClick={handleSubmitHistoryLog}
@@ -1009,7 +1019,7 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                         </div>
                     )}
                     {!historyLogBool && (
-                        <div className={styles.historyLogAdd}>
+                        <div className={s(styles.historyLogAdd, isDarkMode ? styles.textDark : {})}>
                             <Button
                                 icon='add'
                                 onClick={() => setHistoryLogBool(!historyLogBool)}

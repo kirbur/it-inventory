@@ -11,7 +11,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    width: 600px;
+    width: 540px;
     position: relative;
     left: 75px;
 }
@@ -26,13 +26,13 @@
 
 .header {
     position: relative;
-    top: 40px;
+    top: 50px;
     padding-right: 270px;
     padding-bottom: 25px;
 }
 .lastHeader {
     position: relative;
-    top: 40px;
+    top: 50px;
     padding-bottom: 25px;
 }
 
@@ -50,7 +50,7 @@
 /* when pie data is empty */
 .circleContainer {
     position: relative;
-    bottom: 420px;
+    bottom: 340px;
     width: 340px;
     height: 0px;
 }
@@ -69,4 +69,8 @@
     position: relative;
     bottom: 45px;
     right: 10px;
+}
+
+.dark {
+    color: white !important;
 }

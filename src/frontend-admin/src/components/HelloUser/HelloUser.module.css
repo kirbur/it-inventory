@@ -25,3 +25,12 @@
 .helloContainer {
     display: flex;
 }
+
+.dark {
+    color: rgb(173, 173, 173);
+}
+
+.dropdownArrowDark {
+    border-left: 2px solid rgb(173, 173, 173);
+    border-top: 2px solid rgb(173, 173, 173);
+}

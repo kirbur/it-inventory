@@ -1,5 +1,5 @@
 .columns {
-    margin: 0 50px;
+    padding: 0 50px;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -14,6 +14,7 @@
 
 .secondColumn {
     padding: 50px;
+    padding-left: 75px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -27,6 +28,7 @@
 .imgContainer {
     position: relative;
     width: 100%;
+    /* height: 100%; */
 }
 
 .imgContainer:before {
@@ -107,6 +109,7 @@
     border-radius: 3px;
     font-size: 18px;
     padding-left: 12px;
+    margin-bottom: 20px;
     font-family: cqlRegularFont;
 }
 .text {
@@ -201,7 +204,7 @@ input:checked ~ .insideCheckmarkAdmin {
 
 /* so the table doesnt highlight on hover */
 .newRowThing:hover {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0);
 }
 
 /* add to table text and icon */
@@ -295,12 +298,24 @@ input:checked ~ .insideCheckmarkAdmin {
     top: 14px;
 }
 
+.moveItRight {
+    position: relative;
+    left: 50px;
+}
+.ddc1 {
+    position: relative;
+    right: 10px;
+}
 .dropdown1 {
     z-index: 1;
     align-self: flex-end;
     margin: 15px 0;
 }
 
+.ddc2 {
+    position: relative;
+    right: 5px;
+}
 .dropdown2 {
     z-index: 2;
     align-self: flex-end;
@@ -314,6 +329,7 @@ input:checked ~ .insideCheckmarkAdmin {
 }
 
 .descriptionContainer {
+    padding-top: 25px;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -325,4 +341,20 @@ input:checked ~ .insideCheckmarkAdmin {
     height: 100px;
     font-family: cqlRegularFont;
     resize: none;
+}
+
+.titleDark {
+    color: white;
+}
+
+input:checked ~ .checkmarkDark {
+    border-color: #5ec2ff;
+}
+
+input:checked ~ .insideCheckmarkAdminDark {
+    background-color: #5ec2ff;
+}
+
+.backgroundDark {
+    background-color: #282c29;
 }

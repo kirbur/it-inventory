@@ -24,6 +24,9 @@ import {HardwareDetailEditPage} from '../pages/HardwareDetailPage/HardwareDetail
 // Styles
 import styles from './App.module.css'
 
+// Utils
+import {concatStyles as s} from '../../utilities/mikesConcat'
+
 //types
 export interface ILoginContext {
     refreshToken: string
@@ -49,11 +52,18 @@ export const initialValues: {
 }
 export const LoginContext = React.createContext(initialValues)
 
+const themeDefault: {
+    isDarkMode: boolean,
+    setIsDarkMode: any
+} = {
+    isDarkMode: false,
+    setIsDarkMode: () => {},
+}
+export const ThemeContext = React.createContext(themeDefault);
+
+
 // Primary Component
 export const App: React.FC = () => {
-    useEffect(() => {
-        document.title = 'CQL'
-    })
     const user = localStorage.getItem('user')
     const [loginContextVariables, setLoginContextVariables] = useState(
         user
@@ -67,59 +77,72 @@ export const App: React.FC = () => {
               }
     )
 
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
     var contextValue = {
         loginContextVariables: loginContextVariables,
         setLoginContextVariables: setLoginContextVariables,
     }
+
+    var ThemeContextValue = {
+        isDarkMode: isDarkMode,
+        setIsDarkMode: setIsDarkMode,
+    }
     return (
         <LoginContext.Provider value={contextValue}>
-            <div className={styles.app}>
+            <ThemeContext.Provider value={ThemeContextValue}>
+            <div className={s(styles.app, isDarkMode ? styles.dark : {})}>
                 {/*header*/}
 
                 <Router>
                     {loginContextVariables.givenName === '' && <Redirect to='/login' />}
                     {loginContextVariables.givenName !== '' && (
-                        <div className={styles.navContainer}>
+                        <div className={s(styles.navContainer, isDarkMode ? styles.dark : {})}>
                             <HelloUser name={loginContextVariables.givenName} className={styles.helloMesssage} />
-                            <nav className={styles.navBar}>
+                            <nav className={s(styles.navBar, isDarkMode ? styles.navDark : {})}>
                                 <NavLink className={styles.logoContainer} to='/dashboard'>
-                                    <img
-                                        className={styles.navBarLogo}
-                                        src={logo}
-                                        alt={'CQL'}
-                                        // onClick={() => <Redirect to='/dashboard' />}
-                                    />
+
+                                { isDarkMode
+                                ? <img className={styles.navBarLogo} src={require('../../content/Images/CQL-Logo-White.png')} alt={'CQL'} />
+                                :                                     
+                                <img
+                                    className={styles.navBarLogo}
+                                    src={logo}
+                                    alt={'CQL'}
+                                    // onClick={() => <Redirect to='/dashboard' />}
+                                />
+                                }
                                 </NavLink>
-                                <div className={styles.navEllipse} />
-                                <div className={styles.navRectangle} />
+                                <div className={s(styles.navEllipse, isDarkMode ? styles.ellipseDark : {})} />
+                                <div className={s(styles.navRectangle, isDarkMode ? styles.navDark : {})} />
 
                                 <div className={styles.linkContainer}>
                                     <NavLink
-                                        className={styles.navTab}
+                                        className={s(styles.navTab, isDarkMode ? styles.navTabDark : {})}
                                         activeClassName={styles.active}
                                         to='/departments'
                                     >
-                                        <div className={styles.navTabRectangle} />
+                                        <div className={s(styles.navTabRectangle, isDarkMode ? styles.navTabDark : {})} />
                                         <label>Departments</label>
                                     </NavLink>
 
-                                    <NavLink className={styles.navTab} activeClassName={styles.active} to='/hardware'>
-                                        <div className={styles.navTabRectangle} />
+                                    <NavLink className={s(styles.navTab, isDarkMode ? styles.navTabDark : {})} activeClassName={styles.active} to='/hardware'>
+                                        <div className={s(styles.navTabRectangle, isDarkMode ? styles.navTabDark : {})} />
                                         <label>Hardware</label>
                                     </NavLink>
 
-                                    <NavLink className={styles.navTab} activeClassName={styles.active} to='/programs'>
-                                        <div className={styles.navTabRectangle} />
+                                    <NavLink className={s(styles.navTab, isDarkMode ? styles.navTabDark : {})} activeClassName={styles.active} to='/programs'>
+                                        <div className={s(styles.navTabRectangle, isDarkMode ? styles.navTabDark : {})} />
                                         <label>Programs</label>
                                     </NavLink>
 
-                                    <NavLink className={styles.navTab} activeClassName={styles.active} to='/employees'>
-                                        <div className={styles.navTabRectangle} />
+                                    <NavLink className={s(styles.navTab, isDarkMode ? styles.navTabDark : {})} activeClassName={styles.active} to='/employees'>
+                                        <div className={s(styles.navTabRectangle, isDarkMode ? styles.navTabDark : {})} />
                                         <label>Employees</label>
                                     </NavLink>
 
-                                    <NavLink className={styles.navTab} activeClassName={styles.active} to='/dashboard'>
-                                        <div className={styles.navTabRectangle} />
+                                    <NavLink className={s(styles.navTab, isDarkMode ? styles.navTabDark : {})} activeClassName={styles.active} to='/dashboard'>
+                                        <div className={s(styles.navTabRectangle, isDarkMode ? styles.navTabDark : {})} />
                                         <label>Dashboard</label>
                                     </NavLink>
                                 </div>
@@ -179,6 +202,7 @@ export const App: React.FC = () => {
                     </Switch>
                 </Router>
             </div>
+            </ThemeContext.Provider>
         </LoginContext.Provider>
     )
 }

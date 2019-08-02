@@ -6,18 +6,21 @@ import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Styles
 import styles from './DepartmentDetailPage.module.css'
 import placeholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Types
 interface IDepartmentDetailPageProps {
@@ -44,13 +47,13 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     const [defaultSoftware, setDefaultSoftware] = useState<any[]>([])
     const [defaultLicenses, setDefaultLicenses] = useState<any[]>([])
     const [img, setImg] = useState()
-    const [initialImg, setInitialImg] = useState()
     const [isDeleted, setIsDeleted] = useState(false)
 
     const {
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const handleEmployeeClick = (id: number | string) => {
         history.push({pathname: `/employees/detail/${id}`, state: {prev: history.location}})
@@ -68,11 +71,10 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
 
     const axios = new AxiosService(loginContextVariables)
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get(`/detail/department/${match.params.id}`)
             .then((data: any) => {
-                setInitialImg(data[0].picture)
                 let dept: any = {
                     // photo: data[0].picture,'
                     employeeCount: data[0].countEmpsInDep,
@@ -146,73 +148,59 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                 setLicenseRows(l)
 
                 let dhw: any[] = []
-                data[0].defaultHardware.map((i: any) => dhw.push([{value: format(i), sortBy: i}]))
+                if (data[0].defaultHardware !== null) {
+                    data[0].defaultHardware.map((i: any) => dhw.push([{value: format(i), sortBy: i}]))
+                }
                 setDefaultHardware(dhw)
 
                 let dsw: any[] = []
-                data[0].defaultSoftware.map((i: any) => dsw.push([{value: format(i), sortBy: i}]))
+                if (data[0].defaultSoftware !== null) {
+                    data[0].defaultSoftware.map((i: any) => dsw.push([{value: format(i), sortBy: i}]))
+                }
                 setDefaultSoftware(dsw)
 
                 let dl: any[] = []
-                data[0].defaultLicenses.map((i: any) => dl.push([{value: format(i), sortBy: i}]))
+                if (data[0].defaultLicenses !== null) {
+                    data[0].defaultLicenses.map((i: any) => dl.push([{value: format(i), sortBy: i}]))
+                }
                 setDefaultLicenses(dl)
+
+                checkImage(data[0].picture, axios, placeholder)
+                    .then(image => setImg(image))
+                    .catch(err => console.error(err))
             })
             .catch((err: any) => console.error(err))
-
-        //TODO: get dropdown content for all 3 dropdowns
-    }, [])
+    }
 
     useEffect(() => {
-        if (initialImg) {
-            axios.get(initialImg).then((pic: any) => {
-                if (pic !== '') {
-                    setImg(URL + initialImg)
-                } else {
-                    setImg(placeholder)
-                }
-            })
-        }
-    }, [initialImg])
+        getData()
+    }, [])
 
     async function handleArchive() {
-        if (employeeRows.length > 0) {
-            window.alert('Cannot archive department with employees in it!')
-        } else {
-            if (
-                window.confirm(
-                    `Are you sure you want to ${isDeleted ? 'recover' : 'archive'} ${deptData.departmentName}?`
-                )
-            ) {
-                await axios.put(`${isDeleted ? 'recover' : 'archive'}/department/${match.params.id}`, {})
-                history.push({
-                    pathname: `/departments${isDeleted ? `/edit/${match.params.id}` : ''}`,
-                    state: {prev: history.location},
-                })
-            }
+        if (
+            window.confirm(`Are you sure you want to ${isDeleted ? 'recover' : 'archive'} ${deptData.departmentName}?`)
+        ) {
+            await axios.put(`${isDeleted ? 'recover' : 'archive'}/department/${match.params.id}`, {})
+            history.push({
+                pathname: `/departments${isDeleted ? `/edit/${match.params.id}` : ''}`,
+                state: {prev: history.location},
+            })
         }
     }
 
     return (
-        <div className={styles.detailMain}>
+        <div className={s(styles.detailMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
-                    <Group>
-                        <p>Software</p>
-                        <div className={styles.costLine} />
-                        <p>${deptData.softwareCost} /month </p>
-                    </Group>
-                    <Group>
-                        <p>Hardware</p>
-                        <div className={styles.costLine} />
-                        <p>${deptData.hardwareCost} </p>
-                    </Group>
+                    <DetailImage src={img} />
+                    <DetailCostText
+                        costTexts={[
+                            {title: 'Software', cost: `$${deptData.softwareCost} /month`},
+                            {title: 'Hardware', cost: `$${deptData.hardwareCost}`},
+                        ]}
+                    />
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
@@ -241,11 +229,11 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.deptName}>{deptData.departmentName}</div>
+                        <div className={s(styles.deptName, isDarkMode ? styles.textDark : {})}>{deptData.departmentName}</div>
                         <div className={styles.deptText}>{deptData.employeeCount} employees</div>
                     </div>
 
-                    <div className={styles.title}>Department Breakdown</div>
+                    <div className={s(styles.title, isDarkMode ? styles.textDark : {})}>Department Breakdown</div>
 
                     <DetailPageTable
                         headers={employeeHeaders}
@@ -269,7 +257,7 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                     />
 
                     <div className={styles.line} />
-                    <div className={styles.title}>Department Defaults</div>
+                    <div className={s(styles.title, isDarkMode ? styles.textDark : {})}>Department Defaults</div>
 
                     {/* default hardware */}
                     <div className={styles.tableRow}>

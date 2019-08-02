@@ -73,15 +73,15 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                 //Taking the username and finding the user who might be trying to log in
                 var user = UserPrincipal.FindByIdentity(adContext, request.username);
                 if (result)
-                { 
+                {
                     // boolean to store whether the user is an admin
                     bool isAdmin = false;
 
                     var AccessClaims = new[]
                     {
-                        // Get the user's Name (this can be whatever claims you wish)
+                        // Get the user's Name
                         new Claim(ClaimTypes.Name, request.username)
-                        };
+                    };
 
                     // Read our custom key string into a a usable key object 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Secret));
@@ -96,6 +96,7 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
                     var refreshToken = new JwtSecurityToken(
                         issuer: "CQLCORP",
                         audience: "Refresh",
+                        claims: AccessClaims,
                         expires: DateTime.Now.AddDays(7), // how long you wish the token to be active for
                         signingCredentials: creds);
 
@@ -174,6 +175,13 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
             //turn stringifyed token into a JWT token
             var JwtToken = new JwtSecurityTokenHandler().ReadJwtToken(TokenList[1]);
 
+            // Add username to the claims.
+            var username = JwtToken.Claims.First().Value;
+            var AccessClaims = new[]
+            {
+                        new Claim(ClaimTypes.Name, username)
+            };
+
             // Checks if the refresh token we have been passed belongs to our database 
             var tokenInDB = _context.AuthIdserver.Any(x => x.RefreshToken == TokenList[1]);
 
@@ -194,7 +202,7 @@ namespace EFGetStarted.AspNetCore.ExistingDb.Controllers
             var accessToken = new JwtSecurityToken(
                        issuer: "CQLCORP",
                        audience: "Access",
-                       claims: null, // the claims listed above
+                       claims: AccessClaims, // the claims listed above
                        expires: DateTime.Now.AddMinutes(15), // how long you wish the token to be active for
                        signingCredentials: creds);
 

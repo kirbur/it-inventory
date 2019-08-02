@@ -313,7 +313,7 @@ namespace backend_api.Controllers
                     
                 }
                 // if we get here then the various fields were created and changed and now we can return 201 created.
-                return StatusCode(201);
+                return StatusCode(201, emp.EmployeeId);
             }
         }
 
@@ -401,7 +401,7 @@ namespace backend_api.Controllers
                 _context.SaveChanges();
 
                 // if we get here then the various fields were created and changed and now we can return 201 created.
-                return StatusCode(201);
+                return StatusCode(201, dep.DepartmentId);
             }
             catch (Exception e)
             {
@@ -584,12 +584,12 @@ namespace backend_api.Controllers
 		                "ScreenSize" : float?,
 		                "Mfg" : string?,
 		                "RenewalDate" : string? (formatted yyyy-mm-dd),
-		                "Location" : "xx"? (either GR or AA),
+		                "Location" : "string"?,
 		                "SerialNumber" : string?,
 		                "MonthsPerRenewal" : int?,
 	                }
                 }
-         * Return: 201 created if successful, and 400 bad request if not.
+         * Return: 200 if successful, and 400 bad request if not.
          */
         [HttpPost]
         [Route("Monitor")]
@@ -623,12 +623,12 @@ namespace backend_api.Controllers
 		                "IPAddress" : string?,
 		                "SAN" : string?,
 		                "LocalHHD" : string?,
-		                "Location" : "xx"? (either GR or AA),
+		                "Location" : "string"?,
 		                "SerialNumber" : string?,
 		                "MonthsPerRenewal" : int?,
 	                }
                 }
-         * Return: 201 created if successful, and 400 bad request if not.
+         * Return: 200 if successful, and 400 bad request if not.
          */
         [HttpPost]
         [Route("Server")]
@@ -660,12 +660,12 @@ namespace backend_api.Controllers
 		                "Make" : string?,
 		                "Model" : string?,
 		                "Fqdn" : string?,
-		                "Location" : "xx"? (either GR or AA),
+		                "Location" : "string"?,
 		                "SerialNumber" : string?,
 		                "MonthsPerRenewal" : int?
 	                }
                 }
-         * Return: 201 created if successful, and 400 bad request if not.
+         * Return: 200 if successful, and 400 bad request if not.
          */
         [HttpPost]
         [Route("Laptop")]
@@ -689,13 +689,13 @@ namespace backend_api.Controllers
 		                "PurchaseDate" : string? (formatted yyyy-mm-dd),,
 		                "CostPerYear" : decimal?,
 		                "Mfg" : string?,
-		                "Location" : "xx"? (either GR or AA),
+		                "Location" : "string"?,
 		                "RenewalDate" : string? (formatted yyyy-mm-dd),
 		                "SerialNumber" : string?,
 		                "MonthsPerRenewal" : int?,
 	                }
                 }
-         * Return: 201 created if successful, and 400 bad request if not.
+         * Return: 200 if successful, and 400 bad request if not.
          */
         [HttpPost]
         [Route("Peripheral")]
@@ -706,7 +706,7 @@ namespace backend_api.Controllers
 
         /* PostHardware<T>(hardware, table) is a method to post any hardware type 
          *   to it's corresponding table and add hardware history.
-         * Return: 201 created if successful, and 400 bad request if not.
+         * Return: 200 if successful, and 400 bad request if not.
          */
         private IActionResult PostHardware<T>(T hardware, DbSet<T> table)
             where T : class, IHardwareBase
@@ -756,12 +756,8 @@ namespace backend_api.Controllers
             }
 
             // If we make it here, everything must have succeeded
-            return StatusCode(201);
+            return Ok(id);
         }
-
-        /* UnassignedHardwareHelper<T>() is a method to find the unassigned hardware from the given type
-        *   and return it
-        */
         
     }
 }

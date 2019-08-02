@@ -9,17 +9,21 @@ import {Button} from '../../reusables/Button/Button'
 import {Group} from '../../reusables/Group/Group'
 import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {formatCost} from '../../../utilities/FormatCost'
+import {checkImage} from '../../../utilities/CheckImage'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './ProgramOverviewPage.module.css'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Types
 interface IProgramOverviewPageProps {
@@ -30,7 +34,6 @@ interface IProgramOverviewPageProps {
 interface ExpectedProgramOverview {
     countProgInUse: number
     countProgOverall: number
-    icon: string
     isCostPerYear: boolean
     progCostPerYear: number
     progFlatCost: number
@@ -72,13 +75,13 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [img, setImg] = useState('')
     const [programData, setProgramData] = useState<ExpectedProgramOverview>({
         countProgInUse: 0,
         countProgOverall: 0,
-        icon: '',
         isCostPerYear: false,
         progCostPerYear: 0,
         progFlatCost: 0,
@@ -91,8 +94,8 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     const programHeaders = [`${id}`, 'Employee', 'License Key', 'Renewal Date']
     const pluginHeaders = ['Plugins', 'Renewal Date', 'Cost']
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get(`/detail/ProgramOverview/${id}/${archived === 'archived' ? true : false}`)
             .then((data: any) => {
                 setProgramData(data[0].programOverview)
@@ -102,7 +105,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         i.employeeName
                             ? [
                                   {
-                                      value: i.programId,
+                                      value: `Copy ${i.programId}`,
                                       id: i.programId,
                                       sortBy: i.programId,
                                       onClick: handleCopyClick,
@@ -147,27 +150,16 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     ])
                 )
                 setPluginRows(plug)
+
+                checkImage(data[0].programOverview.icon, axios, placeholder)
+                    .then(image => setImg(image))
+                    .catch(err => console.error(err))
             })
             .catch((err: any) => console.error(err))
-    }, [])
-
+    }
     useEffect(() => {
-        //once icon has a value, check to see if that picture exists. If it doesnt then use the placeholder
-        if (programData.icon !== '') {
-            axios
-                .get(programData.icon)
-                .then((data: any) => {
-                    if (data !== '') {
-                        setImg(URL + programData.icon)
-                    } else {
-                        setImg(placeholder)
-                    }
-                })
-                .catch((err: any) => console.error(err))
-        } else {
-            setImg('')
-        }
-    }, [programData.icon])
+        getData()
+    }, [])
 
     const handleEmpClick = (id: number) => {
         history.push({pathname: `/employees/detail/${id}`, state: {prev: history.location}})
@@ -207,40 +199,34 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     }
 
     return (
-        <div className={styles.progOverviewMain}>
+        <div className={s(styles.progOverviewMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
-                    <div className={styles.costText}>
-                        {programData.progFlatCost > 0 && (
-                            <Group>
-                                <p>Paid</p>
-                                <div className={styles.costLine} />
-                                <p>${programData.progFlatCost} </p>
-                            </Group>
-                        )}
-                        {programData.isCostPerYear ? (
-                            <Group>
-                                <p>Yearly</p>
-                                <div className={styles.costLine} />
-                                <p>${programData.progCostPerYear} </p>
-                            </Group>
-                        ) : (
-                            programData.progCostPerYear > 0 && (
-                                <Group>
-                                    <p>Monthly</p>
-                                    <div className={styles.costLine} />
-                                    <p>${programData.progCostPerYear} </p>
-                                </Group>
-                            )
-                        )}
-                    </div>
+                    <DetailImage src={img} />
+                    {programData.progFlatCost > 0 && (
+                        <DetailCostText
+                            costTexts={[
+                                {title: 'Paid', cost: `$${programData.progFlatCost}`},
+                            ]}
+                        />
+                    )}
+                    {programData.isCostPerYear ? (
+                        <DetailCostText
+                        costTexts={[
+                            {title: 'Yearly', cost: `$${programData.progCostPerYear}`},
+                        ]}
+                    />
+                    ) : (
+                        programData.progCostPerYear > 0 && (
+                            <DetailCostText
+                            costTexts={[
+                                {title: 'Monthly', cost: `$${programData.progCostPerYear}`},
+                            ]}
+                        />
+                        )
+                    )}
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
@@ -269,7 +255,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.programName}>{id}</div>
+                        <div className={s(styles.programName, isDarkMode ? styles.dark : {})}>{id}</div>
                         <div className={styles.programText}>
                             {programData.countProgInUse} / {programData.countProgOverall} Used
                         </div>
@@ -277,9 +263,19 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                             <div className={styles.programText}>License Key: {programData.programlicenseKey}</div>
                         )}
                     </div>
-                    <DetailPageTable headers={programHeaders} rows={programRows} setRows={setProgramRows} />
+                    <DetailPageTable
+                        headers={programHeaders}
+                        rows={programRows}
+                        setRows={setProgramRows}
+                        className={styles.table}
+                    />
                     <div className={styles.spaceBetweenTables} />
-                    <DetailPageTable headers={pluginHeaders} rows={pluginRows} setRows={setPluginRows} />
+                    <DetailPageTable
+                        headers={pluginHeaders}
+                        rows={pluginRows}
+                        setRows={setPluginRows}
+                        className={styles.table}
+                    />
                 </div>
             </div>
         </div>

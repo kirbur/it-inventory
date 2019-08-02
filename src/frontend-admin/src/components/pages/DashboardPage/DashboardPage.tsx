@@ -17,7 +17,9 @@ import {CostCard} from '../Dashboard/CostCard/CostCard'
 import {History} from 'history'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
+
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Types
 interface IDashboardPageProps {
@@ -72,6 +74,10 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const {history} = props
     const {loginContextVariables} = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
+
+
+    // const [darkMode, setDarkMode] = useState(false);
 
     //Liscence Bar Chart State
     const [licenses, setLicenses] = useState(initLicenses)
@@ -227,16 +233,17 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     }, [dropdownContent, selectedDept])
 
     return (
-        <div className={styles.dashMain}>
+        <div className={s(styles.dashMain, isDarkMode ? styles.dashMainDark : {})}>
             <div className={styles.dashColumn}>
+
                 <Card
                     title={'licenses'}
-                    titleClassName={styles.linkedTitle}
+                    titleClassName={s(styles.linkedTitle, isDarkMode ? styles.linkedTitleDark : {})}
                     titleOnClick={() => {
                         history.push({pathname: `/programs`, state: {prev: history.location}})
                     }}
                 >
-                    <Group>
+                    <Group className={styles.group}>
                         {licenses &&
                             licenses.map(i => (
                                 <HorizontalBarChart
@@ -251,33 +258,37 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                 </Card>
 
                 <div className={styles.dashRow}>
-                    <CostCard
-                        cardTitle='Yearly Cost'
-                        data={{
-                            programsCost: costs.costOfProgramsPerYear,
-                            pluginsCost: costs.costOfPluginsPerYear,
-                        }}
-                        icon={
-                            <span>
-                                <IoIosArrowRoundUp className={styles.upArrowIcon} />
-                                <IoIosArrowRoundDown className={styles.downArrowIcon} />
-                            </span>
-                        }
-                    />
-                    <CostCard
-                        cardTitle='Monthly Cost'
-                        data={{
-                            programsCost: costs.costOfProgramsPerYear / 12,
-                            pluginsCost: costs.costOfPluginsPerYear / 12,
-                        }}
-                        icon={<IoIosStats className={styles.statsIcon} />}
-                    />
+                    <div className={styles.costIcons}>
+                        <CostCard
+                            cardTitle='Yearly Cost'
+                            data={{
+                                programsCost: costs.costOfProgramsPerYear,
+                                pluginsCost: costs.costOfPluginsPerYear,
+                            }}
+                            icon={
+                                <span>
+                                    <IoIosArrowRoundUp className={styles.upArrowIcon} />
+                                    <IoIosArrowRoundDown className={styles.downArrowIcon} />
+                                </span>
+                            }
+                        />
+                    </div>
+                    <div className={styles.costIcons}>
+                        <CostCard
+                            cardTitle='Monthly Cost'
+                            data={{
+                                programsCost: costs.costOfProgramsPerYear / 12,
+                                pluginsCost: costs.costOfPluginsPerYear / 12,
+                            }}
+                            icon={<IoIosStats className={styles.statsIcon} />}
+                        />
+                    </div>
                 </div>
                 <Card>
                     {dropdownContent && (
                         <Dropdown
                             content={dropdownContent}
-                            titleClassName={styles.linkedTitle}
+                            titleClassName={s(styles.linkedTitle, isDarkMode ? styles.linkedTitleDark : {})}
                             selected={selectedDept}
                             setSelected={(i: IDropdownItem) => {
                                 setSelectedDept(i)
@@ -299,7 +310,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
             <div className={styles.dashColumn}>
                 <Card
                     title={'Departments'}
-                    titleClassName={styles.linkedTitle}
+                    titleClassName={s(styles.linkedTitle, isDarkMode ? styles.linkedTitleDark : {})}
                     titleOnClick={() => {
                         history.push({pathname: `/departments`, state: {prev: history.location}})
                     }}
@@ -324,7 +335,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                 </Card>
                 <Card
                     title={'software'}
-                    titleClassName={styles.linkedTitle}
+                    titleClassName={s(styles.linkedTitle, isDarkMode ? styles.linkedTitleDark : {})}
                     titleOnClick={() => {
                         history.push({pathname: `/programs`, state: {prev: history.location}})
                     }}

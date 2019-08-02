@@ -16,7 +16,7 @@ namespace backend_api.Controllers
     {
         public UpdateController(ITInventoryDBContext context) : base(context) { }
 
-        /* PUT: api/udpate/department
+        /* PUT: api/update/department
          * Will update a specified row on the department table
          * Param input format:
                 {
@@ -456,7 +456,7 @@ namespace backend_api.Controllers
 		            "IPAddress" : string?,
 		            "SAN" : string?,
 		            "LocalHHD" : string?,
-		            "Location" : "xx"? (either GR or AA),
+		            "Location" : "string"?,
 		            "SerialNumber" : string?,
 		            "MonthsPerRenewal" : int?,
                 },
@@ -494,7 +494,7 @@ namespace backend_api.Controllers
 		            "ScreenSize" : float?,
 		            "Mfg" : string?,
 		            "RenewalDate" : string? (formatted yyyy-mm-dd),
-		            "Location" : "xx"? (either GR or AA),
+		            "Location" : "string"?,
 		            "SerialNumber" : string?,
 		            "MonthsPerRenewal" : int?,
                 },
@@ -537,7 +537,7 @@ namespace backend_api.Controllers
 		            "Make" : string?,
 		            "Model" : string?,
 		            "Fqdn" : string?,
-		            "Location" : "xx"? (either GR or AA),
+		            "Location" : "string"?,
 		            "SerialNumber" : string?,
 		            "MonthsPerRenewal" : int?
                 },
@@ -572,7 +572,7 @@ namespace backend_api.Controllers
 		            "PurchaseDate" : string? (formatted yyyy-mm-dd),,
 		            "CostPerYear" : decimal?,
 		            "Mfg" : string?,
-		            "Location" : "xx"? (either GR or AA),
+		            "Location" : "string"?,
 		            "RenewalDate" : string? (formatted yyyy-mm-dd),
 		            "SerialNumber" : string?,
 		            "MonthsPerRenewal" : int?,

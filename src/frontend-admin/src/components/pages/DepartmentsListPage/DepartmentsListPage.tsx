@@ -19,7 +19,7 @@ import styles from './DepartmentsListPage.module.css'
 import placeholder from '../../../content/Images/Placeholders/department-placeholder.png'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Types
 interface IDepartmentsListPageProps {
@@ -29,7 +29,6 @@ interface IDepartmentData {
     cost: number
     id: number
     name: string
-    icon: string
     totalEmployees: number
 }
 interface IPulledData {
@@ -48,6 +47,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         loginContextVariables: {isAdmin},
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<IDepartmentData[]>([])
@@ -62,12 +62,11 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const headerList = ['Departments', 'Total Employees', 'Programs Cost']
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
 
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{id: number; img: string}[]>([])
-    const [displayImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        var imagePromises: any[] = []
+        await axios
             .get('/list/departments')
             .then((data: IPulledData[]) => {
                 var depts: IDepartmentData[] = []
@@ -78,18 +77,23 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                         id: i.departmentId,
                         totalEmployees: i.numOfEmp,
                         cost: i.costOfPrograms,
-                        icon: URL + format(i.icon),
                     })
-                    imgs.push({id: i.departmentId, img: i.icon})
+
+                    imagePromises.push(
+                        checkImage(i.icon, axios, placeholder).then(image => {
+                            return {id: i.departmentId, img: image}
+                        })
+                    )
                 })
                 setListData(depts)
-
-                setImages(imgs)
-                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
 
-        axios
+        await Promise.all(imagePromises)
+            .then(response => setDisplayImages(response))
+            .catch((err: any) => console.error(err))
+
+        await axios
             .get(`/archivedList/department`)
             .then((data: IPulledData[]) => {
                 var depts: IDepartmentData[] = []
@@ -99,12 +103,15 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
                         id: i.departmentId,
                         totalEmployees: 0,
                         cost: 0,
-                        icon: placeholder,
                     })
                 )
                 setArchivedData(depts)
             })
             .catch((err: any) => console.error(err))
+    }
+
+    useEffect(() => {
+        getData()
     }, [])
 
     const formatCost = (cost: number) => {
@@ -114,17 +121,6 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
     }, [search, selected, listData, archivedData, isArchive])
-
-    //Set display Images
-    useEffect(() => {
-        images.map((img: {id: number; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.id !== img.id)
-                setImages([...list, {id: img.id, img: data}])
-                displayImages.push({id: img.id, img: data})
-            })
-        )
-    }, [useImages])
 
     const handleClick = () => {
         history.push({pathname: `/departments/edit/new`, state: {prev: history.location}})
@@ -162,12 +158,12 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     const [sortState, setSortState] = useState(initState)
 
     function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
+        if (sortState.headerStateCounts[index] === 0) {
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
             tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
+        } else if (sortState.headerStateCounts[index] === 1) {
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
@@ -216,15 +212,19 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }
 
     function concatenatedDept(row: any[]) {
-        return displayImages &&
-            displayImages.filter(x => x.id === row[1]) &&
-            displayImages.filter(x => x.id === row[1])[0] ? (
+        var image = placeholder
+        for (let i = 0; i < displayImages.length; i++) {
+            if (displayImages[i].id === row[1]) {
+                image = displayImages[i].img
+            }
+        }
+        return image ? (
             <td key={row[1]} className={styles.departments}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                    <img className={styles.icon} src={image} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <text className={styles.departmentName}>{row[0]}</text>
+                    <text className={s(styles.departmentName, isDarkMode ? styles.dark : {})}>{row[0]}</text>
                 </div>
             </td>
         ) : (
@@ -247,18 +247,21 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedDept(row)
+                    break
                 case 2:
                     transformedRow[2] = (
                         <td className={styles.alignLeft} key={i}>
                             {row[2] === 1 ? row[2] + ' employee' : row[2] + ' employees'}
                         </td>
                     )
+                    break
                 case 3:
                     transformedRow[3] = (
                         <td className={styles.alignLeft} key={i}>
                             {formatCost(row[3])}
                         </td>
                     )
+                    break
             }
         }
 
@@ -266,7 +269,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     })
 
     return (
-        <div className={styles.departmentsListMain}>
+        <div className={s(styles.departmentsListMain, isDarkMode ? styles.listMainDark : {})}>
             <Group direction='row' justify='between' className={styles.group}>
                 <div className={styles.buttonContainer}>
                     {isAdmin && <Button text='Add' icon='add' onClick={handleClick} className={styles.addButton} />}

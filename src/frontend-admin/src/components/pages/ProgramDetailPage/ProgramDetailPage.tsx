@@ -9,18 +9,21 @@ import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLo
 import {History} from 'history'
 import {match} from 'react-router-dom'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {checkImage} from '../../../utilities/CheckImage'
 
 // Styles
 import styles from './ProgramDetailPage.module.css'
 import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Types
 interface IProgramDetailPageProps {
@@ -36,6 +39,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     var axios = new AxiosService(loginContextVariables)
 
@@ -47,7 +51,6 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         description: string
         employee: string
         employeeId: number
-        icon: string
         renewalDate: string
         isCostPerYear: boolean
         flatCost: number
@@ -59,7 +62,6 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
         description: '',
         employee: '',
         employeeId: -1,
-        icon: placeholder,
         renewalDate: '',
         isCostPerYear: false,
         flatCost: 0,
@@ -70,8 +72,8 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     const [progRows, setProgRows] = useState<ITableItem[][]>([])
     const progHeaders = ['License Key', 'Purchase Link']
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        await axios
             .get(`/detail/program/${match.params.id}`)
             .then((data: any) => {
                 setProgData({
@@ -80,7 +82,6 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     description: format(data[0].description),
                     employee: data[0].employeeName,
                     employeeId: data[0].employeeId,
-                    icon: data[0].picture,
                     renewalDate: formatDate(data[0].renewalDate),
                     isCostPerYear: data[0].isCostPerYear,
                     flatCost: data[0].programFlatCost,
@@ -105,44 +106,36 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         }
                     }),
                 ])
+
+                checkImage(data[0].picture, axios, placeholder)
+                    .then(image => setImg(image))
+                    .catch(err => console.error(err))
             })
             .catch((err: any) => console.error(err))
-    }, [match.params.id])
+    }
 
     useEffect(() => {
-        //Check to see if the given icon string corresponds to
-        //an actual image, if not display the placeholder
-        if (progData.icon) {
-            axios
-                .get(progData.icon)
-                .then((data: any) => {
-                    if (data !== '') {
-                        setImg(URL + progData.icon)
-                    } else {
-                        setImg(placeholder)
-                    }
-                })
-                .catch((err: any) => console.error(err))
-        }
-    }, [progData.icon])
+        getData()
+    }, [])
 
     async function handleArchive() {
-        if (progData.hasPlugin) {
+        if (progData.hasPlugin && !isDeleted) {
             window.alert('Please archive the plugins before you archive this program.')
-        } else {
-            if (
-                window.confirm(
-                    `Are you sure you want to ${isDeleted ? 'recover' : 'archive'} this copy of ${progData.name}?`
-                )
-            ) {
-                await axios
-                    .put(`${isDeleted ? 'recover' : 'archive'}/program/${match.params.id}`, {})
-                    .catch((err: any) => console.error(err))
+        } else if (isDeleted) {
+            if (window.confirm(`Are you sure you want to recover this copy of ${progData.name}?`)) {
+                await axios.put(`recover/program/${match.params.id}`, {}).catch((err: any) => console.error(err))
 
                 history.push({
-                    pathname: `/programs${
-                        isDeleted ? '/edit/detail/' + match.params.id : '/overview/' + progData.name
-                    }/inventory`,
+                    pathname: `/programs/edit/detail/${match.params.id}/inventory`,
+                    state: {prev: history.location},
+                })
+            }
+        } else {
+            if (window.confirm(`Are you sure you want to archive this copy of ${progData.name}?`)) {
+                await axios.put(`archive/program/${match.params.id}`, {}).catch((err: any) => console.error(err))
+
+                history.push({
+                    pathname: `/programs/overview/${progData.name}/inventory`,
                     state: {prev: history.location},
                 })
             }
@@ -150,41 +143,34 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
     }
 
     return (
-        <div className={styles.progDetailMain}>
+        <div className={s(styles.progDetailMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
-
-                    <div className={styles.costText}>
-                        {progData.flatCost > 0 && (
-                            <Group>
-                                <p>Paid</p>
-                                <div className={styles.costLine} />
-                                <p>${progData.flatCost} </p>
-                            </Group>
-                        )}
-                        {progData.isCostPerYear ? (
-                            <Group>
-                                <p>Yearly</p>
-                                <div className={styles.costLine} />
-                                <p>${progData.costPerYear} </p>
-                            </Group>
-                        ) : (
-                            progData.costPerYear > 0 && (
-                                <Group>
-                                    <p>Monthly</p>
-                                    <div className={styles.costLine} />
-                                    <p>${progData.costPerYear} </p>
-                                </Group>
-                            )
-                        )}
-                    </div>
+                    <DetailImage src={img} />
+                    {progData.flatCost > 0 && (
+                        <DetailCostText
+                            costTexts={[
+                                {title: 'Paid', cost: `$${progData.flatCost}`},
+                            ]}
+                        />
+                    )}
+                    {progData.isCostPerYear ? (
+                        <DetailCostText
+                        costTexts={[
+                            {title: 'Yearly', cost: `$${progData.costPerYear}`},
+                        ]}
+                    />
+                    ) : (
+                        progData.costPerYear > 0 && (
+                            <DetailCostText
+                            costTexts={[
+                                {title: 'Monthly', cost: `$${progData.costPerYear}`},
+                            ]}
+                        />
+                        )
+                    )}
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
@@ -213,8 +199,23 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                         </Group>
                     )}
                     <div className={styles.titleText}>
-                        <div className={styles.programName}>
-                            {progData.name} {match.params.id}
+                        <div className={s(styles.programName, isDarkMode ? styles.dark : {})}>
+                            <Group>
+                                <div
+                                    className={s(styles.overviewLink, isDarkMode ? styles.linkDark : {})}
+                                    onClick={() =>
+                                        history.push({
+                                            pathname: `/programs/overview/${progData.name}/${
+                                                isDeleted ? 'archived' : 'inventory'
+                                            }`,
+                                            state: {prev: history.location},
+                                        })
+                                    }
+                                >
+                                    {progData.name}
+                                </div>
+                                {`Copy ${match.params.id}`}
+                            </Group>
                         </div>
                         {progData.renewalDate !== '-' && (
                             <div className={styles.programText}>Renewal Date: {progData.renewalDate}</div>
@@ -224,7 +225,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                             <div className={s(styles.programText, styles.assignedTo)}>
                                 Assigned to{' '}
                                 <div
-                                    className={styles.empName}
+                                    className={s(styles.empName, isDarkMode ? styles.linkDark : {})}
                                     onClick={() =>
                                         history.push({
                                             pathname: `/employees/detail/${progData.employeeId}`,

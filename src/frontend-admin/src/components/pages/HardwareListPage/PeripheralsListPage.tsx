@@ -16,7 +16,7 @@ import {Table} from '../../reusables/Table/Table'
 import {History} from 'history'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './HardwareListPage.module.css'
@@ -52,6 +52,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
+    const { isDarkMode } = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<IPeripheralData[]>([])
@@ -65,12 +66,11 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     const options = columns.map((c, i) => ({label: headerList[i], value: c}))
     const [isArchive, setIsArchive] = useState(false)
 
-    const [useImages, setUseImages] = useState(false)
-    const [images, setImages] = useState<{id: number; img: string}[]>([])
-    const [displayImages] = useState<{id: number; img: string}[]>([])
+    const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
-    useEffect(() => {
-        axios
+    async function getData() {
+        var imagePromises: any[] = []
+        await axios
             .get('/list/peripherals')
             .then((data: IPulledData[]) => {
                 const peripherals: IPeripheralData[] = []
@@ -82,15 +82,22 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                         purchaseDate: format(i.purchaseDate),
                         assigned: format(i.isAssigned ? i.employeeFirstName + ' ' + i.employeeLastName : '-'),
                     })
-                    imgs.push({id: i.peripheralId, img: i.icon})
+
+                    imagePromises.push(
+                        checkImage(i.icon, axios, placeholder).then(image => {
+                            return {id: i.peripheralId, img: image}
+                        })
+                    )
                 })
                 setListData(peripherals)
-
-                setImages(imgs)
-                setUseImages(true)
             })
             .catch((err: any) => console.error(err))
-        axios
+
+        await Promise.all(imagePromises)
+            .then(response => setDisplayImages(response))
+            .catch((err: any) => console.error(err))
+
+        await axios
             .get('/archivedList/peripheral')
             .then((data: IPulledData[]) => {
                 const peripherals: IPeripheralData[] = []
@@ -105,22 +112,15 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                 setArchivedData(peripherals)
             })
             .catch((err: any) => console.error(err))
+    }
+
+    useEffect(() => {
+        getData()
     }, [])
 
     useEffect(() => {
         setFilteredData(searchFilter(isArchive ? archivedData : listData, selected.value, search))
     }, [search, selected, listData, archivedData, isArchive])
-
-    //Set display Images
-    useEffect(() => {
-        images.map((img: {id: number; img: string}) =>
-            checkImage(img.img, axios, placeholder).then(data => {
-                var list = images.filter(i => i.id !== img.id)
-                setImages([...list, {id: img.id, img: data}])
-                displayImages.push({id: img.id, img: data})
-            })
-        )
-    }, [useImages])
 
     const handleClick = () => {
         history.push({pathname: '/hardware/edit/peripheral/new', state: {prev: history.location}})
@@ -208,15 +208,19 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
     }
 
     function concatenatedName(row: any[]) {
-        return displayImages &&
-            displayImages.filter(x => x.id === row[1]) &&
-            displayImages.filter(x => x.id === row[1])[0] ? (
+        var image = placeholder
+        for (let i = 0; i < displayImages.length; i++) {
+            if (displayImages[i].id === row[1]) {
+                image = displayImages[i].img
+            }
+        }
+        return image ? (
             <td key={row[1]} className={styles.hardware}>
                 <div className={styles.imgContainer}>
-                    <img className={styles.icon} src={displayImages.filter(x => x.id === row[1])[0].img} alt={''} />
+                    <img className={styles.icon} src={image} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <div className={styles.hardwareName}>{row[0]}</div>
+                    <div className={s(styles.hardwareName, isDarkMode ? styles.dark : {})}>{row[0]}</div>
                 </div>
             </td>
         ) : (
@@ -225,7 +229,7 @@ export const PeripheralListPage: React.SFC<IPeripheralListPageProps> = props => 
                     <img className={styles.icon} src={placeholder} alt={''} />
                 </div>
                 <div className={styles.alignLeft}>
-                    <div className={styles.hardwareName}>{row[0]}</div>
+                    <div className={s(styles.hardwareName, isDarkMode ? styles.dark : {})}>{row[0]}</div>
                 </div>
             </td>
         )

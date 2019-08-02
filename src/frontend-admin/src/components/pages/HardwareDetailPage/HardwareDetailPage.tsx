@@ -7,9 +7,13 @@ import {Group} from '../../reusables/Group/Group'
 import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
 import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText, ICostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
+import {checkImage} from '../../../utilities/CheckImage'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './HardwareDetailPage.module.css'
@@ -19,7 +23,7 @@ import peripheralPlaceholder from '../../../content/Images/Placeholders/peripher
 import monitorPlaceholder from '../../../content/Images/Placeholders/monitor-placeholder.png'
 
 // Context
-import {LoginContext} from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 import {sortByDate} from '../../../utilities/quickSort'
 
 // Types
@@ -36,6 +40,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
 
@@ -47,10 +52,6 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
     const [firstTableData, setFirstTableData] = useState<(string | number)[]>([])
     const [secondTableData, setSecondTableData] = useState<(string | number)[]>([])
-    // const [thirdTableData, setThirdTableData] = useState<(string | number)[]>([])
-
-    //  const [firstTableData, setFirstTableData] = useState<ITableItem[][]>([])
-    // const [secondTableData, setSecondTableData] = useState<ITableItem[][]>([])
     const [thirdTableData, setThirdTableData] = useState<ITableItem[][]>([])
 
     const [historyLogEntries, setHistoryLogEntries] = useState<IHistoryLogArray[]>([])
@@ -61,19 +62,18 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
     const [isDeleted, setIsDeleted] = useState(false)
     const [img, setImg] = useState()
-    const [initialImg, setInitialImg] = useState()
+    // const [initialImg, setInitialImg] = useState()
 
-    useEffect(() => {
+    async function getData() {
         if (match.params.type === 'server') {
             setFirstTableHeaders(['FQDN', 'IP Address', '# of Cores', 'OS', 'RAM'])
             setSecondTableHeaders(['MFG Tag', 'Serial #', 'SAN', 'Local HHD'])
             setThirdTableHeaders(['Employee Assigned', 'Department', 'Location'])
             // make model purchaseDate renewalDate endOfLife virtualized
             setHeadingInfo(['the name', 'another name'])
-            axios
+            await axios
                 .get(`/detail/server/${match.params.id}`)
                 .then((data: any) => {
-                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].server.make,
                         'Model: ' + data[0].server.model,
@@ -87,13 +87,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         data[0].server.ipAddress,
                         data[0].server.numberOfCores,
                         data[0].server.operatingSystem,
-                        data[0].server.ram,
+                        data[0].server.ram + ' GB',
                     ])
                     setSecondTableData([
                         data[0].server.mfg,
                         data[0].server.serialNumber,
                         data[0].server.san,
-                        data[0].server.localHHD,
+                        data[0].server.localHHD + ' GB',
                     ])
                     setCostPerYear(data[0].server.costPerYear)
                     setFlatCost(data[0].server.flatCost)
@@ -131,6 +131,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCommentText(data[0].server.textField)
                     setHistoryLogEntries(data[0].serverHistory)
                     setIsDeleted(data[0].isDeleted)
+
+                    checkImage(data[0].icon, axios, serverPlaceholder)
+                        .then(image => setImg(image))
+                        .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'laptop' || match.params.type === 'computer') {
@@ -139,10 +143,9 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
             // make model purchaseDate renewalDate endOfLife
             setHeadingInfo(['name', 'the make', 'model name'])
-            axios
+            await axios
                 .get(`/detail/computer/${match.params.id}`)
                 .then((data: any) => {
-                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].computer.make,
                         'Model: ' + data[0].computer.model,
@@ -152,13 +155,13 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     ])
                     setFirstTableData([
                         data[0].computer.cpu,
-                        data[0].computer.ramgb,
-                        data[0].computer.ssdgb,
+                        data[0].computer.ramgb + ' GB',
+                        data[0].computer.ssdgb + ' GB',
                         data[0].computer.fqdn,
                     ])
                     setSecondTableData([
                         data[0].computer.monitorOutput,
-                        data[0].computer.screenSize,
+                        data[0].computer.screenSize + ' in',
                         data[0].computer.serialNumber,
                         data[0].computer.mfg,
                     ])
@@ -197,16 +200,19 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCommentText(data[0].computer.textField)
                     setHistoryLogEntries(data[0].computerHistory)
                     setIsDeleted(data[0].isDeleted)
+
+                    checkImage(data[0].icon, axios, laptopPlaceholder)
+                        .then(image => setImg(image))
+                        .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'monitor') {
             setFirstTableHeaders(['Screen Size', 'Resolution', 'Inputs', 'Serial #'])
             setSecondTableHeaders([])
             setThirdTableHeaders(['Employee Assigned', 'Dept Assigned', 'Location'])
-            axios
+            await axios
                 .get(`/detail/monitor/${match.params.id}`)
                 .then((data: any) => {
-                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Make: ' + data[0].monitor.make,
                         'Model: ' + data[0].monitor.model,
@@ -214,8 +220,8 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                         'Renewal Date: ' + formatDate(data[0].monitor.renewalDate),
                     ])
                     setFirstTableData([
-                        data[0].monitor.screenSize,
-                        data[0].monitor.resolution,
+                        data[0].monitor.screenSize + ' in',
+                        data[0].monitor.resolution + 'k',
                         data[0].monitor.inputs,
                         data[0].monitor.serialNumber,
                     ])
@@ -254,16 +260,19 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCommentText(data[0].monitor.textField)
                     setHistoryLogEntries(data[0].monitorHistory)
                     setIsDeleted(data[0].isDeleted)
+
+                    checkImage(data[0].icon, axios, monitorPlaceholder)
+                        .then(image => setImg(image))
+                        .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
         } else if (match.params.type === 'peripheral') {
             setFirstTableHeaders([])
             setSecondTableHeaders([])
             setThirdTableHeaders(['Employee Assigned', 'Department Assigned', 'Serial #'])
-            axios
+            await axios
                 .get(`/detail/peripheral/${match.params.id}`)
                 .then((data: any) => {
-                    setInitialImg(data[0].icon)
                     setHeadingInfo([
                         'Name: ' + data[0].peripheral.peripheralName,
                         'Type: ' + data[0].peripheral.peripheralType,
@@ -305,28 +314,18 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     setCommentText(data[0].peripheral.textField)
                     setHistoryLogEntries(data[0].peripheralHistory)
                     setIsDeleted(data[0].isDeleted)
+
+                    checkImage(data[0].icon, axios, peripheralPlaceholder)
+                        .then(image => setImg(image))
+                        .catch(err => console.error(err))
                 })
                 .catch((err: any) => console.error(err))
         }
-    }, [])
+    }
 
     useEffect(() => {
-        if (initialImg) {
-            axios.get(initialImg).then((pic: any) => {
-                if (pic !== '') {
-                    setImg(URL + initialImg)
-                } else if (match.params.type == 'server') {
-                    setImg(serverPlaceholder)
-                } else if (match.params.type == 'laptop') {
-                    setImg(laptopPlaceholder)
-                } else if (match.params.type == 'monitor') {
-                    setImg(monitorPlaceholder)
-                } else if (match.params.type == 'peripheral') {
-                    setImg(peripheralPlaceholder)
-                }
-            })
-        }
-    }, [initialImg])
+        getData()
+    }, [])
 
     async function handleArchive() {
         if (
@@ -340,46 +339,34 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         }
     }
 
-    function renderFlatCost() {
+    // Returns an arry of the costs to be dislayed.
+    function getCosts(): ICostText[] {
+        let costTexts: ICostText[] = []
         if (flatCost !== undefined && flatCost !== null && flatCost !== 0) {
-            return (
-                <Group>
-                    <p>Initial Cost</p>
-                    <div className={styles.costLine} />
-                    <p>${flatCost} </p>
-                </Group>
-            )
+            costTexts.push({title: "Initial Cost", cost: `$${flatCost}`})
         }
-    }
-    function renderCostPerYear() {
         if (costPerYear !== undefined && costPerYear !== null && costPerYear !== 0) {
-            return (
-                <Group>
-                    <p>Cost Per Year</p>
-                    <div className={styles.costLine} />
-                    <p>${costPerYear} </p>
-                </Group>
-            )
+            costTexts.push({title: "Cost Per Year", cost: `$${costPerYear}`})
         }
+        return costTexts
+    }
+
+    var titleStyle = styles.titleText
+    if (match.params.type === 'server') {
+        titleStyle = styles.serverTitle
     }
 
     return (
-        <div className={styles.detailMain}>
+        <div className={s(styles.detailMain, isDarkMode ? styles.backgroundDark : {})}>
             <div className={styles.columns}>
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <div className={styles.imgContainer}>
-                        <div className={styles.imgPadding}>
-                            <img className={styles.img} src={img} alt={''} />
-                        </div>
-                    </div>
-                    <div className={styles.costText}>
-                        {renderFlatCost()}
-                        {renderCostPerYear()}
-                    </div>
+                    <DetailImage src={img} />
+                    <DetailCostText
+                        costTexts={getCosts()}
+                    />
                 </div>
-
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
                     {isAdmin && (
@@ -408,8 +395,8 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                     )}
 
                     {/* title/makeModel/dates/virtualized */}
-                    <div className={styles.titleText}>
-                        <div className={styles.hardwareName}>{match.params.type}</div>
+                    <div className={titleStyle}>
+                        <div className={s(styles.hardwareName, isDarkMode ? styles.hardwareNameDark : {})}>{match.params.type}</div>
                         {headingInfo.map((heading: string) => (
                             <div className={styles.hardwareText}>{heading} </div>
                         ))}
