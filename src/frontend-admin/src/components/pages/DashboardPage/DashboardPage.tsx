@@ -61,21 +61,12 @@ let initPieData: IPieDataProps[] = [
     },
 ]
 
-let initDeptTable: {id: number; name: string; tableData: IDashboardTableDatum[]}[] = [
-    {
-        id: -1,
-        name: 'Select a Department',
-        tableData: [],
-    },
-]
-
 // Primary Component
 export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     const {history} = props
     const {loginContextVariables} = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
-    const { isDarkMode } = useContext(ThemeContext)
-
+    const {isDarkMode} = useContext(ThemeContext)
 
     // const [darkMode, setDarkMode] = useState(false);
 
@@ -202,7 +193,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
 
     async function getDeptTables() {
         var deptTables: any[] = []
-        await dropdownContent.map(i => {
+        await dropdownContent.map(i =>
             axios
                 .get(`/dashboard/departmentTable/${i.id}`)
                 .then((data: any[]) => {
@@ -223,7 +214,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
                     }
                 })
                 .catch((err: any) => console.error(err))
-        })
+        )
 
         setDeptTableData(deptTables)
     }
@@ -235,7 +226,6 @@ export const DashboardPage: React.FC<IDashboardPageProps> = props => {
     return (
         <div className={s(styles.dashMain, isDarkMode ? styles.dashMainDark : {})}>
             <div className={styles.dashColumn}>
-
                 <Card
                     title={'licenses'}
                     titleClassName={s(styles.linkedTitle, isDarkMode ? styles.linkedTitleDark : {})}

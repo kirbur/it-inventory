@@ -55,7 +55,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<any[]>([])
@@ -78,8 +78,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             .get('/list/servers')
             .then((data: IPulledData[]) => {
                 const servers: IServerData[] = []
-                var imgs: {id: number; img: string}[] = []
-                data.map((i: IPulledData) => {
+                data.forEach((i: IPulledData) => {
                     servers.push({
                         make: format(i.make),
                         id: i.serverId,
@@ -110,7 +109,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             .get('/archivedList/server')
             .then((data: IPulledData[]) => {
                 const servers: IServerData[] = []
-                data.map((i: IPulledData) => {
+                data.map((i: IPulledData) =>
                     servers.push({
                         make: format(i.make),
                         id: i.serverId,
@@ -121,7 +120,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
                         icon: i.icon,
                         model: format(i.model),
                     })
-                })
+                )
                 setArchivedData(servers)
             })
             .catch((err: any) => console.error(err))
@@ -161,7 +160,7 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
         headerStates.push(styles.descending)
         headerStateCounts.push(0)
     }
-    var initHeaderStates = cloneDeep(headerStates)
+
     var initHeaderStateCounts = cloneDeep(headerStateCounts)
     var tempHeaderStates = cloneDeep(headerStates)
     var tempHeaderStateCounts = cloneDeep(headerStateCounts)
@@ -170,12 +169,12 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
     const [sortState, setSortState] = useState(initState)
 
     function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
+        if (sortState.headerStateCounts[index] === 0) {
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
             tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
+        } else if (sortState.headerStateCounts[index] === 1) {
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
@@ -258,14 +257,19 @@ export const ServersListPage: React.SFC<IServersListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
+                    break
                 case 2:
                     transformedRow[1] = <td className={styles.alignLeft}>{row[2]}</td>
+                    break
                 case 3:
                     transformedRow[2] = <td className={styles.alignLeft}>{row[3]} GB</td>
+                    break
                 case 4:
                     transformedRow[3] = <td className={styles.alignLeft}>{row[4]}</td>
+                    break
                 case 5:
                     transformedRow[4] = <td className={styles.alignLeft}>{row[5]}</td>
+                    break
             }
         }
 

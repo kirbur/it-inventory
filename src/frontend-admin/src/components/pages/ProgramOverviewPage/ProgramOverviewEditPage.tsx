@@ -53,9 +53,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         },
     } = props
     const {loginContextVariables} = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
-
-    const axios = new AxiosService(loginContextVariables)
+    const {isDarkMode} = useContext(ThemeContext)
 
     const [programRows, setProgramRows] = useState<ITableItem[][]>([])
     const [removedProgramRows, setRemovedProgramRows] = useState<ITableItem[][]>([])
@@ -124,6 +122,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     })
 
     useEffect(() => {
+        var axios = new AxiosService(loginContextVariables)
         if (id !== 'new') {
             axios
                 .get(`/detail/ProgramOverview/${id}/${archived === 'archived' ? true : false}`)
@@ -145,9 +144,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     )
                     setProgramRows(prog)
 
-                    setOverviewInputs({
-                        ...overviewInputs,
-                        isLicense: {value: data[0].programOverview.isLicense, changed: false},
+                    setOverviewInputs(o => {
+                        return {...o, isLicense: {value: data[0].programOverview.isLicense, changed: false}}
                     })
 
                     let plug: ITableItem[][] = []
@@ -184,7 +182,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 })
                 .catch((err: any) => console.error(err))
         }
-    }, [])
+    }, [archived, id, loginContextVariables])
 
     const handleProgramRemove = (row: ITableItem[]) => {
         //add to removed array
@@ -205,6 +203,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     }
 
     async function handleSubmit() {
+        var axios = new AxiosService(loginContextVariables)
         var postProgram = {
             Program: {
                 numberOfPrograms: programInput.numCopies
@@ -240,7 +239,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             if (
                 postProgram.Program.numberOfPrograms >= 1 &&
                 postProgram.Program.ProgramName &&
-                (postProgram.Program.ProgramCostPerYear > 0 || postProgram.Program.ProgramFlatCost > 0) &&
                 postProgram.Program.DateBought
             ) {
                 await axios
@@ -265,10 +263,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 msg = 'Failed because: \n'
                 msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
                 msg += postProgram.Program.ProgramName === '' ? 'No name entered,\n' : ''
-                msg +=
-                    postProgram.Program.ProgramCostPerYear <= 0 && postProgram.Program.ProgramFlatCost <= 0
-                        ? 'No cost entered,\n'
-                        : ''
                 window.alert(msg)
             }
         } else {

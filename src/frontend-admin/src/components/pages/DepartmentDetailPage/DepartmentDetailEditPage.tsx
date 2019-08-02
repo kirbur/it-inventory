@@ -1,8 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react'
 
 // Components
-import icon from '../../../content/Images/CQL-favicon.png'
-import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import {AddDropdown} from '../../reusables/Dropdown/AddDropdown'
 
 import 'react-datepicker/dist/react-datepicker.css'
@@ -12,7 +10,6 @@ import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './DepartmentDetailEditPage.module.css'
-import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 import {Button} from '../../reusables/Button/Button'
 import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {LoginContext, ThemeContext} from '../../App/App'
@@ -37,12 +34,12 @@ interface Defaults {
 export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps> = props => {
     const {history, match} = props
 
-    const [deptList, setDeptList] = useState<any>([])
+    const [deptList] = useState<any>([])
     var deptsRowOne: any[] = []
     var deptsRowTwo: any[] = []
     //push them into alternating rows so that rows are equal
     for (let i = 0; i < deptList.length; i++) {
-        if (i % 2 == 0) {
+        if (i % 2 === 0) {
             deptsRowOne.push(deptList[i].DepartmentName)
         } else {
             deptsRowTwo.push(deptList[i].DepartmentName)
@@ -50,7 +47,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     }
 
     const {loginContextVariables} = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [deptData, setDeptData] = useState<any>({})
@@ -129,7 +126,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     }
     const handleRemoveHardware = (name: Defaults[]) => {
         let tempArray = cloneDeep(hardwareRows)
-        tempArray = tempArray.filter(item => item[0].id != name[0].id)
+        tempArray = tempArray.filter(item => item[0].id !== name[0].id)
         setHardwareRows(tempArray)
     }
 
@@ -140,7 +137,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     }
     const handleRemoveSoftware = (name: Defaults[]) => {
         let tempArray = cloneDeep(softwareRows)
-        tempArray = tempArray.filter(item => item[0].id != name[0].id)
+        tempArray = tempArray.filter(item => item[0].id !== name[0].id)
         setSoftwareRows(tempArray)
     }
 
@@ -151,7 +148,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     }
     const handleRemoveLicense = (name: Defaults[]) => {
         let tempArray = cloneDeep(licenseRows)
-        tempArray = tempArray.filter(item => item[0].id != name[0].id)
+        tempArray = tempArray.filter(item => item[0].id !== name[0].id)
         setLicenseRows(tempArray)
     }
 
@@ -189,16 +186,18 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
             let newDefaultSoftware = formatForPost(softwareRows)
             let newDefaultLicenses = formatForPost(licenseRows)
             if (match.params.id === 'new') {
-                await axios.post(`add/department`, {
-                    DefaultHardware: {DefaultHardware: newDefaultHardware},
-                    DefaultPrograms: {
-                        license: newDefaultLicenses,
-                        software: newDefaultSoftware,
-                    },
-                    name: deptData.departmentName,
-                }).then((response: any) => {
-                    newID = response.data
-                })
+                await axios
+                    .post(`add/department`, {
+                        DefaultHardware: {DefaultHardware: newDefaultHardware},
+                        DefaultPrograms: {
+                            license: newDefaultLicenses,
+                            software: newDefaultSoftware,
+                        },
+                        name: deptData.departmentName,
+                    })
+                    .then((response: any) => {
+                        newID = response.data
+                    })
                 history.push({pathname: `/departments/detail/${newID}`, state: {prev: history.location}})
             } else {
                 await axios.put(`update/department`, {
@@ -229,7 +228,9 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 {/* name and date */}
-                <div className={s(styles.title, styles.paddingTop, isDarkMode ? styles.textDark : {})}>Department Information</div>
+                <div className={s(styles.title, styles.paddingTop, isDarkMode ? styles.textDark : {})}>
+                    Department Information
+                </div>
 
                 <div className={styles.row}>
                     <div className={styles.text}>Department Name</div>

@@ -210,7 +210,7 @@ input:checked ~ .insideCheckmarkAdmin {
 /* add to table text and icon */
 .addContainer {
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     position: relative;
     left: 50px;
 }

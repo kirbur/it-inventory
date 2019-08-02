@@ -94,7 +94,7 @@
 .tableColumn {
     display: flex;
     flex-direction: row;
-    align-items: start;
+    align-items: flex-start;
     justify-content: left;
     width: 700px;
     position: relative;
@@ -124,7 +124,7 @@
 .addDefaultContainer {
     padding-top: 25px;
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     position: relative;
     left: 50px;
 }

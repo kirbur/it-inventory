@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react'
 import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {checkImage} from '../../../utilities/CheckImage'
@@ -47,7 +47,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
         loginContextVariables: {isAdmin},
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<IDepartmentData[]>([])
@@ -70,8 +70,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
             .get('/list/departments')
             .then((data: IPulledData[]) => {
                 var depts: IDepartmentData[] = []
-                var imgs: {id: number; img: string}[] = []
-                data.map((i: IPulledData) => {
+                data.forEach((i: IPulledData) => {
                     depts.push({
                         name: format(i.departmentName),
                         id: i.departmentId,

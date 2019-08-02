@@ -55,7 +55,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<any[]>([])
@@ -78,8 +78,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
             .get('/list/monitors')
             .then((data: IPulledData[]) => {
                 const monitors: IMonitorData[] = []
-                var imgs: {id: number; img: string}[] = []
-                data.map((i: IPulledData) => {
+                data.forEach((i: IPulledData) => {
                     monitors.push({
                         make: format(i.make),
                         id: i.monitorId,
@@ -109,7 +108,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
             .get('/archivedList/monitor')
             .then((data: IPulledData[]) => {
                 const monitors: IMonitorData[] = []
-                data.map((i: IPulledData) => {
+                data.map((i: IPulledData) =>
                     monitors.push({
                         make: format(i.make),
                         id: i.monitorId,
@@ -120,7 +119,7 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
                         icon: i.icon,
                         model: format(i.model),
                     })
-                })
+                )
                 setArchivedData(monitors)
             })
             .catch((err: any) => console.error(err))
@@ -169,12 +168,12 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
     const [sortState, setSortState] = useState(initState)
 
     function sortStates(index: number) {
-        if (sortState.headerStateCounts[index] == 0) {
+        if (sortState.headerStateCounts[index] === 0) {
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
             tempHeaderStateCounts = [...initHeaderStateCounts]
-        } else if (sortState.headerStateCounts[index] == 1) {
+        } else if (sortState.headerStateCounts[index] === 1) {
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
             setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
@@ -258,15 +257,20 @@ export const MonitorsListPage: React.SFC<IMonitorsListPageProps> = props => {
             switch (i) {
                 case 0:
                     transformedRow[0] = concatenatedName(row)
+                    break
                 case 2:
                     transformedRow[2] = <td className={styles.alignLeft}>{row[2]} in</td>
+                    break
                 case 3:
                     transformedRow[3] = <td className={styles.alignLeft}>{row[3]}k</td>
+                    break
                 case 4:
                     transformedRow[4] = <td className={styles.alignLeft}>{row[4]}</td>
+                    break
 
                 case 5:
                     transformedRow[5] = <td className={styles.alignLeft}>{row[5]}</td>
+                    break
             }
         }
 

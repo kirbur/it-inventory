@@ -19,7 +19,7 @@ import {checkImage} from '../../../utilities/CheckImage'
 import styles from './EmployeeDetailEditPage.module.css'
 import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 import {Button} from '../../reusables/Button/Button'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 import {LoginContext, ThemeContext} from '../../App/App'
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
@@ -58,9 +58,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const {history, match} = props
 
     const {loginContextVariables} = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
-    const axios = new AxiosService(loginContextVariables)
     const [userData, setUserData] = useState<IEmployee>({
         isAdmin: false,
         photo: '',
@@ -106,7 +105,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const licenseHeaders = ['Licenses', 'Key/Username', 'Monthly Cost']
 
     const [deptList, setDeptList] = useState<IDepartment[]>([])
-    const [deptImages, setDeptImages] = useState<{id: number; img: string}[]>([])
+    const [deptImages] = useState<{id: number; img: string}[]>([])
     const [useImages, setUseImages] = useState(false)
 
     //input feild states:
@@ -126,6 +125,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>(employeeDropdown[0])
 
     useEffect(() => {
+        const axios = new AxiosService(loginContextVariables)
         axios
             .get(`/add/employeePrep/`)
             .then((data: any) => {
@@ -210,7 +210,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             {value: formatDate(i.purchaseDate), id: format(i.id), sortBy: i.purchaseDate},
                         ])
                     )
-                    setHardwareRows({...hardwareRows, assigned: [...hw]})
+                    setHardwareRows(oldHardwareRows => {
+                        return {...oldHardwareRows, assigned: [...hw]}
+                    })
 
                     let sw: any[] = []
                     data[0].software.map((i: any) =>
@@ -228,7 +230,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             },
                         ])
                     )
-                    setSoftwareRows({...softwareRows, assigned: [...sw]})
+                    setSoftwareRows(oldSoftwareRows => {
+                        return {...oldSoftwareRows, assigned: [...sw]}
+                    })
 
                     let l: any[] = []
                     data[0].licenses.map((i: any) =>
@@ -250,7 +254,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             {value: format(i.licensesCount), id: format(i.id), sortBy: i.licensesCount},
                         ])
                     )
-                    setLicenseRows({...licenseRows, assigned: [...l]})
+                    setLicenseRows(oldLicenseRows => {
+                        return {...oldLicenseRows, assigned: [...l]}
+                    })
                 })
                 .catch((err: any) => console.error(err))
 
@@ -263,18 +269,19 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 })
                 .catch((err: any) => console.error(err))
         }
-    }, [])
+    }, [loginContextVariables, match.params.id])
 
     //Set display Images
     useEffect(() => {
+        const axios = new AxiosService(loginContextVariables)
         deptList.map((dept: any) =>
             checkImage(dept.icon, axios, deptPlaceholder).then(data => {
-                var list = deptList.filter(i => i.departmentId !== dept.departmentId)
-                setDeptList([...list, {...dept, icon: data}])
+                //var list = deptList.filter(i => i.departmentId !== dept.departmentId)
+                setDeptList(list => [...list.filter(i => i.departmentId !== dept.departmentId), {...dept, icon: data}])
                 deptImages.push({id: dept.departmentId, img: data})
             })
         )
-    }, [useImages])
+    }, [useImages, loginContextVariables])
 
     //Check the current employees department, if they don't have one yet check the first
     useEffect(() => {
@@ -290,7 +297,8 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             if (dept.defaultHardware) {
                 //clear out added
                 hardwareRows.added.map(add => {
-                    if (!hardwareDropdown.filter(item => item.id === add[0].id).length) {
+                    return (
+                        !hardwareDropdown.filter(item => item.id === add[0].id).length &&
                         hardwareDropdown.push({
                             name: add[0].value.toString(),
                             id: add[0].id ? add[0].id.toString() : '',
@@ -298,7 +306,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             mfg: add[2].value.toString(),
                             purchaseDate: add[3].value.toString(),
                         })
-                    }
+                    )
                 })
                 setHardwareRows({...hardwareRows, added: []})
 
@@ -307,7 +315,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 dept.defaultHardware.forEach(need => {
                     var needFulfilled = false
-                    hardwareDropdown.map(available => {
+                    hardwareDropdown.forEach(available => {
                         if (
                             !needFulfilled &&
                             (available.name.search(need) >= 0 || available.id.search(need.toLowerCase()) >= 0)
@@ -322,7 +330,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             toBeAdded.push(arr)
                             needFulfilled = true
                         }
-                        return
                     })
                     if (!needFulfilled) {
                         unavailable.push([
@@ -346,7 +353,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             if (dept.defaultSoftware) {
                 /*APPLY SOFTWARE DEFAULTS */
                 //clear out added
-                softwareRows.added.map(add => {
+                softwareRows.added.forEach(add => {
                     if (!softwareDropdown.filter(item => item.id === add[0].id).length) {
                         softwareDropdown.push({
                             name: add[0].value.toString(),
@@ -362,7 +369,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 dept.defaultSoftware.forEach(need => {
                     var needFulfilled = false
-                    softwareDropdown.map(available => {
+                    softwareDropdown.forEach(available => {
                         if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
                             var arr = [
                                 {value: available.name, id: available.id, sortBy: available.name},
@@ -373,7 +380,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             toBeAdded.push(arr)
                             needFulfilled = true
                         }
-                        return
                     })
                     if (!needFulfilled) {
                         unavailable.push([
@@ -396,7 +402,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             if (dept.defaultLicenses) {
                 /*APPLY LICENSE DEFAULTS */
                 //clear out added
-                licenseRows.added.map(add => {
+                licenseRows.added.forEach(add => {
                     if (!licenseDropdown.filter(item => item.id === add[0].id).length) {
                         licenseDropdown.push({
                             name: add[0].value.toString(),
@@ -412,7 +418,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 dept.defaultLicenses.forEach(need => {
                     var needFulfilled = false
-                    licenseDropdown.map(available => {
+                    licenseDropdown.forEach(available => {
                         if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
                             var arr = [
                                 {value: available.name, id: available.id, sortBy: available.name},
@@ -424,7 +430,6 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             toBeAdded.push(arr)
                             needFulfilled = true
                         }
-                        return
                     })
                     if (!needFulfilled) {
                         unavailable.push([
@@ -578,6 +583,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     async function handleSubmit() {
+        const axios = new AxiosService(loginContextVariables)
         var name = ['first', 'last']
         var msg = ''
         var newID = ''
@@ -730,7 +736,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             })
         }
 
-        rows.added.map((add: any) => {
+        rows.added.forEach((add: any) => {
             if (type === 'hw' || type === 'l') {
                 arr.push([
                     {value: add[0].value, id: add[0].id, sortBy: add[0].sortBy, unavailable: add[0].unavailable},
@@ -764,7 +770,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             {/* column 2 */}
             <div className={styles.secondColumn}>
                 {/* name and date */}
-                <div className={s(styles.title, styles.paddingTop, isDarkMode ? styles.titleDark : {})}>Employee Information</div>
+                <div className={s(styles.title, styles.paddingTop, isDarkMode ? styles.titleDark : {})}>
+                    Employee Information
+                </div>
 
                 {/* Admin/nonadmin radio cards */}
                 <div className={styles.adminCardContainer}>
@@ -783,7 +791,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     }}
                                 />
                                 <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
-                                <div className={s(styles.insideCheckmarkAdmin, isDarkMode ? styles.insideCheckmarkAdminDark : {})} />
+                                <div
+                                    className={s(
+                                        styles.insideCheckmarkAdmin,
+                                        isDarkMode ? styles.insideCheckmarkAdminDark : {}
+                                    )}
+                                />
 
                                 <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Admin User</div>
                                 <div className={styles.adminText}>
@@ -809,7 +822,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 }}
                             />
                             <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
-                            <div className={s(styles.insideCheckmarkAdmin, isDarkMode ? styles.insideCheckmarkAdminDark : {})} />
+                            <div
+                                className={s(
+                                    styles.insideCheckmarkAdmin,
+                                    isDarkMode ? styles.insideCheckmarkAdminDark : {}
+                                )}
+                            />
                             <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Non Admin User</div>
                             <div className={styles.adminText}>
                                 This user will be able to view all content and review the overall company as it grows.
@@ -917,7 +935,16 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 <div className={styles.line} />
 
                 {/* Employee Dept radio buttons */}
-                <div className={s(styles.title, styles.paddingTop, styles.paddingBottom, isDarkMode ? styles.titleDark : {})}>Employee Department</div>
+                <div
+                    className={s(
+                        styles.title,
+                        styles.paddingTop,
+                        styles.paddingBottom,
+                        isDarkMode ? styles.titleDark : {}
+                    )}
+                >
+                    Employee Department
+                </div>
                 {deptInput && deptList && (
                     <div className={styles.employeeDepartment}>
                         {deptList.map((dept: any) => (
@@ -934,7 +961,12 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     }}
                                 />
                                 <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
-                                <div className={s(styles.insideCheckmark, isDarkMode ? styles.insideCheckmarkAdminDark : {})} />
+                                <div
+                                    className={s(
+                                        styles.insideCheckmark,
+                                        isDarkMode ? styles.insideCheckmarkAdminDark : {}
+                                    )}
+                                />
                                 <div className={styles.deptIconContainer}>
                                     {deptImages &&
                                     deptImages.filter(x => x.id === dept.departmentId) &&
@@ -1028,7 +1060,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                     <div className={styles.text}>Description</div>
                     <textarea
                         className={s(styles.input, styles.description)}
-                        value={descriptionInput}
+                        value={descriptionInput ? descriptionInput : ''}
                         onChange={e => {
                             setChanged(true)
                             setDescriptionInput(e.target.value)

@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService, URL} from '../../../services/AxiosService/AxiosService'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
 import {Button} from '../../reusables/Button/Button'
@@ -40,7 +40,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
         loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
 
@@ -343,10 +343,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     function getCosts(): ICostText[] {
         let costTexts: ICostText[] = []
         if (flatCost !== undefined && flatCost !== null && flatCost !== 0) {
-            costTexts.push({title: "Initial Cost", cost: `$${flatCost}`})
+            costTexts.push({title: 'Initial Cost', cost: `$${flatCost}`})
         }
         if (costPerYear !== undefined && costPerYear !== null && costPerYear !== 0) {
-            costTexts.push({title: "Cost Per Year", cost: `$${costPerYear}`})
+            costTexts.push({title: 'Cost Per Year', cost: `$${costPerYear}`})
         }
         return costTexts
     }
@@ -363,9 +363,7 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
                     <DetailImage src={img} />
-                    <DetailCostText
-                        costTexts={getCosts()}
-                    />
+                    <DetailCostText costTexts={getCosts()} />
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
@@ -396,7 +394,9 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
 
                     {/* title/makeModel/dates/virtualized */}
                     <div className={titleStyle}>
-                        <div className={s(styles.hardwareName, isDarkMode ? styles.hardwareNameDark : {})}>{match.params.type}</div>
+                        <div className={s(styles.hardwareName, isDarkMode ? styles.hardwareNameDark : {})}>
+                            {match.params.type}
+                        </div>
                         {headingInfo.map((heading: string) => (
                             <div className={styles.hardwareText}>{heading} </div>
                         ))}
