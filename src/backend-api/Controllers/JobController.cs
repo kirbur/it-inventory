@@ -484,7 +484,7 @@ namespace backend_api.Controllers
         }
 
         /*
-         * POST: api/UpdateRenewalDates
+         * POST: api/job/UpdateRenewalDates
          * This method keeps the renewal dates of the programs and the plugins, current.
          */
         [Route("UpdateRenewalDates")]
