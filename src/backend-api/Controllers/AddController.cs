@@ -106,12 +106,16 @@ namespace backend_api.Controllers
             foreach (var dep in _context.Department.Where(x => x.IsDeleted == false))
             {
                 // if the department is any department apart from utilities does not have default programs
-                if (dep.DepartmentName != "Utilities" && dep.DepartmentName != "Unassigned" && dep.DepartmentName != "IT")
+                if (dep.DepartmentName != "Utilities" && dep.DepartmentName != "Unassigned")
                 {
-                    // pull stringifyed default hardware and software out into a nice JSON object :) using JSON package.
-                    JObject defaultHardware = JObject.Parse(dep.DefaultHardware);
-                    JObject defaultPrograms = JObject.Parse(dep.DefaultPrograms);
-
+                    JObject defaultHardware = null;
+                    JObject defaultPrograms = null;
+                    if (dep.DefaultHardware != null && dep.DefaultPrograms != null && dep.DefaultPrograms != "" && dep.DefaultHardware != "")
+                    {
+                        // pull stringifyed default hardware and software out into a nice JSON object :) using JSON package.
+                        defaultHardware = JObject.Parse(dep.DefaultHardware);
+                        defaultPrograms = JObject.Parse(dep.DefaultPrograms);
+                    }
                     // image for the department
                     string icon = $"/image/department/{dep.DepartmentId}";
 
@@ -121,9 +125,9 @@ namespace backend_api.Controllers
                         dep.DepartmentName,
                         dep.DepartmentId,
                         icon,
-                        DefaultHardware = defaultHardware["DefaultHardware"],
-                        DefaultLicenses = defaultPrograms["license"],
-                        DefaultSoftware = defaultPrograms["software"],
+                        DefaultHardware = defaultHardware !=null ? defaultHardware["DefaultHardware"] : null,
+                        DefaultLicenses = defaultPrograms !=null ? defaultPrograms["license"] : null,
+                        DefaultSoftware = defaultPrograms !=null ? defaultPrograms["software"] : null,
                     });
                 }
 
