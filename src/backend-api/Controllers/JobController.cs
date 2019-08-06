@@ -482,5 +482,65 @@ namespace backend_api.Controllers
             }
             return lowResources;
         }
+
+        /*
+         * POST: api/job/UpdateRenewalDates
+         * This method keeps the renewal dates of the programs and the plugins, current.
+         */
+        [Route("UpdateRenewalDates")]
+        [HttpPost]
+        public IActionResult UpdateRenewalDate([FromHeader]string token)
+        {
+            // Check the token
+            if (token != _jobSettings.AuthToken)
+            {
+                return BadRequest($"Invalid token: {token}");
+            }
+            else
+            {
+                // Updating the programs renewal dates
+                var rows = 1;
+                while (rows > 0)
+                {
+                    // setting rows to 0 so that if nothing changes then we can leave while loop
+                    rows = 0;
+                    foreach (var prog in _context.Program)
+                    {
+                        // if the renewal date is passed (that is, that the current date is beyond the renewal date) 
+                        // add the months per renewal to the renewal date
+                        if (prog.RenewalDate != null &&
+                            prog.MonthsPerRenewal != null &&
+                            prog.RenewalDate < DateTime.Now)
+                        {
+                            prog.RenewalDate = prog.RenewalDate.Value.AddMonths(prog.MonthsPerRenewal.Value);
+                            //incrementing the rows so we know something changed so the while loop will run again.
+                            rows++;
+                        }
+
+                    }
+                    _context.SaveChanges();
+                }
+                // Updating the plugins renewal dates
+                var rows2 = 1;
+                while (rows2 > 0)
+                {
+                    rows2 = 0;
+                    foreach (var plugin in _context.Plugins)
+                    {
+                        if (plugin.RenewalDate < DateTime.Now &&
+                            plugin.RenewalDate != null &&
+                            plugin.MonthsPerRenewal != null)
+                        {
+                            plugin.RenewalDate = plugin.RenewalDate.Value.AddMonths(plugin.MonthsPerRenewal.Value);
+                            rows2++;
+                        }
+
+                    }
+                    _context.SaveChanges();
+                }
+
+                return Ok();
+            }
+        }
     }
 }
