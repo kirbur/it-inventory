@@ -106,7 +106,7 @@ namespace backend_api.Controllers
             foreach (var dep in _context.Department.Where(x => x.IsDeleted == false))
             {
                 // if the department is any department apart from utilities does not have default programs
-                if (dep.DepartmentName != "Utilities" && dep.DepartmentName != "Unassigned")
+                if (dep.DepartmentName != "Utilities" && dep.DepartmentName != "Unassigned" && dep.DepartmentName != "IT")
                 {
                     // pull stringifyed default hardware and software out into a nice JSON object :) using JSON package.
                     JObject defaultHardware = JObject.Parse(dep.DefaultHardware);
