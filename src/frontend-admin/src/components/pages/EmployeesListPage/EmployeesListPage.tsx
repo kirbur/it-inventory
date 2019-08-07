@@ -4,7 +4,7 @@ import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
-import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
+import {formatDate, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {History} from 'history'
 import {checkImage} from '../../../utilities/CheckImage'
 import {searchFilter} from '../../../utilities/SearchFilter'
@@ -100,7 +100,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         //for searching
                         hardware: i.hardwareList ? i.hardwareList.join(', ') : '',
                         programs: i.progForEmp ? i.progForEmp.join(', ') : '',
-                        daysEmployed: getDays(i.hireDate),
+                        daysEmployed: i.hireDate,
                     })
 
                     imagePromises.push(
@@ -125,7 +125,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                     employees.push({
                         name: format(i.firstName + ' ' + i.lastName),
                         dateHired: formatDate(i.hireDate),
-                        daysEmployed: calculateDaysEmployed(getDays(i.hireDate, i.archiveDate)),
+                        daysEmployed: calculateDaysEmployed(i.hireDate, i.archiveDate),
                         space: 0,
                         space4: 0,
                         role: format(i.role),

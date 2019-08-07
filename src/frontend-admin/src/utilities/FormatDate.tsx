@@ -1,25 +1,22 @@
+import moment from 'moment'
+
 export const formatDate = (date: string) => {
     const obj = new Date(date)
     const formatted = obj.getMonth() + 1 + '/' + obj.getDate() + '/' + obj.getFullYear()
     return date ? formatted : '-'
 }
 
-export const getDays = (startDate: string, endDate?: string) => {
-    const end = endDate ? new Date(endDate) : new Date()
-    const start = new Date(startDate)
-    return Math.round(Math.abs(end.getTime() - start.getTime()))
-}
+// Calculate number of days and formate in years, months, day form.
+// Adapted from a friendly SO post: https://stackoverflow.com/questions/33988129/moment-js-get-difference-in-two-birthdays-in-years-months-and-days
+export const calculateDaysEmployed = (startDate: string, endDate?: string) => {
+    var start = moment(new Date(startDate));
+    var end = moment(endDate ? new Date(endDate) : new Date())
 
-//does not account for leap years or variable # of days in a month
-export const calculateDaysEmployed = (dif: number) => {
-    var oneDay = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
-
-    var days = Math.floor(dif / oneDay)
-    var months = Math.floor(days / 31)
-    var years = Math.floor(months / 12)
-
-    months = Math.floor(months % 12)
-    days = Math.floor(days % 31)
+    var years = end.diff(start, 'year');
+    start.add(years, 'years');
+    var months = end.diff(start, 'months');
+    start.add(months, 'months');
+    var days = end.diff(start, 'days');
 
     var ret: string = ''
     ret += years !== 0 ? (years === 1 ? years + ' year, ' : years + ' years, ') : ''
