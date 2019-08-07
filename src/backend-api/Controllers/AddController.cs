@@ -91,8 +91,8 @@ namespace backend_api.Controllers
                 {
                     foreach (var domainUser in search.FindAll())
                     {
-                        if (domainUser.DisplayName != null && domainUser.Guid != null && 
-                            domainUser.IsMemberOf(gp) && 
+                        if (domainUser.DisplayName != null && domainUser.Guid != null &&
+                            domainUser.IsMemberOf(gp) &&
                             !ADIds.Contains(domainUser.Guid.Value))
                         {
                             myDomainUsers.Add(domainUser.DisplayName);
@@ -125,9 +125,9 @@ namespace backend_api.Controllers
                         dep.DepartmentName,
                         dep.DepartmentId,
                         icon,
-                        DefaultHardware = defaultHardware !=null ? defaultHardware["DefaultHardware"] : null,
-                        DefaultLicenses = defaultPrograms !=null ? defaultPrograms["license"] : null,
-                        DefaultSoftware = defaultPrograms !=null ? defaultPrograms["software"] : null,
+                        DefaultHardware = defaultHardware != null ? defaultHardware["DefaultHardware"] : null,
+                        DefaultLicenses = defaultPrograms != null ? defaultPrograms["license"] : null,
+                        DefaultSoftware = defaultPrograms != null ? defaultPrograms["software"] : null,
                     });
                 }
 
@@ -152,7 +152,7 @@ namespace backend_api.Controllers
             // adding unassigned hardware to our list of unassigned using helper method
             UnassignedHardware.AddRange(UnassignedHardwareHelper<Monitor>());
             UnassignedHardware.AddRange(UnassignedHardwareHelper<Server>());
-            UnassignedHardware.AddRange(UnassignedHardwareHelper<Computer>());          
+            UnassignedHardware.AddRange(UnassignedHardwareHelper<Computer>());
             UnassignedHardware.AddRange(UnassignedHardwareHelper<Peripheral>());
 
             // Unassigned programs lists for returning purposes
@@ -175,7 +175,7 @@ namespace backend_api.Controllers
                         prog.ProgramId,
                         type = nameof(Program),
                         prog.ProgramLicenseKey,
-                        MonthlyCost = prog.ProgramCostPerYear !=null ? Math.Round(prog.ProgramCostPerYear.Value / 12, 2) : 0,
+                        MonthlyCost = prog.ProgramCostPerYear != null ? Math.Round(prog.ProgramCostPerYear.Value / 12, 2) : 0,
                         CALS = 1
                     };
                     UnassignedSoftware.Add(SW);
@@ -240,92 +240,79 @@ namespace backend_api.Controllers
         [Route("Employee")]
         public IActionResult PostEmployee([FromBody] PostEmployeeInputModel input)
         {
-            // concatenating first and last name for comparison reasons
-            var userName = input.Employee.FirstName + "." + input.Employee.LastName;
-
-
-            // find our active directory context so we can find the guid of the employee we are adding.
-            using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
+            var user = UserNameHelper(input.Employee.FirstName, input.Employee.LastName);
+            var emp = new Employee()
             {
-                var user = UserPrincipal.FindByIdentity(adContext, userName);
-                // creating employee object to added to the database and then saved.
-                if(user == null)
-                {
-                    userName = input.Employee.FirstName + " " + input.Employee.LastName;
-                    user = UserPrincipal.FindByIdentity(adContext, userName);
-                }
-                var emp = new Employee()
-                {
-                    HireDate = input.Employee.HireDate,
-                    DepartmentID = input.Employee.DepartmentID,
-                    IsDeleted = false,
-                    FirstName = input.Employee.FirstName,
-                    LastName = input.Employee.LastName,
-                    Email = user.EmailAddress,
-                    Role = input.Employee.Role,
-                    Adguid = user.Guid.Value,
-                    TextField = input.Employee.TextField
-                };
-                _context.Employee.Add(emp);
+                HireDate = input.Employee.HireDate,
+                DepartmentID = input.Employee.DepartmentID,
+                IsDeleted = false,
+                FirstName = input.Employee.FirstName,
+                LastName = input.Employee.LastName,
+                Email = user.EmailAddress,
+                Role = input.Employee.Role,
+                Adguid = user.Guid.Value,
+                TextField = input.Employee.TextField
+            };
+            _context.Employee.Add(emp);
 
-                // adding a new authIDEmp for the new employee created
-                var AuthEmp = new AuthIdserver()
+            // adding a new authIDEmp for the new employee created
+            var AuthEmp = new AuthIdserver()
+            {
+                ActiveDirectoryId = user.Guid.Value,
+                RefreshToken = "",
+                IsAdmin = input.Employee.IsAdmin
+            };
+            _context.AuthIdserver.Add(AuthEmp);
+            _context.SaveChanges();
+
+
+            // if there is any hardware that is to be assigned from the front end
+            if (input.HardwareAssigned != null)
+            {
+                // loop through hardware and depending on what type the hardware is, then add the hardware to the specific table. 
+                foreach (var hardware in input.HardwareAssigned)
                 {
-                    ActiveDirectoryId = user.Guid.Value,
-                    RefreshToken = "",
-                    IsAdmin = input.Employee.IsAdmin
-                };
-                _context.AuthIdserver.Add(AuthEmp);
+                    switch (hardware.Type.ToLower())
+                    {
+                        case "monitor":
+                            UpdateHardwareAssignment(_context.Monitor, emp.EmployeeId, true, hardware);
+                            break;
+                        case "peripheral":
+                            UpdateHardwareAssignment(_context.Peripheral, emp.EmployeeId, true, hardware);
+                            break;
+                        case "computer":
+                            UpdateHardwareAssignment(_context.Computer, emp.EmployeeId, true, hardware);
+                            break;
+                        case "server":
+                            UpdateHardwareAssignment(_context.Server, emp.EmployeeId, true, hardware);
+                            break;
+
+                    }
+
+                }
+                _context.SaveChanges();
+            }
+            // list to hold the histories of programs that will be added
+            List<ProgramHistory> programHistories = new List<ProgramHistory>();
+
+            // if there are any programs to be assigned from the front-end
+            if (input.ProgramAssigned != null)
+            {
+                foreach (var program in input.ProgramAssigned)
+                {
+                    var prog = _context.Program.Find(program.ID);
+                    prog.EmployeeId = emp.EmployeeId;
+                    programHistories.Add(UpdateProgramHistory(program.ID, emp.EmployeeId, "Assigned", DateTime.Now));
+                }
+                // Save multiple entries at once
+                _context.ProgramHistory.AddRange(programHistories);
                 _context.SaveChanges();
 
-
-                // if there is any hardware that is to be assigned from the front end
-                if (input.HardwareAssigned != null)
-                {
-                    // loop through hardware and depending on what type the hardware is, then add the hardware to the specific table. 
-                    foreach (var hardware in input.HardwareAssigned)
-                    {
-                        switch (hardware.Type.ToLower())
-                        {
-                            case "monitor":
-                                UpdateHardwareAssignment(_context.Monitor, emp.EmployeeId, true, hardware);
-                                break;
-                            case "peripheral":
-                                UpdateHardwareAssignment(_context.Peripheral, emp.EmployeeId, true, hardware);
-                                break;
-                            case "computer":
-                                UpdateHardwareAssignment(_context.Computer, emp.EmployeeId, true, hardware);
-                                break;
-                            case "server":
-                                UpdateHardwareAssignment(_context.Server, emp.EmployeeId, true, hardware);
-                                break;
-
-                        }
-
-                    }
-                    _context.SaveChanges();
-                }
-                // list to hold the histories of programs that will be added
-                List<ProgramHistory> programHistories = new List<ProgramHistory>();
-
-                // if there are any programs to be assigned from the front-end
-                if (input.ProgramAssigned != null)
-                {
-                    foreach (var program in input.ProgramAssigned)
-                    {
-                        var prog = _context.Program.Find(program.ID);
-                        prog.EmployeeId = emp.EmployeeId;
-                        programHistories.Add(UpdateProgramHistory(program.ID, emp.EmployeeId, "Assigned", DateTime.Now));
-                    }
-                        // Save multiple entries at once
-                        _context.ProgramHistory.AddRange(programHistories);
-                        _context.SaveChanges();
-                    
-                }
-                // if we get here then the various fields were created and changed and now we can return 201 created.
-                return StatusCode(201, emp.EmployeeId);
             }
+            // if we get here then the various fields were created and changed and now we can return 201 created.
+            return StatusCode(201, emp.EmployeeId);
         }
+
 
         /* GET: api/add/departmentprep
          * Returns the list of hardware, licenses, and software to be used
@@ -444,7 +431,7 @@ namespace backend_api.Controllers
             List<Models.Program> Programs = new List<Models.Program>();
 
             // make sure the number of programs added is not less than 1
-            if(input.Program.NumberOfPrograms < 1)
+            if (input.Program.NumberOfPrograms < 1)
             {
                 return BadRequest("number of programs cannot be less than 1");
             }
@@ -768,7 +755,7 @@ namespace backend_api.Controllers
             // If we make it here, everything must have succeeded
             return Ok(id);
         }
-        
+
     }
 }
 
