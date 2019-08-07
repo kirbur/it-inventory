@@ -12,7 +12,7 @@ import {DetailImage} from '../../reusables/DetailImage/DetailImage'
 import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Utils
-import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
+import {formatDate, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {checkImage} from '../../../utilities/CheckImage'
@@ -254,12 +254,12 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                             Start Date: {userData.hireDate} |{' '}
                             {userData.archiveDate !== '-'
                                 ? `End Date: ${userData.archiveDate}`
-                                : calculateDaysEmployed(getDays(userData.hireDate))}
+                                : calculateDaysEmployed(userData.hireDate)}
                         </div>
 
                         {userData.archiveDate !== '-' && (
                             <div className={styles.employeeText}>
-                                {calculateDaysEmployed(getDays(userData.hireDate))}
+                                {calculateDaysEmployed(userData.hireDate)}
                             </div>
                         )}
                     </div>
