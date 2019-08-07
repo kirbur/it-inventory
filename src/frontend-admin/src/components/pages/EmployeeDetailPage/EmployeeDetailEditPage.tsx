@@ -599,7 +599,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
             var postEmployee = {
                 Employee: {
                     FirstName: name.shift(),
-                    LastName: name.join(''),
+                    LastName: name.join(' '),
                     HireDate: dateInput.toISOString(),
                     Role: roleInput ? roleInput : deptInput.departmentName,
                     DepartmentID: deptInput.departmentId,
@@ -651,7 +651,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 Employee: {
                     EmployeeId: match.params.id,
                     FirstName: name.shift(),
-                    LastName: name.join(''),
+                    LastName: name.join(' '),
                     HireDate: dateInput.toISOString(),
                     Role: roleInput,
                     DepartmentID: deptInput.departmentId,
