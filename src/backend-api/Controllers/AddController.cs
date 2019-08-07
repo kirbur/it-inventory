@@ -243,11 +243,17 @@ namespace backend_api.Controllers
             // concatenating first and last name for comparison reasons
             var userName = input.Employee.FirstName + "." + input.Employee.LastName;
 
+
             // find our active directory context so we can find the guid of the employee we are adding.
             using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
             {
                 var user = UserPrincipal.FindByIdentity(adContext, userName);
                 // creating employee object to added to the database and then saved.
+                if(user == null)
+                {
+                    userName = input.Employee.FirstName + " " + input.Employee.LastName;
+                    user = UserPrincipal.FindByIdentity(adContext, userName);
+                }
                 var emp = new Employee()
                 {
                     HireDate = input.Employee.HireDate,
