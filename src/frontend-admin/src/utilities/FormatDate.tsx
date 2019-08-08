@@ -6,6 +6,12 @@ export const formatDate = (date: string) => {
     return date ? formatted : '-'
 }
 
+export const getDays = (startDate: string, endDate?: string) => {
+    const end = endDate ? new Date(endDate) : new Date()
+    const start = new Date(startDate)
+    return Math.round(Math.abs(end.getTime() - start.getTime()))
+}
+
 // Calculate number of days and formate in years, months, day form.
 // Adapted from a friendly SO post: https://stackoverflow.com/questions/33988129/moment-js-get-difference-in-two-birthdays-in-years-months-and-days
 export const calculateDaysEmployed = (startDate: string, endDate?: string) => {
