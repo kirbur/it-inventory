@@ -4,7 +4,7 @@ import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
-import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
+import {formatDate, getDays, calculateDaysEmployed, calculateHireDate} from '../../../utilities/FormatDate'
 import {History} from 'history'
 import {checkImage} from '../../../utilities/CheckImage'
 import {searchFilter} from '../../../utilities/SearchFilter'
@@ -315,7 +315,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                 case 2:
                     transformedRow[2] = (
                         <td key={row[7] + row[10]} className={styles.alignLeft}>
-                            {isArchive ? row[10] : calculateDaysEmployed(row[10])}
+                            {isArchive ? row[10] : calculateDaysEmployed(calculateHireDate(row[10]))}
                         </td>
                     )
                     break

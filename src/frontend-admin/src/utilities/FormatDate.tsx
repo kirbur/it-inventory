@@ -6,14 +6,17 @@ export const formatDate = (date: string) => {
     return date ? formatted : '-'
 }
 
+/* Get the total number of days employed. */
 export const getDays = (startDate: string, endDate?: string) => {
-    const end = endDate ? new Date(endDate) : new Date()
-    const start = new Date(startDate)
-    return Math.round(Math.abs(end.getTime() - start.getTime()))
+    const end = moment(endDate ? new Date(endDate) : new Date())
+    const start = moment(new Date(startDate))
+    var thing = end.diff(start, 'days')
+    return thing
 }
 
-// Calculate number of days and formate in years, months, day form.
-// Adapted from a friendly SO post: https://stackoverflow.com/questions/33988129/moment-js-get-difference-in-two-birthdays-in-years-months-and-days
+/* Calculate number of days and formate in years, months, day form.
+     Adapted from a friendly SO post: https://stackoverflow.com/questions/33988129/moment-js-get-difference-in-two-birthdays-in-years-months-and-days
+*/
 export const calculateDaysEmployed = (startDate: string, endDate?: string) => {
     var start = moment(new Date(startDate));
     var end = moment(endDate ? new Date(endDate) : new Date())
@@ -29,4 +32,10 @@ export const calculateDaysEmployed = (startDate: string, endDate?: string) => {
     ret += months !== 0 ? (months === 1 ? months + ' month, ' : months + ' months, ') : ''
     ret += days === 1 ? days + ' day' : days + ' days'
     return ret
+}
+
+/* Convert the number of days employee to the hire date. */
+export const calculateHireDate = (numberOfDaysEmployee: number) => {
+    var hireDate = moment(new Date()).subtract(numberOfDaysEmployee, "days")
+    return hireDate.toString()
 }
