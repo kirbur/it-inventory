@@ -4,7 +4,7 @@ import {sortTable} from '../../../utilities/quickSort'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
-import {formatDate, getDays, calculateDaysEmployed} from '../../../utilities/FormatDate'
+import {formatDate, getDays, calculateDaysEmployed, calculateHireDate} from '../../../utilities/FormatDate'
 import {History} from 'history'
 import {checkImage} from '../../../utilities/CheckImage'
 import {searchFilter} from '../../../utilities/SearchFilter'
@@ -86,29 +86,31 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             .get('/list/employees')
             .then((data: IPulledData[]) => {
                 let employees: IEmployeeData[] = []
-                data.forEach((i: IPulledData) => {
-                    employees.push({
-                        name: format(i.employeeName),
-                        dateHired: i.hireDate,
-                        cost: formatCost(i.hardwareCostForEmp, i.programCostForEmp),
-                        hwCost: i.hardwareCostForEmp,
-                        swCost: i.programCostForEmp,
-                        role: format(i.role),
-                        icon: format(i.photo),
-                        id: i.employeeId,
-
-                        //for searching
-                        hardware: i.hardwareList ? i.hardwareList.join(', ') : '',
-                        programs: i.progForEmp ? i.progForEmp.join(', ') : '',
-                        daysEmployed: getDays(i.hireDate),
-                    })
-
-                    imagePromises.push(
-                        checkImage(i.photo, axios, placeholder).then(image => {
-                            return {id: i.employeeId, img: image}
+                if (data != undefined) {
+                    data.forEach((i: IPulledData) => {
+                        employees.push({
+                            name: format(i.employeeName),
+                            dateHired: i.hireDate,
+                            cost: formatCost(i.hardwareCostForEmp, i.programCostForEmp),
+                            hwCost: i.hardwareCostForEmp,
+                            swCost: i.programCostForEmp,
+                            role: format(i.role),
+                            icon: format(i.photo),
+                            id: i.employeeId,
+    
+                            //for searching
+                            hardware: i.hardwareList ? i.hardwareList.join(', ') : '',
+                            programs: i.progForEmp ? i.progForEmp.join(', ') : '',
+                            daysEmployed: getDays(i.hireDate),
                         })
-                    )
-                })
+    
+                        imagePromises.push(
+                            checkImage(i.photo, axios, placeholder).then(image => {
+                                return {id: i.employeeId, img: image}
+                            })
+                        )
+                    })
+                }
                 setListData(employees)
             })
             .catch((err: any) => console.error(err))
@@ -315,7 +317,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                 case 2:
                     transformedRow[2] = (
                         <td key={row[7] + row[10]} className={styles.alignLeft}>
-                            {isArchive ? row[10] : calculateDaysEmployed(row[10])}
+                            {isArchive ? row[10] : calculateDaysEmployed(calculateHireDate(row[10]))}
                         </td>
                     )
                     break
