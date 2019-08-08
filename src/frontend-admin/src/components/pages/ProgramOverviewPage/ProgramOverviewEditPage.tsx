@@ -18,6 +18,7 @@ import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {formatCost} from '../../../utilities/FormatCost'
+import {uploadImage} from '../../../utilities/UploadImage'
 
 // Context
 import {LoginContext, ThemeContext} from '../../App/App'
@@ -253,27 +254,19 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 : ''
                             window.alert(msg)
                         }
+                        const {newId, newName} = response.data[0]
                         
-                        const {
-                            newId,
-                            newName,
-                        } = response.data[0]
-
                         // Upload the image
-                        if (imgInput) { 
+                        if (imgInput) {
                             const imageLocation = `/image/program/${newId}`
-                            var formData = new FormData()
-                            formData.append('file', imgInput)
-
-                            await axios
-                                .put(imageLocation, formData, {
-                                    headers: {'Content-Type': 'multipart/form-data'},
-                                })
-                                .catch(err => console.error(err))
+                            uploadImage(imgInput, imageLocation, axios)
                         }
 
                         // after submitting go back to detail
-                        history.push({pathname: `/programs/overview/${newName}/inventory`, state: {prev: history.location}})
+                        history.push({
+                            pathname: `/programs/overview/${newName}/inventory`,
+                            state: {prev: history.location},
+                        })
                         return
                     })
                     .catch((err: any) => console.error(err))
@@ -429,20 +422,13 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         }
 
         if (imgInput && imgLocation) {
-            var formData = new FormData()
-            formData.append('file', imgInput)
-
-            await axios
-                .put(imgLocation, formData, {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                })
-                .catch(err => console.error(err))
-
             //after submitting go back to detail
-            history.push({
-                pathname: `/programs/overview/${id}/inventory`,
-                state: {prev: history.location},
-            })
+            const cb = () =>
+                history.push({
+                    pathname: `/programs/overview/${id}/inventory`,
+                    state: {prev: history.location},
+                })
+            uploadImage(imgInput, imgLocation, axios, cb)
         }
     }
 
