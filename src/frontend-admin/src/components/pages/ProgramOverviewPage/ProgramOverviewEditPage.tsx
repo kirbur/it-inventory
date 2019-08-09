@@ -18,7 +18,7 @@ import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {formatCost} from '../../../utilities/FormatCost'
-import {uploadImage} from '../../../utilities/UploadImage'
+import {putUploadImage} from '../../../utilities/UploadImage'
 
 // Context
 import {LoginContext, ThemeContext} from '../../App/App'
@@ -259,7 +259,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         // Upload the image
                         if (imgInput) {
                             const imageLocation = `/image/program/${newId}`
-                            uploadImage(imgInput, imageLocation, axios)
+                            putUploadImage(imgInput, imageLocation, axios)
                         }
 
                         // after submitting go back to detail
@@ -428,7 +428,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     pathname: `/programs/overview/${id}/inventory`,
                     state: {prev: history.location},
                 })
-            uploadImage(imgInput, imgLocation, axios, cb)
+            putUploadImage(imgInput, imgLocation, axios, cb)
         }
     }
 

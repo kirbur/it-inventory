@@ -1,10 +1,10 @@
 import {AxiosService} from '../services/AxiosService/AxiosService';
 
 /*
-uploadImage takes a file, and the absolute path, with the service class 
+PutputUploadImage takes a file, and the absolute path, with the service class 
     and an optional callback and will upload an image.
 */
-export const uploadImage = async (image: File, imageLocation: string, axios: AxiosService, callback?: () => void) => {
+export const putUploadImage = async (image: File, imageLocation: string, axios: AxiosService, callback?: () => void) => {
     var formData = new FormData()
     formData.append('file', image)
 

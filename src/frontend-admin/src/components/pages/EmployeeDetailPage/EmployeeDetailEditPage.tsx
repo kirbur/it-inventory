@@ -14,7 +14,7 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {checkImage} from '../../../utilities/CheckImage'
-import {uploadImage} from '../../../utilities/UploadImage'
+import {putUploadImage} from '../../../utilities/UploadImage'
 
 // Styles
 import styles from './EmployeeDetailEditPage.module.css'
@@ -631,7 +631,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         window.alert(`${selectedEmployee.name} was successfully added!`)
                     }
                     if (imgInput) {
-                        uploadImage(imgInput, `image/employee/${newID}`, axios)
+                        putUploadImage(imgInput, `image/employee/${newID}`, axios)
                     }
                 })
                 .catch((err: any) => console.error(err))
@@ -710,7 +710,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
         if (imgInput) {
             const cb = () =>
                 history.push({pathname: `/employees/detail/${match.params.id}`, state: {prev: history.location}})
-            uploadImage(imgInput, userData.photo, axios, cb)
+            putUploadImage(imgInput, userData.photo, axios, cb)
         }
     }
 
