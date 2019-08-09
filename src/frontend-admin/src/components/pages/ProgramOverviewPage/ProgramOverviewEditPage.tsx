@@ -402,7 +402,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     window.location.reload()
                 } else {
                     removedProgramRows.forEach(remove => {
-                        axios.put(`archive/programs/${[remove[0].id]}`, {}).catch((err: any) => console.error(err))
+                        axios.put(`archive/programs`, [remove[0].id]).catch((err: any) => console.error(err))
                     })
                     setRemovedProgramRows([])
                     //after submitting go back to detail
