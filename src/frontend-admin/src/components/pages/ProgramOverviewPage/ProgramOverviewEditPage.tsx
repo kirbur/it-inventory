@@ -255,7 +255,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             window.alert(msg)
                         }
                         const {newId, newName} = response.data[0]
-                        
+
                         // Upload the image
                         if (imgInput) {
                             const imageLocation = `/image/program/${newId}`
@@ -402,11 +402,17 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
             if (removedPluginRows.length > 0) {
                 removedPluginRows.forEach(remove =>
-                    axios.put(`archive/plugin/${remove[0].id}`, {}).catch((err: any) => console.error(err))
+                    axios
+                        .put(`archive/plugin/${remove[0].id}`, {})
+                        .then(() =>
+                            history.push({
+                                pathname: `/programs/overview/${id}/inventory`,
+                                state: {prev: history.location},
+                            })
+                        )
+                        .catch((err: any) => console.error(err))
                 )
                 setRemovedPluginRows([])
-                //after submitting go back to detail
-                history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
             }
 
             if (removedProgramRows.length > 0) {
@@ -415,13 +421,24 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     window.location.reload()
                 } else {
                     removedProgramRows.forEach(remove => {
-                        axios.put(`archive/programs`, [remove[0].id]).catch((err: any) => console.error(err))
+                        axios
+                            .put(`archive/programs`, [remove[0].id])
+                            .then(() =>
+                                history.push({
+                                    pathname: `/programs/overview/${id}/inventory`,
+                                    state: {prev: history.location},
+                                })
+                            )
+                            .catch((err: any) => console.error(err))
                     })
                     setRemovedProgramRows([])
                     //after submitting go back to detail
-                    history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
                 }
             }
+            history.push({
+                pathname: `/programs/overview/${id}/inventory`,
+                state: {prev: history.location},
+            })
         }
 
         if (imgInput && imgLocation) {
