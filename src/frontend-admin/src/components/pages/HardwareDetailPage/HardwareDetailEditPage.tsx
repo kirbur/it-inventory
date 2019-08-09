@@ -11,6 +11,7 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import { putUploadImage } from '../../../utilities/UploadImage';
 
 // Styles
 import styles from './HardwareDetailEditPage.module.css'
@@ -353,19 +354,8 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
     }
 
     async function handleSubmit() {
-        //update image
+        
         var newID = ''
-
-        if (imgInput) {
-            var formData = new FormData()
-            formData.append('file', imgInput)
-
-            axios
-                .put(`/image/${match.params.type}/${match.params.id}`, formData, {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                })
-                .catch(err => console.error(err))
-        }
 
         if (badForm()) {
             return
@@ -499,6 +489,12 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                     })
             }
             history.push({pathname: `/hardware/detail/${match.params.type}/${newID}`, state: {prev: history.location}})
+            
+            //update image on entity creation
+            if (imgInput) {
+                const imgLocation = `/image/${match.params.type}/${newID}`
+                putUploadImage(imgInput, imgLocation, axios)
+            }
         } else {
             //not new --> editing existing page
             if (match.params.type === 'monitor') {
@@ -631,6 +627,11 @@ export const HardwareDetailEditPage: React.SFC<IHardwareDetailEditPageProps> = p
                 pathname: `/hardware/detail/${match.params.type}/${match.params.id}`,
                 state: {prev: history.location},
             })
+            // update image
+            if (imgInput) {
+                const imgLocation = `/image/${match.params.type}/${match.params.id}`
+                putUploadImage(imgInput, imgLocation, axios)
+            }
         }
     }
 

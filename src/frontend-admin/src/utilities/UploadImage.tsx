@@ -1,7 +1,7 @@
 import {AxiosService} from '../services/AxiosService/AxiosService';
 
 /*
-PutputUploadImage takes a file, and the absolute path, with the service class 
+putUploadImage takes a file, and the absolute path, with the service class 
     and an optional callback and will upload an image.
 */
 export const putUploadImage = async (image: File, imageLocation: string, axios: AxiosService, callback?: () => void) => {
