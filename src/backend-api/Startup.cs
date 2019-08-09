@@ -55,24 +55,24 @@ namespace backend_api
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             //adding the necessary setup for the jwt bearer 
-           .AddJwtBearer(x =>
-           {
-               x.RequireHttpsMetadata = false;
-               x.SaveToken = true;
-               x.TokenValidationParameters = new TokenValidationParameters
-               {
-                   ClockSkew = TimeSpan.Zero,
-                   ValidateIssuerSigningKey = true,
-                   IssuerSigningKey = new SymmetricSecurityKey(key),
-                   ValidateIssuer = false,
-                   //This makes sure that you can't use access tokens as refresh tokens and vice versa
-                   ValidateAudience = true,
-                   ValidAudiences = new List<string>
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ClockSkew = TimeSpan.Zero,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    //This makes sure that you can't use access tokens as refresh tokens and vice versa
+                    ValidateAudience = true,
+                    ValidAudiences = new List<string>
                     {
                         "Access"
                     }
-               };
-           });
+                };
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -113,6 +113,12 @@ namespace backend_api
             {
                 app.UseHsts();
             }
+
+            app.UseCors(builder =>
+                builder.WithOrigins("http://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+            );
 
             app.UseAuthentication();
             app.UseHttpsRedirection();
