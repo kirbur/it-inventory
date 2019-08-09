@@ -457,8 +457,7 @@ namespace backend_api.Controllers
                 bool Admin = false;
                 using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
                 {
-                    // find the user from the AD using their first and last name
-                    var user = UserPrincipal.FindByIdentity(adContext, emp.FirstName + "." + emp.LastName);
+                    var user = UserNameHelper(emp.FirstName, emp.LastName);
                     if (user != null)
                     {
                         // Return the isAdmin field from the AuthIDServer matching the Guid.
