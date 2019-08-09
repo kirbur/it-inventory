@@ -28,6 +28,7 @@ import styles from './ProgramOverviewEditPage.module.css'
 
 // Types
 import {ExpectedPluginType, ExpectedProgramType} from './ProgramOverviewPage'
+import {conditionalExpression} from '@babel/types'
 interface IProgramOverviewEditPageProps {
     history: History
     match: match<{id: string; archived: string}>
@@ -234,7 +235,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     : null,
             },
         }
-
         if (id === 'new') {
             var msg: string = ''
             if (
@@ -270,6 +270,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         return
                     })
                     .catch((err: any) => console.error(err))
+
+                //after submitting go back to detail
+                history.push({pathname: `/programs`, state: {prev: history.location}})
             } else {
                 msg = 'Failed because: \n'
                 msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
@@ -412,7 +415,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     window.location.reload()
                 } else {
                     removedProgramRows.forEach(remove => {
-                        axios.put(`archive/program/${remove[0].id}`, {}).catch((err: any) => console.error(err))
+                        axios.put(`archive/programs/${[remove[0].id]}`, {}).catch((err: any) => console.error(err))
                     })
                     setRemovedProgramRows([])
                     //after submitting go back to detail
@@ -528,6 +531,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             />
                         )}
                     </Group>
+                    {console.log(programUpdateInput)}
                     {programForm.edit && (
                         <div className={styles.programForm}>
                             <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} />

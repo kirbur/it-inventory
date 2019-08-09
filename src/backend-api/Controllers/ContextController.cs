@@ -178,5 +178,25 @@ namespace backend_api.Controllers
             }
             return UnassignedHardware;
         }
+
+        public UserPrincipal UserNameHelper(string firstName, string lastName)
+        {
+            UserPrincipal user;
+            // concatenating first and last name for comparison reasons
+            var userName = firstName + "." + lastName;
+
+            // find our active directory context so we can find the guid of the employee we are adding.
+            using (var adContext = new PrincipalContext(ContextType.Domain, "CQLCORP"))
+            {
+                user = UserPrincipal.FindByIdentity(adContext, userName);
+                // creating employee object to added to the database and then saved.
+                if (user == null)
+                {
+                    userName = firstName + " " + lastName;
+                    user = UserPrincipal.FindByIdentity(adContext, userName);
+                }
+            }
+            return user;
+        }
     }
 }
