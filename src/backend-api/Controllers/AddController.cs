@@ -721,7 +721,7 @@ namespace backend_api.Controllers
 
         /* PostHardware<T>(hardware, table) is a method to post any hardware type 
          *   to it's corresponding table and add hardware history.
-         * Return: 200 if successful, and 400 bad request if not.
+         * Return: 201 Created if successful, and 400 bad request if not.
          */
         private IActionResult PostHardware<T>(T hardware, DbSet<T> table)
             where T : class, IHardwareBase
@@ -771,7 +771,7 @@ namespace backend_api.Controllers
             }
 
             // If we make it here, everything must have succeeded
-            return Ok(id);
+            return StatusCode(201, id);
         }
         
     }
