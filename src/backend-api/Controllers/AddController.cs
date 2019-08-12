@@ -464,15 +464,16 @@ namespace backend_api.Controllers
 
                     // add the individual program to our list to hold the congruent program
                     Programs.Add(Prog);
-
                 }
                 // Save multiple entities at once.
                 _context.Program.AddRange(Programs);
                 _context.SaveChanges();
 
+                var newPrograms = _context.Program.Where(x => x.ProgramName == input.Program.ProgramName);
+
                 // now that the programs have been added to the database, now we can generate the program history entries
                 // for the programs we just added
-                foreach (var prog in _context.Program.Where(x => x.ProgramName == input.Program.ProgramName))
+                foreach (var prog in newPrograms)
                 {
                     programHistories.Add(UpdateProgramHistory(prog.ProgramId, null, "Bought", prog.DateBought.Value));
                 }
@@ -480,9 +481,13 @@ namespace backend_api.Controllers
                 _context.ProgramHistory.AddRange(programHistories);
                 _context.SaveChanges();
 
-
+                // ID returned to upload program images and name returned to route to created program page.
+                Models.Program newProgram = newPrograms.First();
+                string newName = newProgram.ProgramName;
+                int newId = newProgram.ProgramId;
+                
                 // if we get here then the various fields were created and changed and now we can return 201 created.
-                return StatusCode(201);
+                return StatusCode(201, new[] { new { newName, newId } });
             }
             catch
             {
@@ -703,7 +708,7 @@ namespace backend_api.Controllers
 
         /* PostHardware<T>(hardware, table) is a method to post any hardware type 
          *   to it's corresponding table and add hardware history.
-         * Return: 200 if successful, and 400 bad request if not.
+         * Return: 201 Created if successful, and 400 bad request if not.
          */
         private IActionResult PostHardware<T>(T hardware, DbSet<T> table)
             where T : class, IHardwareBase
@@ -753,7 +758,7 @@ namespace backend_api.Controllers
             }
 
             // If we make it here, everything must have succeeded
-            return Ok(id);
+            return StatusCode(201, id);
         }
 
     }
