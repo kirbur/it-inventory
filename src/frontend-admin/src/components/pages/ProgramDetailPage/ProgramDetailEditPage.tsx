@@ -12,6 +12,7 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import { putUploadImage } from '../../../utilities/UploadImage';
 
 // Context
 import {LoginContext, ThemeContext} from '../../App/App'
@@ -93,14 +94,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
     async function handleSubmit() {
         //update image
         if (imgInput) {
-            var formData = new FormData()
-            formData.append('file', imgInput)
-
-            axios
-                .put(`/image/program/${match.params.id}`, formData, {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                })
-                .catch(err => console.error(err))
+            putUploadImage(imgInput, `/image/program/${match.params.id}`, axios)
         }
 
         //update program info

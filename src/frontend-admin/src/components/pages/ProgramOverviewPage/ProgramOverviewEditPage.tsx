@@ -18,6 +18,7 @@ import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {formatCost} from '../../../utilities/FormatCost'
+import {putUploadImage} from '../../../utilities/UploadImage'
 
 // Context
 import {LoginContext, ThemeContext} from '../../App/App'
@@ -27,6 +28,7 @@ import styles from './ProgramOverviewEditPage.module.css'
 
 // Types
 import {ExpectedPluginType, ExpectedProgramType} from './ProgramOverviewPage'
+import {conditionalExpression} from '@babel/types'
 interface IProgramOverviewEditPageProps {
     history: History
     match: match<{id: string; archived: string}>
@@ -233,7 +235,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     : null,
             },
         }
-
         if (id === 'new') {
             var msg: string = ''
             if (
@@ -243,7 +244,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             ) {
                 await axios
                     .post('/add/program', postProgram)
-                    .then((response: any) => {
+                    .then(async (response: any) => {
                         if (response.status === 201) {
                             msg = programInput.numCopies
                                 ? programInput.numCopies.value +
@@ -253,6 +254,19 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 : ''
                             window.alert(msg)
                         }
+                        const {newId, newName} = response.data[0]
+
+                        // Upload the image
+                        if (imgInput) {
+                            const imageLocation = `/image/program/${newId}`
+                            putUploadImage(imgInput, imageLocation, axios)
+                        }
+
+                        // after submitting go back to detail
+                        history.push({
+                            pathname: `/programs/overview/${newName}/inventory`,
+                            state: {prev: history.location},
+                        })
                         return
                     })
                     .catch((err: any) => console.error(err))
@@ -388,11 +402,17 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
             if (removedPluginRows.length > 0) {
                 removedPluginRows.forEach(remove =>
-                    axios.put(`archive/plugin/${remove[0].id}`, {}).catch((err: any) => console.error(err))
+                    axios
+                        .put(`archive/plugin/${remove[0].id}`, {})
+                        .then(() =>
+                            history.push({
+                                pathname: `/programs/overview/${id}/inventory`,
+                                state: {prev: history.location},
+                            })
+                        )
+                        .catch((err: any) => console.error(err))
                 )
                 setRemovedPluginRows([])
-                //after submitting go back to detail
-                history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
             }
 
             if (removedProgramRows.length > 0) {
@@ -401,30 +421,34 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     window.location.reload()
                 } else {
                     removedProgramRows.forEach(remove => {
-                        axios.put(`archive/program/${remove[0].id}`, {}).catch((err: any) => console.error(err))
+                        axios
+                            .put(`archive/programs`, [remove[0].id])
+                            .then(() =>
+                                history.push({
+                                    pathname: `/programs/overview/${id}/inventory`,
+                                    state: {prev: history.location},
+                                })
+                            )
+                            .catch((err: any) => console.error(err))
                     })
                     setRemovedProgramRows([])
                     //after submitting go back to detail
-                    history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
                 }
             }
-        }
-
-        if (imgInput && imgLocation) {
-            var formData = new FormData()
-            formData.append('file', imgInput)
-
-            await axios
-                .put(imgLocation, formData, {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                })
-                .catch(err => console.error(err))
-
-            //after submitting go back to detail
             history.push({
                 pathname: `/programs/overview/${id}/inventory`,
                 state: {prev: history.location},
             })
+        }
+
+        if (imgInput && imgLocation) {
+            //after submitting go back to detail
+            const cb = () =>
+                history.push({
+                    pathname: `/programs/overview/${id}/inventory`,
+                    state: {prev: history.location},
+                })
+            putUploadImage(imgInput, imgLocation, axios, cb)
         }
     }
 
@@ -524,6 +548,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             />
                         )}
                     </Group>
+                    {console.log(programUpdateInput)}
                     {programForm.edit && (
                         <div className={styles.programForm}>
                             <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} />

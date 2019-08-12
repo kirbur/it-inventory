@@ -18,6 +18,7 @@ import {cloneDeep} from 'lodash'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import { putUploadImage } from '../../../utilities/UploadImage';
 
 // Types
 interface IDepartmentDetailEditPageProps {
@@ -163,17 +164,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     }
     async function handleSubmit() {
         var newID = ''
-
-        if (imgInput) {
-            var formData = new FormData()
-            formData.append('file', imgInput)
-
-            axios
-                .put(`/image/department/${match.params.id}`, formData, {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                })
-                .catch(err => console.error(err))
-        }
+        var imgID;
         if (
             //check to make sure there is a proper entry in department name
             deptData.departmentName === '' ||
@@ -196,7 +187,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                         name: deptData.departmentName,
                     })
                     .then((response: any) => {
-                        newID = response.data
+                        newID = imgID = response.data  
                     })
                 history.push({pathname: `/departments/detail/${newID}`, state: {prev: history.location}})
             } else {
@@ -210,7 +201,12 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                     ID: match.params.id,
                 })
                 history.push({pathname: `/departments/detail/${match.params.id}`, state: {prev: history.location}})
+                imgID = match.params.id
             }
+        }
+        // Update Image.
+        if (imgInput) {
+            putUploadImage(imgInput, `/image/department/${imgID}`, axios)
         }
     }
 

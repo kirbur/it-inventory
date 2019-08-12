@@ -168,7 +168,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
         history.push({pathname: `/programs/detail/${id}`, state: {prev: history.location}})
     }
 
-    const handleArchive = () => {
+    async function handleArchive() {
         //cant archive everything unless there are no plugins
         if (pluginRows.length > 0 && archived !== 'archived') {
             window.alert('Please archive the plugins before you archive this program.')
@@ -178,19 +178,24 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     `Are you sure you want to archive all copies of ${id}? ${programData.countProgInUse} are in use.`
                 )
             ) {
+                let idArray: any[] = []
                 programRows.forEach(program => {
-                    axios.put(`archive/program/${program[0].id}`, {}).catch((err: any) => console.error(err))
+                    idArray.push(program[0].id)
                 })
+                await axios.put(`archive/programs`, idArray).catch((err: any) => console.error(err))
+
                 setProgramRows([])
-                history.push({pathname: '/programs', state: {prev: history.location}})
+                history.push({pathname: `/programs`, state: {prev: history.location}})
             }
         }
 
         if (archived === 'archived') {
             if (window.confirm(`Are you sure you want to recover ${id}? `)) {
+                let idArray: any[] = []
                 programRows.forEach(program => {
-                    axios.put(`recover/program/${program[0].id}`, {}).catch((err: any) => console.error(err))
+                    idArray.push(program[0].id)
                 })
+                await axios.put(`recover/programs`, idArray).catch((err: any) => console.error(err))
                 setProgramRows([])
                 history.push({pathname: `/programs/edit/overview/${id}/inventory`, state: {prev: history.location}})
             }
