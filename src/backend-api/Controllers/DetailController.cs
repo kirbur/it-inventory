@@ -546,8 +546,12 @@ namespace backend_api.Controllers
             // if the program does exist...
             else
             {
+                var ID = _context.Program
+                    .Where(x => x.ProgramName == prog.ProgramName)
+                    .Select(x => x.ProgramId)
+                    .FirstOrDefault();
                 // Partial path for picture
-                string picture = $"/image/program/{id}";
+                string picture = $"/image/program/{ID}";
 
 
                 // holds the employee name for concatenation purposes 
