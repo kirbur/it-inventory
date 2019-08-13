@@ -97,8 +97,9 @@ namespace backend_api.Controllers
                     // Add the email recipients
                     foreach (EmailRecipient person in _emailSettings.CostBreakdownEmailAddresses)
                     {
-                        if (person.name == null || person.address == null)
+                        if (String.IsNullOrEmpty(person.name) || String.IsNullOrEmpty(person.address))
                         {
+
                             return StatusCode(204);
                         }
                         else
