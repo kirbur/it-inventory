@@ -97,7 +97,14 @@ namespace backend_api.Controllers
                     // Add the email recipients
                     foreach (EmailRecipient person in _emailSettings.CostBreakdownEmailAddresses)
                     {
-                        receiverEmails.Add(new MailboxAddress(person.name, person.address));
+                        if (person.name == null || person.address == null)
+                        {
+                            return StatusCode(204);
+                        }
+                        else
+                        {
+                            receiverEmails.Add(new MailboxAddress(person.name, person.address));
+                        }
                     }
 
                     // Format the email subject.
@@ -130,7 +137,14 @@ namespace backend_api.Controllers
                         // Add the email recipients
                         foreach (EmailRecipient person in _emailSettings.LowResourcesEmailAddresses)
                         {
-                            receiverEmails.Add(new MailboxAddress(person.name, person.address));
+                            if (person.name == null || person.address == null)
+                            {
+                                return StatusCode(204);
+                            }
+                            else
+                            {
+                                receiverEmails.Add(new MailboxAddress(person.name, person.address));
+                            }
                         }
 
                         // Format the email subject.
