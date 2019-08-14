@@ -94,8 +94,19 @@ namespace backend_api.Controllers
                 // Construct the message based on the job requested.
                 if (job == ValidJob.CostBreakdown)
                 {
-                    // TODO: Add the actual emails.
-                    receiverEmails.Add(new MailboxAddress("Charles Kornoelje", "charles.kornoelje@cqlcorp.com"));
+                    // Add the email recipients
+                    foreach (EmailRecipient person in _emailSettings.CostBreakdownEmailAddresses)
+                    {
+                        if (String.IsNullOrEmpty(person.name) || String.IsNullOrEmpty(person.address))
+                        {
+
+                            return StatusCode(204);
+                        }
+                        else
+                        {
+                            receiverEmails.Add(new MailboxAddress(person.name, person.address));
+                        }
+                    }
 
                     // Format the email subject.
                     string date = DateTime.UtcNow.Date.ToString("d");
@@ -124,8 +135,18 @@ namespace backend_api.Controllers
                     int count = lowResources.Count();
                     if (count > 0)
                     {
-                        // TODO: Add actual emails.
-                        receiverEmails.Add(new MailboxAddress("Charles Kornoelje", "charles.kornoelje@cqlcorp.com"));
+                        // Add the email recipients
+                        foreach (EmailRecipient person in _emailSettings.LowResourcesEmailAddresses)
+                        {
+                            if (person.name == null || person.address == null)
+                            {
+                                return StatusCode(204);
+                            }
+                            else
+                            {
+                                receiverEmails.Add(new MailboxAddress(person.name, person.address));
+                            }
+                        }
 
                         // Format the email subject.
                         message.Subject = $"CQL IT Inventory Low Resource{(count > 1 ? "s" : "")}: {ResourceNameSubjectString(lowResources)}";
