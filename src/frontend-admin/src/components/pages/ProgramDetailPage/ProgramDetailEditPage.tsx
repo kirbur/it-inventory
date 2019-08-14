@@ -106,7 +106,7 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     DateBought: programInput.purchaseDate
                         ? programInput.purchaseDate.value.toISOString()
                         : progData.dateBought,
-                    RenewalDate: programInput.renewalDate.value.toISOString(),
+                    RenewalDate: programInput.renewalDate.changed ? programInput.renewalDate.value.toISOString() : null,
                     MonthsPerRenewal: Number.isNaN(programInput.monthsPerRenewal.value)
                         ? 0
                         : programInput.monthsPerRenewal.value,
