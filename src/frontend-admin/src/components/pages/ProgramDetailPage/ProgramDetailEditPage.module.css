@@ -104,6 +104,11 @@
     text-align: left;
 }
 
+.unassign {
+    margin-top: 28px;
+    margin-left: 28px;
+}
+
 .dark {
     color: white;
 }

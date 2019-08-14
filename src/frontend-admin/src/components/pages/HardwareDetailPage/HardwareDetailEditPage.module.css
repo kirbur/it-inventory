@@ -148,6 +148,11 @@
     text-align: left;
 }
 
+.unassign {
+    margin-top: 42px;
+    margin-left: 28px;
+}
+
 /* cost radio inputs */
 .checkBoxContainer {
     width: 50px;
