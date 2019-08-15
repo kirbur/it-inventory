@@ -164,16 +164,6 @@
     display: flex;
     justify-content: center;
 }
-.submitButton {
-    border: 2px solid #009eff;
-    border-radius: 3px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 200px;
-    height: 35px;
-}
 .submitButton:hover {
     background-color: #009eff;
     cursor: pointer;
@@ -193,10 +183,6 @@
     transform: scale(1.5, 1.5);
     position: relative;
     left: 10px;
-}
-
-.submitbutton {
-    width: 200px;
 }
 
 /*dropdown styles*/
