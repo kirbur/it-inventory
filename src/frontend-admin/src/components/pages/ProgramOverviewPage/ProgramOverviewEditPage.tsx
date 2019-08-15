@@ -1,35 +1,37 @@
-import React, {useState, useEffect, useContext} from 'react'
-import {AxiosService} from '../../../services/AxiosService/AxiosService'
-import {History} from 'history'
-import {match} from 'react-router-dom'
+import React, { useState, useEffect, useContext } from 'react'
+import { AxiosService } from '../../../services/AxiosService/AxiosService'
+import { History } from 'history'
+import { match } from 'react-router-dom'
 
 // Components
-import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
-import {Button} from '../../reusables/Button/Button'
-import {Group} from '../../reusables/Group/Group'
+import { DetailPageTable, ITableItem } from '../../reusables/DetailPageTable/DetailPageTable'
+import { Button } from '../../reusables/Button/Button'
+import { Group } from '../../reusables/Group/Group'
 import DatePicker from 'react-datepicker'
-import {PictureInput} from '../../reusables/PictureInput/PictureInput'
-import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
-import {Checkbox} from '../../reusables/Checkbox/Checkbox'
-import {BackButton} from '../../reusables/BackButton/BackButton'
+import { PictureInput } from '../../reusables/PictureInput/PictureInput'
+import { ProgramForm, IProgramFormInputs } from '../../reusables/ProgramForm/ProgramForm'
+import { Checkbox } from '../../reusables/Checkbox/Checkbox'
+import { BackButton } from '../../reusables/BackButton/BackButton'
 
 // Utils
-import {formatDate} from '../../../utilities/FormatDate'
-import {format} from '../../../utilities/formatEmptyStrings'
-import {concatStyles as s} from '../../../utilities/mikesConcat'
-import {formatCost} from '../../../utilities/FormatCost'
+import { formatDate } from '../../../utilities/FormatDate'
+import { format } from '../../../utilities/formatEmptyStrings'
+import { concatStyles as s } from '../../../utilities/mikesConcat'
+import { formatCost } from '../../../utilities/FormatCost'
+import { putUploadImage } from '../../../utilities/UploadImage'
 
 // Context
-import {LoginContext, ThemeContext} from '../../App/App'
+import { LoginContext, ThemeContext } from '../../App/App'
 
 // Styles
 import styles from './ProgramOverviewEditPage.module.css'
 
 // Types
-import {ExpectedPluginType, ExpectedProgramType} from './ProgramOverviewPage'
+import { ExpectedPluginType, ExpectedProgramType } from './ProgramOverviewPage'
+import { conditionalExpression } from '@babel/types'
 interface IProgramOverviewEditPageProps {
     history: History
-    match: match<{id: string; archived: string}>
+    match: match<{ id: string; archived: string }>
 }
 
 interface IPluginInfo {
@@ -49,11 +51,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     const {
         history,
         match: {
-            params: {id, archived},
+            params: { id, archived },
         },
     } = props
-    const {loginContextVariables} = useContext(LoginContext)
-    const {isDarkMode} = useContext(ThemeContext)
+    const { loginContextVariables } = useContext(LoginContext)
+    const { isDarkMode } = useContext(ThemeContext)
 
     const [programRows, setProgramRows] = useState<ITableItem[][]>([])
     const [removedProgramRows, setRemovedProgramRows] = useState<ITableItem[][]>([])
@@ -62,7 +64,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     const [removedPluginRows, setRemovedPluginRows] = useState<ITableItem[][]>([])
 
     const [pluginForm, setPluginForm] = useState(false)
-    const [programForm, setProgramForm] = useState({edit: false, add: false})
+    const [programForm, setProgramForm] = useState({ edit: false, add: false })
 
     const programHeaders = [`${id}`, 'Employee', 'License Key', 'Renewal Date']
     const pluginHeaders = ['Plugins', 'Renewal Date', 'Cost']
@@ -72,8 +74,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     const [imgLocation, setImgLocation] = useState<string>()
 
     const [overviewInputs, setOverviewInputs] = useState({
-        name: {value: id === 'new' ? '' : id, changed: false},
-        isLicense: {value: false, changed: false},
+        name: { value: id === 'new' ? '' : id, changed: false },
+        isLicense: { value: false, changed: false },
     })
 
     const defaultPluginInfo = {
@@ -87,38 +89,38 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         purchaseDate: new Date(),
         monthsPerRenewal: 0,
     }
-    const [pluginInput, setPluginInput] = useState<IPluginInfo>({...defaultPluginInfo})
+    const [pluginInput, setPluginInput] = useState<IPluginInfo>({ ...defaultPluginInfo })
 
     const [pluginList, setPluginList] = useState<IPluginInfo[]>([])
 
     const [programInput, setProgramInput] = useState<IProgramFormInputs>({
-        name: {value: '', changed: false},
-        programName: {value: overviewInputs.name.value, changed: false},
-        description: {value: '', changed: false},
-        renewalDate: {value: new Date(), changed: false},
-        purchaseDate: {value: new Date(), changed: false},
-        purchaseLink: {value: '', changed: false},
-        licenseKey: {value: '', changed: false},
-        cost: {value: 0, changed: false},
+        name: { value: '', changed: false },
+        programName: { value: overviewInputs.name.value, changed: false },
+        description: { value: '', changed: false },
+        renewalDate: { value: new Date(), changed: false },
+        purchaseDate: { value: new Date(), changed: false },
+        purchaseLink: { value: '', changed: false },
+        licenseKey: { value: '', changed: false },
+        cost: { value: 0, changed: false },
         hasRecurringCost: false,
-        flatCost: {value: 0, changed: false},
+        flatCost: { value: 0, changed: false },
         hasFlatCost: false,
-        monthsPerRenewal: {value: 0, changed: false},
-        numCopies: {value: 1, changed: false},
+        monthsPerRenewal: { value: 0, changed: false },
+        numCopies: { value: 1, changed: false },
     })
 
     const [programUpdateInput, setProgramUpdateInput] = useState<IProgramFormInputs>({
-        name: {value: '', changed: false},
-        programName: {value: overviewInputs.name.value, changed: false},
-        description: {value: '', changed: false},
-        renewalDate: {value: new Date(), changed: false},
-        purchaseLink: {value: '', changed: false},
-        licenseKey: {value: '', changed: false},
-        cost: {value: 0, changed: false},
+        name: { value: '', changed: false },
+        programName: { value: overviewInputs.name.value, changed: false },
+        description: { value: '', changed: false },
+        renewalDate: { value: new Date(), changed: false },
+        purchaseLink: { value: '', changed: false },
+        licenseKey: { value: '', changed: false },
+        cost: { value: 0, changed: false },
         hasRecurringCost: false,
-        flatCost: {value: 0, changed: false},
+        flatCost: { value: 0, changed: false },
         hasFlatCost: false,
-        monthsPerRenewal: {value: 0, changed: false},
+        monthsPerRenewal: { value: 0, changed: false },
     })
 
     useEffect(() => {
@@ -132,20 +134,20 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     let prog: ITableItem[][] = []
                     data[0].inDivPrograms.map((i: ExpectedProgramType) =>
                         prog.push([
-                            {value: `Copy ${i.programId}`, id: i.programId, sortBy: i.programId},
+                            { value: `Copy ${i.programId}`, id: i.programId, sortBy: i.programId },
                             {
                                 value: format(i.employeeName),
                                 id: i.employeeId,
                                 sortBy: format(i.employeeName),
                             },
-                            {value: format(i.programlicenseKey), sortBy: i.programlicenseKey},
-                            {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
+                            { value: format(i.programlicenseKey), sortBy: i.programlicenseKey },
+                            { value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate) },
                         ])
                     )
                     setProgramRows(prog)
 
                     setOverviewInputs(o => {
-                        return {...o, isLicense: {value: data[0].programOverview.isLicense, changed: false}}
+                        return { ...o, isLicense: { value: data[0].programOverview.isLicense, changed: false } }
                     })
 
                     let plug: ITableItem[][] = []
@@ -158,7 +160,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 id: i.pluginId,
                                 tooltip: i.textField,
                             },
-                            {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
+                            { value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate) },
                             {
                                 value: formatCost(i.isCostPerYear, i.pluginCostPerYear, i.pluginFlatCost),
                                 sortBy: i.pluginCostPerYear,
@@ -199,7 +201,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         setPluginForm(true)
 
         var plug = pluginList.filter(plugin => plugin.id === row[0].id)
-        setPluginInput({...plug[0]})
+        setPluginInput({ ...plug[0] })
     }
 
     async function handleSubmit() {
@@ -233,36 +235,51 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     : null,
             },
         }
-
         if (id === 'new') {
             var msg: string = ''
+            var needsRenewalDate = postProgram.Program.MonthsPerRenewal ? true : false
             if (
                 postProgram.Program.numberOfPrograms >= 1 &&
                 postProgram.Program.ProgramName &&
-                postProgram.Program.DateBought
+                postProgram.Program.DateBought &&
+                (needsRenewalDate && postProgram.Program.RenewalDate)
             ) {
                 await axios
                     .post('/add/program', postProgram)
-                    .then((response: any) => {
+                    .then(async (response: any) => {
                         if (response.status === 201) {
                             msg = programInput.numCopies
                                 ? programInput.numCopies.value +
-                                  ' copies of ' +
-                                  overviewInputs.name.value +
-                                  ' were added to inventory!'
+                                ' copies of ' +
+                                overviewInputs.name.value +
+                                ' were added to inventory!'
                                 : ''
                             window.alert(msg)
                         }
+                        const { newId, newName } = response.data[0]
+
+                        // Upload the image
+                        if (imgInput) {
+                            const imageLocation = `/image/program/${newId}`
+                            putUploadImage(imgInput, imageLocation, axios)
+                        }
+
+                        // after submitting go back to detail
+                        history.push({
+                            pathname: `/programs/overview/${newName}/inventory`,
+                            state: { prev: history.location },
+                        })
                         return
                     })
                     .catch((err: any) => console.error(err))
 
                 //after submitting go back to detail
-                history.push({pathname: `/programs`, state: {prev: history.location}})
+                history.push({ pathname: `/programs`, state: { prev: history.location } })
             } else {
                 msg = 'Failed because: \n'
                 msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
                 msg += postProgram.Program.ProgramName === '' ? 'No name entered,\n' : ''
+                msg += needsRenewalDate && !postProgram.Program.RenewalDate ? 'No renewal date entered,\n' : ''
                 window.alert(msg)
             }
         } else {
@@ -280,9 +297,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             if (response.status === 201) {
                                 msg = programInput.numCopies
                                     ? programInput.numCopies.value +
-                                      ' copies of ' +
-                                      overviewInputs.name.value +
-                                      ' were added to inventory!'
+                                    ' copies of ' +
+                                    overviewInputs.name.value +
+                                    ' were added to inventory!'
                                     : ''
                                 window.alert(msg)
                             }
@@ -293,7 +310,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     //after submitting go back to detail
                     history.push({
                         pathname: `/programs/overview/${id}/inventory`,
-                        state: {prev: history.location},
+                        state: { prev: history.location },
                     })
                 } else {
                     msg = 'Failed because: \n'
@@ -342,13 +359,13 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 history.push({
                     pathname: `/programs/overview/${
                         overviewInputs.name.changed ? overviewInputs.name.value : id
-                    }/inventory`,
-                    state: {prev: history.location},
+                        }/inventory`,
+                    state: { prev: history.location },
                 })
             }
 
             if (pluginForm) {
-                setPluginInput({...pluginInput, programName: overviewInputs.name.value})
+                setPluginInput({ ...pluginInput, programName: overviewInputs.name.value })
                 var postPlugin = {
                     PluginId: pluginInput.id,
                     ProgramName: id,
@@ -371,12 +388,12 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         await axios.post('/add/plugin', postPlugin).catch((err: any) => console.error(err))
 
                         //after submitting go back to detail
-                        history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
+                        history.push({ pathname: `/programs/overview/${id}/inventory`, state: { prev: history.location } })
                     } else {
                         await axios.put('/update/plugin', postPlugin).catch((err: any) => console.error(err))
 
                         //after submitting go back to detail
-                        history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
+                        history.push({ pathname: `/programs/overview/${id}/inventory`, state: { prev: history.location } })
                     }
                 } else {
                     msg = 'Failed to Add Plugin Because: \n'
@@ -388,11 +405,17 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
             if (removedPluginRows.length > 0) {
                 removedPluginRows.forEach(remove =>
-                    axios.put(`archive/plugin/${remove[0].id}`, {}).catch((err: any) => console.error(err))
+                    axios
+                        .put(`archive/plugin/${remove[0].id}`, {})
+                        .then(() =>
+                            history.push({
+                                pathname: `/programs/overview/${id}/inventory`,
+                                state: { prev: history.location },
+                            })
+                        )
+                        .catch((err: any) => console.error(err))
                 )
                 setRemovedPluginRows([])
-                //after submitting go back to detail
-                history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
             }
 
             if (removedProgramRows.length > 0) {
@@ -401,30 +424,34 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     window.location.reload()
                 } else {
                     removedProgramRows.forEach(remove => {
-                        axios.put(`archive/program/${remove[0].id}`, {}).catch((err: any) => console.error(err))
+                        axios
+                            .put(`archive/programs`, [remove[0].id])
+                            .then(() =>
+                                history.push({
+                                    pathname: `/programs/overview/${id}/inventory`,
+                                    state: { prev: history.location },
+                                })
+                            )
+                            .catch((err: any) => console.error(err))
                     })
                     setRemovedProgramRows([])
                     //after submitting go back to detail
-                    history.push({pathname: `/programs/overview/${id}/inventory`, state: {prev: history.location}})
                 }
             }
+            history.push({
+                pathname: `/programs/overview/${id}/inventory`,
+                state: { prev: history.location },
+            })
         }
 
         if (imgInput && imgLocation) {
-            var formData = new FormData()
-            formData.append('file', imgInput)
-
-            await axios
-                .put(imgLocation, formData, {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                })
-                .catch(err => console.error(err))
-
             //after submitting go back to detail
-            history.push({
-                pathname: `/programs/overview/${id}/inventory`,
-                state: {prev: history.location},
-            })
+            const cb = () =>
+                history.push({
+                    pathname: `/programs/overview/${id}/inventory`,
+                    state: { prev: history.location },
+                })
+            putUploadImage(imgInput, imgLocation, axios, cb)
         }
     }
 
@@ -496,7 +523,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 className={styles.input}
                                 value={overviewInputs.name.value}
                                 onChange={e =>
-                                    setOverviewInputs({...overviewInputs, name: {value: e.target.value, changed: true}})
+                                    setOverviewInputs({ ...overviewInputs, name: { value: e.target.value, changed: true } })
                                 }
                             />
                         </div>
@@ -509,7 +536,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             onClick={() =>
                                 setOverviewInputs({
                                     ...overviewInputs,
-                                    isLicense: {value: !overviewInputs.isLicense.value, changed: true},
+                                    isLicense: { value: !overviewInputs.isLicense.value, changed: true },
                                 })
                             }
                         />
@@ -518,7 +545,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             <Button
                                 className={styles.editButton}
                                 onClick={() => {
-                                    setProgramForm({add: false, edit: !programForm.edit})
+                                    setProgramForm({ add: false, edit: !programForm.edit })
                                 }}
                                 text={`Edit All Copies`}
                             />
@@ -547,7 +574,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 className={styles.addContainer}
                                 icon='add'
                                 onClick={() => {
-                                    setProgramForm({edit: false, add: !programForm.add})
+                                    setProgramForm({ edit: false, add: !programForm.add })
                                 }}
                                 textInside={false}
                                 text={`Add Copy(s)`}
@@ -559,10 +586,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             )}
                         </Group>
                     ) : (
-                        <div className={styles.programForm}>
-                            <ProgramForm state={programInput} setState={setProgramInput} />
-                        </div>
-                    )}
+                            <div className={styles.programForm}>
+                                <ProgramForm state={programInput} setState={setProgramInput} />
+                            </div>
+                        )}
 
                     {id !== 'new' && (
                         <div className={styles.pluginTableContainer}>
@@ -581,7 +608,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 icon='add'
                                 onClick={() => {
                                     setPluginForm(!pluginForm)
-                                    setPluginInput({...defaultPluginInfo})
+                                    setPluginInput({ ...defaultPluginInfo })
                                 }}
                                 textInside={false}
                                 text={'Add Plugin'}
@@ -597,7 +624,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                         type='text'
                                         className={s(styles.input, styles.pluginInputRow1)}
                                         value={pluginInput.name}
-                                        onChange={e => setPluginInput({...pluginInput, name: e.target.value})}
+                                        onChange={e => setPluginInput({ ...pluginInput, name: e.target.value })}
                                     />
                                 </div>
 
@@ -607,7 +634,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                         dateFormat='MM/dd/yyyy'
                                         placeholderText={new Date().toDateString()}
                                         selected={pluginInput.purchaseDate}
-                                        onChange={e => e && setPluginInput({...pluginInput, purchaseDate: e})}
+                                        onChange={e => e && setPluginInput({ ...pluginInput, purchaseDate: e })}
                                         className={s(styles.input, styles.dateInput)}
                                     />
                                 </div>
@@ -618,7 +645,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                         dateFormat='MM/dd/yyyy'
                                         placeholderText={new Date().toDateString()}
                                         selected={pluginInput.renewalDate}
-                                        onChange={e => e && setPluginInput({...pluginInput, renewalDate: e})}
+                                        onChange={e => e && setPluginInput({ ...pluginInput, renewalDate: e })}
                                         className={s(styles.input, styles.dateInput)}
                                     />
                                 </div>
@@ -633,7 +660,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                         className={s(styles.input, styles.pluginInputRow2)}
                                         value={pluginInput.flatCost}
                                         onChange={e =>
-                                            setPluginInput({...pluginInput, flatCost: parseFloat(e.target.value)})
+                                            setPluginInput({ ...pluginInput, flatCost: parseFloat(e.target.value) })
                                         }
                                     />
                                 </div>
@@ -674,7 +701,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                                 <textarea
                                     className={s(styles.input, styles.description)}
                                     value={pluginInput.description}
-                                    onChange={e => setPluginInput({...pluginInput, description: e.target.value})}
+                                    onChange={e => setPluginInput({ ...pluginInput, description: e.target.value })}
                                 />
                             </div>
                         </div>

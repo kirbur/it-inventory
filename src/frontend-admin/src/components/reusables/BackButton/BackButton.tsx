@@ -1,9 +1,9 @@
-import React, {useContext} from 'react'
-import {History} from 'history'
-import {concatStyles as s} from '../../../utilities/mikesConcat'
+import React, { useContext } from 'react'
+import { History } from 'history'
+import { concatStyles as s } from '../../../utilities/mikesConcat'
 
 // Components
-import {Button} from '../Button/Button'
+import { Button } from '../Button/Button'
 
 // styles
 import styles from './BackButton.module.css'
@@ -18,7 +18,7 @@ interface IBackButtonProps {
 
 // Primary Component
 export const BackButton: React.SFC<IBackButtonProps> = props => {
-    const {history, className = '', textClassName = ''} = props
+    const { history, className = '', textClassName = '' } = props
     const { isDarkMode } = useContext(ThemeContext)
 
     var pathArray = history.location.state ? history.location.state.prev.pathname.split('/') : 'Back'
@@ -28,11 +28,13 @@ export const BackButton: React.SFC<IBackButtonProps> = props => {
                 ? pathArray[1].substring(0, pathArray[1].length - 1)
                 : pathArray[1]
             : pathArray[1] === 'dashboard'
-            ? pathArray[1]
-            : 'All ' + pathArray[1]
+                ? pathArray[1]
+                : 'All ' + pathArray[1]
 
     var prevIsEdit = history.location.state && history.location.state.prev.pathname.search('edit') !== -1
-    if (prevIsEdit) {
+    var prevIsSame = history.location.state.prev.pathname === history.location.pathname;
+
+    if (prevIsEdit || prevIsSame) {
         text = 'All ' + pathArray[1]
     }
 
@@ -41,7 +43,7 @@ export const BackButton: React.SFC<IBackButtonProps> = props => {
             text={history.location.state ? text : pathArray}
             icon='back'
             onClick={() => {
-                if (prevIsEdit) {
+                if (prevIsEdit || prevIsSame) {
                     history.push(`/${pathArray[1]}`)
                 } else {
                     history.goBack()

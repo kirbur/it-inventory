@@ -14,6 +14,7 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {checkImage} from '../../../utilities/CheckImage'
+import {putUploadImage} from '../../../utilities/UploadImage'
 
 // Styles
 import styles from './EmployeeDetailEditPage.module.css'
@@ -629,6 +630,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         newID = response.data
                         window.alert(`${selectedEmployee.name} was successfully added!`)
                     }
+                    if (imgInput) {
+                        putUploadImage(imgInput, `image/employee/${newID}`, axios)
+                    }
                 })
                 .catch((err: any) => console.error(err))
 
@@ -704,15 +708,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
         /*CHANGE IMAGE */
         if (imgInput) {
-            var formData = new FormData()
-            formData.append('file', imgInput)
-
-            await axios
-                .put(userData.photo, formData, {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                })
-                .catch(err => console.error(err))
-            history.push({pathname: `/employees/detail/${match.params.id}`, state: {prev: history.location}})
+            const cb = () =>
+                history.push({pathname: `/employees/detail/${match.params.id}`, state: {prev: history.location}})
+            putUploadImage(imgInput, userData.photo, axios, cb)
         }
     }
 

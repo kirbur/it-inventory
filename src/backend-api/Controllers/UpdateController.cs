@@ -203,8 +203,9 @@ namespace backend_api.Controllers
                     // Case 3: When an assigned program becomes unassigned
                     else if (input.Program.EmployeeId == null && progEmpId != null)
                     {
-                        var History = UpdateProgramHistory(prog.ProgramId, input.Program.EmployeeId, "Assigned", DateTime.Now);
+                        var History = UpdateProgramHistory(prog.ProgramId, progEmpId, "Unassigned", DateTime.Now);
                         programHistories.Add(History);
+                        prog.EmployeeId = null;
                     }
                     if (programHistories != null)
                     {

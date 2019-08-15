@@ -20,6 +20,35 @@ namespace backend_api.Controllers
         }
         public ArchiveRecoverController(ITInventoryDBContext context) : base(context) { }
 
+        /* PUT: api/{operation}/programs
+         *  Route Params: {operation} is a string. Either "archive" or "recover"
+         *  Body Params: programIds is an int array of program Ids to be archived or recovered
+         * ArchiveRecoverPrograms(operation, programIds) is a method to archive or recover multiple 
+         *  programs at once.
+         * Return: 200 if updated.
+         */
+        [HttpPut]
+        [Route("{operation}/programs")]
+        public IActionResult ArchiveRecoverPrograms([FromRoute] ValidOperation operation, [FromBody] int[] programIds)
+        {
+            // Assigns isDeleted to a boolean according to the operation provided.
+            bool isDeleted = ValidOperation.Archive == operation ? true : false;
+
+            DbSet<Models.Program> programs = _context.Program;
+            foreach (int progId in programIds)
+            {
+                Models.Program prog = programs.Find(progId);
+                if (prog != null)
+                {
+                    prog.IsDeleted = isDeleted;
+                }
+
+                _context.SaveChanges();
+            }
+
+            return Ok($"{(isDeleted ? "archive" : "recover")} completed for programs {programIds}");
+        }
+
         /* PUT: api/{operation}/{model}/{id}
          * Route Params:
          *   {operation} is a string. Either "archive" or "recover"

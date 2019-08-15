@@ -7,9 +7,7 @@
 
 .firstColumn {
     padding: 50px;
-    min-width: 160px;
-    max-width: 300px;
-    flex-grow: 1;
+    width: 100px;
 }
 
 .secondColumn {
@@ -104,6 +102,11 @@
     color: #a5a5a5;
     font-size: 24px;
     text-align: left;
+}
+
+.unassign {
+    margin-top: 28px;
+    margin-left: 28px;
 }
 
 .dark {
