@@ -271,7 +271,6 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         var image = placeholder
-        console.log(row[7])
         for (let i = 0; i < displayImages.length; i++) {
             if (displayImages[i].id === row[7]) {
                 image = displayImages[i].img
