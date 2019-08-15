@@ -97,7 +97,6 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
         await axios
             .get(`/detail/ProgramOverview/${id}/${archived === 'archived' ? true : false}`)
             .then((data: any) => {
-                console.log(data)
                 setProgramData(data[0].programOverview)
                 let prog: ITableItem[][] = []
                 data[0].inDivPrograms.map((i: ExpectedProgramType) =>
