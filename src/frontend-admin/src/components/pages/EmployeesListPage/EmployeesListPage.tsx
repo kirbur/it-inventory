@@ -97,13 +97,13 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                             role: format(i.role),
                             icon: format(i.photo),
                             id: i.employeeId,
-    
+
                             //for searching
                             hardware: i.hardwareList ? i.hardwareList.join(', ') : '',
                             programs: i.progForEmp ? i.progForEmp.join(', ') : '',
                             daysEmployed: getDays(i.hireDate),
                         })
-    
+
                         imagePromises.push(
                             checkImage(i.photo, axios, placeholder).then(image => {
                                 return {id: i.employeeId, img: image}
@@ -271,6 +271,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
     function concatenatedName(row: any[]) {
         var image = placeholder
+        console.log(row[7])
         for (let i = 0; i < displayImages.length; i++) {
             if (displayImages[i].id === row[7]) {
                 image = displayImages[i].img
