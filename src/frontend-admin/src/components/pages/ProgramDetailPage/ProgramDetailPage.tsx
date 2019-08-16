@@ -1,45 +1,46 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { AxiosService } from '../../../services/AxiosService/AxiosService'
+import React, {useState, useEffect, useContext} from 'react'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
 
 // Components
-import { DetailPageTable, ITableItem } from '../../reusables/DetailPageTable/DetailPageTable'
-import { Button } from '../../reusables/Button/Button'
-import { Group } from '../../reusables/Group/Group'
-import { HistoryLog, IHistoryLogArray } from '../../reusables/HistoryLog/HistoryLog'
-import { History } from 'history'
-import { match } from 'react-router-dom'
-import { BackButton } from '../../reusables/BackButton/BackButton'
-import { DetailImage } from '../../reusables/DetailImage/DetailImage'
-import { DetailCostText } from '../../reusables/DetailCostText/DetailCostText'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
+import {Button} from '../../reusables/Button/Button'
+import {Group} from '../../reusables/Group/Group'
+import {HistoryLog, IHistoryLogArray} from '../../reusables/HistoryLog/HistoryLog'
+import {History} from 'history'
+import {match} from 'react-router-dom'
+import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Utils
-import { formatDate } from '../../../utilities/FormatDate'
-import { format } from '../../../utilities/formatEmptyStrings'
-import { concatStyles as s } from '../../../utilities/mikesConcat'
-import { checkImage } from '../../../utilities/CheckImage'
+import {formatDate} from '../../../utilities/FormatDate'
+import {format} from '../../../utilities/formatEmptyStrings'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {checkImage} from '../../../utilities/CheckImage'
+import {formatMoney} from '../../../utilities/FormatCost'
 
 // Styles
 import styles from './ProgramDetailPage.module.css'
 import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
 
 // Context
-import { LoginContext, ThemeContext } from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Types
 interface IProgramDetailPageProps {
     history: History
-    match: match<{ id: string }>
+    match: match<{id: string}>
 }
 
 // Primary Component
 export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
-    const { history, match } = props
+    const {history, match} = props
 
     const {
-        loginContextVariables: { isAdmin },
+        loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     var axios = new AxiosService(loginContextVariables)
 
@@ -92,8 +93,8 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                 setIsDeleted(data[0].isDeleted)
                 setProgRows([
                     [
-                        { value: format(data[0].programLicenseKey ? data[0].programLicenseKey : '-'), sortBy: 0 },
-                        { value: format(data[0].programPurchaseLink), sortBy: 0 },
+                        {value: format(data[0].programLicenseKey ? data[0].programLicenseKey : '-'), sortBy: 0},
+                        {value: format(data[0].programPurchaseLink), sortBy: 0},
                     ],
                 ])
 
@@ -127,7 +128,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
 
                 history.push({
                     pathname: `/programs/edit/detail/${match.params.id}/inventory`,
-                    state: { prev: history.location },
+                    state: {prev: history.location},
                 })
             }
         } else {
@@ -136,7 +137,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
 
                 history.push({
                     pathname: `/programs/overview/${progData.name}/inventory`,
-                    state: { prev: history.location },
+                    state: {prev: history.location},
                 })
             }
         }
@@ -150,15 +151,17 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                     <BackButton history={history} className={styles.backButton} />
                     <DetailImage src={img} />
                     {progData.flatCost > 0 && (
-                        <DetailCostText costTexts={[{ title: 'Paid', cost: `$${progData.flatCost}` }]} />
+                        <DetailCostText costTexts={[{title: 'Paid', cost: `${formatMoney(progData.flatCost)}`}]} />
                     )}
                     {progData.isCostPerYear ? (
-                        <DetailCostText costTexts={[{ title: 'Yearly', cost: `$${progData.costPerYear}` }]} />
+                        <DetailCostText costTexts={[{title: 'Yearly', cost: `${formatMoney(progData.costPerYear)}`}]} />
                     ) : (
-                            progData.costPerYear > 0 && (
-                                <DetailCostText costTexts={[{ title: 'Monthly', cost: `$${Math.round(progData.costPerYear / 12 * 100) / 100}` }]} />
-                            )
-                        )}
+                        progData.costPerYear > 0 && (
+                            <DetailCostText
+                                costTexts={[{title: 'Monthly', cost: `${formatMoney(progData.costPerYear / 12)}`}]}
+                            />
+                        )
+                    )}
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
@@ -171,7 +174,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                     onClick={() => {
                                         history.push({
                                             pathname: '/programs/edit/detail/' + match.params.id,
-                                            state: { prev: history.location },
+                                            state: {prev: history.location},
                                         })
                                     }}
                                     className={styles.editbutton}
@@ -195,8 +198,8 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                         history.push({
                                             pathname: `/programs/overview/${progData.name}/${
                                                 isDeleted ? 'archived' : 'inventory'
-                                                }`,
-                                            state: { prev: history.location },
+                                            }`,
+                                            state: {prev: history.location},
                                         })
                                     }
                                 >
@@ -217,7 +220,7 @@ export const ProgramDetailPage: React.SFC<IProgramDetailPageProps> = props => {
                                     onClick={() =>
                                         history.push({
                                             pathname: `/employees/detail/${progData.employeeId}`,
-                                            state: { prev: history.location },
+                                            state: {prev: history.location},
                                         })
                                     }
                                 >

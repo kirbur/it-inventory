@@ -1,11 +1,12 @@
-import React, { useContext } from 'react'
+import React, {useContext} from 'react'
 
 import s from 'classnames'
 
 import styles from './DashboardTable.module.css'
 
-import { concatStyles } from '../../../utilities/mikesConcat'
-import { ThemeContext } from '../../App';
+import {concatStyles} from '../../../utilities/mikesConcat'
+import {ThemeContext} from '../../App'
+import {formatMoney} from '../../../utilities/FormatCost'
 
 //types
 export interface IDashboardTableDatum {
@@ -45,8 +46,7 @@ export const DashboardTable = (props: IDashboardTableProps) => {
                         <td className={concatStyles(styles.name, isDarkMode ? styles.dark : {})}>{datum.name}</td>
                         <td className={styles.numberOf}>{datum.numberOf} users</td>
                         <td className={styles.cost}>
-                            ${Math.round(datum.costPerMonth * 100) / 100}/month | $
-                            {Math.round(datum.costPerMonth * 12 * 100) / 100}/year
+                            {formatMoney(datum.costPerMonth)}/month | {formatMoney(datum.costPerMonth * 12)}/year
                             {datum.projected}
                         </td>
                     </tr>

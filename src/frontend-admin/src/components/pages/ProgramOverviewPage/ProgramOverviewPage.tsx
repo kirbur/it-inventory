@@ -15,7 +15,7 @@ import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
-import {formatCost} from '../../../utilities/FormatCost'
+import {formatCost, formatMoney} from '../../../utilities/FormatCost'
 import {checkImage} from '../../../utilities/CheckImage'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 
@@ -210,18 +210,19 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     <BackButton history={history} className={styles.backButton} />
                     <DetailImage src={img} />
                     {programData.progFlatCost > 0 && (
-                        <DetailCostText costTexts={[{title: 'Paid', cost: `$${programData.progFlatCost}`}]} />
+                        <DetailCostText
+                            costTexts={[{title: 'Paid', cost: `${formatMoney(programData.progFlatCost)}`}]}
+                        />
                     )}
                     {programData.isCostPerYear ? (
-                        <DetailCostText costTexts={[{title: 'Yearly', cost: `$${programData.progCostPerYear}`}]} />
+                        <DetailCostText
+                            costTexts={[{title: 'Yearly', cost: `${formatMoney(programData.progCostPerYear)}`}]}
+                        />
                     ) : (
                         programData.progCostPerYear > 0 && (
                             <DetailCostText
                                 costTexts={[
-                                    {
-                                        title: 'Monthly',
-                                        cost: `$${Math.round((programData.progCostPerYear / 12) * 100) / 100}`,
-                                    },
+                                    {title: 'Monthly', cost: `${formatMoney(programData.progCostPerYear / 12)}`},
                                 ]}
                             />
                         )
