@@ -310,21 +310,21 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                     break
                 case 1:
                     transformedRow[1] = (
-                        <td key={row[7] + row[1]} className={styles.alignLeft}>
+                        <td key={i + row[1]} className={styles.alignLeft}>
                             {formatDate(row[1])}
                         </td>
                     )
                     break
                 case 2:
                     transformedRow[2] = (
-                        <td key={row[7] + row[10]} className={styles.alignLeft}>
+                        <td key={i + row[10]} className={styles.alignLeft}>
                             {isArchive ? row[10] : calculateDaysEmployed(calculateHireDate(row[10]))}
                         </td>
                     )
                     break
                 case 3:
                     transformedRow[3] = (
-                        <td key={row[7] + row[2]} className={styles.alignLeft}>
+                        <td key={i + row[2]} className={styles.alignLeft}>
                             {row[2]}
                         </td>
                     )

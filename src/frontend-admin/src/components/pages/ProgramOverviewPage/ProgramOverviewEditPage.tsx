@@ -521,6 +521,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     <div className={styles.imgContainer}>
                         <PictureInput setImage={setImgInput} image={imgInput} />
                     </div>
+                    <div className={styles.submitContainer}>
+                        <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />
+                    </div>
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>

@@ -765,6 +765,9 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 <div className={styles.imgContainer}>
                     <PictureInput setImage={setImgInput} image={imgInput} />
                 </div>
+                <div className={styles.submitContainer}>
+                    <Button text='Submit' icon='submit' onClick={handleSubmit} className={styles.submitbutton} />
+                </div>
             </div>
             {/* column 2 */}
             <div className={styles.secondColumn}>
@@ -1068,7 +1071,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 </div>
 
                 <div className={styles.submitContainer}>
-                    <Button text='Submit' icon='submit' onClick={handleSubmit} className={styles.submitbutton} />
+                    <Button text='Submit' icon='submit' onClick={handleSubmit} />
                 </div>
             </div>
         </div>

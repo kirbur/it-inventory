@@ -1,6 +1,6 @@
 import React from 'react'
 
-import {concatStyles as s} from '../../../utilities/mikesConcat'
+import { concatStyles as s } from '../../../utilities/mikesConcat'
 import styles from './Table.module.css'
 
 interface ITableProps {
@@ -10,7 +10,7 @@ interface ITableProps {
 }
 
 export const Table = (props: ITableProps) => {
-    const {headers, rows, onRowClick} = props
+    const { headers, rows, onRowClick } = props
     const isClickable = Boolean(onRowClick)
 
     return (
@@ -20,20 +20,21 @@ export const Table = (props: ITableProps) => {
             </thead>
 
             <tbody>
-                {rows.map(row => (
-                    <tr
+                {rows.map((row, index) => {
+                    return <tr
+                        key={index}
                         className={s(styles.tr, isClickable && styles.clickable)}
                         onClick={
                             onRowClick
                                 ? e => {
-                                      onRowClick(row)
-                                  }
+                                    onRowClick(row)
+                                }
                                 : undefined
                         }
                     >
                         {row}
                     </tr>
-                ))}
+                })}
             </tbody>
         </table>
     )

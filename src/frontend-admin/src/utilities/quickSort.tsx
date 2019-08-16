@@ -5,7 +5,6 @@ export function sortTable(rows: any[][], dataIndex: number, sortValue: number) {
         const reversemodifier = sortValue === 0 ? 1 : -1
         // const sortFunc = x => rows[0][dataIndex].sortBy
         if (rows[0][dataIndex].hasOwnProperty('sortBy')) {
-            //console.log(rows[0][dataIndex].sortBy)
             rows.sort((a, b) => reversemodifier * compareString(a[dataIndex].sortBy, b[dataIndex].sortBy))
         } else {
             rows.sort((a, b) => reversemodifier * compareString(a[dataIndex], b[dataIndex]))
