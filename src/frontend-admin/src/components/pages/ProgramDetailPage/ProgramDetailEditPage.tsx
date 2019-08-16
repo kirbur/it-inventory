@@ -4,7 +4,6 @@ import {AxiosService} from '../../../services/AxiosService/AxiosService'
 // Components
 import {Button} from '../../reusables/Button/Button'
 import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
-import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import {History} from 'history'
 import {match} from 'react-router-dom'
 import {BackButton} from '../../reusables/BackButton/BackButton'
@@ -17,7 +16,6 @@ import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './ProgramDetailEditPage.module.css'
-import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Types
 interface IProgramDetailEditPageProps {
@@ -105,14 +103,13 @@ export const ProgramDetailEditPage: React.SFC<IProgramDetailEditPageProps> = pro
                     DateBought: programInput.purchaseDate
                         ? programInput.purchaseDate.value.toISOString()
                         : progData.dateBought,
-                    RenewalDate: programInput.renewalDate.value.toISOString(),
+                    RenewalDate: programInput.renewalDate.changed ? programInput.renewalDate.value.toISOString() : null,
                     MonthsPerRenewal: Number.isNaN(programInput.monthsPerRenewal.value)
                         ? 0
                         : programInput.monthsPerRenewal.value,
                     EmployeeId: selectedEmployee && selectedEmployee.id !== -1 ? selectedEmployee.id : null,
                 },
             }
-
             await axios.put(`update/program/${match.params.id}`, updateProgram).catch((err: any) => console.error(err))
 
             history.push({pathname: `/programs/detail/${match.params.id}`, state: {prev: history.location}})
