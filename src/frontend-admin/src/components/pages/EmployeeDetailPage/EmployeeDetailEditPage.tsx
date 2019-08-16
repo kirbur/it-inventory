@@ -15,6 +15,7 @@ import {BackButton} from '../../reusables/BackButton/BackButton'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {checkImage} from '../../../utilities/CheckImage'
 import {putUploadImage} from '../../../utilities/UploadImage'
+import {formatMoney} from '../../../utilities/FormatCost'
 
 // Styles
 import styles from './EmployeeDetailEditPage.module.css'
@@ -155,7 +156,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         name: i.programName,
                         id: i.programId,
                         key: format(i.programLicenseKey),
-                        monthlyCost: '$' + i.monthlyCost,
+                        monthlyCost: formatMoney(i.monthlyCost),
                     })
                 )
                 setSoftwareDropdown(usw)
@@ -166,7 +167,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                         name: i.programName,
                         id: i.programId,
                         key: format(i.programLicenseKey),
-                        monthlyCost: '$' + i.monthlyCost,
+                        monthlyCost: formatMoney(i.monthlyCost),
                     })
                 )
                 setLicenseDropdown(ul)
@@ -225,7 +226,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             },
                             {value: format(i.licenseKey), id: format(i.id), sortBy: i.licenseKey},
                             {
-                                value: '$' + Math.round(i.costPerMonth * 100) / 100,
+                                value: formatMoney(i.costPerMonth),
                                 id: format(i.id),
                                 sortBy: i.costPerMonth,
                             },
@@ -249,7 +250,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                 sortBy: format(i.licensesKey),
                             },
                             {
-                                value: '$' + Math.round(i.costPerMonth * 100) / 100,
+                                value: formatMoney(i.costPerMonth),
                                 sortBy: i.costPerMonth,
                             },
                             {value: format(i.licensesCount), id: format(i.id), sortBy: i.licensesCount},

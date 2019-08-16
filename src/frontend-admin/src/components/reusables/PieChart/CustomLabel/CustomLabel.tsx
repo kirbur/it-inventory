@@ -1,5 +1,6 @@
 import React from 'react'
 import {IRechartPieDatum} from '../PieChart'
+import {formatMoney} from '../../../../utilities/FormatCost'
 
 interface ICustomLabelProps {
     cx?: number
@@ -51,7 +52,7 @@ export const CustomLabel: React.FunctionComponent<ICustomLabelProps> = props => 
             textAnchor='middle'
             dominantBaseline='middle'
         >
-            ${Number(data[index].value.toFixed(2))}
+            {formatMoney(Number(data[index].value))}
         </text>
     )
 }

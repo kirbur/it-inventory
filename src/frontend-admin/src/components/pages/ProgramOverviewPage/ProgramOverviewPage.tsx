@@ -1,34 +1,34 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { AxiosService } from '../../../services/AxiosService/AxiosService'
-import { History } from 'history'
-import { match } from 'react-router-dom'
+import React, {useState, useEffect, useContext} from 'react'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {History} from 'history'
+import {match} from 'react-router-dom'
 
 // Components
-import { DetailPageTable, ITableItem } from '../../reusables/DetailPageTable/DetailPageTable'
-import { Button } from '../../reusables/Button/Button'
-import { Group } from '../../reusables/Group/Group'
+import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
+import {Button} from '../../reusables/Button/Button'
+import {Group} from '../../reusables/Group/Group'
 import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
-import { BackButton } from '../../reusables/BackButton/BackButton'
-import { DetailImage } from '../../reusables/DetailImage/DetailImage'
-import { DetailCostText } from '../../reusables/DetailCostText/DetailCostText'
+import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
+import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
 
 // Utils
-import { formatDate } from '../../../utilities/FormatDate'
-import { format } from '../../../utilities/formatEmptyStrings'
-import { formatCost } from '../../../utilities/FormatCost'
-import { checkImage } from '../../../utilities/CheckImage'
-import { concatStyles as s } from '../../../utilities/mikesConcat'
+import {formatDate} from '../../../utilities/FormatDate'
+import {format} from '../../../utilities/formatEmptyStrings'
+import {formatCost, formatMoney} from '../../../utilities/FormatCost'
+import {checkImage} from '../../../utilities/CheckImage'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
 
 // Styles
 import styles from './ProgramOverviewPage.module.css'
 
 // Context
-import { LoginContext, ThemeContext } from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Types
 interface IProgramOverviewPageProps {
     history: History
-    match: match<{ id: string; archived: string }>
+    match: match<{id: string; archived: string}>
 }
 
 interface ExpectedProgramOverview {
@@ -66,15 +66,15 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     const {
         history,
         match: {
-            params: { archived, id },
+            params: {archived, id},
         },
     } = props
 
     const {
-        loginContextVariables: { isAdmin },
+        loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     const axios = new AxiosService(loginContextVariables)
     const [img, setImg] = useState('')
@@ -101,40 +101,39 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 setProgramData(data[0].programOverview)
                 let prog: ITableItem[][] = []
                 data[0].inDivPrograms.map((i: ExpectedProgramType) =>
-
                     prog.push(
                         i.employeeName
                             ? [
-                                {
-                                    value: `Copy ${i.programId}`,
-                                    id: i.programId,
-                                    sortBy: i.programId,
-                                    onClick: handleCopyClick,
-                                },
-                                {
-                                    value: format(i.employeeName),
-                                    id: i.employeeId,
-                                    sortBy: format(i.employeeName),
-                                    onClick: handleEmpClick,
-                                },
-                                { value: format(i.programlicenseKey), sortBy: i.programlicenseKey },
-                                { value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate) },
-                            ]
+                                  {
+                                      value: `Copy ${i.programId}`,
+                                      id: i.programId,
+                                      sortBy: i.programId,
+                                      onClick: handleCopyClick,
+                                  },
+                                  {
+                                      value: format(i.employeeName),
+                                      id: i.employeeId,
+                                      sortBy: format(i.employeeName),
+                                      onClick: handleEmpClick,
+                                  },
+                                  {value: format(i.programlicenseKey), sortBy: i.programlicenseKey},
+                                  {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
+                              ]
                             : [
-                                {
-                                    value: `Copy ${i.programId}`,
-                                    id: i.programId,
-                                    sortBy: i.programId,
-                                    onClick: handleCopyClick,
-                                },
-                                {
-                                    value: format(i.employeeName),
-                                    id: i.employeeId,
-                                    sortBy: format(i.employeeName),
-                                },
-                                { value: format(i.programlicenseKey), sortBy: i.programlicenseKey },
-                                { value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate) },
-                            ]
+                                  {
+                                      value: `Copy ${i.programId}`,
+                                      id: i.programId,
+                                      sortBy: i.programId,
+                                      onClick: handleCopyClick,
+                                  },
+                                  {
+                                      value: format(i.employeeName),
+                                      id: i.employeeId,
+                                      sortBy: format(i.employeeName),
+                                  },
+                                  {value: format(i.programlicenseKey), sortBy: i.programlicenseKey},
+                                  {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
+                              ]
                     )
                 )
                 setProgramRows(prog)
@@ -142,8 +141,8 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 let plug: ITableItem[][] = []
                 data[0].listOfPlugins.map((i: ExpectedPluginType) =>
                     plug.push([
-                        { value: format(i.pluginName), sortBy: format(i.pluginName), tooltip: i.textField },
-                        { value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate) },
+                        {value: format(i.pluginName), sortBy: format(i.pluginName), tooltip: i.textField},
+                        {value: formatDate(i.renewalDate), sortBy: formatDate(i.renewalDate)},
                         {
                             value: formatCost(i.isCostPerYear, i.pluginCostPerYear, i.pluginFlatCost),
                             sortBy: i.pluginCostPerYear,
@@ -163,11 +162,11 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
     }, [])
 
     const handleEmpClick = (id: number) => {
-        history.push({ pathname: `/employees/detail/${id}`, state: { prev: history.location } })
+        history.push({pathname: `/employees/detail/${id}`, state: {prev: history.location}})
     }
 
     const handleCopyClick = (id: number) => {
-        history.push({ pathname: `/programs/detail/${id}`, state: { prev: history.location } })
+        history.push({pathname: `/programs/detail/${id}`, state: {prev: history.location}})
     }
 
     async function handleArchive() {
@@ -187,7 +186,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 await axios.put(`archive/programs`, idArray).catch((err: any) => console.error(err))
 
                 setProgramRows([])
-                history.push({ pathname: `/programs`, state: { prev: history.location } })
+                history.push({pathname: `/programs`, state: {prev: history.location}})
             }
         }
 
@@ -199,7 +198,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                 })
                 await axios.put(`recover/programs`, idArray).catch((err: any) => console.error(err))
                 setProgramRows([])
-                history.push({ pathname: `/programs/edit/overview/${id}/inventory`, state: { prev: history.location } })
+                history.push({pathname: `/programs/edit/overview/${id}/inventory`, state: {prev: history.location}})
             }
         }
     }
@@ -212,15 +211,23 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                     <BackButton history={history} className={styles.backButton} />
                     <DetailImage src={img} />
                     {programData.progFlatCost > 0 && (
-                        <DetailCostText costTexts={[{ title: 'Paid', cost: `$${programData.progFlatCost}` }]} />
+                        <DetailCostText
+                            costTexts={[{title: 'Paid', cost: `${formatMoney(programData.progFlatCost)}`}]}
+                        />
                     )}
                     {programData.isCostPerYear ? (
-                        <DetailCostText costTexts={[{ title: 'Yearly', cost: `$${programData.progCostPerYear}` }]} />
+                        <DetailCostText
+                            costTexts={[{title: 'Yearly', cost: `${formatMoney(programData.progCostPerYear)}`}]}
+                        />
                     ) : (
-                            programData.progCostPerYear > 0 && (
-                                <DetailCostText costTexts={[{ title: 'Monthly', cost: `$${Math.round(programData.progCostPerYear / 12 * 100) / 100}` }]} />
-                            )
-                        )}
+                        programData.progCostPerYear > 0 && (
+                            <DetailCostText
+                                costTexts={[
+                                    {title: 'Monthly', cost: `${formatMoney(programData.progCostPerYear / 12)}`},
+                                ]}
+                            />
+                        )
+                    )}
                 </div>
                 {/* column 2 */}
                 <div className={styles.secondColumn}>
@@ -233,7 +240,7 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
                                     onClick={() => {
                                         history.push({
                                             pathname: `/programs/edit/overview/${id}/${archived}`,
-                                            state: { prev: history.location },
+                                            state: {prev: history.location},
                                         })
                                     }}
                                     className={styles.editbutton}

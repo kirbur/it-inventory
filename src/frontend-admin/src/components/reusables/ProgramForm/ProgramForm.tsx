@@ -6,10 +6,13 @@ import DatePicker from 'react-datepicker'
 // Components
 import {Group} from '../Group/Group'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {DropdownList} from '../../reusables/Dropdown/DropdownList'
+import {Checkbox} from '../Checkbox/Checkbox'
+import {Button} from '../Button/Button'
 
 // Styles
 import styles from './ProgramForm.module.css'
-import {Checkbox} from '../Checkbox/Checkbox'
+import dropdownStyles from '../../reusables/Dropdown/Dropdown.module.css'
 
 // Types
 export interface IProgramFormInputs {
@@ -31,11 +34,15 @@ export interface IProgramFormInputs {
 interface IProgramFormProps {
     state: IProgramFormInputs
     setState: Function
+
+    employeeDropdown: {name: string; id: number}[] | undefined
+    selectedEmployee: {name: string; id: number} | undefined
+    setSelectedEmployee: Function
 }
 
 // Primary Component
 export const ProgramForm: React.SFC<IProgramFormProps> = props => {
-    const {state, setState} = props
+    const {state, setState, employeeDropdown, selectedEmployee, setSelectedEmployee} = props
 
     return (
         <div className={styles.formMain}>
@@ -182,6 +189,52 @@ export const ProgramForm: React.SFC<IProgramFormProps> = props => {
                 />
             </div>
 
+            <div className={styles.line} />
+
+            <div className={styles.assignContainer}>
+                <div className={styles.empText}>Assign to:</div>
+
+                <Button className={s(styles.input, styles.employeeDropdownButton)}>
+                    <div className={s(dropdownStyles.dropdownContainer, styles.employeeDropdownContainer)}>
+                        {employeeDropdown && (
+                            <DropdownList
+                                triggerElement={({isOpen, toggle}) => (
+                                    <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                        <div className={s(dropdownStyles.dropdownTitle, styles.employeeDropdownTitle)}>
+                                            <div>{selectedEmployee ? selectedEmployee.name : 'Select An Employee'}</div>
+                                            <div
+                                                className={s(
+                                                    dropdownStyles.dropdownArrow,
+                                                    styles.employeeDropdownArrow
+                                                )}
+                                            />
+                                        </div>
+                                    </button>
+                                )}
+                                choicesList={() => (
+                                    <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
+                                        {employeeDropdown.map(i => (
+                                            <li
+                                                className={dropdownStyles.dropdownListItem}
+                                                key={i.name}
+                                                onClick={() => {
+                                                    setSelectedEmployee(i)
+                                                }}
+                                            >
+                                                <button className={dropdownStyles.dropdownListItemButton}>
+                                                    <div className={dropdownStyles.dropdownItemLabel}>{i.name}</div>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                listWidthClass={styles.dropdownContent}
+                            />
+                        )}
+                        <div />
+                    </div>
+                </Button>
+            </div>
             <div className={styles.line} />
         </div>
     )

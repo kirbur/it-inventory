@@ -6,6 +6,7 @@ import {cloneDeep} from 'lodash'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {checkImage} from '../../../utilities/CheckImage'
 import {searchFilter} from '../../../utilities/SearchFilter'
+import {formatMoney} from '../../../utilities/FormatCost'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -114,7 +115,7 @@ export const DepartmentsListPage: React.SFC<IDepartmentsListPageProps> = props =
     }, [])
 
     const formatCost = (cost: number) => {
-        return '$' + Math.round((cost / 12) * 100) / 100 + ' /mo | $' + cost + ' /yr'
+        return formatMoney(cost / 12) + ' /mo | ' + formatMoney(cost) + ' /yr'
     }
 
     useEffect(() => {

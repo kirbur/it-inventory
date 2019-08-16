@@ -21,6 +21,7 @@ import {formatDate} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {checkImage} from '../../../utilities/CheckImage'
+import {formatMoney} from '../../../utilities/FormatCost'
 
 // Types
 interface IDepartmentDetailPageProps {
@@ -63,9 +64,9 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
     }
     function renderProgramCost(isProgramCostPerYear: boolean, programCostPerYear: number) {
         if (isProgramCostPerYear === true) {
-            return '$' + programCostPerYear.toString() + ' /year'
+            return formatMoney(programCostPerYear) + ' /year'
         } else {
-            return '$' + programCostPerYear.toString() + ' /mo'
+            return formatMoney(programCostPerYear) + ' /mo'
         }
     }
 
@@ -100,7 +101,12 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                         },
                         {
                             //all programCostForEmp is per month
-                            value: 'HW: $' + i.hardwareCostForEmp + ' | SW: $' + i.programCostForEmp + ' /mo',
+                            value:
+                                'HW: ' +
+                                formatMoney(i.hardwareCostForEmp) +
+                                ' | SW: ' +
+                                formatMoney(i.programCostForEmp) +
+                                ' /mo',
                             sortBy: i.hardwareCostForEmp,
                         },
                     ])
@@ -197,8 +203,8 @@ export const DepartmentDetailPage: React.SFC<IDepartmentDetailPageProps> = props
                     <DetailImage src={img} />
                     <DetailCostText
                         costTexts={[
-                            {title: 'Software', cost: `$${deptData.softwareCost} /month`},
-                            {title: 'Hardware', cost: `$${deptData.hardwareCost}`},
+                            {title: 'Software', cost: `${formatMoney(deptData.softwareCost)} /month`},
+                            {title: 'Hardware', cost: `${formatMoney(deptData.hardwareCost)}`},
                         ]}
                     />
                 </div>

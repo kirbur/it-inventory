@@ -8,6 +8,7 @@ import {formatDate, getDays, calculateDaysEmployed, calculateHireDate} from '../
 import {History} from 'history'
 import {checkImage} from '../../../utilities/CheckImage'
 import {searchFilter} from '../../../utilities/SearchFilter'
+import {formatMoney} from '../../../utilities/FormatCost'
 
 // Components
 import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
@@ -97,13 +98,13 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                             role: format(i.role),
                             icon: format(i.photo),
                             id: i.employeeId,
-    
+
                             //for searching
                             hardware: i.hardwareList ? i.hardwareList.join(', ') : '',
                             programs: i.progForEmp ? i.progForEmp.join(', ') : '',
                             daysEmployed: getDays(i.hireDate),
                         })
-    
+
                         imagePromises.push(
                             checkImage(i.photo, axios, placeholder).then(image => {
                                 return {id: i.employeeId, img: image}
@@ -157,7 +158,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }, [search, selected, listData, archivedData, isArchive])
 
     const formatCost = (hwCpost: number, progCost: number) => {
-        return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo'
+        return 'HW: ' + formatMoney(hwCpost) + ' | SW: ' + formatMoney(progCost) + ' /mo'
     }
 
     const handleClick = () => {
