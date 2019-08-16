@@ -255,12 +255,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         }
         if (id === 'new') {
             var msg: string = ''
-            var needsRenewalDate = postProgram.Program.MonthsPerRenewal ? true : false
+
             if (
                 postProgram.Program.numberOfPrograms >= 1 &&
                 postProgram.Program.ProgramName &&
-                postProgram.Program.DateBought &&
-                (needsRenewalDate && postProgram.Program.RenewalDate)
+                postProgram.Program.DateBought
             ) {
                 await axios
                     .post('/add/program', postProgram)
@@ -297,7 +296,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 msg = 'Failed because: \n'
                 msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
                 msg += postProgram.Program.ProgramName === '' ? 'No name entered,\n' : ''
-                msg += needsRenewalDate && !postProgram.Program.RenewalDate ? 'No renewal date entered,\n' : ''
                 window.alert(msg)
             }
         } else {
