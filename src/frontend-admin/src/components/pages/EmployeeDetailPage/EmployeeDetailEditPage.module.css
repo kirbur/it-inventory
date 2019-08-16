@@ -246,16 +246,6 @@ input:checked ~ .insideCheckmarkAdmin {
     display: flex;
     justify-content: center;
 }
-.submitButton {
-    border: 2px solid #009eff;
-    border-radius: 3px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 200px;
-    height: 35px;
-}
 
 /*dropdown styles*/
 .dropdownTitle {

@@ -419,7 +419,8 @@ namespace backend_api.Controllers
          *          "ProgramPurchaseLink" : string,
          *          "DateBought" : DateTime,
          *          "RenewalDate" : DateTime,
-         *          "MonthsPerRenewal" : int
+         *          "MonthsPerRenewal" : int,
+         *          "EmployeeId": int
          *     }
          * }
          */
@@ -450,7 +451,7 @@ namespace backend_api.Controllers
                         ProgramFlatCost = input.Program.ProgramFlatCost,
                         ProgramLicenseKey = input.Program.ProgramLicenseKey,
                         IsLicense = input.Program.IsLicense,
-                        EmployeeId = null,
+                        EmployeeId = input.Program.EmployeeId,
                         Description = input.Program.Description,
                         ProgramPurchaseLink = input.Program.ProgramPurchaseLink,
                         HasPlugIn = false,

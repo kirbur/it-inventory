@@ -1,22 +1,23 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { AxiosService } from '../../../services/AxiosService/AxiosService'
-import { sortTable } from '../../../utilities/quickSort'
-import { concatStyles as s } from '../../../utilities/mikesConcat'
-import { cloneDeep } from 'lodash'
-import { format } from '../../../utilities/formatEmptyStrings'
-import { formatDate, getDays, calculateDaysEmployed, calculateHireDate } from '../../../utilities/FormatDate'
-import { History } from 'history'
-import { checkImage } from '../../../utilities/CheckImage'
-import { searchFilter } from '../../../utilities/SearchFilter'
+import React, {useState, useEffect, useContext} from 'react'
+import {AxiosService} from '../../../services/AxiosService/AxiosService'
+import {sortTable} from '../../../utilities/quickSort'
+import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {cloneDeep} from 'lodash'
+import {format} from '../../../utilities/formatEmptyStrings'
+import {formatDate, getDays, calculateDaysEmployed, calculateHireDate} from '../../../utilities/FormatDate'
+import {History} from 'history'
+import {checkImage} from '../../../utilities/CheckImage'
+import {searchFilter} from '../../../utilities/SearchFilter'
+import {formatMoney} from '../../../utilities/FormatCost'
 
 // Components
-import { FilteredSearch } from '../../reusables/FilteredSearch/FilteredSearch'
-import { Button } from '../../reusables/Button/Button'
-import { Group } from '../../reusables/Group/Group'
-import { Table } from '../../reusables/Table/Table'
+import {FilteredSearch} from '../../reusables/FilteredSearch/FilteredSearch'
+import {Button} from '../../reusables/Button/Button'
+import {Group} from '../../reusables/Group/Group'
+import {Table} from '../../reusables/Table/Table'
 
 // Context
-import { LoginContext, ThemeContext } from '../../App/App'
+import {LoginContext, ThemeContext} from '../../App/App'
 
 // Styles
 import styles from './EmployeesListPage.module.css'
@@ -56,19 +57,19 @@ interface IPulledData {
 
 // Primary Component
 export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
-    const { history } = props
+    const {history} = props
     const {
-        loginContextVariables: { isAdmin },
+        loginContextVariables: {isAdmin},
         loginContextVariables,
     } = useContext(LoginContext)
     const axios = new AxiosService(loginContextVariables)
-    const { isDarkMode } = useContext(ThemeContext)
+    const {isDarkMode} = useContext(ThemeContext)
 
     // state
     const [listData, setListData] = useState<IEmployeeData[]>([])
     const [filteredData, setFilteredData] = useState<IEmployeeData[]>([]) //this is what is used in the list
     const [search, setSearch] = useState('')
-    const [selected, setSelected] = useState({ label: 'Employees', value: 'name' })
+    const [selected, setSelected] = useState({label: 'Employees', value: 'name'})
 
     const [archivedData, setArchivedData] = useState<IEmployeeData[]>([])
     const [isArchive, setIsArchive] = useState(false)
@@ -76,9 +77,9 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     const columns = ['name', 'role', 'dateHired', 'daysEmployed', 'cost', 'hardware', 'programs']
     var headers = ['Employees', 'Role', 'Date Hired', 'Days Employed', 'Cost', 'Hardware', 'Programs']
     var headerList: string[] = []
-    const options = columns.map((c, i) => ({ label: headers[i], value: c }))
+    const options = columns.map((c, i) => ({label: headers[i], value: c}))
 
-    const [displayImages, setDisplayImages] = useState<{ id: number; img: string }[]>([])
+    const [displayImages, setDisplayImages] = useState<{id: number; img: string}[]>([])
 
     async function getData() {
         var imagePromises: any[] = []
@@ -106,7 +107,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
 
                         imagePromises.push(
                             checkImage(i.photo, axios, placeholder).then(image => {
-                                return { id: i.employeeId, img: image }
+                                return {id: i.employeeId, img: image}
                             })
                         )
                     })
@@ -157,15 +158,15 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     }, [search, selected, listData, archivedData, isArchive])
 
     const formatCost = (hwCpost: number, progCost: number) => {
-        return 'HW: $' + hwCpost + ' | SW: $' + progCost + ' /mo'
+        return 'HW: ' + formatMoney(hwCpost) + ' | SW: ' + formatMoney(progCost) + ' /mo'
     }
 
     const handleClick = () => {
-        history.push({ pathname: `/employees/edit/new`, state: { prev: history.location } })
+        history.push({pathname: `/employees/edit/new`, state: {prev: history.location}})
     }
 
     const handleRowClick = (row: any) => {
-        history.push({ pathname: `/employees/detail/${row[0].key}`, state: { prev: history.location } })
+        history.push({pathname: `/employees/detail/${row[0].key}`, state: {prev: history.location}})
     }
 
     //changes it from array of objects to matrix
@@ -197,7 +198,7 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
     var tempHeaderStates = cloneDeep(headerStates)
     var tempHeaderStateCounts = cloneDeep(headerStateCounts)
 
-    var initState = { headerStates, headerStateCounts }
+    var initState = {headerStates, headerStateCounts}
     const [sortState, setSortState] = useState(initState)
 
     function sortStates(index: number) {
@@ -205,13 +206,13 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
             //already descending or neutral
             tempHeaderStates[index] = styles.descending
             tempHeaderStateCounts[index] = 1
-            setSortState({ headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts })
+            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
             tempHeaderStateCounts = [...initHeaderStateCounts]
         } else if (sortState.headerStateCounts[index] === 1) {
             //already ascending
             tempHeaderStates[index] = styles.ascending
             tempHeaderStateCounts[index] = 0
-            setSortState({ headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts })
+            setSortState({headerStates: tempHeaderStates, headerStateCounts: tempHeaderStateCounts})
             tempHeaderStateCounts = [...initHeaderStateCounts]
         }
     }
@@ -250,19 +251,19 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                         </div>
                     </td>
                 ) : (
-                        <td
-                            key={headerList[i]}
-                            onClick={e => {
-                                setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
-                                sortStates(i)
-                            }}
-                        >
-                            <div className={styles.header}>
-                                {headerList[i]}
-                                <div className={sortState.headerStates[i]} />
-                            </div>
-                        </td>
-                    )
+                    <td
+                        key={headerList[i]}
+                        onClick={e => {
+                            setRows(sortTable(rows, i, sortState.headerStateCounts[i]))
+                            sortStates(i)
+                        }}
+                    >
+                        <div className={styles.header}>
+                            {headerList[i]}
+                            <div className={sortState.headerStates[i]} />
+                        </div>
+                    </td>
+                )
             headers.push(header)
         }
 
@@ -288,16 +289,16 @@ export const EmployeesListPage: React.SFC<IEmployeesListPageProps> = props => {
                 </div>
             </td>
         ) : (
-                <td key={row[7]} className={styles.employees}>
-                    <div className={styles.imgContainer}>
-                        <img className={styles.icon} src={placeholder} alt={''} />
-                    </div>
-                    <div className={styles.alignLeft}>
-                        <text className={styles.employeeName}>{row[0]}</text> <br />
-                        <text className={styles.role}>{row[5]}</text>
-                    </div>
-                </td>
-            )
+            <td key={row[7]} className={styles.employees}>
+                <div className={styles.imgContainer}>
+                    <img className={styles.icon} src={placeholder} alt={''} />
+                </div>
+                <div className={styles.alignLeft}>
+                    <text className={styles.employeeName}>{row[0]}</text> <br />
+                    <text className={styles.role}>{row[5]}</text>
+                </div>
+            </td>
+        )
     }
     var renderedRows: any[] = []
     rows.forEach(row => {

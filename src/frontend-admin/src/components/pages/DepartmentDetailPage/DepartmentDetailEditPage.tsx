@@ -18,7 +18,7 @@ import {cloneDeep} from 'lodash'
 import {DetailPageTable} from '../../reusables/DetailPageTable/DetailPageTable'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {BackButton} from '../../reusables/BackButton/BackButton'
-import { putUploadImage } from '../../../utilities/UploadImage';
+import {putUploadImage} from '../../../utilities/UploadImage'
 
 // Types
 interface IDepartmentDetailEditPageProps {
@@ -164,7 +164,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
     }
     async function handleSubmit() {
         var newID = ''
-        var imgID;
+        var imgID
         if (
             //check to make sure there is a proper entry in department name
             deptData.departmentName === '' ||
@@ -187,7 +187,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                         name: deptData.departmentName,
                     })
                     .then((response: any) => {
-                        newID = imgID = response.data  
+                        newID = imgID = response.data
                     })
                 history.push({pathname: `/departments/detail/${newID}`, state: {prev: history.location}})
             } else {
@@ -219,6 +219,9 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
 
                 <div className={styles.imgContainer}>
                     <PictureInput setImage={setImgInput} image={imgInput} />
+                </div>
+                <div className={styles.submitContainer}>
+                    <Button text='Submit' onClick={handleSubmit} />
                 </div>
             </div>
             {/* column 2 */}
@@ -305,7 +308,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                     </div>
                 </div>
                 <div className={styles.submitContainer}>
-                    <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />
+                    <Button text='Submit' onClick={handleSubmit} />
                 </div>
             </div>
         </div>

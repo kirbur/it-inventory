@@ -463,7 +463,7 @@ namespace backend_api.Controllers
             // rolling back all the renewal dates of the softwares so we can sort them by this date
             // this will be used to tell us which software was most recently renewed
             software
-                .Where(x => x.RenewalDate != null)
+                .Where(x => x.RenewalDate != null && x.MonthsPerRenewal != null)
                 .ToList()
                 .ForEach(x => x.RenewalDate = x.RenewalDate.Value.AddMonths(-(x.MonthsPerRenewal.Value)));
 
