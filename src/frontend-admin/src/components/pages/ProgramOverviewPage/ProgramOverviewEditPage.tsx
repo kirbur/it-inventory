@@ -123,6 +123,9 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         monthsPerRenewal: {value: 0, changed: false},
     })
 
+    const [employeeDropdown, setEmployeeDropdown] = useState<{name: string; id: number}[]>()
+    const [selectedEmployee, setSelectedEmployee] = useState<{name: string; id: number}>()
+
     useEffect(() => {
         var axios = new AxiosService(loginContextVariables)
         if (id !== 'new') {
@@ -184,6 +187,20 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                 })
                 .catch((err: any) => console.error(err))
         }
+
+        axios
+            .get(`add/hardwarePrep`)
+            .then(data => {
+                const employees: {name: string; id: number}[] = []
+                data.map((i: {employeeName: string; employeeId: number}) =>
+                    employees.push({
+                        name: i.employeeName,
+                        id: i.employeeId,
+                    })
+                )
+                setEmployeeDropdown(employees)
+            })
+            .catch((err: any) => console.error(err))
     }, [archived, id, loginContextVariables])
 
     const handleProgramRemove = (row: ITableItem[]) => {
@@ -233,6 +250,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         ? 1 //default is monthly
                         : programInput.monthsPerRenewal.value
                     : null,
+                EmployeeId: selectedEmployee ? selectedEmployee.id : null,
             },
         }
         if (id === 'new') {
@@ -283,11 +301,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
             //Add x# of new copies w/ programInput
             if (programForm.add) {
                 postProgram.Program.ProgramName = id
-                if (
-                    postProgram.Program.numberOfPrograms >= 1 &&
-                    (postProgram.Program.ProgramCostPerYear > 0 || postProgram.Program.ProgramFlatCost > 0) &&
-                    postProgram.Program.DateBought
-                ) {
+                if (postProgram.Program.numberOfPrograms >= 1 && postProgram.Program.DateBought) {
                     await axios
                         .post('/add/program', postProgram)
                         .then((response: any) => {
@@ -313,10 +327,6 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     msg = 'Failed because: \n'
                     msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
                     msg += postProgram.Program.ProgramName === '' ? 'No name entered,\n' : ''
-                    msg +=
-                        postProgram.Program.ProgramCostPerYear <= 0 && postProgram.Program.ProgramFlatCost <= 0
-                            ? 'No cost entered,\n'
-                            : ''
                     window.alert(msg)
                 }
             }
@@ -347,6 +357,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         MonthsPerRenewal: programUpdateInput.monthsPerRenewal.changed
                             ? programUpdateInput.monthsPerRenewal.value
                             : null,
+                        EmployeeId: selectedEmployee ? selectedEmployee.id : null,
                     },
                 }
 
@@ -551,7 +562,16 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     {console.log(programUpdateInput)}
                     {programForm.edit && (
                         <div className={styles.programForm}>
-                            <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} />
+                            {/* <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} /> */}
+                            {programInput && (
+                                <ProgramForm
+                                    state={programInput}
+                                    setState={setProgramInput}
+                                    employeeDropdown={employeeDropdown}
+                                    selectedEmployee={selectedEmployee}
+                                    setSelectedEmployee={setSelectedEmployee}
+                                />
+                            )}
                         </div>
                     )}
 
@@ -579,13 +599,31 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             />
                             {programForm.add && (
                                 <div className={styles.programForm}>
-                                    <ProgramForm state={programInput} setState={setProgramInput} />
+                                    {/* <ProgramForm state={programInput} setState={setProgramInput} /> */}
+                                    {programInput && (
+                                        <ProgramForm
+                                            state={programInput}
+                                            setState={setProgramInput}
+                                            employeeDropdown={employeeDropdown}
+                                            selectedEmployee={selectedEmployee}
+                                            setSelectedEmployee={setSelectedEmployee}
+                                        />
+                                    )}
                                 </div>
                             )}
                         </Group>
                     ) : (
                         <div className={styles.programForm}>
-                            <ProgramForm state={programInput} setState={setProgramInput} />
+                            {/* <ProgramForm state={programInput} setState={setProgramInput} /> */}
+                            {programInput && (
+                                <ProgramForm
+                                    state={programInput}
+                                    setState={setProgramInput}
+                                    employeeDropdown={employeeDropdown}
+                                    selectedEmployee={selectedEmployee}
+                                    setSelectedEmployee={setSelectedEmployee}
+                                />
+                            )}
                         </div>
                     )}
 

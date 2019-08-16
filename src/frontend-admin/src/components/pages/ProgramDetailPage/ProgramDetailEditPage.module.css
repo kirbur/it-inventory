@@ -69,41 +69,6 @@
     text-align: left;
 }
 
-.employeeDropdownButton {
-    background: white;
-}
-
-.employeeDropdownButton:hover {
-    background: white;
-}
-
-.employeeDropdownTitle {
-    line-height: 40px;
-    width: 380px;
-    height: 45px;
-    font-size: 18px;
-    font-family: cqlRegularFont;
-}
-
-.employeeDropdownArrow {
-    top: 14px;
-}
-
-.dropdownList {
-    max-height: 200px;
-    overflow-y: scroll;
-}
-
-.dropdownContent {
-    width: 250px;
-}
-
-.empText {
-    color: #a5a5a5;
-    font-size: 24px;
-    text-align: left;
-}
-
 .dark {
     color: white;
 }

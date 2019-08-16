@@ -97,7 +97,8 @@ namespace backend_api.Controllers
         *           "ProgramPurchaseLink" : String,
         *           "DateBought" : DateTime,
         *           "RenewalDate" : DateTime,
-        *           "MonthsPerRenewal" : int
+        *           "MonthsPerRenewal" : int,
+        *           "EmployeeId": int
         *       }
         * }
         */
