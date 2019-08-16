@@ -28,7 +28,6 @@ import styles from './ProgramOverviewEditPage.module.css'
 
 // Types
 import {ExpectedPluginType, ExpectedProgramType} from './ProgramOverviewPage'
-import {conditionalExpression} from '@babel/types'
 interface IProgramOverviewEditPageProps {
     history: History
     match: match<{id: string; archived: string}>
@@ -568,8 +567,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             {/* <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} /> */}
                             {programInput && (
                                 <ProgramForm
-                                    state={programInput}
-                                    setState={setProgramInput}
+                                    state={programUpdateInput}
+                                    setState={setProgramUpdateInput}
                                     employeeDropdown={employeeDropdown}
                                     selectedEmployee={selectedEmployee}
                                     setSelectedEmployee={setSelectedEmployee}
