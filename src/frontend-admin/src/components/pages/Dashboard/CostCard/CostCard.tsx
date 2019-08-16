@@ -3,6 +3,7 @@ import React from 'react'
 // Components
 import {Card} from '../../../reusables'
 
+import {formatMoney} from '../../../../utilities/FormatCost'
 // Styles
 import styles from './CostCard.module.css'
 
@@ -27,9 +28,9 @@ export const CostCard = (props: ICostCardProps) => {
         <Card title={cardTitle}>
             <div>{icon}</div>
             <div className={styles.titleContainer}>
-                <div className={styles.title}>${Math.round((programsCost + pluginsCost) * 100) / 100}</div>
-                <div className={styles.subtitle}>Programs: ${Math.round(programsCost * 100) / 100}</div>
-                <div className={styles.subtitle}>Plugins: ${Math.round(pluginsCost * 100) / 100}</div>
+                <div className={styles.title}>{formatMoney(programsCost + pluginsCost)}</div>
+                <div className={styles.subtitle}>Programs: {formatMoney(programsCost)}</div>
+                <div className={styles.subtitle}>Plugins: {formatMoney(pluginsCost)}</div>
             </div>
         </Card>
     )

@@ -14,6 +14,7 @@ import {DetailCostText, ICostText} from '../../reusables/DetailCostText/DetailCo
 import {formatDate} from '../../../utilities/FormatDate'
 import {checkImage} from '../../../utilities/CheckImage'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
+import {formatMoney} from '../../../utilities/FormatCost'
 
 // Styles
 import styles from './HardwareDetailPage.module.css'
@@ -343,10 +344,10 @@ export const HardwareDetailPage: React.SFC<IHardwareDetailPageProps> = props => 
     function getCosts(): ICostText[] {
         let costTexts: ICostText[] = []
         if (flatCost !== undefined && flatCost !== null && flatCost !== 0) {
-            costTexts.push({title: 'Initial Cost', cost: `$${flatCost}`})
+            costTexts.push({title: 'Initial Cost', cost: `${formatMoney(flatCost)}`})
         }
         if (costPerYear !== undefined && costPerYear !== null && costPerYear !== 0) {
-            costTexts.push({title: 'Cost Per Year', cost: `$${costPerYear}`})
+            costTexts.push({title: 'Cost Per Year', cost: `${formatMoney(costPerYear)}`})
         }
         return costTexts
     }

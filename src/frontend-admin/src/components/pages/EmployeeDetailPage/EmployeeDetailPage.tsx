@@ -16,6 +16,7 @@ import {formatDate, calculateDaysEmployed} from '../../../utilities/FormatDate'
 import {format} from '../../../utilities/formatEmptyStrings'
 import {concatStyles as s} from '../../../utilities/mikesConcat'
 import {checkImage} from '../../../utilities/CheckImage'
+import {formatMoney} from '../../../utilities/FormatCost'
 
 // Styles
 import styles from './EmployeeDetailPage.module.css'
@@ -96,8 +97,8 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     deptId: data[0].departmentID,
                     role: data[0].role,
                     hireDate: formatDate(data[0].hireDate),
-                    hwCost: Math.round(data[0].totalHardwareCost * 100) / 100,
-                    swCost: Math.round(data[0].totalProgramCostMonthly * 100) / 100,
+                    hwCost: data[0].totalHardwareCost,
+                    swCost: data[0].totalProgramCostMonthly,
                     archiveDate: formatDate(data[0].archiveDate), //TODO: make sure these were added
                     description: data[0].textField,
                     email: format(data[0].email),
@@ -136,7 +137,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         },
                         {value: format(i.licenseKey), id: format(i.id), sortBy: i.licenseKey},
                         {
-                            value: '$' + Math.round(i.costPerMonth * 100) / 100,
+                            value: formatMoney(i.costPerMonth),
                             id: format(i.id),
                             sortBy: i.costPerMonth,
                         },
@@ -159,7 +160,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                             sortBy: format(i.licensesKey),
                         },
                         {
-                            value: '$' + Math.round(i.costPerMonth * 100) / 100,
+                            value: formatMoney(i.costPerMonth),
                             sortBy: i.costPerMonth,
                         },
                         {value: format(i.licensesCount), id: format(i.id), sortBy: i.licensesCount},
@@ -199,8 +200,8 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                     <DetailImage src={img} />
                     <DetailCostText
                         costTexts={[
-                            {title: `Software`, cost: `$${userData.swCost} /month`},
-                            {title: `Hardware`, cost: `$${userData.hwCost}`},
+                            {title: `Software`, cost: `${formatMoney(userData.swCost)} /month`},
+                            {title: `Hardware`, cost: `${formatMoney(userData.hwCost)}`},
                         ]}
                     />
                 </div>
@@ -258,9 +259,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
                         </div>
 
                         {userData.archiveDate !== '-' && (
-                            <div className={styles.employeeText}>
-                                {calculateDaysEmployed(userData.hireDate)}
-                            </div>
+                            <div className={styles.employeeText}>{calculateDaysEmployed(userData.hireDate)}</div>
                         )}
                     </div>
                     <DetailPageTable
