@@ -290,7 +290,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     .catch((err: any) => console.error(err))
 
                 //after submitting go back to detail
-                history.push({pathname: `/programs`, state: {prev: history.location}})
+                history.push({
+                    pathname: `/programs/overview/${id}/inventory`,
+                    state: {prev: history.location},
+                })
             } else {
                 msg = 'Failed because: \n'
                 msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
