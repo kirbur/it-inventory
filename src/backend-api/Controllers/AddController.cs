@@ -162,7 +162,7 @@ namespace backend_api.Controllers
             // loop and lambda to find all the distinct programs that have any of their individual programs unassigned and loop though them
             foreach (var prog in _context.Program
                 .Where(x => x.EmployeeId == null && x.IsDeleted == false)
-                .GroupBy(prog => prog.ProgramName)
+                .GroupBy(prog => prog.ProgramId)
                 .Select(x => x.FirstOrDefault())
                 .ToList())
             {
