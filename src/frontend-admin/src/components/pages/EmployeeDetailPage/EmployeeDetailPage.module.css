@@ -1,39 +1,10 @@
-.empDetailMain {
-    padding: 0 50px;
-}
-
-.columns {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    min-width: fit-content;
-}
-
-.firstColumn {
-    padding: 50px;
-    min-width: 160px;
-    max-width: 300px;
-    flex-grow: 1;
-}
-
-.secondColumn {
-    padding: 50px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    padding-left: 75px;
-}
-
-/*Second Column*/
+/*Buttons*/
 .archivebutton {
     margin-left: 18px;
     padding: 0 5px;
 }
 
-.backButton {
-    margin-bottom: 30px;
-}
-
+/*Title & description Text*/
 .titleText {
     text-align: left;
     padding-top: 50px;
@@ -62,6 +33,16 @@
     margin-bottom: 50px;
 }
 
+/*Dark Mode*/
+.employeeNameDark {
+    color: white;
+}
+
+.deptTextDark {
+    color: #5ec2ff;
+}
+
+/*Description*/
 .descriptionContainer {
     width: 100%;
     text-align: left;
@@ -79,16 +60,4 @@
     color: #4a4a4a;
     font-size: 20px;
     line-height: 27px;
-}
-
-.employeeNameDark {
-    color: white;
-}
-
-.deptTextDark {
-    color: #5ec2ff;
-}
-
-.backgroundDark {
-    background-color: #282c29;
 }

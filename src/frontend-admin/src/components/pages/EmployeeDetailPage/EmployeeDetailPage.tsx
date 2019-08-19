@@ -6,10 +6,7 @@ import {match} from 'react-router-dom'
 // Components
 import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
-import {Group} from '../../reusables/Group/Group'
-import {BackButton} from '../../reusables/BackButton/BackButton'
-import {DetailImage} from '../../reusables/DetailImage/DetailImage'
-import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
+import {DetailLayout} from '../DetailLayout/DetailLayout'
 
 // Utils
 import {formatDate, calculateDaysEmployed} from '../../../utilities/FormatDate'
@@ -191,104 +188,103 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
         }
     }
 
+    const getButtons = () => {
+        var buttons: any[] = []
+
+        if (isAdmin) {
+            if (!isDeleted) {
+                buttons.push(
+                    <Button
+                        text='Edit'
+                        icon='edit'
+                        onClick={() => {
+                            history.push({
+                                pathname: '/employees/edit/' + match.params.id,
+                                state: {prev: history.location},
+                            })
+                        }}
+                        className={styles.editbutton}
+                    />
+                )
+            }
+
+            buttons.push(
+                <Button
+                    text={isDeleted ? 'Recover' : 'Archive'}
+                    icon='archive'
+                    onClick={handleArchive}
+                    className={styles.archivebutton}
+                />
+            )
+        }
+        return buttons
+    }
+
     return (
-        <div className={s(styles.empDetailMain, isDarkMode ? styles.backgroundDark : {})}>
-            <div className={styles.columns}>
-                {/* column 1 */}
-                <div className={styles.firstColumn}>
-                    <BackButton history={history} className={styles.backButton} />
-                    <DetailImage src={img} />
-                    <DetailCostText
-                        costTexts={[
-                            {title: `Software`, cost: `${formatMoney(userData.swCost)} /month`},
-                            {title: `Hardware`, cost: `${formatMoney(userData.hwCost)}`},
-                        ]}
-                    />
+        <DetailLayout
+            history={history}
+            picture={img}
+            costTexts={[
+                {title: `Software`, cost: `${formatMoney(userData.swCost)} /month`},
+                {title: `Hardware`, cost: `${formatMoney(userData.hwCost)}`},
+            ]}
+            buttons={getButtons()}
+        >
+            <div className={styles.titleText}>
+                <div className={s(styles.employeeName, isDarkMode ? styles.employeeNameDark : {})}>{userData.name}</div>
+                <div className={styles.employeeText}>{userData.email}</div>
+                <div className={styles.employeeText}>
+                    <div
+                        className={s(styles.deptText, isDarkMode ? styles.deptTextDark : {})}
+                        onClick={() => {
+                            history.push({
+                                pathname: '/departments/detail/' + userData.deptId,
+                                state: {prev: history.location},
+                            })
+                        }}
+                    >
+                        {userData.department}
+                    </div>{' '}
+                    | {userData.role}
                 </div>
-                {/* column 2 */}
-                <div className={styles.secondColumn}>
-                    {isAdmin && (
-                        <Group direction='row' justify='start' className={styles.group}>
-                            {!isDeleted && (
-                                <Button
-                                    text='Edit'
-                                    icon='edit'
-                                    onClick={() => {
-                                        history.push({
-                                            pathname: '/employees/edit/' + match.params.id,
-                                            state: {prev: history.location},
-                                        })
-                                    }}
-                                    className={styles.editbutton}
-                                />
-                            )}
 
-                            <Button
-                                text={isDeleted ? 'Recover' : 'Archive'}
-                                icon='archive'
-                                onClick={handleArchive}
-                                className={styles.archivebutton}
-                            />
-                        </Group>
-                    )}
-                    <div className={styles.titleText}>
-                        <div className={s(styles.employeeName, isDarkMode ? styles.employeeNameDark : {})}>
-                            {userData.name}
-                        </div>
-                        <div className={styles.employeeText}>{userData.email}</div>
-                        <div className={styles.employeeText}>
-                            <div
-                                className={s(styles.deptText, isDarkMode ? styles.deptTextDark : {})}
-                                onClick={() => {
-                                    history.push({
-                                        pathname: '/departments/detail/' + userData.deptId,
-                                        state: {prev: history.location},
-                                    })
-                                }}
-                            >
-                                {userData.department}
-                            </div>{' '}
-                            | {userData.role}
-                        </div>
-
-                        <div className={styles.employeeText}>
-                            Start Date: {userData.hireDate} |{' '}
-                            {userData.archiveDate !== '-'
-                                ? `End Date: ${userData.archiveDate}`
-                                : calculateDaysEmployed(userData.hireDate)}
-                        </div>
-
-                        {userData.archiveDate !== '-' && (
-                            <div className={styles.employeeText}>{calculateDaysEmployed(userData.hireDate)}</div>
-                        )}
-                    </div>
-                    <DetailPageTable
-                        headers={hardwareHeaders}
-                        rows={hardwareRows}
-                        setRows={setHardwareRows}
-                        className={styles.table}
-                    />
-
-                    <DetailPageTable
-                        headers={softwareHeaders}
-                        rows={softwareRows}
-                        setRows={setSoftwareRows}
-                        className={styles.table}
-                    />
-
-                    <DetailPageTable
-                        headers={licenseHeaders}
-                        rows={licenseRows}
-                        setRows={setLicenseRows}
-                        className={styles.table}
-                    />
-
-                    <div className={styles.descriptionContainer}>
-                        <div className={styles.descriptionTitle}>Description</div>
-                        <div className={styles.descriptionBody}>{userData.description}</div>
-                    </div>
+                <div className={styles.employeeText}>
+                    Start Date: {userData.hireDate} |{' '}
+                    {userData.archiveDate !== '-'
+                        ? `End Date: ${userData.archiveDate}`
+                        : calculateDaysEmployed(userData.hireDate)}
                 </div>
+
+                {userData.archiveDate !== '-' && (
+                    <div className={styles.employeeText}>{calculateDaysEmployed(userData.hireDate)}</div>
+                )}
             </div>
-        </div>
+
+            <DetailPageTable
+                headers={hardwareHeaders}
+                rows={hardwareRows}
+                setRows={setHardwareRows}
+                className={styles.table}
+            />
+
+            <DetailPageTable
+                headers={softwareHeaders}
+                rows={softwareRows}
+                setRows={setSoftwareRows}
+                className={styles.table}
+            />
+
+            <DetailPageTable
+                headers={licenseHeaders}
+                rows={licenseRows}
+                setRows={setLicenseRows}
+                className={styles.table}
+            />
+
+            <div className={styles.descriptionContainer}>
+                <div className={styles.descriptionTitle}>Description</div>
+                <div className={styles.descriptionBody}>{userData.description}</div>
+            </div>
+        </DetailLayout>
     )
 }
