@@ -7,6 +7,7 @@ import {match} from 'react-router-dom'
 import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
 import {DetailLayout} from '../DetailLayout/DetailLayout'
+import {DetailImage} from '../../reusables/DetailImage/DetailImage'
 
 // Utils
 import {formatDate, calculateDaysEmployed} from '../../../utilities/FormatDate'
@@ -223,7 +224,7 @@ export const EmployeeDetailPage: React.SFC<IEmployeeDetailPageProps> = props => 
     return (
         <DetailLayout
             history={history}
-            picture={img}
+            picture={<DetailImage src={img} />}
             costTexts={[
                 {title: `Software`, cost: `${formatMoney(userData.swCost)} /month`},
                 {title: `Hardware`, cost: `${formatMoney(userData.hwCost)}`},

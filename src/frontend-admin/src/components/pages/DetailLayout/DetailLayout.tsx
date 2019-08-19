@@ -19,7 +19,7 @@ import styles from './DetailLayout.module.css'
 // Types
 interface IDetailLayoutProps {
     history: History
-    picture: string
+    picture: any
     costTexts?: ICostText[]
     buttons: any
     children: any
@@ -38,7 +38,7 @@ export const DetailLayout: React.SFC<IDetailLayoutProps> = props => {
                 {/* column 1 */}
                 <div className={styles.firstColumn}>
                     <BackButton history={history} className={styles.backButton} />
-                    <DetailImage src={picture} />
+                    {picture}
                     {costTexts && <DetailCostText costTexts={costTexts} />}
                 </div>
                 {/* column 2 */}

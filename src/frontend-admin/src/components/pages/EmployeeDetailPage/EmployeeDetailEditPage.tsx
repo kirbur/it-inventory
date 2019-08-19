@@ -9,7 +9,7 @@ import {DropdownList} from '../../reusables/Dropdown/DropdownList'
 import DatePicker from 'react-datepicker'
 import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {AddDropdown} from '../../reusables/Dropdown/AddDropdown'
-import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailLayout} from '../DetailLayout/DetailLayout'
 
 // Utils
 import {concatStyles as s} from '../../../utilities/mikesConcat'
@@ -782,69 +782,38 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
     }
 
     return (
-        <div className={s(styles.columns, isDarkMode ? styles.backgroundDark : {})}>
-            {/* column 1 */}
-
-            <div className={styles.firstColumn}>
-                <BackButton history={history} className={styles.backButton} />
-                <div className={styles.imgContainer}>
-                    <PictureInput setImage={setImgInput} image={imgInput} />
-                </div>
-                <div className={styles.submitContainer}>
-                    <Button text='Submit' icon='submit' onClick={handleSubmit} className={styles.submitbutton} />
-                </div>
-            </div>
-            {/* column 2 */}
-            <div className={styles.secondColumn}>
-                {/* name and date */}
-                <div className={s(styles.title, styles.paddingTop, isDarkMode ? styles.titleDark : {})}>
-                    Employee Information
-                </div>
-
-                {/* Admin/nonadmin radio cards */}
-                <div className={styles.adminCardContainer}>
-                    {/* admin card */}
-                    <div className={styles.paddingRight}>
-                        <div className={styles.adminCard}>
-                            <div className={styles.card}>
-                                <input
-                                    type='radio'
-                                    name='admin'
-                                    className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
-                                    checked={adminInput}
-                                    onChange={() => {
-                                        setAdminInput(true)
-                                        setChanged(true)
-                                    }}
-                                />
-                                <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
-                                <div
-                                    className={s(
-                                        styles.insideCheckmarkAdmin,
-                                        isDarkMode ? styles.insideCheckmarkAdminDark : {}
-                                    )}
-                                />
-
-                                <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Admin User</div>
-                                <div className={styles.adminText}>
-                                    This user will be able to edit any detail pages and be able to add new hardware,
-                                    software, etc.
-                                </div>
-                            </div>
-                            <FaUserShield className={s(styles.adminIconShield, isDarkMode ? styles.titleDark : {})} />
-                        </div>
+        <DetailLayout
+            history={history}
+            picture={
+                <div>
+                    <div className={styles.imgContainer}>
+                        <PictureInput setImage={setImgInput} image={imgInput} />
                     </div>
-                    {/* non admin card */}
-                    {/* // TODO: Make this a component */}
+                    <div className={styles.submitContainer}>
+                        <Button text='Submit' icon='submit' onClick={handleSubmit} />
+                    </div>
+                </div>
+            }
+            buttons={[]}
+        >
+            {/* name and date */}
+            <div className={s(styles.title, styles.paddingTop, isDarkMode ? styles.titleDark : {})}>
+                Employee Information
+            </div>
+
+            {/* Admin/nonadmin radio cards */}
+            <div className={styles.adminCardContainer}>
+                {/* admin card */}
+                <div className={styles.paddingRight}>
                     <div className={styles.adminCard}>
                         <div className={styles.card}>
                             <input
                                 type='radio'
                                 name='admin'
                                 className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
-                                checked={!adminInput}
+                                checked={adminInput}
                                 onChange={() => {
-                                    setAdminInput(false)
+                                    setAdminInput(true)
                                     setChanged(true)
                                 }}
                             />
@@ -855,250 +824,267 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                                     isDarkMode ? styles.insideCheckmarkAdminDark : {}
                                 )}
                             />
-                            <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Non Admin User</div>
+
+                            <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Admin User</div>
                             <div className={styles.adminText}>
-                                This user will be able to view all content and review the overall company as it grows.
+                                This user will be able to edit any detail pages and be able to add new hardware,
+                                software, etc.
                             </div>
                         </div>
-                        <FaUser className={s(styles.adminIconShield, isDarkMode ? styles.titleDark : {})} />
+                        <FaUserShield className={s(styles.adminIconShield, isDarkMode ? styles.titleDark : {})} />
                     </div>
                 </div>
-
-                <div className={styles.row}>
-                    <div className={styles.paddingRight}>
-                        <div className={styles.paddingBottom}>
-                            <div className={styles.text}>Employee Name</div>
-                            {match.params.id === 'new' ? (
-                                <Button className={s(styles.input, styles.employeeDropdownButton)}>
-                                    <div
-                                        className={s(
-                                            dropdownStyles.dropdownContainer,
-                                            styles.employeeDropdownContainer
-                                        )}
-                                    >
-                                        <DropdownList
-                                            triggerElement={({isOpen, toggle}) => (
-                                                <button onClick={toggle} className={dropdownStyles.dropdownButton}>
-                                                    <div
-                                                        className={s(
-                                                            dropdownStyles.dropdownTitle,
-                                                            styles.employeeDropdownTitle
-                                                        )}
-                                                    >
-                                                        <div>{selectedEmployee.name}</div>
-                                                        <div
-                                                            className={s(
-                                                                dropdownStyles.dropdownArrow,
-                                                                styles.employeeDropdownArrow
-                                                            )}
-                                                        />
-                                                    </div>
-                                                </button>
-                                            )}
-                                            choicesList={() => (
-                                                <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
-                                                    {employeeDropdown.map(i => (
-                                                        <li
-                                                            className={dropdownStyles.dropdownListItem}
-                                                            key={i.id}
-                                                            onClick={() => {
-                                                                setSelectedEmployee(i)
-                                                            }}
-                                                        >
-                                                            <button className={dropdownStyles.dropdownListItemButton}>
-                                                                <div className={dropdownStyles.dropdownItemLabel}>
-                                                                    {i.name}
-                                                                </div>
-                                                            </button>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        />
-                                        <div />
-                                    </div>
-                                </Button>
-                            ) : (
-                                selectedEmployee && (
-                                    <input
-                                        type='text'
-                                        className={styles.input}
-                                        value={selectedEmployee.name}
-                                        onChange={e => {
-                                            setSelectedEmployee({name: e.target.value, id: parseInt(match.params.id)})
-                                            setChanged(true)
-                                        }}
-                                    />
-                                )
-                            )}
-
-                            <div className={styles.text}>Role</div>
-                            <input
-                                type='text'
-                                className={styles.input}
-                                value={roleInput}
-                                onChange={e => {
-                                    setRoleInput(e.target.value)
-                                    setChanged(true)
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <div className={styles.text}>Date Hired</div>
-                        <DatePicker
-                            dateFormat='MM/dd/yyyy'
-                            placeholderText={userData.hireDate}
-                            selected={dateInput}
-                            onChange={e => {
-                                e && setDateInput(e)
+                {/* non admin card */}
+                {/* // TODO: Make this a component */}
+                <div className={styles.adminCard}>
+                    <div className={styles.card}>
+                        <input
+                            type='radio'
+                            name='admin'
+                            className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
+                            checked={!adminInput}
+                            onChange={() => {
+                                setAdminInput(false)
                                 setChanged(true)
                             }}
-                            className={styles.input}
                         />
+                        <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                        <div
+                            className={s(
+                                styles.insideCheckmarkAdmin,
+                                isDarkMode ? styles.insideCheckmarkAdminDark : {}
+                            )}
+                        />
+                        <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Non Admin User</div>
+                        <div className={styles.adminText}>
+                            This user will be able to view all content and review the overall company as it grows.
+                        </div>
                     </div>
+                    <FaUser className={s(styles.adminIconShield, isDarkMode ? styles.titleDark : {})} />
                 </div>
+            </div>
 
-                <div className={styles.line} />
-
-                {/* Employee Dept radio buttons */}
-                <div
-                    className={s(
-                        styles.title,
-                        styles.paddingTop,
-                        styles.paddingBottom,
-                        isDarkMode ? styles.titleDark : {}
-                    )}
-                >
-                    Employee Department
-                </div>
-                {deptInput && deptList && (
-                    <div className={styles.employeeDepartment}>
-                        {deptList.map((dept: any) => (
-                            <div key={dept.departmentId} className={styles.container}>
+            <div className={styles.row}>
+                <div className={styles.paddingRight}>
+                    <div className={styles.paddingBottom}>
+                        <div className={styles.text}>Employee Name</div>
+                        {match.params.id === 'new' ? (
+                            <Button className={s(styles.input, styles.employeeDropdownButton)}>
+                                <div className={s(dropdownStyles.dropdownContainer, styles.employeeDropdownContainer)}>
+                                    <DropdownList
+                                        triggerElement={({isOpen, toggle}) => (
+                                            <button onClick={toggle} className={dropdownStyles.dropdownButton}>
+                                                <div
+                                                    className={s(
+                                                        dropdownStyles.dropdownTitle,
+                                                        styles.employeeDropdownTitle
+                                                    )}
+                                                >
+                                                    <div>{selectedEmployee.name}</div>
+                                                    <div
+                                                        className={s(
+                                                            dropdownStyles.dropdownArrow,
+                                                            styles.employeeDropdownArrow
+                                                        )}
+                                                    />
+                                                </div>
+                                            </button>
+                                        )}
+                                        choicesList={() => (
+                                            <ul className={s(dropdownStyles.dropdownList, styles.dropdownList)}>
+                                                {employeeDropdown.map(i => (
+                                                    <li
+                                                        className={dropdownStyles.dropdownListItem}
+                                                        key={i.id}
+                                                        onClick={() => {
+                                                            setSelectedEmployee(i)
+                                                        }}
+                                                    >
+                                                        <button className={dropdownStyles.dropdownListItemButton}>
+                                                            <div className={dropdownStyles.dropdownItemLabel}>
+                                                                {i.name}
+                                                            </div>
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    />
+                                    <div />
+                                </div>
+                            </Button>
+                        ) : (
+                            selectedEmployee && (
                                 <input
-                                    type='radio'
-                                    name='employeeDept'
-                                    className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
-                                    checked={dept.departmentId === deptInput.departmentId}
-                                    onChange={() => {
-                                        setDeptInput(dept)
-                                        applyDefaults(dept)
+                                    type='text'
+                                    className={styles.input}
+                                    value={selectedEmployee.name}
+                                    onChange={e => {
+                                        setSelectedEmployee({name: e.target.value, id: parseInt(match.params.id)})
                                         setChanged(true)
                                     }}
                                 />
-                                <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
-                                <div
-                                    className={s(
-                                        styles.insideCheckmark,
-                                        isDarkMode ? styles.insideCheckmarkAdminDark : {}
-                                    )}
-                                />
-                                <div className={styles.deptIconContainer}>
-                                    {deptImages &&
-                                    deptImages.filter(x => x.id === dept.departmentId) &&
-                                    deptImages.filter(x => x.id === dept.departmentId)[0] ? (
-                                        <img
-                                            src={deptImages.filter(x => x.id === dept.departmentId)[0].img}
-                                            alt={''}
-                                            className={styles.deptIcon}
-                                        />
-                                    ) : (
-                                        <img src={deptPlaceholder} alt={''} className={styles.deptIcon} />
-                                    )}
-                                </div>
-                                <div className={styles.deptName}>{dept.departmentName}</div>
-                            </div>
-                        ))}
+                            )
+                        )}
+
+                        <div className={styles.text}>Role</div>
+                        <input
+                            type='text'
+                            className={styles.input}
+                            value={roleInput}
+                            onChange={e => {
+                                setRoleInput(e.target.value)
+                                setChanged(true)
+                            }}
+                        />
                     </div>
+                </div>
+                <div>
+                    <div className={styles.text}>Date Hired</div>
+                    <DatePicker
+                        dateFormat='MM/dd/yyyy'
+                        placeholderText={userData.hireDate}
+                        selected={dateInput}
+                        onChange={e => {
+                            e && setDateInput(e)
+                            setChanged(true)
+                        }}
+                        className={styles.input}
+                    />
+                </div>
+            </div>
+
+            <div className={styles.line} />
+
+            {/* Employee Dept radio buttons */}
+            <div
+                className={s(styles.title, styles.paddingTop, styles.paddingBottom, isDarkMode ? styles.titleDark : {})}
+            >
+                Employee Department
+            </div>
+            {deptInput && deptList && (
+                <div className={styles.employeeDepartment}>
+                    {deptList.map((dept: any) => (
+                        <div key={dept.departmentId} className={styles.container}>
+                            <input
+                                type='radio'
+                                name='employeeDept'
+                                className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})}
+                                checked={dept.departmentId === deptInput.departmentId}
+                                onChange={() => {
+                                    setDeptInput(dept)
+                                    applyDefaults(dept)
+                                    setChanged(true)
+                                }}
+                            />
+                            <div className={s(styles.checkmark, isDarkMode ? styles.checkmarkDark : {})} />
+                            <div
+                                className={s(styles.insideCheckmark, isDarkMode ? styles.insideCheckmarkAdminDark : {})}
+                            />
+                            <div className={styles.deptIconContainer}>
+                                {deptImages &&
+                                deptImages.filter(x => x.id === dept.departmentId) &&
+                                deptImages.filter(x => x.id === dept.departmentId)[0] ? (
+                                    <img
+                                        src={deptImages.filter(x => x.id === dept.departmentId)[0].img}
+                                        alt={''}
+                                        className={styles.deptIcon}
+                                    />
+                                ) : (
+                                    <img src={deptPlaceholder} alt={''} className={styles.deptIcon} />
+                                )}
+                            </div>
+                            <div className={styles.deptName}>{dept.departmentName}</div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            <div className={styles.line} />
+
+            {/* Tables */}
+            <div className={styles.tableContainer}>
+                <div className={styles.paddingTop}>
+                    <DetailPageTable
+                        headers={hardwareHeaders}
+                        rows={displayTable(hardwareRows, 'hw')}
+                        setRows={() => {}}
+                        style={styles.newRowThing}
+                        edit={true}
+                        remove={handleRemoveHardware}
+                        // sorting={false}
+                    />
+                </div>
+                {hardwareDropdown && (
+                    <AddDropdown
+                        title={'Assign new hardware'}
+                        content={hardwareDropdown}
+                        onSelect={handleAddHardware}
+                        className={s(styles.moveItRight, styles.dropdown3)}
+                    />
                 )}
 
-                <div className={styles.line} />
-
-                {/* Tables */}
-                <div className={styles.tableContainer}>
-                    <div className={styles.paddingTop}>
-                        <DetailPageTable
-                            headers={hardwareHeaders}
-                            rows={displayTable(hardwareRows, 'hw')}
-                            setRows={() => {}}
-                            style={styles.newRowThing}
-                            edit={true}
-                            remove={handleRemoveHardware}
-                            // sorting={false}
-                        />
-                    </div>
-                    {hardwareDropdown && (
-                        <AddDropdown
-                            title={'Assign new hardware'}
-                            content={hardwareDropdown}
-                            onSelect={handleAddHardware}
-                            className={s(styles.moveItRight, styles.dropdown3)}
-                        />
-                    )}
-
-                    <div className={styles.paddingTop}>
-                        <DetailPageTable
-                            headers={softwareHeaders}
-                            rows={displayTable(softwareRows, 'sw')}
-                            setRows={() => {}}
-                            style={styles.newRowThing}
-                            className={styles.paddingTop}
-                            edit={true}
-                            remove={handleRemoveSoftware}
-                            // sorting={false}
-                        />
-                        <div className={styles.ddc2}>
-                            {softwareDropdown && (
-                                <AddDropdown
-                                    title={'Assign new software'}
-                                    content={softwareDropdown}
-                                    onSelect={handleAddSoftware}
-                                    className={s(styles.moveItRight, styles.dropdown2)}
-                                />
-                            )}
-                        </div>
-                    </div>
-
-                    <div className={styles.paddingTop}>
-                        <DetailPageTable
-                            headers={licenseHeaders}
-                            rows={displayTable(licenseRows, 'l')}
-                            setRows={() => {}}
-                            style={styles.newRowThing}
-                            edit={true}
-                            remove={handleRemoveLicence}
-                        />
-                    </div>
-
-                    <div className={styles.ddc1}>
-                        {licenseDropdown && (
+                <div className={styles.paddingTop}>
+                    <DetailPageTable
+                        headers={softwareHeaders}
+                        rows={displayTable(softwareRows, 'sw')}
+                        setRows={() => {}}
+                        style={styles.newRowThing}
+                        className={styles.paddingTop}
+                        edit={true}
+                        remove={handleRemoveSoftware}
+                        // sorting={false}
+                    />
+                    <div className={styles.ddc2}>
+                        {softwareDropdown && (
                             <AddDropdown
-                                title={'Assign new license'}
-                                content={licenseDropdown}
-                                onSelect={handleAddLicense}
-                                className={s(styles.moveItRight, styles.dropdown1)}
+                                title={'Assign new software'}
+                                content={softwareDropdown}
+                                onSelect={handleAddSoftware}
+                                className={s(styles.moveItRight, styles.dropdown2)}
                             />
                         )}
                     </div>
                 </div>
 
-                <div className={s(styles.inputContainer, styles.descriptionContainer)}>
-                    <div className={styles.text}>Description</div>
-                    <textarea
-                        className={s(styles.input, styles.description)}
-                        value={descriptionInput ? descriptionInput : ''}
-                        onChange={e => {
-                            setChanged(true)
-                            setDescriptionInput(e.target.value)
-                        }}
+                <div className={styles.paddingTop}>
+                    <DetailPageTable
+                        headers={licenseHeaders}
+                        rows={displayTable(licenseRows, 'l')}
+                        setRows={() => {}}
+                        style={styles.newRowThing}
+                        edit={true}
+                        remove={handleRemoveLicence}
                     />
                 </div>
 
-                <div className={styles.submitContainer}>
-                    <Button text='Submit' icon='submit' onClick={handleSubmit} />
+                <div className={styles.ddc1}>
+                    {licenseDropdown && (
+                        <AddDropdown
+                            title={'Assign new license'}
+                            content={licenseDropdown}
+                            onSelect={handleAddLicense}
+                            className={s(styles.moveItRight, styles.dropdown1)}
+                        />
+                    )}
                 </div>
             </div>
-        </div>
+
+            <div className={s(styles.inputContainer, styles.descriptionContainer)}>
+                <div className={styles.text}>Description</div>
+                <textarea
+                    className={s(styles.input, styles.description)}
+                    value={descriptionInput ? descriptionInput : ''}
+                    onChange={e => {
+                        setChanged(true)
+                        setDescriptionInput(e.target.value)
+                    }}
+                />
+            </div>
+
+            <div className={styles.submitContainer}>
+                <Button text='Submit' icon='submit' onClick={handleSubmit} />
+            </div>
+        </DetailLayout>
     )
 }

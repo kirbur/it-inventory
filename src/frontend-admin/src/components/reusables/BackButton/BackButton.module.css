@@ -1,5 +1,6 @@
 .button {
     text-transform: capitalize;
+    width: fit-content;
 }
 
 .dark {
