@@ -291,7 +291,7 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
 
                 //after submitting go back to detail
                 history.push({
-                    pathname: `/programs/overview/${id}/inventory`,
+                    pathname: `/programs/overview/${postProgram.Program.ProgramName}/inventory`,
                     state: {prev: history.location},
                 })
             } else {
