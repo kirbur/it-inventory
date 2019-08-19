@@ -28,7 +28,6 @@ import styles from './ProgramOverviewEditPage.module.css'
 
 // Types
 import {ExpectedPluginType, ExpectedProgramType} from './ProgramOverviewPage'
-import {conditionalExpression} from '@babel/types'
 interface IProgramOverviewEditPageProps {
     history: History
     match: match<{id: string; archived: string}>
@@ -255,12 +254,11 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
         }
         if (id === 'new') {
             var msg: string = ''
-            var needsRenewalDate = postProgram.Program.MonthsPerRenewal ? true : false
+
             if (
                 postProgram.Program.numberOfPrograms >= 1 &&
                 postProgram.Program.ProgramName &&
-                postProgram.Program.DateBought &&
-                (needsRenewalDate && postProgram.Program.RenewalDate)
+                postProgram.Program.DateBought
             ) {
                 await axios
                     .post('/add/program', postProgram)
@@ -292,12 +290,14 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                     .catch((err: any) => console.error(err))
 
                 //after submitting go back to detail
-                history.push({pathname: `/programs`, state: {prev: history.location}})
+                history.push({
+                    pathname: `/programs/overview/${id}/inventory`,
+                    state: {prev: history.location},
+                })
             } else {
                 msg = 'Failed because: \n'
                 msg += postProgram.Program.numberOfPrograms < 1 ? 'Not enough copies,\n' : ''
                 msg += postProgram.Program.ProgramName === '' ? 'No name entered,\n' : ''
-                msg += needsRenewalDate && !postProgram.Program.RenewalDate ? 'No renewal date entered,\n' : ''
                 window.alert(msg)
             }
         } else {
@@ -570,8 +570,8 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             {/* <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} /> */}
                             {programInput && (
                                 <ProgramForm
-                                    state={programInput}
-                                    setState={setProgramInput}
+                                    state={programUpdateInput}
+                                    setState={setProgramUpdateInput}
                                     employeeDropdown={employeeDropdown}
                                     selectedEmployee={selectedEmployee}
                                     setSelectedEmployee={setSelectedEmployee}
