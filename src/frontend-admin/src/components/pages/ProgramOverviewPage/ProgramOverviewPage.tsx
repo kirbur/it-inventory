@@ -6,11 +6,9 @@ import {match} from 'react-router-dom'
 // Components
 import {DetailPageTable, ITableItem} from '../../reusables/DetailPageTable/DetailPageTable'
 import {Button} from '../../reusables/Button/Button'
-import {Group} from '../../reusables/Group/Group'
 import placeholder from '../../../content/Images/Placeholders/program-placeholder.png'
-import {BackButton} from '../../reusables/BackButton/BackButton'
 import {DetailImage} from '../../reusables/DetailImage/DetailImage'
-import {DetailCostText} from '../../reusables/DetailCostText/DetailCostText'
+import {DetailLayout} from '../DetailLayout/DetailLayout'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -202,82 +200,79 @@ export const ProgramOverviewPage: React.SFC<IProgramOverviewPageProps> = props =
         }
     }
 
-    return (
-        <div className={s(styles.progOverviewMain, isDarkMode ? styles.backgroundDark : {})}>
-            <div className={styles.columns}>
-                {/* column 1 */}
-                <div className={styles.firstColumn}>
-                    <BackButton history={history} className={styles.backButton} />
-                    <DetailImage src={img} />
-                    {programData.progFlatCost > 0 && (
-                        <DetailCostText
-                            costTexts={[{title: 'Paid', cost: `${formatMoney(programData.progFlatCost)}`}]}
-                        />
-                    )}
-                    {programData.isCostPerYear ? (
-                        <DetailCostText
-                            costTexts={[{title: 'Yearly', cost: `${formatMoney(programData.progCostPerYear)}`}]}
-                        />
-                    ) : (
-                        programData.progCostPerYear > 0 && (
-                            <DetailCostText
-                                costTexts={[
-                                    {title: 'Monthly', cost: `${formatMoney(programData.progCostPerYear / 12)}`},
-                                ]}
-                            />
-                        )
-                    )}
-                </div>
-                {/* column 2 */}
-                <div className={styles.secondColumn}>
-                    {isAdmin && (
-                        <Group direction='row' justify='start' className={styles.group}>
-                            {archived !== 'archived' && (
-                                <Button
-                                    text='Edit'
-                                    icon='edit'
-                                    onClick={() => {
-                                        history.push({
-                                            pathname: `/programs/edit/overview/${id}/${archived}`,
-                                            state: {prev: history.location},
-                                        })
-                                    }}
-                                    className={styles.editbutton}
-                                />
-                            )}
+    const getButtons = () => {
+        var buttons: any[] = []
 
-                            <Button
-                                text={archived === 'archived' ? 'Recover' : 'Archive'}
-                                icon='archive'
-                                onClick={handleArchive}
-                                className={styles.archivebutton}
-                            />
-                        </Group>
-                    )}
-                    <div className={styles.titleText}>
-                        <div className={s(styles.programName, isDarkMode ? styles.dark : {})}>{id}</div>
-                        <div className={styles.programText}>
-                            {programData.countProgInUse} / {programData.countProgOverall} Used
-                        </div>
-                        {programData.programlicenseKey && (
-                            <div className={styles.programText}>License Key: {programData.programlicenseKey}</div>
-                        )}
-                    </div>
-                    <DetailPageTable
-                        headers={programHeaders}
-                        rows={programRows}
-                        setRows={setProgramRows}
-                        className={styles.table}
-                    />
-                    <div className={styles.spaceBetweenTables} />
-                    <DetailPageTable
-                        headers={pluginHeaders}
-                        rows={pluginRows}
-                        setRows={setPluginRows}
-                        className={styles.table}
-                    />
+        if (archived !== 'archived') {
+            buttons.push(
+                <Button
+                    text='Edit'
+                    icon='edit'
+                    onClick={() => {
+                        history.push({
+                            pathname: `/programs/edit/overview/${id}/${archived}`,
+                            state: {prev: history.location},
+                        })
+                    }}
+                    className={styles.editbutton}
+                />
+            )
+        }
+
+        buttons.push(
+            <Button
+                text={archived === 'archived' ? 'Recover' : 'Archive'}
+                icon='archive'
+                onClick={handleArchive}
+                className={styles.archivebutton}
+            />
+        )
+        return buttons
+    }
+
+    const getCostTexts = () => {
+        var costTexts: any[] = []
+        if (programData.progFlatCost > 0) {
+            costTexts.push({title: 'Paid', cost: `${formatMoney(programData.progFlatCost)}`})
+        }
+        if (programData.isCostPerYear) {
+            costTexts.push({title: 'Yearly', cost: `${formatMoney(programData.progCostPerYear)}`})
+        } else if (programData.progCostPerYear > 0) {
+            costTexts.push({title: 'Monthly', cost: `${formatMoney(programData.progCostPerYear / 12)}`})
+        }
+
+        return costTexts
+    }
+
+    return (
+        <DetailLayout
+            history={history}
+            picture={<DetailImage src={img} />}
+            costTexts={getCostTexts()}
+            buttons={getButtons()}
+        >
+            <div className={styles.titleText}>
+                <div className={s(styles.programName, isDarkMode ? styles.dark : {})}>{id}</div>
+                <div className={styles.programText}>
+                    {programData.countProgInUse} / {programData.countProgOverall} Used
                 </div>
+                {programData.programlicenseKey && (
+                    <div className={styles.programText}>License Key: {programData.programlicenseKey}</div>
+                )}
             </div>
-        </div>
+            <DetailPageTable
+                headers={programHeaders}
+                rows={programRows}
+                setRows={setProgramRows}
+                className={styles.table}
+            />
+            <div className={styles.spaceBetweenTables} />
+            <DetailPageTable
+                headers={pluginHeaders}
+                rows={pluginRows}
+                setRows={setPluginRows}
+                className={styles.table}
+            />
+        </DetailLayout>
     )
 }

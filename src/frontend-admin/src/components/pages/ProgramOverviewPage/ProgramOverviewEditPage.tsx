@@ -12,6 +12,7 @@ import {PictureInput} from '../../reusables/PictureInput/PictureInput'
 import {ProgramForm, IProgramFormInputs} from '../../reusables/ProgramForm/ProgramForm'
 import {Checkbox} from '../../reusables/Checkbox/Checkbox'
 import {BackButton} from '../../reusables/BackButton/BackButton'
+import {DetailLayout} from '../DetailLayout/DetailLayout'
 
 // Utils
 import {formatDate} from '../../../utilities/FormatDate'
@@ -513,11 +514,10 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
     }
 
     return (
-        <div className={s(styles.progOverviewEditMain, isDarkMode ? styles.backgroundDark : {})}>
-            <div className={styles.columns}>
-                {/* column 1 */}
-                <div className={styles.firstColumn}>
-                    <BackButton history={history} className={styles.backButton} />
+        <DetailLayout
+            history={history}
+            picture={
+                <div>
                     <div className={styles.imgContainer}>
                         <PictureInput setImage={setImgInput} image={imgInput} />
                     </div>
@@ -525,99 +525,86 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                         <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />
                     </div>
                 </div>
-                {/* column 2 */}
-                <div className={styles.secondColumn}>
-                    <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Program Information</div>
+            }
+            costTexts={[]}
+            buttons={[]}
+        >
+            <div className={s(styles.title, isDarkMode ? styles.titleDark : {})}>Program Information</div>
 
-                    <Group justify={'between'} className={styles.row1Group}>
-                        <div className={id !== 'new' ? styles.nameInput : styles.nameInputWithEdit}>
-                            <div className={styles.inputText}>Program Name</div>
-                            <input
-                                type='text'
-                                className={styles.input}
-                                value={overviewInputs.name.value}
-                                onChange={e =>
-                                    setOverviewInputs({...overviewInputs, name: {value: e.target.value, changed: true}})
-                                }
-                            />
-                        </div>
+            <Group justify={'between'} className={styles.row1Group}>
+                <div className={id !== 'new' ? styles.nameInput : styles.nameInputWithEdit}>
+                    <div className={styles.inputText}>Program Name</div>
+                    <input
+                        type='text'
+                        className={styles.input}
+                        value={overviewInputs.name.value}
+                        onChange={e =>
+                            setOverviewInputs({...overviewInputs, name: {value: e.target.value, changed: true}})
+                        }
+                    />
+                </div>
 
-                        <Checkbox
-                            className={styles.checkBoxContainer}
-                            boxClassName={styles.checkBox}
-                            checked={overviewInputs.isLicense.value}
-                            title={'License'}
-                            onClick={() =>
-                                setOverviewInputs({
-                                    ...overviewInputs,
-                                    isLicense: {value: !overviewInputs.isLicense.value, changed: true},
-                                })
-                            }
+                <Checkbox
+                    className={styles.checkBoxContainer}
+                    boxClassName={styles.checkBox}
+                    checked={overviewInputs.isLicense.value}
+                    title={'License'}
+                    onClick={() =>
+                        setOverviewInputs({
+                            ...overviewInputs,
+                            isLicense: {value: !overviewInputs.isLicense.value, changed: true},
+                        })
+                    }
+                />
+
+                {id !== 'new' && (
+                    <Button
+                        className={styles.editButton}
+                        onClick={() => {
+                            setProgramForm({add: false, edit: !programForm.edit})
+                        }}
+                        text={`Edit All Copies`}
+                    />
+                )}
+            </Group>
+            {programForm.edit && (
+                <div className={styles.programForm}>
+                    {/* <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} /> */}
+                    {programInput && (
+                        <ProgramForm
+                            state={programUpdateInput}
+                            setState={setProgramUpdateInput}
+                            employeeDropdown={employeeDropdown}
+                            selectedEmployee={selectedEmployee}
+                            setSelectedEmployee={setSelectedEmployee}
                         />
-
-                        {id !== 'new' && (
-                            <Button
-                                className={styles.editButton}
-                                onClick={() => {
-                                    setProgramForm({add: false, edit: !programForm.edit})
-                                }}
-                                text={`Edit All Copies`}
-                            />
-                        )}
-                    </Group>
-                    {programForm.edit && (
-                        <div className={styles.programForm}>
-                            {/* <ProgramForm state={programUpdateInput} setState={setProgramUpdateInput} /> */}
-                            {programInput && (
-                                <ProgramForm
-                                    state={programUpdateInput}
-                                    setState={setProgramUpdateInput}
-                                    employeeDropdown={employeeDropdown}
-                                    selectedEmployee={selectedEmployee}
-                                    setSelectedEmployee={setSelectedEmployee}
-                                />
-                            )}
-                        </div>
                     )}
+                </div>
+            )}
 
-                    {id !== 'new' ? (
-                        <Group direction={'column'}>
-                            <div className={styles.programTableContainer}>
-                                <DetailPageTable
-                                    headers={programHeaders}
-                                    rows={displayCopies()}
-                                    setRows={setProgramRows}
-                                    edit={true}
-                                    remove={handleProgramRemove}
-                                    hover={false}
-                                />
-                            </div>
+            {id !== 'new' ? (
+                <Group direction={'column'}>
+                    <div className={styles.programTableContainer}>
+                        <DetailPageTable
+                            headers={programHeaders}
+                            rows={displayCopies()}
+                            setRows={setProgramRows}
+                            edit={true}
+                            remove={handleProgramRemove}
+                            hover={false}
+                        />
+                    </div>
 
-                            <Button
-                                className={styles.addContainer}
-                                icon='add'
-                                onClick={() => {
-                                    setProgramForm({edit: false, add: !programForm.add})
-                                }}
-                                textInside={false}
-                                text={`Add Copy(s)`}
-                            />
-                            {programForm.add && (
-                                <div className={styles.programForm}>
-                                    {/* <ProgramForm state={programInput} setState={setProgramInput} /> */}
-                                    {programInput && (
-                                        <ProgramForm
-                                            state={programInput}
-                                            setState={setProgramInput}
-                                            employeeDropdown={employeeDropdown}
-                                            selectedEmployee={selectedEmployee}
-                                            setSelectedEmployee={setSelectedEmployee}
-                                        />
-                                    )}
-                                </div>
-                            )}
-                        </Group>
-                    ) : (
+                    <Button
+                        className={styles.addContainer}
+                        icon='add'
+                        onClick={() => {
+                            setProgramForm({edit: false, add: !programForm.add})
+                        }}
+                        textInside={false}
+                        text={`Add Copy(s)`}
+                    />
+                    {programForm.add && (
                         <div className={styles.programForm}>
                             {/* <ProgramForm state={programInput} setState={setProgramInput} /> */}
                             {programInput && (
@@ -631,127 +618,138 @@ export const ProgramOverviewEditPage: React.SFC<IProgramOverviewEditPageProps> =
                             )}
                         </div>
                     )}
+                </Group>
+            ) : (
+                <div className={styles.programForm}>
+                    {/* <ProgramForm state={programInput} setState={setProgramInput} /> */}
+                    {programInput && (
+                        <ProgramForm
+                            state={programInput}
+                            setState={setProgramInput}
+                            employeeDropdown={employeeDropdown}
+                            selectedEmployee={selectedEmployee}
+                            setSelectedEmployee={setSelectedEmployee}
+                        />
+                    )}
+                </div>
+            )}
 
-                    {id !== 'new' && (
-                        <div className={styles.pluginTableContainer}>
-                            <DetailPageTable
-                                headers={pluginHeaders}
-                                rows={displayPlugins()}
-                                setRows={setPluginRows}
-                                edit={true}
-                                remove={handlePluginRemove}
-                                editRows={handlePluginEdit}
-                                hover={false}
-                            />
+            {id !== 'new' && (
+                <div className={styles.pluginTableContainer}>
+                    <DetailPageTable
+                        headers={pluginHeaders}
+                        rows={displayPlugins()}
+                        setRows={setPluginRows}
+                        edit={true}
+                        remove={handlePluginRemove}
+                        editRows={handlePluginEdit}
+                        hover={false}
+                    />
 
-                            <Button
-                                className={styles.addContainer}
-                                icon='add'
-                                onClick={() => {
-                                    setPluginForm(!pluginForm)
-                                    setPluginInput({...defaultPluginInfo})
-                                }}
-                                textInside={false}
-                                text={'Add Plugin'}
+                    <Button
+                        className={styles.addContainer}
+                        icon='add'
+                        onClick={() => {
+                            setPluginForm(!pluginForm)
+                            setPluginInput({...defaultPluginInfo})
+                        }}
+                        textInside={false}
+                        text={'Add Plugin'}
+                    />
+                </div>
+            )}
+            {pluginForm && id !== 'new' && (
+                <div className={styles.pluginForm}>
+                    <Group justify={'between'} className={styles.pluginGroup}>
+                        <div className={styles.pluginInputContainerRow1}>
+                            <div className={styles.inputText}>Plugin Name</div>
+                            <input
+                                type='text'
+                                className={s(styles.input, styles.pluginInputRow1)}
+                                value={pluginInput.name}
+                                onChange={e => setPluginInput({...pluginInput, name: e.target.value})}
                             />
                         </div>
-                    )}
-                    {pluginForm && id !== 'new' && (
-                        <div className={styles.pluginForm}>
-                            <Group justify={'between'} className={styles.pluginGroup}>
-                                <div className={styles.pluginInputContainerRow1}>
-                                    <div className={styles.inputText}>Plugin Name</div>
-                                    <input
-                                        type='text'
-                                        className={s(styles.input, styles.pluginInputRow1)}
-                                        value={pluginInput.name}
-                                        onChange={e => setPluginInput({...pluginInput, name: e.target.value})}
-                                    />
-                                </div>
 
-                                <div className={styles.dateInputContainer}>
-                                    <div className={styles.inputText}>Purchase Date</div>
-                                    <DatePicker
-                                        dateFormat='MM/dd/yyyy'
-                                        placeholderText={new Date().toDateString()}
-                                        selected={pluginInput.purchaseDate}
-                                        onChange={e => e && setPluginInput({...pluginInput, purchaseDate: e})}
-                                        className={s(styles.input, styles.dateInput)}
-                                    />
-                                </div>
-
-                                <div className={styles.dateInputContainer}>
-                                    <div className={styles.inputText}>Renewal Date</div>
-                                    <DatePicker
-                                        dateFormat='MM/dd/yyyy'
-                                        placeholderText={new Date().toDateString()}
-                                        selected={pluginInput.renewalDate}
-                                        onChange={e => e && setPluginInput({...pluginInput, renewalDate: e})}
-                                        className={s(styles.input, styles.dateInput)}
-                                    />
-                                </div>
-                            </Group>
-
-                            <Group justify={'between'} className={styles.pluginGroup}>
-                                <div className={styles.pluginInputContainerRow2}>
-                                    <div className={styles.inputText}>Flat Cost</div>
-                                    <input
-                                        type='number'
-                                        step='0.01'
-                                        className={s(styles.input, styles.pluginInputRow2)}
-                                        value={pluginInput.flatCost}
-                                        onChange={e =>
-                                            setPluginInput({...pluginInput, flatCost: parseFloat(e.target.value)})
-                                        }
-                                    />
-                                </div>
-
-                                <div className={styles.pluginInputContainerRow2}>
-                                    <div className={styles.inputText}>Recurring Cost</div>
-                                    <input
-                                        type='number'
-                                        step='0.01'
-                                        className={s(styles.input, styles.pluginInputRow2)}
-                                        value={pluginInput.recurringCost}
-                                        onChange={e =>
-                                            setPluginInput({
-                                                ...pluginInput,
-                                                recurringCost: parseFloat(e.target.value),
-                                            })
-                                        }
-                                    />
-                                </div>
-
-                                <div className={styles.pluginInputContainerRow2}>
-                                    <div className={styles.inputText}>Months Per Renewal</div>
-                                    <input
-                                        type='number'
-                                        className={s(styles.input, styles.pluginInputRow2)}
-                                        value={pluginInput.monthsPerRenewal}
-                                        onChange={e =>
-                                            setPluginInput({
-                                                ...pluginInput,
-                                                monthsPerRenewal: parseFloat(e.target.value),
-                                            })
-                                        }
-                                    />
-                                </div>
-                            </Group>
-                            <div className={styles.pluginGroup}>
-                                <div className={styles.inputText}>Description</div>
-                                <textarea
-                                    className={s(styles.input, styles.description)}
-                                    value={pluginInput.description}
-                                    onChange={e => setPluginInput({...pluginInput, description: e.target.value})}
-                                />
-                            </div>
+                        <div className={styles.dateInputContainer}>
+                            <div className={styles.inputText}>Purchase Date</div>
+                            <DatePicker
+                                dateFormat='MM/dd/yyyy'
+                                placeholderText={new Date().toDateString()}
+                                selected={pluginInput.purchaseDate}
+                                onChange={e => e && setPluginInput({...pluginInput, purchaseDate: e})}
+                                className={s(styles.input, styles.dateInput)}
+                            />
                         </div>
-                    )}
-                    <div className={styles.submitContainer}>
-                        <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />
+
+                        <div className={styles.dateInputContainer}>
+                            <div className={styles.inputText}>Renewal Date</div>
+                            <DatePicker
+                                dateFormat='MM/dd/yyyy'
+                                placeholderText={new Date().toDateString()}
+                                selected={pluginInput.renewalDate}
+                                onChange={e => e && setPluginInput({...pluginInput, renewalDate: e})}
+                                className={s(styles.input, styles.dateInput)}
+                            />
+                        </div>
+                    </Group>
+
+                    <Group justify={'between'} className={styles.pluginGroup}>
+                        <div className={styles.pluginInputContainerRow2}>
+                            <div className={styles.inputText}>Flat Cost</div>
+                            <input
+                                type='number'
+                                step='0.01'
+                                className={s(styles.input, styles.pluginInputRow2)}
+                                value={pluginInput.flatCost}
+                                onChange={e => setPluginInput({...pluginInput, flatCost: parseFloat(e.target.value)})}
+                            />
+                        </div>
+
+                        <div className={styles.pluginInputContainerRow2}>
+                            <div className={styles.inputText}>Recurring Cost</div>
+                            <input
+                                type='number'
+                                step='0.01'
+                                className={s(styles.input, styles.pluginInputRow2)}
+                                value={pluginInput.recurringCost}
+                                onChange={e =>
+                                    setPluginInput({
+                                        ...pluginInput,
+                                        recurringCost: parseFloat(e.target.value),
+                                    })
+                                }
+                            />
+                        </div>
+
+                        <div className={styles.pluginInputContainerRow2}>
+                            <div className={styles.inputText}>Months Per Renewal</div>
+                            <input
+                                type='number'
+                                className={s(styles.input, styles.pluginInputRow2)}
+                                value={pluginInput.monthsPerRenewal}
+                                onChange={e =>
+                                    setPluginInput({
+                                        ...pluginInput,
+                                        monthsPerRenewal: parseFloat(e.target.value),
+                                    })
+                                }
+                            />
+                        </div>
+                    </Group>
+                    <div className={styles.pluginGroup}>
+                        <div className={styles.inputText}>Description</div>
+                        <textarea
+                            className={s(styles.input, styles.description)}
+                            value={pluginInput.description}
+                            onChange={e => setPluginInput({...pluginInput, description: e.target.value})}
+                        />
                     </div>
                 </div>
+            )}
+            <div className={styles.submitContainer}>
+                <Button text='Submit' onClick={handleSubmit} className={styles.submitbutton} />
             </div>
-        </div>
+        </DetailLayout>
     )
 }
