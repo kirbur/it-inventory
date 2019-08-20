@@ -237,6 +237,7 @@ export const DepartmentDetailEditPage: React.SFC<IDepartmentDetailEditPageProps>
                         value={deptData.departmentName}
                         onChange={(e: any) => setDeptData({...deptData, departmentName: e.target.value})}
                         maxChars={50}
+                        className={styles.deptNameInput}
                     />
                 </div>
 
