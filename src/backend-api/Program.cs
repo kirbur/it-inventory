@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Cql.InventoryManagement.Web.StartupHelpers;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace backend_api
@@ -21,6 +22,15 @@ namespace backend_api
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    string configroot = Environment.GetEnvironmentVariable("CONFIGROOT");
+
+                    if (!string.IsNullOrWhiteSpace(configroot))
+                    {
+                        config.SetBasePath(configroot);
+                    }
+                })
                 .UseStartup<Startup>()
                 .UseWebRoot(GetWebRootDirectoryPath());
 
