@@ -314,13 +314,15 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
 
                 var toBeAdded: any[] = []
                 var unavailable: any[] = []
+                var tempHardwareDropdown = [...hardwareDropdown]
 
                 dept.defaultHardware.forEach(need => {
                     var needFulfilled = false
-                    hardwareDropdown.forEach(available => {
+                    tempHardwareDropdown.forEach(available => {
                         if (
                             !needFulfilled &&
-                            (available.name.search(need) >= 0 || available.id.search(need.toLowerCase()) >= 0)
+                            (available.name.toLowerCase().search(need.toLowerCase()) >= 0 ||
+                                available.id.search(need.toLowerCase()) >= 0)
                         ) {
                             var arr = [
                                 {value: available.name, id: available.id, sortBy: available.name},
@@ -340,16 +342,21 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             {value: '', id: -1, sortBy: -1},
                             {value: '', id: -1, sortBy: -1},
                         ])
+                    } else {
+                        //remove from the temp dropdown
+                        tempHardwareDropdown = [
+                            ...tempHardwareDropdown.filter(
+                                (option: any) => option.id !== toBeAdded[toBeAdded.length - 1][0].id
+                            ),
+                        ]
                     }
                 })
 
                 //add the hardware defaults
                 setHardwareRows({...hardwareRows, added: [...toBeAdded], assigned: [...unavailable]})
 
-                //remove the defaults from the dropdown
-                toBeAdded.map(added =>
-                    setHardwareDropdown([...hardwareDropdown.filter((option: any) => option.name !== added[0].value)])
-                )
+                //remove the used defaults from the dropdown
+                setHardwareDropdown(tempHardwareDropdown)
             }
 
             if (dept.defaultSoftware) {
@@ -368,11 +375,15 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 setSoftwareRows({...softwareRows, added: []})
                 toBeAdded = []
                 unavailable = []
+                var tempSoftwareDropdown = [...softwareDropdown]
 
                 dept.defaultSoftware.forEach(need => {
                     var needFulfilled = false
-                    softwareDropdown.forEach(available => {
-                        if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
+                    tempSoftwareDropdown.forEach(available => {
+                        if (
+                            !needFulfilled &&
+                            (available.name.toLowerCase().search(need.toLowerCase()) >= 0 || available.name === need)
+                        ) {
                             var arr = [
                                 {value: available.name, id: available.id, sortBy: available.name},
                                 {value: available.key, id: available.id, sortBy: available.key},
@@ -389,6 +400,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             {value: '', id: -1, sortBy: -1},
                             {value: '', id: -1, sortBy: -1},
                         ])
+                    } else {
+                        //remove from the temp dropdown
+                        tempSoftwareDropdown = [
+                            ...tempSoftwareDropdown.filter(
+                                (option: any) => option.id !== toBeAdded[toBeAdded.length - 1][0].id
+                            ),
+                        ]
                     }
                 })
 
@@ -396,9 +414,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 setSoftwareRows({...softwareRows, added: [...toBeAdded], assigned: [...unavailable]})
 
                 //remove the defaults from the dropdown
-                toBeAdded.map(added =>
-                    setSoftwareDropdown([...softwareDropdown.filter((option: any) => option.name !== added[0].value)])
-                )
+                setSoftwareDropdown([...tempSoftwareDropdown])
             }
 
             if (dept.defaultLicenses) {
@@ -417,11 +433,15 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 setLicenseRows({...licenseRows, added: []})
                 toBeAdded = []
                 unavailable = []
+                var tempLicenseDropdown = [...licenseDropdown]
 
                 dept.defaultLicenses.forEach(need => {
                     var needFulfilled = false
-                    licenseDropdown.forEach(available => {
-                        if (!needFulfilled && (available.name.search(need) >= 0 || available.name === need)) {
+                    tempLicenseDropdown.forEach(available => {
+                        if (
+                            !needFulfilled &&
+                            (available.name.toLowerCase().search(need.toLowerCase()) >= 0 || available.name === need)
+                        ) {
                             var arr = [
                                 {value: available.name, id: available.id, sortBy: available.name},
                                 {value: available.key, id: available.id, sortBy: available.key},
@@ -440,6 +460,13 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                             {value: '', id: -1, sortBy: -1},
                             {value: '', id: -1, sortBy: -1},
                         ])
+                    } else {
+                        //remove from the temp dropdown
+                        tempLicenseDropdown = [
+                            ...tempLicenseDropdown.filter(
+                                (option: any) => option.id !== toBeAdded[toBeAdded.length - 1][0].id
+                            ),
+                        ]
                     }
                 })
 
@@ -447,9 +474,7 @@ export const EmployeeDetailEditPage: React.SFC<IEmployeeDetailEditPageProps> = p
                 setLicenseRows({...licenseRows, added: [...toBeAdded], assigned: [...unavailable]})
 
                 //remove the defaults from the dropdown
-                toBeAdded.map(added =>
-                    setLicenseDropdown([...licenseDropdown.filter((option: any) => option.name !== added[0].value)])
-                )
+                setLicenseDropdown([...tempLicenseDropdown])
             }
         }
     }
