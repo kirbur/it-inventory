@@ -28,7 +28,7 @@ namespace backend_api
 
                     if (!string.IsNullOrWhiteSpace(configroot))
                     {
-                        config.SetBasePath(configroot);
+                        config.SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), configroot));
                     }
                 })
                 .UseStartup<Startup>()
